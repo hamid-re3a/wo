@@ -44,7 +44,6 @@ class PackageServiceProvider extends ServiceProvider
         $this->setupConfig();
 
         $this->registerHelpers();
-
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->routes_namespace)

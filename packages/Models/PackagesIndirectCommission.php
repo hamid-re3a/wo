@@ -1,0 +1,36 @@
+<?php
+
+namespace Packages\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+
+/**
+ * Packages\Models\PackagesIndirectCommission
+ *
+ * @property int $id
+ * @property int $package_id
+ * @property int $level
+ * @property int $percentage
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission query()
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission wherePercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+class PackagesIndirectCommission extends Model
+{
+    use HasFactory;
+
+    protected $table = 'packages_indirect_commissions';
+
+    protected $guarded = [];
+}

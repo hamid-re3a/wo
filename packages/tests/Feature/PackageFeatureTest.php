@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Packages\Feature;
+namespace Packages\tests\Feature;
 
 
 use Packages\tests\PackageTest;

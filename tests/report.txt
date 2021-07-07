@@ -1,3 +1,19 @@
-Package Feature (Packages\tests\Feature\PackageFeature)
- [x] Return package list green
+Admin (User\tests\Feature\Admin)
+ [x] Verify email user account green
+ [x] User deactivate activate
+
+User (User\tests\Feature\User)
+ [x] Register new user green
+ [x] Register new user not enough strong password
+ [x] Login when user has not activate its account
+ [x] Login user green
+ [x] Login user block
+ [x] User forgot password green
+ [x] User forgot password failed
+ [x] User forgot password not valid reset
+ [x] User reset forget password green
+ [x] User email verify green
+ [x] User email verify failed
+ [x] Login user block failed
+ [x] Ask for email otp green
 

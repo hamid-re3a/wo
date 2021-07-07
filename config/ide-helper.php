@@ -129,7 +129,7 @@ return [
 
     'model_locations' => [
         'app',
-        'packages'
+        'User',
     ],
 
     /*
@@ -143,21 +143,6 @@ return [
 
     'ignored_models' => [
 
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Models hooks
-    |--------------------------------------------------------------------------
-    |
-    | Define which hook classes you want to run for models to add custom information
-    |
-    | Hooks should implement Barryvdh\LaravelIdeHelper\Contracts\ModelHookInterface.
-    |
-    */
-
-    'model_hooks' => [
-        // App\Support\IdeHelper\MyModelHook::class
     ],
 
     /*
@@ -293,17 +278,5 @@ return [
     |
     */
     'additional_relation_types' => [],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Run artisan commands after migrations to generate model helpers
-    |--------------------------------------------------------------------------
-    |
-    | The specified commands should run after migrations are finished running.
-    |
-    */
-    'post_migrate' => [
-        // 'ide-helper:models --nowrite',
-    ],
 
 ];

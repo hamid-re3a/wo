@@ -1,62 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Introduction:
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This repository has **API Gateway** only.  It acts as a front microservice and consist of three main modules:
 
-## About Laravel
+ 1. Authentication & Authorization
+ 2. Users
+ 3. Request Router
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The API Gateway receives the request and forward to the corresponding service.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The API Gateway issues the token as the user logged-in and validate it  with the subsequent requests. It also check the authorization. If a user is requesting to access some resources, then API Gateway first ensure that the user has privileges to access the requested resources.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The user module is also a part of this microservices. The reason for this is to avoid more HTTP API calls and decrease network latency. 
+ 
+The first two modules names make sense and understandable.  But the Request Router might be a new term for some viewers especially for junior or mid-level developers. 
 
-## Learning Laravel
+Request Router module forward the received request to the corresponding service. When it receives a request, the API gateway consults a routing map that specifies which service to route the request to. All the configuration of this module is placed in `request_map.php` or `request_router.php` 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+The another two benefits of  Request Router are **simplicity** and **security**. 
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+ - **Simplicity**:  It hides all the backend complexity of the project from the frontend developers and make their lives very easier. Examples are:
+	 - How many microservices we have?
+	 - What are their IPs etc.
+	 - How they ensure security?
+	 - etc. 
+	 
+They don't need to configure anything extra in the frontend codebase. They should only know the IP or Domain of the API Gateway and send their request to it.
 
-## Laravel Sponsors
+ - **Security**: API Gateway help us to secure our internal infrastructure. Only the API Gateway can access the internal microservices servers. They are not accessible publicly. 
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+# Setup Guide
 
-### Premium Partners
+**Prerequisite:** These software must be installed on your machine to setup this microservice
+ 1. LAMP
+ 2. Git
+ 3. Composer
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
+> **Pro Tip!** Making PHP globally available will make your life much easier.
 
-## Contributing
+**Installation Steps:**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+ - **Download Code:** Clone the code
+ -  **Setup Code:** Run these commands in the same order inside the project directory
+	 - `composer install`
+	 - `php artisan optimize`
+	 - `php artisan scribe:generate`
+	 - `php -r "file_exists('.env') || copy('.env.example', '.env');"`
+	 - `php artisan key:generate`
+	 - `chmod -R 777 storage bootstrap/cache`
+	 
+ - **Basic Configuration**
+	 - Edit the .env file which is located in the root of the project
+	 - Update database credentials
+	 - Update mailing server credentials
+ 
+ > **Pro Tip!** Also make sure you run, `php artisan optimize` command again
+ > 
+ - **Setup Database**
+	 - Run `php artisan migrate:refresh --seed` to create database tables and seed them
+	 
+ - **Run Development Server**
+	 - Run `php artisan serve --port=3531` to start the development server.
 
-## Code of Conduct
+> **Pro Tip!** If you want to use different port, then make sure you also use the same port for scribe([API documentation package](https://github.com/knuckleswtf/scribe)).
+>
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+ - **Access APIs Documentation**
+	 - Hit [http://127.0.0.1:3541/docs](http://127.0.0.1:3541/docs) in your browser to access database documentation.
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Author
+*Name: Sajid Javed
+Email: work@sajidjaved.com
+Last Update: 03 July 2021*
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This document is generated through https://stackedit.io/

@@ -11,7 +11,8 @@ class PackageController extends Controller
     /**
      * All packages
      * @group
-     * Admin > User
+     * Public User > Packages
+     * @unathenticated
      */
     public function index()
     {

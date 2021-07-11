@@ -2,7 +2,7 @@
 
 namespace Packages\Http\Controllers\Front;
 
-use ApiGatewayUser\Http\Resources\PackageResource;
+use Packages\Http\Resources\PackageResource;
 use Illuminate\Routing\Controller;
 use Packages\Models\Package;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace ApiGatewayUser\Http\Resources;
+namespace Packages\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Packages\Models\CategoriesIndirectCommission;

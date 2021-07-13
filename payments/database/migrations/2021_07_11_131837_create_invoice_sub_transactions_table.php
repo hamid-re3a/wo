@@ -15,13 +15,15 @@ class CreateInvoicesTable extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id')->nullable();
-            $table->bigInteger('amount')->default(0);
+            $table->unsignedBigInteger('invoice_id')->nullable();
+            $table->foreign('invoice_id')->references('id')->on('invoices');
 
-            $table->json('payload')->nullable();
+            $table->string('driver')->nullable();
+
+            $table->string('transaction_id')->nullable();
+            $table->string('reference_id')->nullable();
 
             $table->boolean('is_paid')->default(false);
-
             $table->timestamps();
         });
     }

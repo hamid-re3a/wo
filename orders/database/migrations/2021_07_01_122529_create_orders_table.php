@@ -21,12 +21,15 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger('to_user_id')->nullable();
             $table->foreign('to_user_id')->references('id')->on('users');
 
-            $table->unsignedBigInteger('total_cost')->default(0);
-            $table->unsignedBigInteger('packages_cost')->default(0);
+            $table->unsignedBigInteger('total_cost_in_usd')->default(0);
+            $table->unsignedBigInteger('packages_cost_in_usd')->default(0);
+            $table->unsignedBigInteger('registration_fee_in_usd')->default(0);
 
-            $table->boolean('is_paid')->default(false);
-            $table->boolean('is_resolved')->default(false);
-            $table->boolean('is_commission_resolved')->default(false);
+            $table->timestamp('is_paid_at')->nullable();
+            $table->timestamp('is_resolved_at')->nullable();
+            $table->timestamp('is_refund_at')->nullable();
+            $table->timestamp('is_expired_at')->nullable();
+            $table->timestamp('is_commission_resolved_at')->nullable();
 
             $table->string('payment_type')->default(ORDER_PAYMENT_TYPE_WALLET);
             $table->string('payment_currency')->default(ORDER_PAYMENT_TYPE_WALLET);

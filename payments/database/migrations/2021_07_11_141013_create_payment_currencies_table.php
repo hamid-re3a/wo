@@ -16,7 +16,6 @@ class CreatePaymentCurrenciesTable extends Migration
         Schema::create('payment_currencies', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('legacy_id');
 
             $table->string('name');
             $table->boolean('is_active');

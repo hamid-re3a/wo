@@ -18,6 +18,9 @@ class CreateInvoicesTable extends Migration
             $table->unsignedBigInteger('order_id')->nullable();
             $table->bigInteger('amount')->default(0);
 
+            $table->string('transaction_id')->nullable();
+            $table->string('reference_id')->nullable();
+            
             $table->json('payload')->nullable();
 
             $table->boolean('is_paid')->default(false);

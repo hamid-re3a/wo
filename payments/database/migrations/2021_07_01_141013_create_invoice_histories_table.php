@@ -15,11 +15,12 @@ class CreateInvoiceHistoriesTable extends Migration
     {
         Schema::create('invoice_histories', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('order_id')->nullable();
             $table->bigInteger('amount')->default(0);
+
             $table->string('transaction_id')->nullable();
             $table->string('reference_id')->nullable();
-            $table->string('driver')->nullable();
 
             $table->json('payload')->nullable();
 

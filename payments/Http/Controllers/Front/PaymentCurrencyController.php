@@ -15,6 +15,5 @@ class PaymentCurrencyController extends Controller
     public function index()
     {
         return api()->success('payment.successfully-fetched-all-payment-currencies',PaymentCurrency::query()->get());
-
     }
 }

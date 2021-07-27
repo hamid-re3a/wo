@@ -15,46 +15,10 @@ interface PaymentsServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Id $request
-    * @return Payment
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function paymentById(Context $context, Id $request): Payment;
-
-    /**
-    * @param Context $context
     * @param Services\Order $request
-    * @return Payment
+    * @return Invoice
     *
     * @throws Grpc\Exception\InvokeException
     */
-    public function pay(Context $context, Services\Order $request): Payment;
-
-    /**
-    * @param Context $context
-    * @param Services\Order $request
-    * @return Payment
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function rollbackPay(Context $context, Services\Order $request): Payment;
-
-    /**
-    * @param Context $context
-    * @param Services\Order $request
-    * @return Payment
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function refund(Context $context, Services\Order $request): Payment;
-
-    /**
-    * @param Context $context
-    * @param Id $request
-    * @return Payments
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function paymentsByUserId(Context $context, Id $request): Payments;
+    public function pay(Context $context, Services\Order $request): Invoice;
 }

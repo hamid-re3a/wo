@@ -12,17 +12,17 @@ class GrpcMainService
     {
         $capsule = new Capsule;
 
+
         $capsule->addConnection([
-            'driver' => 'mysql',
-            'host' => 'mysql',
-            'database' => 'wo_r2f_back',
-            'username' => 'root',
-            'password' => '123456',
+            'driver' => env('DB_CONNECTION'),
+            'host' => env('DB_HOST'),
+            'database' => env('DB_DATABASE'),
+            'username' => env('DB_USERNAME'),
+            'password' => env('DB_PASSWORD'),
         ]);
         $capsule->setAsGlobal();
 
     // Setup the Eloquent ORM.
-        $capsule->bootEloquent();
         $capsule->bootEloquent();
     }
 }

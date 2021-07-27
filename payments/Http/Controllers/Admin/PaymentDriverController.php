@@ -1,6 +1,6 @@
 <?php
 
-namespace Packages\Http\Controllers\Admin;
+namespace Payments\Http\Controllers\Admin;
 
 use Illuminate\Routing\Controller;
 use Payments\Http\Requests\PaymentCurrency\StorePaymentCurrencyRequest;

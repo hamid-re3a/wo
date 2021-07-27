@@ -18,25 +18,25 @@ class Invoice extends \Google\Protobuf\Internal\Message
      */
     protected $order_id = 0;
     /**
-     * Generated from protobuf field <code>int64 amount = 2;</code>
+     * Generated from protobuf field <code>double amount = 2;</code>
      */
-    protected $amount = 0;
+    protected $amount = 0.0;
     /**
      * Generated from protobuf field <code>string transaction_id = 3;</code>
      */
     protected $transaction_id = '';
     /**
-     * Generated from protobuf field <code>string reference_id = 4;</code>
+     * Generated from protobuf field <code>string checkout_link = 4;</code>
      */
-    protected $reference_id = '';
+    protected $checkout_link = '';
     /**
-     * Generated from protobuf field <code>string payload = 5;</code>
+     * Generated from protobuf field <code>string status = 5;</code>
      */
-    protected $payload = '';
+    protected $status = '';
     /**
-     * Generated from protobuf field <code>bool is_paid = 6;</code>
+     * Generated from protobuf field <code>string additional_status = 6;</code>
      */
-    protected $is_paid = false;
+    protected $additional_status = '';
     /**
      * Generated from protobuf field <code>.google.protobuf.Timestamp deleted_at = 7;</code>
      */
@@ -57,11 +57,11 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int|string $order_id
-     *     @type int|string $amount
+     *     @type float $amount
      *     @type string $transaction_id
-     *     @type string $reference_id
-     *     @type string $payload
-     *     @type bool $is_paid
+     *     @type string $checkout_link
+     *     @type string $status
+     *     @type string $additional_status
      *     @type \Google\Protobuf\Timestamp $deleted_at
      *     @type \Google\Protobuf\Timestamp $created_at
      *     @type \Google\Protobuf\Timestamp $updated_at
@@ -95,8 +95,8 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 amount = 2;</code>
-     * @return int|string
+     * Generated from protobuf field <code>double amount = 2;</code>
+     * @return float
      */
     public function getAmount()
     {
@@ -104,13 +104,13 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 amount = 2;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>double amount = 2;</code>
+     * @param float $var
      * @return $this
      */
     public function setAmount($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkDouble($var);
         $this->amount = $var;
 
         return $this;
@@ -139,67 +139,67 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string reference_id = 4;</code>
+     * Generated from protobuf field <code>string checkout_link = 4;</code>
      * @return string
      */
-    public function getReferenceId()
+    public function getCheckoutLink()
     {
-        return $this->reference_id;
+        return $this->checkout_link;
     }
 
     /**
-     * Generated from protobuf field <code>string reference_id = 4;</code>
+     * Generated from protobuf field <code>string checkout_link = 4;</code>
      * @param string $var
      * @return $this
      */
-    public function setReferenceId($var)
+    public function setCheckoutLink($var)
     {
         GPBUtil::checkString($var, True);
-        $this->reference_id = $var;
+        $this->checkout_link = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>string payload = 5;</code>
+     * Generated from protobuf field <code>string status = 5;</code>
      * @return string
      */
-    public function getPayload()
+    public function getStatus()
     {
-        return $this->payload;
+        return $this->status;
     }
 
     /**
-     * Generated from protobuf field <code>string payload = 5;</code>
+     * Generated from protobuf field <code>string status = 5;</code>
      * @param string $var
      * @return $this
      */
-    public function setPayload($var)
+    public function setStatus($var)
     {
         GPBUtil::checkString($var, True);
-        $this->payload = $var;
+        $this->status = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>bool is_paid = 6;</code>
-     * @return bool
+     * Generated from protobuf field <code>string additional_status = 6;</code>
+     * @return string
      */
-    public function getIsPaid()
+    public function getAdditionalStatus()
     {
-        return $this->is_paid;
+        return $this->additional_status;
     }
 
     /**
-     * Generated from protobuf field <code>bool is_paid = 6;</code>
-     * @param bool $var
+     * Generated from protobuf field <code>string additional_status = 6;</code>
+     * @param string $var
      * @return $this
      */
-    public function setIsPaid($var)
+    public function setAdditionalStatus($var)
     {
-        GPBUtil::checkBool($var);
-        $this->is_paid = $var;
+        GPBUtil::checkString($var, True);
+        $this->additional_status = $var;
 
         return $this;
     }

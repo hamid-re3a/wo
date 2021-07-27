@@ -1,6 +1,6 @@
 <?php
 
-namespace Packages\Http\Controllers\Front;
+namespace Payments\Http\Controllers\Front;
 
 use Illuminate\Routing\Controller;
 use Payments\Models\PaymentCurrency;

@@ -1,53 +1,56 @@
 <?php
 
-namespace App\Services\Payment;
+namespace Payments\Services;
 
+use Illuminate\Support\Facades\Http;
 use Mix\Grpc\Context;
 use Orders\Services;
-use Payments\Services\GrpcMainService;
-use Payments\Services\Id;
-use Payments\Services\Payments;
-use Payments\Services\PaymentsServiceInterface;
 
 class PaymentService extends GrpcMainService implements PaymentsServiceInterface
 {
     /**
      * @inheritDoc
      */
-    public function paymentById(Context $context, Id $request): \Payments\Services\Payment
+    public function pay(Context $context, Services\Order $request): Invoice
     {
-        // TODO: Implement paymentById() method.
+
+        $invoice = new Invoice();
+        switch ($request->getPaymentType()) {
+            case 'gate-way':
+                return $this->payFromGateway($request);
+            default:
+                break;
+        }
+
+        return $invoice;
+
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function pay(Context $context, Services\Order $request): \Payments\Services\Payment
+    private function payFromGateway(Services\Order $request): Invoice
     {
-        // TODO: Implement pay() method.
+        $invoice = new Invoice();
+        if ($request->getPaymentDriver() == 'btc-pay-server') {
+
+            $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
+                ->post(
+                    config('payment.btc-pay-server-domain') .
+                    'api/v1/stores/' . config('payment.btc-pay-server-store-id') . '/invoices',
+                    [
+                        'amount' => $request->getTotalCostInUsd(),
+                        'currency' => $request->getPaymentCurrency()
+                    ]
+                );
+
+            $invoice->setOrderId($request->getId());
+            $invoice->setAmount($response->json()['amount']);
+            $invoice->setTransactionId($response->json()['id']);
+            $invoice->setCheckoutLink($response->json()['checkoutLink']);
+            $invoice->setStatus($response->json()['status']);
+            $invoice->setAdditionalStatus($response->json()['additionalStatus']);
+
+        }
+        return $invoice;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function rollbackPay(Context $context, Services\Order $request): \Payments\Services\Payment
-    {
-        // TODO: Implement rollbackPay() method.
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function refund(Context $context, Services\Order $request): \Payments\Services\Payment
-    {
-        // TODO: Implement refund() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function paymentsByUserId(Context $context, Id $request): Payments
-    {
-        // TODO: Implement paymentsByUserId() method.
-    }
 }

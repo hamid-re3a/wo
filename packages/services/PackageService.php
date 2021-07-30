@@ -7,7 +7,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Mix\Grpc\Context;
 use Packages\PackageConfigure;
 
-class PackageService extends GrpcMainService implements PackagesServiceInterface
+class PackageService implements PackagesServiceInterface
 {
     /**
      * @inheritDoc

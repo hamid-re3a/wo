@@ -26,37 +26,37 @@ class Order extends \Google\Protobuf\Internal\Message
      */
     protected $to_user_id = 0;
     /**
-     * Generated from protobuf field <code>int64 total_cost_in_usd = 4;</code>
+     * Generated from protobuf field <code>double total_cost_in_usd = 4;</code>
      */
-    protected $total_cost_in_usd = 0;
+    protected $total_cost_in_usd = 0.0;
     /**
-     * Generated from protobuf field <code>int64 packages_cost_in_usd = 5;</code>
+     * Generated from protobuf field <code>double packages_cost_in_usd = 5;</code>
      */
-    protected $packages_cost_in_usd = 0;
+    protected $packages_cost_in_usd = 0.0;
     /**
-     * Generated from protobuf field <code>int64 registration_fee_in_usd = 6;</code>
+     * Generated from protobuf field <code>double registration_fee_in_usd = 6;</code>
      */
-    protected $registration_fee_in_usd = 0;
+    protected $registration_fee_in_usd = 0.0;
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_paid_at = 7;</code>
+     * Generated from protobuf field <code>string is_paid_at = 7;</code>
      */
-    protected $is_paid_at = null;
+    protected $is_paid_at = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_resolved_at = 8;</code>
+     * Generated from protobuf field <code>string is_resolved_at = 8;</code>
      */
-    protected $is_resolved_at = null;
+    protected $is_resolved_at = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_refund_at = 9;</code>
+     * Generated from protobuf field <code>string is_refund_at = 9;</code>
      */
-    protected $is_refund_at = null;
+    protected $is_refund_at = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_expired_at = 10;</code>
+     * Generated from protobuf field <code>string is_expired_at = 10;</code>
      */
-    protected $is_expired_at = null;
+    protected $is_expired_at = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_commission_resolved_at = 11;</code>
+     * Generated from protobuf field <code>string is_commission_resolved_at = 11;</code>
      */
-    protected $is_commission_resolved_at = null;
+    protected $is_commission_resolved_at = '';
     /**
      * Generated from protobuf field <code>string payment_type = 12;</code>
      */
@@ -74,17 +74,25 @@ class Order extends \Google\Protobuf\Internal\Message
      */
     protected $plan = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp deleted_at = 16;</code>
+     * Generated from protobuf field <code>string deleted_at = 16;</code>
      */
-    protected $deleted_at = null;
+    protected $deleted_at = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp created_at = 17;</code>
+     * Generated from protobuf field <code>string created_at = 17;</code>
      */
-    protected $created_at = null;
+    protected $created_at = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp updated_at = 18;</code>
+     * Generated from protobuf field <code>string updated_at = 18;</code>
      */
-    protected $updated_at = null;
+    protected $updated_at = '';
+    /**
+     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
+     */
+    protected $user = null;
+    /**
+     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
+     */
+    protected $to_user = null;
 
     /**
      * Constructor.
@@ -95,21 +103,23 @@ class Order extends \Google\Protobuf\Internal\Message
      *     @type int|string $id
      *     @type int|string $user_id
      *     @type int|string $to_user_id
-     *     @type int|string $total_cost_in_usd
-     *     @type int|string $packages_cost_in_usd
-     *     @type int|string $registration_fee_in_usd
-     *     @type \Google\Protobuf\Timestamp $is_paid_at
-     *     @type \Google\Protobuf\Timestamp $is_resolved_at
-     *     @type \Google\Protobuf\Timestamp $is_refund_at
-     *     @type \Google\Protobuf\Timestamp $is_expired_at
-     *     @type \Google\Protobuf\Timestamp $is_commission_resolved_at
+     *     @type float $total_cost_in_usd
+     *     @type float $packages_cost_in_usd
+     *     @type float $registration_fee_in_usd
+     *     @type string $is_paid_at
+     *     @type string $is_resolved_at
+     *     @type string $is_refund_at
+     *     @type string $is_expired_at
+     *     @type string $is_commission_resolved_at
      *     @type string $payment_type
      *     @type string $payment_currency
      *     @type string $payment_driver
      *     @type string $plan
-     *     @type \Google\Protobuf\Timestamp $deleted_at
-     *     @type \Google\Protobuf\Timestamp $created_at
-     *     @type \Google\Protobuf\Timestamp $updated_at
+     *     @type string $deleted_at
+     *     @type string $created_at
+     *     @type string $updated_at
+     *     @type \Orders\Services\User $user
+     *     @type \Orders\Services\User $to_user
      * }
      */
     public function __construct($data = NULL) {
@@ -184,8 +194,8 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 total_cost_in_usd = 4;</code>
-     * @return int|string
+     * Generated from protobuf field <code>double total_cost_in_usd = 4;</code>
+     * @return float
      */
     public function getTotalCostInUsd()
     {
@@ -193,21 +203,21 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 total_cost_in_usd = 4;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>double total_cost_in_usd = 4;</code>
+     * @param float $var
      * @return $this
      */
     public function setTotalCostInUsd($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkDouble($var);
         $this->total_cost_in_usd = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>int64 packages_cost_in_usd = 5;</code>
-     * @return int|string
+     * Generated from protobuf field <code>double packages_cost_in_usd = 5;</code>
+     * @return float
      */
     public function getPackagesCostInUsd()
     {
@@ -215,21 +225,21 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 packages_cost_in_usd = 5;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>double packages_cost_in_usd = 5;</code>
+     * @param float $var
      * @return $this
      */
     public function setPackagesCostInUsd($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkDouble($var);
         $this->packages_cost_in_usd = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>int64 registration_fee_in_usd = 6;</code>
-     * @return int|string
+     * Generated from protobuf field <code>double registration_fee_in_usd = 6;</code>
+     * @return float
      */
     public function getRegistrationFeeInUsd()
     {
@@ -237,173 +247,123 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 registration_fee_in_usd = 6;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>double registration_fee_in_usd = 6;</code>
+     * @param float $var
      * @return $this
      */
     public function setRegistrationFeeInUsd($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkDouble($var);
         $this->registration_fee_in_usd = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_paid_at = 7;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string is_paid_at = 7;</code>
+     * @return string
      */
     public function getIsPaidAt()
     {
         return $this->is_paid_at;
     }
 
-    public function hasIsPaidAt()
-    {
-        return isset($this->is_paid_at);
-    }
-
-    public function clearIsPaidAt()
-    {
-        unset($this->is_paid_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_paid_at = 7;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string is_paid_at = 7;</code>
+     * @param string $var
      * @return $this
      */
     public function setIsPaidAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->is_paid_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_resolved_at = 8;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string is_resolved_at = 8;</code>
+     * @return string
      */
     public function getIsResolvedAt()
     {
         return $this->is_resolved_at;
     }
 
-    public function hasIsResolvedAt()
-    {
-        return isset($this->is_resolved_at);
-    }
-
-    public function clearIsResolvedAt()
-    {
-        unset($this->is_resolved_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_resolved_at = 8;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string is_resolved_at = 8;</code>
+     * @param string $var
      * @return $this
      */
     public function setIsResolvedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->is_resolved_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_refund_at = 9;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string is_refund_at = 9;</code>
+     * @return string
      */
     public function getIsRefundAt()
     {
         return $this->is_refund_at;
     }
 
-    public function hasIsRefundAt()
-    {
-        return isset($this->is_refund_at);
-    }
-
-    public function clearIsRefundAt()
-    {
-        unset($this->is_refund_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_refund_at = 9;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string is_refund_at = 9;</code>
+     * @param string $var
      * @return $this
      */
     public function setIsRefundAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->is_refund_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_expired_at = 10;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string is_expired_at = 10;</code>
+     * @return string
      */
     public function getIsExpiredAt()
     {
         return $this->is_expired_at;
     }
 
-    public function hasIsExpiredAt()
-    {
-        return isset($this->is_expired_at);
-    }
-
-    public function clearIsExpiredAt()
-    {
-        unset($this->is_expired_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_expired_at = 10;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string is_expired_at = 10;</code>
+     * @param string $var
      * @return $this
      */
     public function setIsExpiredAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->is_expired_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_commission_resolved_at = 11;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string is_commission_resolved_at = 11;</code>
+     * @return string
      */
     public function getIsCommissionResolvedAt()
     {
         return $this->is_commission_resolved_at;
     }
 
-    public function hasIsCommissionResolvedAt()
-    {
-        return isset($this->is_commission_resolved_at);
-    }
-
-    public function clearIsCommissionResolvedAt()
-    {
-        unset($this->is_commission_resolved_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp is_commission_resolved_at = 11;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string is_commission_resolved_at = 11;</code>
+     * @param string $var
      * @return $this
      */
     public function setIsCommissionResolvedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->is_commission_resolved_at = $var;
 
         return $this;
@@ -498,97 +458,131 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp deleted_at = 16;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string deleted_at = 16;</code>
+     * @return string
      */
     public function getDeletedAt()
     {
         return $this->deleted_at;
     }
 
-    public function hasDeletedAt()
-    {
-        return isset($this->deleted_at);
-    }
-
-    public function clearDeletedAt()
-    {
-        unset($this->deleted_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp deleted_at = 16;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string deleted_at = 16;</code>
+     * @param string $var
      * @return $this
      */
     public function setDeletedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->deleted_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp created_at = 17;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string created_at = 17;</code>
+     * @return string
      */
     public function getCreatedAt()
     {
         return $this->created_at;
     }
 
-    public function hasCreatedAt()
-    {
-        return isset($this->created_at);
-    }
-
-    public function clearCreatedAt()
-    {
-        unset($this->created_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp created_at = 17;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string created_at = 17;</code>
+     * @param string $var
      * @return $this
      */
     public function setCreatedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->created_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp updated_at = 18;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string updated_at = 18;</code>
+     * @return string
      */
     public function getUpdatedAt()
     {
         return $this->updated_at;
     }
 
-    public function hasUpdatedAt()
-    {
-        return isset($this->updated_at);
-    }
-
-    public function clearUpdatedAt()
-    {
-        unset($this->updated_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp updated_at = 18;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string updated_at = 18;</code>
+     * @param string $var
      * @return $this
      */
     public function setUpdatedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->updated_at = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
+     * @return \Orders\Services\User|null
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function hasUser()
+    {
+        return isset($this->user);
+    }
+
+    public function clearUser()
+    {
+        unset($this->user);
+    }
+
+    /**
+     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
+     * @param \Orders\Services\User $var
+     * @return $this
+     */
+    public function setUser($var)
+    {
+        GPBUtil::checkMessage($var, \Orders\Services\User::class);
+        $this->user = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
+     * @return \Orders\Services\User|null
+     */
+    public function getToUser()
+    {
+        return $this->to_user;
+    }
+
+    public function hasToUser()
+    {
+        return isset($this->to_user);
+    }
+
+    public function clearToUser()
+    {
+        unset($this->to_user);
+    }
+
+    /**
+     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
+     * @param \Orders\Services\User $var
+     * @return $this
+     */
+    public function setToUser($var)
+    {
+        GPBUtil::checkMessage($var, \Orders\Services\User::class);
+        $this->to_user = $var;
 
         return $this;
     }

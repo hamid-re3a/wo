@@ -15,6 +15,15 @@ interface PaymentsServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
+    * @param Id $request
+    * @return Invoice
+    *
+    * @throws Grpc\Exception\InvokeException
+    */
+    public function getInvoiceById(Context $context, Id $request): Invoice;
+
+    /**
+    * @param Context $context
     * @param Services\Order $request
     * @return Invoice
     *

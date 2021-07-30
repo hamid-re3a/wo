@@ -16,10 +16,10 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('order_users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('order_users');
 
             $table->unsignedBigInteger('to_user_id')->nullable();
-            $table->foreign('to_user_id')->references('id')->on('users');
+            $table->foreign('to_user_id')->references('id')->on('order_users');
 
             $table->unsignedBigInteger('total_cost_in_usd')->default(0);
             $table->unsignedBigInteger('packages_cost_in_usd')->default(0);
@@ -31,8 +31,8 @@ class CreateOrdersTable extends Migration
             $table->timestamp('is_expired_at')->nullable();
             $table->timestamp('is_commission_resolved_at')->nullable();
 
-            $table->string('payment_type')->default(ORDER_PAYMENT_TYPE_WALLET);
-            $table->string('payment_currency')->default(ORDER_PAYMENT_TYPE_WALLET);
+            $table->string('payment_type');
+            $table->string('payment_currency');
             $table->string('payment_driver')->nullable()->default(null);
 
             $table->string('plan')->default(ORDER_PLAN_DEFAULT);

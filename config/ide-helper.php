@@ -129,7 +129,9 @@ return [
 
     'model_locations' => [
         'app',
-        'User',
+        'orders',
+        'packages',
+        'payments',
     ],
 
     /*

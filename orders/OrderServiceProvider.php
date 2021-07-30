@@ -46,7 +46,7 @@ class OrderServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        Route::prefix('v1')
+        Route::prefix('v1/orders')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');

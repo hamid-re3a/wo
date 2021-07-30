@@ -5,7 +5,6 @@ namespace Payments\Http\Controllers\Front;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Payments\Jobs\WebhookJob;
-use Payments\Models\PaymentCurrency;
 
 class WebhookController extends Controller
 {

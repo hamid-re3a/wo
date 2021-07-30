@@ -15,6 +15,12 @@ class CreateOrderUsersTable extends Migration
     {
         Schema::create('order_users', function (Blueprint $table) {
             $table->id();
+
+            $table->string('first_name',100)->nullable();
+            $table->string('last_name',100)->nullable();
+            $table->string('username',100)->nullable();
+            $table->string('email',100)->nullable();
+
             $table->softDeletes();
             $table->timestamps();
         });

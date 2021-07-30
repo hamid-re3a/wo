@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Requests\Front\Order;
+namespace Orders\Http\Requests\Front\Order;
 
-use App\Rules\PersianCharacterRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderRequest extends FormRequest
@@ -25,15 +24,15 @@ class OrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'items' => 'required|array',
+//            'items' => 'required|array',
 //            'items.*.id' => 'exists:packages,id',
 //            'items.*.qty' => 'required|numeric|min:1',
-            'to_user_id' => 'nullable|exists:order_users,id',
-            'plan' => array('in:'.implode(',',ORDER_PLANS)),
+//            'to_user_id' => 'nullable|exists:order_users,id',
+//            'plan' => array('in:'.implode(',',ORDER_PLANS)),
 
-            'payment_type' => array('required','in:'.implode(',',ORDER_PAYMENT_TYPES)),
-            'payment_driver' => array('sometimes','in:'.implode(',',ORDER_PAYMENT_DRIVERS)),
-            'payment_currency' => array('sometimes','in:'.implode(',',ORDER_PAYMENT_CURRENCIES)),
+//            'payment_type' => array('required','in:'.implode(',',ORDER_PAYMENT_TYPES)),
+//            'payment_driver' => array('sometimes','in:'.implode(',',ORDER_PAYMENT_DRIVERS)),
+//            'payment_currency' => array('sometimes','in:'.implode(',',ORDER_PAYMENT_CURRENCIES)),
 
         ];
     }

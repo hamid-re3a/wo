@@ -177,6 +177,7 @@ return [
         \ResponseTransformer\ResponseTransformerServiceProvider::class,
         \Packages\PackageServiceProvider::class,
         \Payments\PaymentServiceProvider::class,
+        \Orders\OrderServiceProvider::class,
 
     ],
 

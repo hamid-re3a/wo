@@ -38,17 +38,25 @@ class Invoice extends \Google\Protobuf\Internal\Message
      */
     protected $additional_status = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp deleted_at = 7;</code>
+     * Generated from protobuf field <code>double paid_amount = 7;</code>
      */
-    protected $deleted_at = null;
+    protected $paid_amount = 0.0;
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp created_at = 8;</code>
+     * Generated from protobuf field <code>string deleted_at = 8;</code>
      */
-    protected $created_at = null;
+    protected $deleted_at = '';
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp updated_at = 9;</code>
+     * Generated from protobuf field <code>string created_at = 9;</code>
      */
-    protected $updated_at = null;
+    protected $created_at = '';
+    /**
+     * Generated from protobuf field <code>string updated_at = 10;</code>
+     */
+    protected $updated_at = '';
+    /**
+     * Generated from protobuf field <code>.orders.services.Order order = 11;</code>
+     */
+    protected $order = null;
 
     /**
      * Constructor.
@@ -62,9 +70,11 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     @type string $checkout_link
      *     @type string $status
      *     @type string $additional_status
-     *     @type \Google\Protobuf\Timestamp $deleted_at
-     *     @type \Google\Protobuf\Timestamp $created_at
-     *     @type \Google\Protobuf\Timestamp $updated_at
+     *     @type float $paid_amount
+     *     @type string $deleted_at
+     *     @type string $created_at
+     *     @type string $updated_at
+     *     @type \Orders\Services\Order $order
      * }
      */
     public function __construct($data = NULL) {
@@ -205,97 +215,121 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp deleted_at = 7;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>double paid_amount = 7;</code>
+     * @return float
+     */
+    public function getPaidAmount()
+    {
+        return $this->paid_amount;
+    }
+
+    /**
+     * Generated from protobuf field <code>double paid_amount = 7;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setPaidAmount($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->paid_amount = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string deleted_at = 8;</code>
+     * @return string
      */
     public function getDeletedAt()
     {
         return $this->deleted_at;
     }
 
-    public function hasDeletedAt()
-    {
-        return isset($this->deleted_at);
-    }
-
-    public function clearDeletedAt()
-    {
-        unset($this->deleted_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp deleted_at = 7;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string deleted_at = 8;</code>
+     * @param string $var
      * @return $this
      */
     public function setDeletedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->deleted_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp created_at = 8;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string created_at = 9;</code>
+     * @return string
      */
     public function getCreatedAt()
     {
         return $this->created_at;
     }
 
-    public function hasCreatedAt()
-    {
-        return isset($this->created_at);
-    }
-
-    public function clearCreatedAt()
-    {
-        unset($this->created_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp created_at = 8;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string created_at = 9;</code>
+     * @param string $var
      * @return $this
      */
     public function setCreatedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->created_at = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp updated_at = 9;</code>
-     * @return \Google\Protobuf\Timestamp|null
+     * Generated from protobuf field <code>string updated_at = 10;</code>
+     * @return string
      */
     public function getUpdatedAt()
     {
         return $this->updated_at;
     }
 
-    public function hasUpdatedAt()
-    {
-        return isset($this->updated_at);
-    }
-
-    public function clearUpdatedAt()
-    {
-        unset($this->updated_at);
-    }
-
     /**
-     * Generated from protobuf field <code>.google.protobuf.Timestamp updated_at = 9;</code>
-     * @param \Google\Protobuf\Timestamp $var
+     * Generated from protobuf field <code>string updated_at = 10;</code>
+     * @param string $var
      * @return $this
      */
     public function setUpdatedAt($var)
     {
-        GPBUtil::checkMessage($var, \Google\Protobuf\Timestamp::class);
+        GPBUtil::checkString($var, True);
         $this->updated_at = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.orders.services.Order order = 11;</code>
+     * @return \Orders\Services\Order|null
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    public function hasOrder()
+    {
+        return isset($this->order);
+    }
+
+    public function clearOrder()
+    {
+        unset($this->order);
+    }
+
+    /**
+     * Generated from protobuf field <code>.orders.services.Order order = 11;</code>
+     * @param \Orders\Services\Order $var
+     * @return $this
+     */
+    public function setOrder($var)
+    {
+        GPBUtil::checkMessage($var, \Orders\Services\Order::class);
+        $this->order = $var;
 
         return $this;
     }

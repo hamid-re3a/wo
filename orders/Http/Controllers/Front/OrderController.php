@@ -1,11 +1,14 @@
 <?php
 
-namespace User\Http\Controllers\Front;
+namespace Orders\Http\Controllers\Front;
 
 
-use App\Http\Requests\Front\Order\OrderRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Mix\Grpc\Context;
+use Orders\Http\Requests\Front\Order\OrderRequest;
+use Orders\Models\Order;
+use Payments\Services\PaymentService;
 
 class OrderController extends Controller
 {
@@ -13,14 +16,34 @@ class OrderController extends Controller
      * Submit new Order
      * @group
      * Public User > Orders
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(OrderRequest $request)
+    public function store(Request $request)
     {
 
         $this->validatePackages($request);
 
+            $order_db = Order::query()->create([
+                "user_id" => user($request)->getId(),
+                "total_cost_in_usd" => 10,
+                "payment_type" => $request->payment_type,
+                "payment_currency" => $request->payment_currency,
+                "payment_driver" => $request->payment_driver,
+            ]);
 
-        return api()->success(trans('user.responses'));
+        $payment_service = new PaymentService;
+
+        $order = new \Orders\Services\Order();
+        $order->setId((int)$order_db->id);
+        $order->setTotalCostInUsd($order_db->total_cost_in_usd);
+        $order->setPaymentDriver($order_db->payment_driver);
+        $order->setPaymentType($order_db->payment_type);
+        $order->setPaymentCurrency($order_db->payment_currency);
+
+        $invoice = $payment_service->pay(new Context(), $order);
+
+        return api()->success('success',$invoice);
     }
 
     private function validatePackages(Request $request)

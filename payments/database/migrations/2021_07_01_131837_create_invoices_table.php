@@ -17,13 +17,15 @@ class CreateInvoicesTable extends Migration
             $table->id();
 
             $table->unsignedBigInteger('order_id')->nullable();
-            $table->bigInteger('amount')->default(0);
+            $table->unsignedDouble('amount')->default(0);
 
             $table->string('transaction_id')->nullable();
             $table->string('checkout_link')->nullable();
 
             $table->string('status')->nullable();
             $table->string('additional_status')->default(false);
+
+            $table->unsignedDouble('paid_amount')->default(0);
 
             $table->timestamps();
         });

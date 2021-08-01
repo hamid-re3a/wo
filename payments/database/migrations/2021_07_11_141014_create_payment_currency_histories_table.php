@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCategoryHistoriesTable extends Migration
+class CreatePaymentCurrencyHistoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,14 @@ class CreateCategoryHistoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('category_histories', function (Blueprint $table) {
+        Schema::create('payment_currency_histories', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('legacy_id');
 
-            $table->string('key');
             $table->string('name');
-            $table->string('short_name',20);
+            $table->boolean('is_active');
 
-            $table->integer('roi_percentage');
-            $table->integer('direct_percentage');
-            $table->integer('binary_percentage');
-
-            $table->integer('package_validity_in_days');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -38,6 +33,8 @@ class CreateCategoryHistoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('category_histories');
+        Schema::dropIfExists('payment_currency_histories');
     }
 }
+
+

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCategoriesIndirectCommissionsTable extends Migration
+class CreatePaymentTypeHistoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,15 @@ class CreateCategoriesIndirectCommissionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('categories_indirect_commissions', function (Blueprint $table) {
+        Schema::create('payment_type_histories', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('legacy_id');
 
-            $table->integer('level');
-            $table->integer('percentage');
+            $table->string('name');
+            $table->boolean('is_active');
 
-            $table->unique(['category_id', 'level']);
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -34,6 +33,6 @@ class CreateCategoriesIndirectCommissionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categories_indirect_commissions');
+        Schema::dropIfExists('payment_type_histories');
     }
 }

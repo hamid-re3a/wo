@@ -42,10 +42,8 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-
-
         if ($e instanceof ValidationException)
-            return parent::render($request, $e);
+            return api()->validation(trans('responses.validation-error'),$e->errors());
         if ($this->isHttpException($e)) {
             switch ($e->getStatusCode()) {
                 case '401':

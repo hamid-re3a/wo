@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePackagesIndirectCommissionsTable extends Migration
+class CreatePaymentCurrenciesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,14 @@ class CreatePackagesIndirectCommissionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('packages_indirect_commissions', function (Blueprint $table) {
+        Schema::create('payment_currencies', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('package_id');
 
-            $table->integer('level');
-            $table->integer('percentage');
+            $table->string('name');
+            $table->boolean('is_active');
 
-            $table->unique(['package_id', 'level']);
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -34,6 +32,6 @@ class CreatePackagesIndirectCommissionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('packages_indirect_commissions');
+        Schema::dropIfExists('payment_currencies');
     }
 }

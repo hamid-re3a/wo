@@ -176,6 +176,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         \ResponseTransformer\ResponseTransformerServiceProvider::class,
         \Packages\PackageServiceProvider::class,
+        \Payments\PaymentServiceProvider::class,
+        \Orders\OrderServiceProvider::class,
 
     ],
 

@@ -15,6 +15,10 @@ class CreateOrderPackagesTable extends Migration
     {
         Schema::create('order_packages', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->foreign('order_id')->references('id')->on('orders');
+            $table->unsignedBigInteger('package_id');
+            $table->index(['order_id','package_id']);
             $table->timestamps();
         });
     }

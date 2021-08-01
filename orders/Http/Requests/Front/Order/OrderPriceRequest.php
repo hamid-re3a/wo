@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Requests\Front\Order;
+namespace Orders\Http\Requests\Front\Order;
 
-use App\Rules\PersianCharacterRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderPriceRequest extends FormRequest
@@ -26,8 +25,8 @@ class OrderPriceRequest extends FormRequest
     {
         return [
             'items_id' => 'required|array',
-//            'items_id.*' => 'exists:products,id',
-            'items_qty' => 'required|array',
+////            'items_id.*' => 'exists:products,id',
+//            'items_qty' => 'required|array',
         ];
     }
 }

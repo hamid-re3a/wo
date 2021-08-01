@@ -30,6 +30,6 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
           username: "root"
-          host: "62.171.186.163"
-          password: "8BSqG4WVbp9WFr"
-          script: "cd /home/staging-subscription/public_html/subscription/ && ./server_deploy.sh"
+          host: "207.244.231.120"
+          password: "WnFN3hU5aAMru"
+          script: "cd /home/subscription/public_html/Subscriptions/ && ./server_deploy.sh"

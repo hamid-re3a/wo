@@ -3,12 +3,18 @@
 
 namespace Packages\Services;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Mix\Grpc\Context;
-use Packages\PackageConfigure;
+use Packages\Repository\PackageRepository;
 
 class PackageService implements PackagesServiceInterface
 {
+    private $packageRepository;
+
+    public function __construct(PackageRepository $packageRepository)
+    {
+        $this->packageRepository = $packageRepository;
+    }
+
     /**
      * @inheritDoc
      */
@@ -27,5 +33,10 @@ class PackageService implements PackagesServiceInterface
         $response_package->setBinaryPercentage((int)$packeage->binary_percentage);
         $response_package->setCategoryId((int)$packeage->category_id);
         return $response_package;
+    }
+
+    public function editPackage(Id $id, Package $package): \Packages\Models\Package
+    {
+        return $this->packageRepository->edit($id, $package);
     }
 }

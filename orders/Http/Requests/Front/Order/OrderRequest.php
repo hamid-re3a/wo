@@ -28,12 +28,14 @@ class OrderRequest extends FormRequest
             'items' => 'required|array',
 //            'items.*.id' => 'exists:packages,id',
 //            'items.*.qty' => 'required|numeric|min:1',
-            'to_user_id' => 'nullable|exists:order_users,id',
+//            'to_user_id' => 'nullable|exists:order_users,id',
             'plan' => array('in:'.implode(',',ORDER_PLANS)),
 
-            'payment_type' => array('required','in:'.implode(',',ORDER_PAYMENT_TYPES)),
-            'payment_driver' => array('sometimes','in:'.implode(',',ORDER_PAYMENT_DRIVERS)),
-            'payment_currency' => array('required','in:'.implode(',',ORDER_PAYMENT_CURRENCIES)),
+//            'payment_type' => array('required','in:'.implode(',',ORDER_PAYMENT_TYPES)),
+            'payment_type' => array('required'),
+            'payment_driver' => array('required_if:payment_type,=,gate-way'),
+//            'payment_currency' => array('required','in:'.implode(',',ORDER_PAYMENT_CURRENCIES)),
+            'payment_currency' => array('required'),
 
         ];
     }

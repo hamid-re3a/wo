@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Payments\Commands;
 
 use Illuminate\Console\Command;
 use Payments\Jobs\BtcpayserverInvoiceResolveJob;

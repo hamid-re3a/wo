@@ -30,4 +30,22 @@ interface PaymentsServiceInterface extends Grpc\ServiceInterface
     * @throws Grpc\Exception\InvokeException
     */
     public function pay(Context $context, Services\Order $request): Invoice;
+
+    /**
+    * @param Context $context
+    * @param EmptyObject $request
+    * @return PaymentCurrencies
+    *
+    * @throws Grpc\Exception\InvokeException
+    */
+    public function getPaymentCurrencies(Context $context, EmptyObject $request): PaymentCurrencies;
+
+    /**
+    * @param Context $context
+    * @param EmptyObject $request
+    * @return PaymentTypes
+    *
+    * @throws Grpc\Exception\InvokeException
+    */
+    public function getPaymentTypes(Context $context, EmptyObject $request): PaymentTypes;
 }

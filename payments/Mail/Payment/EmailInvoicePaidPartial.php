@@ -63,6 +63,6 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
 
     private function getInvoiceDueAmount()
     {
-        return $this->invoice->getAmount() - $this->invoice->getPaidAmount();
+        return $this->invoice->getDueAmount() . ' ' . $this->invoice->getOrder()->getPaymentCurrency();
     }
 }

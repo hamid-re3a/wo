@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Mix\Grpc;
 use Mix\Grpc\Context;
 use Orders\Services;
+use Orders\Services\OrderService;
 
 class PaymentService implements PaymentsServiceInterface
 {
@@ -82,9 +83,34 @@ class PaymentService implements PaymentsServiceInterface
         $response_invoice->setStatus($invoice->status);
         $response_invoice->setAdditionalStatus($invoice->additional_status);
         $response_invoice->setPaidAmount((double)$invoice->paid_amount);
+        $response_invoice->setDueAmount((double)$invoice->due_amount);
+        $response_invoice->setIsPaid((boolean)$invoice->is_paid);
+
+
+        $order_service = new OrderService;
+        $order_id = new Services\Id();
+        $order_id->setId($response_invoice->getOrderId());
+        $order = $order_service->OrderById(new Context(),$order_id);
+        $response_invoice->setOrder($order);
 
         return $response_invoice;
 
 
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPaymentCurrencies(Context $context, EmptyObject $request): PaymentCurrencies
+    {
+        // TODO: Implement getPaymentCurrencies() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPaymentTypes(Context $context, EmptyObject $request): PaymentTypes
+    {
+        // TODO: Implement getPaymentTypes() method.
     }
 }

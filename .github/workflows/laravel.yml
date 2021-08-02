@@ -10,7 +10,7 @@ jobs:
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
     - name: Config composer
-      run: composer config --global --auth http-basic.repo.packagist.com hamid-re3a 9e2c7d6ce623079937fe6dfbfb1ee49e079432ebafec93f3ccd5076aaca0
+      run: composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
     - name: Install Dependencies
       run: composer update
     - name: Generate key

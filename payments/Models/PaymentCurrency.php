@@ -28,4 +28,9 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentCurrency extends Model
 {
     use HasFactory;
+
+    public function paymentDriver()
+    {
+        return $this->hasMany(PaymentDriver::class, 'id','driver_id');
+    }
 }

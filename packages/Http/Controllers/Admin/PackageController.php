@@ -11,11 +11,11 @@ use Packages\Services\PackageService;
 
 class PackageController extends Controller
 {
-    private $packageService;
+    private $package_service;
 
-    public function __construct(PackageService $packageService)
+    public function __construct(PackageService $package_service)
     {
-        $this->packageService = $packageService;
+        $this->package_service = $package_service;
     }
 
     /**
@@ -39,8 +39,8 @@ class PackageController extends Controller
         $package->setRoiPercentage($request->get('roi_percentage'));
         $package->setShortName($request->get('short_name'));
         $package->setValidityInDays($request->get('validity_in_days'));
-        $updatePackage = $this->packageService->editPackage($id,$package);
-        return api()->success('packages.successfully-fetched-all-packages',new PackageResource($updatePackage));
+        $updatePackage = $this->package_service->editPackage($id,$package);
+        return api()->success('edit package successful',new PackageResource($updatePackage));
 
     }
 

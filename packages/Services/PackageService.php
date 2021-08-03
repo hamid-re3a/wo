@@ -8,11 +8,11 @@ use Packages\Repository\PackageRepository;
 
 class PackageService implements PackagesServiceInterface
 {
-    private $packageRepository;
+    private $package_repository;
 
-    public function __construct(PackageRepository $packageRepository)
+    public function __construct(PackageRepository $package_repository)
     {
-        $this->packageRepository = $packageRepository;
+        $this->package_repository = $package_repository;
     }
 
     /**
@@ -37,6 +37,6 @@ class PackageService implements PackagesServiceInterface
 
     public function editPackage(Id $id, Package $package): \Packages\Models\Package
     {
-        return $this->packageRepository->edit($id, $package);
+        return $this->package_repository->edit($id, $package);
     }
 }

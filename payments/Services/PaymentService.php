@@ -7,9 +7,20 @@ use Mix\Grpc;
 use Mix\Grpc\Context;
 use Orders\Services;
 use Orders\Services\OrderService;
+use Payments\Repository\PaymentCurrencyRepository;
+use Payments\Repository\PaymentTypesRepository;
 
 class PaymentService implements PaymentsServiceInterface
 {
+    private $payment_type_repository;
+    private $payment_currency_repository;
+
+    public function __construct(PaymentTypesRepository $payment_type_repository, PaymentCurrencyRepository $payment_currency_repository)
+    {
+        $this->payment_type_repository = $payment_type_repository;
+        $this->payment_currency_repository = $payment_currency_repository;
+    }
+
     /**
      * @inheritDoc
      */
@@ -103,7 +114,10 @@ class PaymentService implements PaymentsServiceInterface
      */
     public function getPaymentCurrencies(Context $context, EmptyObject $request): PaymentCurrencies
     {
-        // TODO: Implement getPaymentCurrencies() method.
+        $payment_currency_data = $this->payment_currency_repository->getAll();
+        $payment_currencies =  new PaymentCurrencies();
+        $payment_currencies->setPaymentCurrencies($this->mapPaymentCurrency($payment_currency_data));
+        return $payment_currencies;
     }
 
     /**
@@ -111,6 +125,61 @@ class PaymentService implements PaymentsServiceInterface
      */
     public function getPaymentTypes(Context $context, EmptyObject $request): PaymentTypes
     {
-        // TODO: Implement getPaymentTypes() method.
+        $payment_types_data = $this->payment_type_repository->getAll();
+        $payment_types =  new PaymentTypes();
+        $payment_types->setPaymentTypes($this->mapPaymentType($payment_types_data));
+       return $payment_types;
+    }
+
+    /**
+     * this function get collection of data paymentCurrency to array of paymentCurrency class
+     * @param $payment_currencies
+     * @return mixed
+     */
+    private function mapPaymentCurrency($payment_currencies)
+    {
+        $payment_currency = new PaymentCurrency();
+        $data_array = $payment_currencies->map(function ($item) use($payment_currency){
+            $payment_currency->setId($item->id);
+            $payment_currency->setName($item->name);
+            $payment_currency->setIsActive($item->is_active);
+            $payment_currency->setPaymentDriver($this->mapPaymentDriver($item->paymentDriver));
+            return $payment_currency;
+        });
+        return $data_array->toArray();
+    }
+
+    /**
+     * this function for get paymentDriver collection to array of paymentDriver class
+     * @param $payment_drivers
+     * @return mixed
+     */
+    private function mapPaymentDriver($payment_drivers)
+    {
+        $payment_driver = new PaymentDriver();
+        $data_array = $payment_drivers->map(function ($item) use($payment_driver){
+            $payment_driver->setId($item->id);
+            $payment_driver->setName($item->name);
+            $payment_driver->setIsActive($item->is_active);
+            return $payment_driver;
+        });
+        return $data_array->toArray();
+    }
+
+    /**
+     * this function get collection of data paymentType to array of paymentType class
+     * @param $payment_types
+     * @return mixed
+     */
+    private function mapPaymentType($payment_types)
+    {
+        $payment_type= new PaymentType();
+        $data_array = $payment_types->map(function ($item) use($payment_type){
+            $payment_type->setId($item->id);
+            $payment_type->setName($item->name);
+            $payment_type->setIsActive($item->is_active);
+            return $payment_type;
+        });
+        return $data_array->toArray();
     }
 }

@@ -28,4 +28,9 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentDriver extends Model
 {
     use HasFactory;
+
+    public function paymentCurrency()
+    {
+        return $this->belongsTo(PaymentCurrency::class);
+    }
 }

@@ -10,4 +10,9 @@ Route::name('payments.')->group(function () {
         Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'update']);
         Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'delete']);
     });
+    Route::name('driver.')->prefix("payments/driver")->group(function () {
+        Route::post('create',[\Payments\Http\Controllers\Admin\PaymentDriverController::class,'store']);
+        Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentDriverController::class,'update']);
+        Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentDriverController::class,'delete']);
+    });
 });

@@ -8,17 +8,19 @@ use Mix\Grpc\Context;
 use Orders\Services;
 use Orders\Services\OrderService;
 use Payments\Repository\PaymentCurrencyRepository;
+use Payments\Repository\PaymentDriverRepository;
 use Payments\Repository\PaymentTypesRepository;
 
 class PaymentService implements PaymentsServiceInterface
 {
     private $payment_type_repository;
     private $payment_currency_repository;
+    private $payment_driver_repository;
 
-    public function __construct(PaymentTypesRepository $payment_type_repository, PaymentCurrencyRepository $payment_currency_repository)
+    public function __construct(PaymentTypesRepository $payment_type_repository, PaymentDriverRepository $payment_driver_repository)
     {
         $this->payment_type_repository = $payment_type_repository;
-        $this->payment_currency_repository = $payment_currency_repository;
+        $this->payment_driver_repository = $payment_driver_repository;
     }
 
     /**
@@ -223,5 +225,47 @@ class PaymentService implements PaymentsServiceInterface
     public function deletePaymentCurrency(PaymentCurrency $payment_currency)
     {
        return  $this->payment_currency_repository->delete( $payment_currency);
+    }
+
+    /**
+     * createCurrency
+     * @param $payment_currency
+     * @return mixed
+     */
+    public function createPaymentDriver(PaymentDriver $payment_driver) : PaymentDriver
+    {
+        $payment_driver_data = $this->payment_driver_repository->create( $payment_driver);
+        $payment_driver->setIsActive($payment_driver_data->is_active);
+        $payment_driver->setName($payment_driver_data->name);
+        $payment_driver->setId($payment_driver_data->id);
+        $payment_driver->setCreatedAt($payment_driver_data->created_at->format("Y-m-d H:s:m"));
+        $payment_driver->setUpdatedAt($payment_driver_data->updated_at->format("Y-m-d H:s:m"));
+        return  $payment_driver;
+    }
+
+    /**
+     * createDriver
+     * @param $payment_driver
+     * @return mixed
+     */
+    public function updatePaymentDriver(PaymentDriver $payment_driver) : PaymentDriver
+    {
+        $payment_driver_data = $this->payment_driver_repository->update($payment_driver);
+        $payment_driver->setIsActive($payment_driver_data->is_active);
+        $payment_driver->setName($payment_driver_data->name);
+        $payment_driver->setId($payment_driver_data->id);
+        $payment_driver->setCreatedAt($payment_driver_data->created_at->format("Y-m-d H:s:m"));
+        $payment_driver->setUpdatedAt($payment_driver_data->updated_at->format("Y-m-d H:s:m"));
+        return  $payment_driver;
+    }
+
+    /**
+     * createDriver
+     * @param $payment_driver
+     * @return mixed
+     */
+    public function deletePaymentDriver(PaymentDriver $payment_driver)
+    {
+        return  $this->payment_driver_repository->delete( $payment_driver);
     }
 }

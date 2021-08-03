@@ -28,7 +28,7 @@ class PaymentCurrencyRepository
         $payment_currency_entity = new $this->entity_name;
         $payment_currency_find = $payment_currency_entity->whereId($payment_currency->getId())->first();
         $payment_currency_find->name = $payment_currency->getName() ? $payment_currency->getName(): $payment_currency_find->name;
-        $payment_currency_find->is_active = $payment_currency->getIsActive() ? $payment_currency->getIsActive() : $payment_currency_find->is_active;
+        $payment_currency_find->is_active = $payment_currency->getIsActive() ?? $payment_currency_find->is_active;
         if (!empty($payment_currency_find->getDirty())) {
             $payment_currency_find->save();
         }

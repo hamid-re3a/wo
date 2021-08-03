@@ -7,7 +7,7 @@ namespace Payments\Http\Requests\PaymentDriver;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePaymentDriverRequest extends FormRequest
+class RemovePaymentDriverRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,9 +28,7 @@ class StorePaymentDriverRequest extends FormRequest
     {
 
         return [
-            'name' => array('required','string',
-                Rule::unique('payment_drivers')->ignore($this->request->get('id'), 'id')),
-            'is_active' => 'required|boolean'
+            'id' => 'required|exists:payment_currencies',
         ];
     }
 }

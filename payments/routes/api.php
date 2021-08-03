@@ -1,9 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Payments\Http\Controllers\Admin\PaymentTypeController;
 use Payments\Http\Controllers\Front\WebhookController;
 
 Route::name('payments.')->group(function () {
-    Route::post('payments/webhook',[WebhookController::class,'index'])->name('btc-pay-server-webhook');
+    Route::post('payments/webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');
+    Route::name('currency.')->prefix("payments/currency")->group(function () {
+        Route::post('create',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'store']);
+        Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'update']);
+        Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'delete']);
+    });
 });

@@ -20,7 +20,9 @@ class PaymentTypeController extends Controller
     public function __construct(PaymentService $payment_service)
     {
         $this->payment_service = $payment_service;
-    }    /**
+    }
+
+    /**
      * Update payment types
      * @group
      * Admin > Payments

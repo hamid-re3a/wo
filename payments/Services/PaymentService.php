@@ -182,4 +182,46 @@ class PaymentService implements PaymentsServiceInterface
         });
         return $data_array->toArray();
     }
+
+    /**
+     * createCurrency
+     * @param $payment_currency
+     * @return mixed
+     */
+    public function createPaymentCurrency(PaymentCurrency $payment_currency) : PaymentCurrency
+    {
+        $payment_currency_data = $this->payment_currency_repository->create( $payment_currency);
+        $payment_currency->setIsActive($payment_currency_data->is_active);
+        $payment_currency->setName($payment_currency_data->name);
+        $payment_currency->setId($payment_currency_data->id);
+        $payment_currency->setCreatedAt($payment_currency_data->created_at->format("Y-m-d H:s:m"));
+        $payment_currency->setUpdatedAt($payment_currency_data->updated_at->format("Y-m-d H:s:m"));
+        return  $payment_currency;
+    }
+
+    /**
+     * createCurrency
+     * @param $payment_currency
+     * @return mixed
+     */
+    public function updatePaymentCurrency(PaymentCurrency $payment_currency) : PaymentCurrency
+    {
+        $payment_currency_data = $this->payment_currency_repository->update( $payment_currency);
+        $payment_currency->setIsActive($payment_currency_data->is_active);
+        $payment_currency->setName($payment_currency_data->name);
+        $payment_currency->setId($payment_currency_data->id);
+        $payment_currency->setCreatedAt($payment_currency_data->created_at->format("Y-m-d H:s:m"));
+        $payment_currency->setUpdatedAt($payment_currency_data->updated_at->format("Y-m-d H:s:m"));
+        return  $payment_currency;
+    }
+
+    /**
+     * createCurrency
+     * @param $payment_currency
+     * @return mixed
+     */
+    public function deletePaymentCurrency(PaymentCurrency $payment_currency)
+    {
+       return  $this->payment_currency_repository->delete( $payment_currency);
+    }
 }

@@ -39,4 +39,9 @@ class PackageService implements PackagesServiceInterface
     {
         return $this->package_repository->edit($id, $package);
     }
+
+    public function getPackages()
+    {
+        return $this->package_repository->getAll();
+    }
 }

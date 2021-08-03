@@ -29,4 +29,12 @@ class PackageRepository
         return $package_find;
     }
 
+    /**
+     */
+    public function getAll()
+    {
+        $package_entity = new $this->entity_name;
+        return $package_entity->with('category','packageIndirectCommission')->get();
+    }
+
 }

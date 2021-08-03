@@ -40,8 +40,7 @@ class PackageController extends Controller
         $package->setShortName($request->get('short_name'));
         $package->setValidityInDays($request->get('validity_in_days'));
         $updatePackage = $this->package_service->editPackage($id,$package);
-        return api()->success('edit package successful',new PackageResource($updatePackage));
-
+        return api()->success('packages.successfully-fetched-all-packages',new PackageResource($updatePackage));
     }
 
 }

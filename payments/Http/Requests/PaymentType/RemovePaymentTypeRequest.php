@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Payments\Http\Requests\PaymentDriver;
+namespace Payments\Http\Requests\PaymentType;
 
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class RemovePaymentDriverRequest extends FormRequest
+class RemovePaymentTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class RemovePaymentDriverRequest extends FormRequest
     {
 
         return [
-            'id' => 'required|exists:payment_drivers',
+            'id' => 'required|exists:payment_types',
         ];
     }
 }

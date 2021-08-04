@@ -28,7 +28,6 @@ class StorePaymentTypeRequest extends FormRequest
     {
 
         return [
-            'id' => 'required|exists:payment_types',
             'name' => array('string','required',
                 Rule::unique('payment_types')->ignore($this->request->get('id'), 'id')),
             'is_active' => 'boolean|required'

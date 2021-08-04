@@ -103,7 +103,7 @@ class PaymentService implements PaymentsServiceInterface
         $order_service = new OrderService;
         $order_id = new Services\Id();
         $order_id->setId($response_invoice->getOrderId());
-        $order = $order_service->OrderById(new Context(),$order_id);
+        $order = $order_service->OrderById(new Context(), $order_id);
         $response_invoice->setOrder($order);
 
         return $response_invoice;
@@ -117,7 +117,7 @@ class PaymentService implements PaymentsServiceInterface
     public function getPaymentCurrencies(Context $context, EmptyObject $request): PaymentCurrencies
     {
         $payment_currency_data = $this->payment_currency_repository->getAll();
-        $payment_currencies =  new PaymentCurrencies();
+        $payment_currencies = new PaymentCurrencies();
         $payment_currencies->setPaymentCurrencies($this->mapPaymentCurrency($payment_currency_data));
         return $payment_currencies;
     }
@@ -128,9 +128,9 @@ class PaymentService implements PaymentsServiceInterface
     public function getPaymentTypes(Context $context, EmptyObject $request): PaymentTypes
     {
         $payment_types_data = $this->payment_type_repository->getAll();
-        $payment_types =  new PaymentTypes();
+        $payment_types = new PaymentTypes();
         $payment_types->setPaymentTypes($this->mapPaymentType($payment_types_data));
-       return $payment_types;
+        return $payment_types;
     }
 
     /**
@@ -141,7 +141,7 @@ class PaymentService implements PaymentsServiceInterface
     private function mapPaymentCurrency($payment_currencies)
     {
         $payment_currency = new PaymentCurrency();
-        $data_array = $payment_currencies->map(function ($item) use($payment_currency){
+        $data_array = $payment_currencies->map(function ($item) use ($payment_currency) {
             $payment_currency->setId($item->id);
             $payment_currency->setName($item->name);
             $payment_currency->setIsActive($item->is_active);
@@ -159,7 +159,7 @@ class PaymentService implements PaymentsServiceInterface
     private function mapPaymentDriver($payment_drivers)
     {
         $payment_driver = new PaymentDriver();
-        $data_array = $payment_drivers->map(function ($item) use($payment_driver){
+        $data_array = $payment_drivers->map(function ($item) use ($payment_driver) {
             $payment_driver->setId($item->id);
             $payment_driver->setName($item->name);
             $payment_driver->setIsActive($item->is_active);
@@ -175,8 +175,8 @@ class PaymentService implements PaymentsServiceInterface
      */
     private function mapPaymentType($payment_types)
     {
-        $payment_type= new PaymentType();
-        $data_array = $payment_types->map(function ($item) use($payment_type){
+        $payment_type = new PaymentType();
+        $data_array = $payment_types->map(function ($item) use ($payment_type) {
             $payment_type->setId($item->id);
             $payment_type->setName($item->name);
             $payment_type->setIsActive($item->is_active);
@@ -190,15 +190,15 @@ class PaymentService implements PaymentsServiceInterface
      * @param $payment_currency
      * @return mixed
      */
-    public function createPaymentCurrency(PaymentCurrency $payment_currency) : PaymentCurrency
+    public function createPaymentCurrency(PaymentCurrency $payment_currency): PaymentCurrency
     {
-        $payment_currency_data = $this->payment_currency_repository->create( $payment_currency);
+        $payment_currency_data = $this->payment_currency_repository->create($payment_currency);
         $payment_currency->setIsActive($payment_currency_data->is_active);
         $payment_currency->setName($payment_currency_data->name);
         $payment_currency->setId($payment_currency_data->id);
         $payment_currency->setCreatedAt($payment_currency_data->created_at->format("Y-m-d H:s:m"));
         $payment_currency->setUpdatedAt($payment_currency_data->updated_at->format("Y-m-d H:s:m"));
-        return  $payment_currency;
+        return $payment_currency;
     }
 
     /**
@@ -206,15 +206,15 @@ class PaymentService implements PaymentsServiceInterface
      * @param $payment_currency
      * @return mixed
      */
-    public function updatePaymentCurrency(PaymentCurrency $payment_currency) : PaymentCurrency
+    public function updatePaymentCurrency(PaymentCurrency $payment_currency): PaymentCurrency
     {
-        $payment_currency_data = $this->payment_currency_repository->update( $payment_currency);
+        $payment_currency_data = $this->payment_currency_repository->update($payment_currency);
         $payment_currency->setIsActive($payment_currency_data->is_active);
         $payment_currency->setName($payment_currency_data->name);
         $payment_currency->setId($payment_currency_data->id);
         $payment_currency->setCreatedAt($payment_currency_data->created_at->format("Y-m-d H:s:m"));
         $payment_currency->setUpdatedAt($payment_currency_data->updated_at->format("Y-m-d H:s:m"));
-        return  $payment_currency;
+        return $payment_currency;
     }
 
     /**
@@ -224,7 +224,7 @@ class PaymentService implements PaymentsServiceInterface
      */
     public function deletePaymentCurrency(PaymentCurrency $payment_currency)
     {
-       return  $this->payment_currency_repository->delete( $payment_currency);
+        return $this->payment_currency_repository->delete($payment_currency);
     }
 
     /**
@@ -232,15 +232,15 @@ class PaymentService implements PaymentsServiceInterface
      * @param $payment_currency
      * @return mixed
      */
-    public function createPaymentDriver(PaymentDriver $payment_driver) : PaymentDriver
+    public function createPaymentDriver(PaymentDriver $payment_driver): PaymentDriver
     {
-        $payment_driver_data = $this->payment_driver_repository->create( $payment_driver);
+        $payment_driver_data = $this->payment_driver_repository->create($payment_driver);
         $payment_driver->setIsActive($payment_driver_data->is_active);
         $payment_driver->setName($payment_driver_data->name);
         $payment_driver->setId($payment_driver_data->id);
         $payment_driver->setCreatedAt($payment_driver_data->created_at->format("Y-m-d H:s:m"));
         $payment_driver->setUpdatedAt($payment_driver_data->updated_at->format("Y-m-d H:s:m"));
-        return  $payment_driver;
+        return $payment_driver;
     }
 
     /**
@@ -248,7 +248,7 @@ class PaymentService implements PaymentsServiceInterface
      * @param $payment_driver
      * @return mixed
      */
-    public function updatePaymentDriver(PaymentDriver $payment_driver) : PaymentDriver
+    public function updatePaymentDriver(PaymentDriver $payment_driver): PaymentDriver
     {
         $payment_driver_data = $this->payment_driver_repository->update($payment_driver);
         $payment_driver->setIsActive($payment_driver_data->is_active);
@@ -256,7 +256,7 @@ class PaymentService implements PaymentsServiceInterface
         $payment_driver->setId($payment_driver_data->id);
         $payment_driver->setCreatedAt($payment_driver_data->created_at->format("Y-m-d H:s:m"));
         $payment_driver->setUpdatedAt($payment_driver_data->updated_at->format("Y-m-d H:s:m"));
-        return  $payment_driver;
+        return $payment_driver;
     }
 
     /**
@@ -266,6 +266,48 @@ class PaymentService implements PaymentsServiceInterface
      */
     public function deletePaymentDriver(PaymentDriver $payment_driver)
     {
-        return  $this->payment_driver_repository->delete( $payment_driver);
+        return $this->payment_driver_repository->delete($payment_driver);
+    }
+
+    /**
+     * createCurrency
+     * @param $payment_currency
+     * @return mixed
+     */
+    public function createPaymentType(PaymentType $payment_type): PaymentType
+    {
+        $payment_type_data = $this->payment_type_repository->create($payment_type);
+        $payment_type->setIsActive($payment_type_data->is_active);
+        $payment_type->setName($payment_type_data->name);
+        $payment_type->setId($payment_type_data->id);
+        $payment_type->setCreatedAt($payment_type_data->created_at->format("Y-m-d H:s:m"));
+        $payment_type->setUpdatedAt($payment_type_data->updated_at->format("Y-m-d H:s:m"));
+        return $payment_type;
+    }
+
+    /**
+     * createType
+     * @param $payment_type
+     * @return mixed
+     */
+    public function updatePaymentType(PaymentType $payment_type): PaymentType
+    {
+        $payment_type_data = $this->payment_type_repository->update($payment_type);
+        $payment_type->setIsActive($payment_type_data->is_active);
+        $payment_type->setName($payment_type_data->name);
+        $payment_type->setId($payment_type_data->id);
+        $payment_type->setCreatedAt($payment_type_data->created_at->format("Y-m-d H:s:m"));
+        $payment_type->setUpdatedAt($payment_type_data->updated_at->format("Y-m-d H:s:m"));
+        return $payment_type;
+    }
+
+    /**
+     * createType
+     * @param $payment_type
+     * @return mixed
+     */
+    public function deletePaymentType(PaymentType $payment_type)
+    {
+        return $this->payment_type_repository->delete($payment_type);
     }
 }

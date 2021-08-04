@@ -4,6 +4,7 @@ namespace Payments\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Payments\Models\PaymentType
@@ -27,5 +28,5 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PaymentType extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 }

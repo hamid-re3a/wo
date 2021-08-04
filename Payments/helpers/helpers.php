@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\DB;
 use Payments\Models\EmailContentSetting;
-use User\Models\Setting;
+use Payments\Models\Setting;
 const INVOICE_STATUS_NEW = 'New';
 const INVOICE_STATUS_EXPIRED = 'Expired';
 const INVOICE_STATUS_PAID = 'Paid';

@@ -25,7 +25,7 @@ class OrderRequest extends FormRequest
     {
         return [
 
-            'items' => 'required|array',
+            'items' => 'required|array|min:1|max:1',
 //            'items.*.id' => 'exists:packages,id',
 //            'items.*.qty' => 'required|numeric|min:1',
 //            'to_user_id' => 'nullable|exists:order_users,id',

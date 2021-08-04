@@ -46,7 +46,7 @@ class PaymentServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        Route::prefix('v1')
+        Route::prefix('v1/payments')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');

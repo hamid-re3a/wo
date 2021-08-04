@@ -17,7 +17,21 @@ class PackageService implements PackagesServiceInterface
         $packeage = \Packages\Models\Package::query()->find($request->getId());
         if (is_null($packeage))
             return new Package();
+        return $this->setPackage($packeage);
+    }
+
+
+
+
+
+    /**
+     * @param $packeage
+     * @return Package
+     */
+    private function setPackage($packeage): Package
+    {
         $response_package = new Package();
+        $response_package->setId($packeage->id);
         $response_package->setName($packeage->name);
         $response_package->setShortName($packeage->short_name);
         $response_package->setValidityInDays((int)$packeage->validity_in_days);

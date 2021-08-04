@@ -50,19 +50,23 @@ class Invoice extends \Google\Protobuf\Internal\Message
      */
     protected $is_paid = false;
     /**
-     * Generated from protobuf field <code>string deleted_at = 10;</code>
+     * Generated from protobuf field <code>string expiration_time = 10;</code>
+     */
+    protected $expiration_time = '';
+    /**
+     * Generated from protobuf field <code>string deleted_at = 11;</code>
      */
     protected $deleted_at = '';
     /**
-     * Generated from protobuf field <code>string created_at = 11;</code>
+     * Generated from protobuf field <code>string created_at = 12;</code>
      */
     protected $created_at = '';
     /**
-     * Generated from protobuf field <code>string updated_at = 12;</code>
+     * Generated from protobuf field <code>string updated_at = 13;</code>
      */
     protected $updated_at = '';
     /**
-     * Generated from protobuf field <code>.orders.services.Order order = 13;</code>
+     * Generated from protobuf field <code>.orders.services.Order order = 14;</code>
      */
     protected $order = null;
 
@@ -81,6 +85,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     @type float $paid_amount
      *     @type float $due_amount
      *     @type bool $is_paid
+     *     @type string $expiration_time
      *     @type string $deleted_at
      *     @type string $created_at
      *     @type string $updated_at
@@ -291,7 +296,29 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string deleted_at = 10;</code>
+     * Generated from protobuf field <code>string expiration_time = 10;</code>
+     * @return string
+     */
+    public function getExpirationTime()
+    {
+        return $this->expiration_time;
+    }
+
+    /**
+     * Generated from protobuf field <code>string expiration_time = 10;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setExpirationTime($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->expiration_time = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string deleted_at = 11;</code>
      * @return string
      */
     public function getDeletedAt()
@@ -300,7 +327,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string deleted_at = 10;</code>
+     * Generated from protobuf field <code>string deleted_at = 11;</code>
      * @param string $var
      * @return $this
      */
@@ -313,7 +340,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string created_at = 11;</code>
+     * Generated from protobuf field <code>string created_at = 12;</code>
      * @return string
      */
     public function getCreatedAt()
@@ -322,7 +349,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string created_at = 11;</code>
+     * Generated from protobuf field <code>string created_at = 12;</code>
      * @param string $var
      * @return $this
      */
@@ -335,7 +362,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string updated_at = 12;</code>
+     * Generated from protobuf field <code>string updated_at = 13;</code>
      * @return string
      */
     public function getUpdatedAt()
@@ -344,7 +371,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string updated_at = 12;</code>
+     * Generated from protobuf field <code>string updated_at = 13;</code>
      * @param string $var
      * @return $this
      */
@@ -357,7 +384,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.Order order = 13;</code>
+     * Generated from protobuf field <code>.orders.services.Order order = 14;</code>
      * @return \Orders\Services\Order|null
      */
     public function getOrder()
@@ -376,7 +403,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.Order order = 13;</code>
+     * Generated from protobuf field <code>.orders.services.Order order = 14;</code>
      * @param \Orders\Services\Order $var
      * @return $this
      */

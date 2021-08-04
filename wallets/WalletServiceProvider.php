@@ -47,7 +47,7 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        Route::prefix('v1')
+        Route::prefix('v1/wallets')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');

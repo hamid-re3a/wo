@@ -37,7 +37,7 @@ class CreateOrderHistoriesTable extends Migration
             $table->string('payment_driver')->nullable()->default(null);
 
 
-            $table->string('plan')->default(ORDER_PLAN_DEFAULT);
+            $table->string('plan')->default(ORDER_PLAN_START);
             $table->timestamps();
         });
     }

@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Payments\Models\EmailContentSetting;
+use User\Models\Setting;
 const INVOICE_STATUS_NEW = 'New';
 const INVOICE_STATUS_EXPIRED = 'Expired';
 const INVOICE_STATUS_PAID = 'Paid';
@@ -51,8 +53,22 @@ const WEBHOOK_EVENT_TYPES = [
     WEBHOOK_EVENT_TYPE_INVOICE_INVALID,
 ];
 
+const REGISTRATION_FEE = '20';
+
 /**
- *
+ *  main settings
+ */
+const SETTINGS = [
+    'REGISTRATION_FEE' => [
+        'value' => REGISTRATION_FEE,
+        'description' => 'Start Order Registration Fee',
+        'category' => 'Order',
+    ],
+];
+
+
+/**
+ * payment email content settings
  */
 
 const PAYMENT_EMAIL_CONTENT_SETTINGS = [
@@ -114,7 +130,41 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'variables_description'=>'full_name user full name',
         'type'=>'email',
     ],
+    'INVOICE_CRATED_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Invoice created',
+        'from' => 'support@janex.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>Invoice created.</p>
+                <p>Please complete your payment with this <a href="{{invoice_link}}">link</a></p>
+                <p></p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
 ];
+if (!function_exists('getSetting')) {
+    function getSetting($key)
+    {
+        if (DB::table('settings')->exists()) {
+            $key_db = Setting::query()->where('key', $key)->first();
+            if ($key_db && !empty($key_db->value))
+                return $key_db->value;
+        }
+
+        if (isset(SETTINGS[$key]) && isset(SETTINGS[$key]['value']))
+            return SETTINGS[$key]['value'];
+
+        throw new Exception(trans('payment.responses.main-key-settings-is-missing'));
+    }
+}
 if (!function_exists('getPaymentEmailSetting')) {
 
 
@@ -129,6 +179,6 @@ if (!function_exists('getPaymentEmailSetting')) {
         if (isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key]))
             return PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
 
-        throw new Exception(trans('user.responses.main-key-settings-is-missing'));
+        throw new Exception(trans('payment.responses.main-key-settings-is-missing'));
     }
 }

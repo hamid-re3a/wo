@@ -30,6 +30,7 @@ class CreateInvoicesTable extends Migration
             $table->unsignedDouble('paid_amount')->default(0);
             $table->unsignedDouble('due_amount')->default(0);
 
+            $table->timestamp('expiration_time')->nullable();
             $table->timestamps();
         });
     }

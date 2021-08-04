@@ -4,6 +4,11 @@ namespace Orders\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Mix\Grpc\Context;
+use Orders\Services\User;
+use Packages\Models\Package;
+use Packages\Services\Id;
+use Packages\Services\PackageService;
 
 /**
  * Orders\Models\Order
@@ -50,6 +55,8 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  * @property-read \Orders\Models\OrderUser $user
  * @property-read \Orders\Models\OrderUser $toUser
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Orders\Models\OrderPackage[] $packages
+ * @property-read int|null $packages_count
  */
 class Order extends Model
 {
@@ -58,12 +65,43 @@ class Order extends Model
 
     public function user()
     {
-        return $this->belongsTo(OrderUser::class,'user_id','id');
+        return $this->belongsTo(OrderUser::class, 'user_id', 'id');
     }
 
 
     public function toUser()
     {
-        return $this->belongsTo(OrderUser::class,'user_id','id');
+        return $this->belongsTo(OrderUser::class, 'user_id', 'id');
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(OrderPackage::class, '', '');
+    }
+
+
+    public function reCalculateCosts()
+    {
+        if ($this->plan == ORDER_PLAN_START)
+            $this->registration_fee_in_usd = (float)getSetting('REGISTRATION_FEE');
+        $this->packages_cost_in_usd = (float)$this->orderPackagesPrice();
+        $this->total_cost_in_usd = (float)$this->packages_cost_in_usd + (float)$this->registration_fee_in_usd;
+        $this->save();
+    }
+
+    /**
+     * @return float|int
+     */
+    private function orderPackagesPrice()
+    {
+        $packages_price = 0;
+        foreach ($this->packages as $package_order) {
+            $package = new PackageService;
+            $id = new Id;
+            $id->setId($package_order->package_id);
+            $package_service_object = $package->packageById(new Context(), $id);
+            $packages_price += $package_service_object->getPrice();
+        }
+        return $packages_price;
     }
 }

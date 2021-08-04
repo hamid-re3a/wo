@@ -2,6 +2,7 @@
 
 namespace Payments\Jobs;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -44,6 +45,7 @@ class BtcpayserverInvoiceResolveJob implements ShouldQueue
             $amount_paid = $payment_response->json()[0]['totalPaid'];
             $amount_due = $payment_response->json()[0]['due'];
             $this->invoice_db->update([
+                'expiration_time' => Carbon::createFromTimestamp($response->json()['expirationTime']),
                 'status' => $response->json()['status'],
                 'additional_status' => $response->json()['additionalStatus'],
                 'paid_amount' => $amount_paid,

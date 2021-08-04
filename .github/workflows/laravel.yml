@@ -9,10 +9,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-    - name: Config composer
-      run: composer config --global --auth http-basic.repo.packagist.com hamid-re3a 9e2c7d6ce623079937fe6dfbfb1ee49e079432ebafec93f3ccd5076aaca0
     - name: Install Dependencies
-      run: composer install
+      run: composer update
     - name: Generate key
       run: php artisan key:generate
     - name: Directory Permissions

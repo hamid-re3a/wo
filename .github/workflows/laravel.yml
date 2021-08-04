@@ -1,12 +1,16 @@
 name: Laravel
 on:
-  pull_request:
+  push:
     branches: [ master ]
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        extensions: imagick, swoole
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
     - name: Install Dependencies
@@ -19,15 +23,19 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      env:
-        DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
-      run: vendor/bin/phpunit
-    - name: Deploy to production
-      uses: appleboy/ssh-action@master
-      with:
-          username: "root"
-          host: "207.244.231.120"
-          password: "WnFN3hU5aAMru"
-          script: "cd /home/subscription/public_html/Subscriptions/ && ./server_deploy.sh"
+
+
+  laravel-deploy:
+    runs-on: vmi627964
+    needs: laravel-tests
+    steps:
+    - uses: actions/checkout@v2
+    - name: Copy project to deployment directory
+      run: |
+        shopt -s dotglob 
+        sudo mkdir -p /home/subscription/public_html/Subscriptions/temp-project 
+        sudo cp -r . /home/subscription/public_html/Subscriptions/temp-project/
+        sudo chown -R subscription:subscription /home/subscription/public_html/Subscriptions/temp-project
+    - name: Run server_deploy.sh
+      run: | 
+        sudo su - subscription -c '/home/subscription/public_html/Subscriptions/server_deploy.sh'

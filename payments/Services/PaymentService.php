@@ -17,10 +17,11 @@ class PaymentService implements PaymentsServiceInterface
     private $payment_currency_repository;
     private $payment_driver_repository;
 
-    public function __construct(PaymentTypesRepository $payment_type_repository, PaymentDriverRepository $payment_driver_repository)
+    public function __construct(PaymentTypesRepository $payment_type_repository, PaymentDriverRepository $payment_driver_repository, PaymentCurrencyRepository $payment_currency_repository)
     {
         $this->payment_type_repository = $payment_type_repository;
         $this->payment_driver_repository = $payment_driver_repository;
+        $this->payment_currency_repository = $payment_currency_repository;
     }
 
     /**
@@ -140,8 +141,8 @@ class PaymentService implements PaymentsServiceInterface
      */
     private function mapPaymentCurrency($payment_currencies)
     {
-        $payment_currency = new PaymentCurrency();
-        $data_array = $payment_currencies->map(function ($item) use ($payment_currency) {
+        $data_array =  $payment_currencies->map(function ($item) {
+            $payment_currency = new PaymentCurrency();
             $payment_currency->setId($item->id);
             $payment_currency->setName($item->name);
             $payment_currency->setIsActive($item->is_active);
@@ -152,14 +153,24 @@ class PaymentService implements PaymentsServiceInterface
     }
 
     /**
+     * this function get collection of data paymentCurrency to array of paymentCurrency class
+     * @param PaymentCurrency $paymentCurrency
+     * @return mixed
+     */
+    public function filterNamePaymentCurrency(PaymentCurrency $paymentCurrency)
+    {
+        return $paymentCurrency->getName();
+    }
+
+    /**
      * this function for get paymentDriver collection to array of paymentDriver class
      * @param $payment_drivers
      * @return mixed
      */
     private function mapPaymentDriver($payment_drivers)
     {
-        $payment_driver = new PaymentDriver();
-        $data_array = $payment_drivers->map(function ($item) use ($payment_driver) {
+        $data_array = $payment_drivers->map(function ($item) {
+            $payment_driver = new PaymentDriver();
             $payment_driver->setId($item->id);
             $payment_driver->setName($item->name);
             $payment_driver->setIsActive($item->is_active);
@@ -175,8 +186,8 @@ class PaymentService implements PaymentsServiceInterface
      */
     private function mapPaymentType($payment_types)
     {
-        $payment_type = new PaymentType();
-        $data_array = $payment_types->map(function ($item) use ($payment_type) {
+        $data_array = $payment_types->map(function ($item){
+            $payment_type = new PaymentType();
             $payment_type->setId($item->id);
             $payment_type->setName($item->name);
             $payment_type->setIsActive($item->is_active);

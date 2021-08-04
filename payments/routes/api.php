@@ -20,4 +20,7 @@ Route::name('payments.')->group(function () {
         Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'update'])->name('update');
         Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
     });
+
+    Route::post('test',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'tt'])->name('tt');
+
 });

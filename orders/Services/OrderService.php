@@ -4,11 +4,21 @@
 namespace Orders\Services;
 
 
-use Mix\Grpc;
 use Mix\Grpc\Context;
+use Payments\Services\EmptyObject;
+use Payments\Services\PaymentCurrencies;
+use Payments\Services\PaymentCurrency;
+use Payments\Services\PaymentService;
 
 class OrderService implements OrdersServiceInterface
 {
+
+    private $payment_service;
+
+    public function __construct(PaymentService $payment_service)
+    {
+        $this->payment_service = $payment_service;
+    }
 
     /**
      * @inheritDoc
@@ -53,4 +63,17 @@ class OrderService implements OrdersServiceInterface
 
         return $response;
     }
+
+    public function getPaymentCurrencies(){
+        $context = new Context();
+        $empty_object = new EmptyObject();
+        return $this->payment_service->getPaymentCurrencies($context,$empty_object);
+    }
+
+    public function getPaymentTypes(){
+        $context = new Context();
+        $empty_object = new EmptyObject();
+        return $this->payment_service->getPaymentTypes($context,$empty_object);
+    }
+
 }

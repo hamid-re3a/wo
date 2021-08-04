@@ -22,7 +22,9 @@ class OrderController extends Controller
      */
     public function newOrder(OrderRequest $request)
     {
-        $this->validatePackages($request);
+        dd('f');
+/*        dd('');
+        $this->validatePackages($request);*/
 
         $order_db = Order::query()->create([
             "user_id" => user($request)->getId(),

@@ -14,47 +14,51 @@ use Google\Protobuf\Internal\GPBUtil;
 class Package extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>int64 id = 1;</code>
+     */
+    protected $id = 0;
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      */
     protected $name = '';
     /**
-     * Generated from protobuf field <code>string short_name = 2;</code>
+     * Generated from protobuf field <code>string short_name = 3;</code>
      */
     protected $short_name = '';
     /**
-     * Generated from protobuf field <code>int32 validity_in_days = 3;</code>
+     * Generated from protobuf field <code>int32 validity_in_days = 4;</code>
      */
     protected $validity_in_days = 0;
     /**
-     * Generated from protobuf field <code>double price = 4;</code>
+     * Generated from protobuf field <code>double price = 5;</code>
      */
     protected $price = 0.0;
     /**
-     * Generated from protobuf field <code>int32 roi_percentage = 5;</code>
+     * Generated from protobuf field <code>int32 roi_percentage = 6;</code>
      */
     protected $roi_percentage = 0;
     /**
-     * Generated from protobuf field <code>int32 direct_percentage = 6;</code>
+     * Generated from protobuf field <code>int32 direct_percentage = 7;</code>
      */
     protected $direct_percentage = 0;
     /**
-     * Generated from protobuf field <code>int32 binary_percentage = 7;</code>
+     * Generated from protobuf field <code>int32 binary_percentage = 8;</code>
      */
     protected $binary_percentage = 0;
     /**
-     * Generated from protobuf field <code>int64 category_id = 8;</code>
+     * Generated from protobuf field <code>int64 category_id = 9;</code>
      */
     protected $category_id = 0;
     /**
-     * Generated from protobuf field <code>string deleted_at = 9;</code>
+     * Generated from protobuf field <code>string deleted_at = 10;</code>
      */
     protected $deleted_at = '';
     /**
-     * Generated from protobuf field <code>string created_at = 10;</code>
+     * Generated from protobuf field <code>string created_at = 11;</code>
      */
     protected $created_at = '';
     /**
-     * Generated from protobuf field <code>string updated_at = 11;</code>
+     * Generated from protobuf field <code>string updated_at = 12;</code>
      */
     protected $updated_at = '';
 
@@ -64,6 +68,7 @@ class Package extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type int|string $id
      *     @type string $name
      *     @type string $short_name
      *     @type int $validity_in_days
@@ -83,7 +88,29 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>int64 id = 1;</code>
+     * @return int|string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 id = 1;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      * @return string
      */
     public function getName()
@@ -92,7 +119,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 2;</code>
      * @param string $var
      * @return $this
      */
@@ -105,7 +132,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string short_name = 2;</code>
+     * Generated from protobuf field <code>string short_name = 3;</code>
      * @return string
      */
     public function getShortName()
@@ -114,7 +141,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string short_name = 2;</code>
+     * Generated from protobuf field <code>string short_name = 3;</code>
      * @param string $var
      * @return $this
      */
@@ -127,7 +154,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 validity_in_days = 3;</code>
+     * Generated from protobuf field <code>int32 validity_in_days = 4;</code>
      * @return int
      */
     public function getValidityInDays()
@@ -136,7 +163,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 validity_in_days = 3;</code>
+     * Generated from protobuf field <code>int32 validity_in_days = 4;</code>
      * @param int $var
      * @return $this
      */
@@ -149,7 +176,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double price = 4;</code>
+     * Generated from protobuf field <code>double price = 5;</code>
      * @return float
      */
     public function getPrice()
@@ -158,7 +185,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double price = 4;</code>
+     * Generated from protobuf field <code>double price = 5;</code>
      * @param float $var
      * @return $this
      */
@@ -171,7 +198,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 roi_percentage = 5;</code>
+     * Generated from protobuf field <code>int32 roi_percentage = 6;</code>
      * @return int
      */
     public function getRoiPercentage()
@@ -180,7 +207,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 roi_percentage = 5;</code>
+     * Generated from protobuf field <code>int32 roi_percentage = 6;</code>
      * @param int $var
      * @return $this
      */
@@ -193,7 +220,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 direct_percentage = 6;</code>
+     * Generated from protobuf field <code>int32 direct_percentage = 7;</code>
      * @return int
      */
     public function getDirectPercentage()
@@ -202,7 +229,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 direct_percentage = 6;</code>
+     * Generated from protobuf field <code>int32 direct_percentage = 7;</code>
      * @param int $var
      * @return $this
      */
@@ -215,7 +242,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 binary_percentage = 7;</code>
+     * Generated from protobuf field <code>int32 binary_percentage = 8;</code>
      * @return int
      */
     public function getBinaryPercentage()
@@ -224,7 +251,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int32 binary_percentage = 7;</code>
+     * Generated from protobuf field <code>int32 binary_percentage = 8;</code>
      * @param int $var
      * @return $this
      */
@@ -237,7 +264,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 category_id = 8;</code>
+     * Generated from protobuf field <code>int64 category_id = 9;</code>
      * @return int|string
      */
     public function getCategoryId()
@@ -246,7 +273,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 category_id = 8;</code>
+     * Generated from protobuf field <code>int64 category_id = 9;</code>
      * @param int|string $var
      * @return $this
      */
@@ -259,7 +286,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string deleted_at = 9;</code>
+     * Generated from protobuf field <code>string deleted_at = 10;</code>
      * @return string
      */
     public function getDeletedAt()
@@ -268,7 +295,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string deleted_at = 9;</code>
+     * Generated from protobuf field <code>string deleted_at = 10;</code>
      * @param string $var
      * @return $this
      */
@@ -281,7 +308,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string created_at = 10;</code>
+     * Generated from protobuf field <code>string created_at = 11;</code>
      * @return string
      */
     public function getCreatedAt()
@@ -290,7 +317,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string created_at = 10;</code>
+     * Generated from protobuf field <code>string created_at = 11;</code>
      * @param string $var
      * @return $this
      */
@@ -303,7 +330,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string updated_at = 11;</code>
+     * Generated from protobuf field <code>string updated_at = 12;</code>
      * @return string
      */
     public function getUpdatedAt()
@@ -312,7 +339,7 @@ class Package extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string updated_at = 11;</code>
+     * Generated from protobuf field <code>string updated_at = 12;</code>
      * @param string $var
      * @return $this
      */

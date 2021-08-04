@@ -25,8 +25,12 @@ class CreateInvoicesTable extends Migration
             $table->string('status')->nullable();
             $table->string('additional_status')->default(false);
 
-            $table->unsignedDouble('paid_amount')->default(0);
+            $table->boolean('is_paid')->default(false);
 
+            $table->unsignedDouble('paid_amount')->default(0);
+            $table->unsignedDouble('due_amount')->default(0);
+
+            $table->timestamp('expiration_time')->nullable();
             $table->timestamps();
         });
     }

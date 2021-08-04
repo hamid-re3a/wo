@@ -26,4 +26,5 @@ use Illuminate\Database\Eloquent\Model;
 class OrderPackage extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 }

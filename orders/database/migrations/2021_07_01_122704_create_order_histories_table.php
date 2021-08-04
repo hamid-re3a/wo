@@ -32,12 +32,12 @@ class CreateOrderHistoriesTable extends Migration
             $table->timestamp('is_expired_at')->nullable();
             $table->timestamp('is_commission_resolved_at')->nullable();
 
-            $table->string('payment_type')->default(ORDER_PAYMENT_TYPE_WALLET);
-            $table->string('payment_currency')->default(ORDER_PAYMENT_TYPE_WALLET);
+            $table->string('payment_type');
+            $table->string('payment_currency');
             $table->string('payment_driver')->nullable()->default(null);
 
 
-            $table->string('plan')->default(ORDER_PLAN_DEFAULT);
+            $table->string('plan')->default(ORDER_PLAN_START);
             $table->timestamps();
         });
     }

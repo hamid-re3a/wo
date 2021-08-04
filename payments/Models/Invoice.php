@@ -2,6 +2,7 @@
 
 namespace Payments\Models;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +34,12 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  * @property float $paid_amount
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaidAmount($value)
+ * @property int $is_paid
+ * @property float $due_amount
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDueAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereIsPaid($value)
+ * @property string|null $expiration_time
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereExpirationTime($value)
  */
 class Invoice extends Model
 {

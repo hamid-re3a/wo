@@ -2,31 +2,11 @@
 
 use Illuminate\Http\Request;
 use Orders\Models\OrderUser;
-const ORDER_PLAN_DEFAULT = 'ORDER_PLAN_DEFAULT';
+const ORDER_PLAN_UPGRADE = 'ORDER_PLAN_UPGRADE';
+const ORDER_PLAN_START = 'ORDER_PLAN_START';
 const ORDER_PLANS = [
-    ORDER_PLAN_DEFAULT
-];
-
-
-const ORDER_PAYMENT_TYPE_GIFT_CODE = 'ORDER_PAYMENT_TYPE_GIFT_CODE';
-const ORDER_PAYMENT_TYPE_GATEWAY = 'ORDER_PAYMENT_TYPE_GATEWAY';
-const ORDER_PAYMENT_TYPE_WALLET = 'ORDER_PAYMENT_TYPE_WALLET';
-const ORDER_PAYMENT_TYPES = [
-    ORDER_PAYMENT_TYPE_GIFT_CODE,
-    ORDER_PAYMENT_TYPE_GATEWAY,
-    ORDER_PAYMENT_TYPE_WALLET
-];
-
-const ORDER_PAYMENT_DRIVER_BTC_PAY_SERVER = 'BTC_PAY_SERVER';
-const ORDER_PAYMENT_DRIVERS = [
-    ORDER_PAYMENT_DRIVER_BTC_PAY_SERVER
-];
-
-
-
-const ORDER_PAYMENT_CURRENCY_BTC = 'BTC';
-const ORDER_PAYMENT_CURRENCIES = [
-    ORDER_PAYMENT_CURRENCY_BTC
+    ORDER_PLAN_START,
+    ORDER_PLAN_UPGRADE
 ];
 
 if (!function_exists('user')) {
@@ -44,8 +24,8 @@ if (!function_exists('user')) {
             $user->setId((int)$request->header('X-user-id'));
             $user->setFirstName($request->header('X-user-first-name'));
             $user->setLastName($request->header('X-user-last-name'));
-            $user->setUsername($request->header('X-user-email'));
-            $user->setEmail($request->header('X-user-username'));
+            $user->setUsername($request->header('X-user-username'));
+            $user->setEmail($request->header('X-user-email'));
 
 
             $user_db = OrderUser::query()->firstOrCreate([

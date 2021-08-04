@@ -4,6 +4,7 @@ namespace Payments\database\seeders;
 
 use Payments\Models\EmailContentSetting;
 use Illuminate\Database\Seeder;
+use User\Models\Setting;
 
 /**
  * Class AuthTableSeeder.
@@ -17,7 +18,17 @@ class SettingTableSeeder extends Seeder
      */
     public function run()
     {
-
+        foreach (SETTINGS as $key => $setting) {
+            $key = Setting::query()->firstOrCreate([
+                'key' => $key
+            ]);
+            if (is_null($key->value)) {
+                $key->value = $setting['value'];
+                $key->description = $setting['description'];
+                $key->category = $setting['category'];
+                $key->save();
+            }
+        }
         foreach (PAYMENT_EMAIL_CONTENT_SETTINGS as $key => $setting) {
 
             if (!EmailContentSetting::query()->whereKey($key)->exists()) {

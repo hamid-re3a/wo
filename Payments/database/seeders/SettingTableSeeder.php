@@ -4,7 +4,7 @@ namespace Payments\database\seeders;
 
 use Payments\Models\EmailContentSetting;
 use Illuminate\Database\Seeder;
-use User\Models\Setting;
+use Payments\Models\Setting;
 
 /**
  * Class AuthTableSeeder.

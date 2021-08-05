@@ -4,7 +4,6 @@ namespace Orders\Http\Requests\Front\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Orders\Http\Resources\OrderPaymentCurrencyResource;
 use Orders\Services\OrderService;
 use Payments\Services\PaymentCurrency;
 

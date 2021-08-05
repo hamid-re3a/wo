@@ -55,7 +55,6 @@ class OrderController extends Controller
         $order->setPaymentCurrency($order_db->payment_currency);
 
         $order->setUser(user($request));
-
         $invoice = $payment_service->pay(new Context(), $order);
 
         return api()->success('success', ['invoice_id' => $invoice->getTransactionId(), 'checkout_link' => $invoice->getCheckoutLink()]);

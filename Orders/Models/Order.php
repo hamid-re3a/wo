@@ -82,6 +82,7 @@ class Order extends Model
 
     public function reCalculateCosts()
     {
+        $this->refresh();
         if ($this->plan == ORDER_PLAN_START)
             $this->registration_fee_in_usd = (float)getSetting('REGISTRATION_FEE');
         $this->packages_cost_in_usd = (float)$this->orderPackagesPrice();

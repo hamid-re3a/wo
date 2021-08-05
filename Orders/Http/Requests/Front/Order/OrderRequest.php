@@ -4,7 +4,6 @@ namespace Orders\Http\Requests\Front\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Orders\Http\Resources\OrderPaymentCurrencyResource;
 use Orders\Services\OrderService;
 use Payments\Services\PaymentCurrency;
 
@@ -34,7 +33,7 @@ class OrderRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+            return [
 
             'items' => 'required|array|min:1|max:1',
 //            'items.*.id' => 'exists:packages,id',
@@ -42,9 +41,9 @@ class OrderRequest extends FormRequest
 //            'to_user_id' => 'nullable|exists:order_users,id',
             'plan' => array('in:' . implode(',', ORDER_PLANS)),
 
-            'payment_type' => array('required', Rule::in($this->getNamePaymentCurrency())),
+            'payment_type' => array('required', Rule::in($this->getNamePaymentType())),
             'payment_driver' => array('required_if:payment_type,=,gate-way'),
-            'payment_currency' => array('required', Rule::in($this->getNamePaymentType())),
+//            'payment_currency' => array('required', Rule::in($this->getNamePaymentCurrency())),
         ];
     }
 

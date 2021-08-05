@@ -53,7 +53,7 @@ const WEBHOOK_EVENT_TYPES = [
     WEBHOOK_EVENT_TYPE_INVOICE_INVALID,
 ];
 
-const REGISTRATION_FEE = '20';
+const REGISTRATION_FEE = '20' ;
 
 /**
  *  main settings
@@ -61,7 +61,7 @@ const REGISTRATION_FEE = '20';
 const SETTINGS = [
     'REGISTRATION_FEE' => [
         'value' => REGISTRATION_FEE,
-        'description' => 'Start Order Registration Fee',
+        'description' => 'Start Order Registration Fee in dollars',
         'category' => 'Order',
     ],
 ];

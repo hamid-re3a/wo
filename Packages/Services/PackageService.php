@@ -18,9 +18,10 @@ class PackageService implements PackagesServiceInterface
     /**
      * @inheritDoc
      */
-    public function packageById(Context $context, Id $request): Package
+    public function packageById(Context $context, Id $id): Package
     {
-        $packeage = \Packages\Models\Package::query()->find($request->getId());
+        ;
+        $packeage = $this->package_repository->getById($id);
         if (is_null($packeage))
             return new Package();
         return $this->setPackage($packeage);

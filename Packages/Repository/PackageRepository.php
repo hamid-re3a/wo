@@ -29,6 +29,12 @@ class PackageRepository
         return $package_find;
     }
 
+    public function getById(Id $id): Package
+    {
+        $package_entity = new $this->entity_name;
+        return $package_entity->find($id->getId());
+    }
+
     /**
      */
     public function getAll()

@@ -23,7 +23,7 @@ class PaymentDriverController extends Controller
     /**
      * Update payment currencies
      * @group
-     * Admin > Payments
+     * Admin > Payments Driver
      * @param UpdatePaymentDriverRequest $request
      * @return JsonResponse
      */
@@ -37,7 +37,7 @@ class PaymentDriverController extends Controller
     /**
      * Store payment drivers
      * @group
-     * Admin > Payments
+     * Admin > Payments Driver
      * @param StorePaymentDriverRequest $request
      * @return JsonResponse
      */
@@ -50,7 +50,7 @@ class PaymentDriverController extends Controller
     /**
      * Store payment drivers
      * @group
-     * Admin > Payments
+     * Admin > Payments Driver
      * @param RemovePaymentDriverRequest $request
      * @return JsonResponse
      */

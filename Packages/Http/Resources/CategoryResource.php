@@ -15,7 +15,6 @@ class CategoryResource extends JsonResource
      */
     public function toArray($request)
     {
-        $indirect = CategoriesIndirectCommission::query()->where('category_id',$this->id)->get();
         return [
             'id'=>$this->id,
             'key'=>$this->key,
@@ -25,7 +24,7 @@ class CategoryResource extends JsonResource
             'direct_percentage'=>$this->direct_percentage,
             'binary_percentage'=>$this->binary_percentage,
             'package_validity_in_days'=>$this->package_validity_in_days,
-            'indirect_percentages'=> $indirect ? CategoryIndirectSettingResource::collection($indirect): null
+            'indirect_percentages'=> $this->categoryIndirectCommission ? CategoryIndirectSettingResource::collection($this->categoryIndirectCommission): null
         ];
     }
 }

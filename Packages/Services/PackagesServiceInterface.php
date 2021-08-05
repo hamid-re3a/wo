@@ -10,7 +10,7 @@ use Mix\Grpc\Context;
 interface PackagesServiceInterface extends Grpc\ServiceInterface
 {
     // GRPC specific service name.
-    public const NAME = "packages.services.PackagesService";
+    public const NAME = "packages.Services.PackagesService";
 
     /**
     * @param Context $context

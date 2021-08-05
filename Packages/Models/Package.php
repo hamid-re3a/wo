@@ -41,4 +41,22 @@ class Package extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    /**
+     * relation with Category
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function Category()
+    {
+        return $this->belongsTo(Category::class)->with('categoryIndirectCommission');
+    }
+
+    /**
+     * relation with packageIndicatorCommission
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function packageIndirectCommission()
+    {
+        return $this->hasMany(PackagesIndirectCommission::class);
+    }
 }

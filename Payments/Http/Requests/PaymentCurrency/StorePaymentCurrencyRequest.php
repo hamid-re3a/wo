@@ -28,7 +28,6 @@ class StorePaymentCurrencyRequest extends FormRequest
     {
 
         return [
-            'id' => 'required|exists:payment_currencies',
             'name' => array('required','string',
                 Rule::unique('payment_currencies')->ignore($this->request->get('id'), 'id')),
             'is_active' => 'required|boolean'

@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
 //        if(config('app.env') === 'production') {
-            \URL::forceScheme('http');
+            \URL::forceScheme('https');
 //        }
     }
 

@@ -34,4 +34,13 @@ class PackagesIndirectCommission extends Model
     protected $table = 'packages_indirect_commissions';
 
     protected $guarded = [];
+
+    /**
+     * relation with package
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function package()
+    {
+        return $this->belongsTo(Package::class);
+    }
 }

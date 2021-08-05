@@ -40,4 +40,23 @@ class Category extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    /**
+     * relation with package
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function packages()
+    {
+        return $this->hasMany(Package::class);
+    }
+
+    /**
+     * relation with categoryIndicatorCommission
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function categoryIndirectCommission()
+    {
+        return $this->hasMany(CategoriesIndirectCommission::class);
+    }
+
 }

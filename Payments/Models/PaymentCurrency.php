@@ -4,6 +4,7 @@ namespace Payments\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Payments\Models\PaymentCurrency
@@ -27,5 +28,12 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PaymentCurrency extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [ "name", "is_active"];
+
+    public function paymentDriver()
+    {
+        return $this->hasMany(PaymentDriver::class, 'id','driver_id');
+    }
 }

@@ -4,6 +4,7 @@ namespace Payments\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Payments\Models\PaymentDriver
@@ -27,5 +28,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PaymentDriver extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
+
+    public function paymentCurrency()
+    {
+        return $this->belongsTo(PaymentCurrency::class);
+    }
 }

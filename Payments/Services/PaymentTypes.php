@@ -7,6 +7,7 @@ namespace Payments\Services;
 use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
+use Illuminate\Support\Collection;
 
 /**
  * Generated from protobuf message <code>payments.services.PaymentTypes</code>
@@ -58,11 +59,9 @@ class PaymentTypes extends \Google\Protobuf\Internal\Message
      */
     public function setPaymentTypes($var)
     {
-        GPBUtil::checkMessage($var, \Payments\Services\PaymentType::class);
-        $this->payment_types = $var;
-
-        return $this;
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Payments\Services\PaymentType::class);
+        $this->payment_types = $arr;
+        return $this->payment_types;
     }
-
 }
 

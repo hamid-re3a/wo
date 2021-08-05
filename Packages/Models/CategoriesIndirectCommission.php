@@ -33,4 +33,13 @@ class CategoriesIndirectCommission extends Model
     protected $table = 'categories_indirect_commissions';
 
     protected $guarded = [];
+
+    /**
+     * relation with category
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

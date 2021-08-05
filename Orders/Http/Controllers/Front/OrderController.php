@@ -17,14 +17,23 @@ class OrderController extends Controller
 {
     use  ValidatesRequests;
 
+    private $payment_service;
+    private $package_service;
+
+    public function __construct(PaymentService $payment_service,PackageService $package_service)
+    {
+        $this->payment_service = $payment_service;
+        $this->package_service = $package_service;
+    }
+
     /**
      * Submit new Order
      * @group
      * Public User > Orders
      */
-    public function newOrder(OrderRequest $request,PackageService $package_service,PaymentService $payment_service)
+    public function newOrder(OrderRequest $request)
     {
-        $this->validatePackages($request,$package_service);
+        $this->validatePackages($request);
 
         $order_db = Order::query()->create([
             "user_id" => user($request)->getId(),
@@ -52,12 +61,12 @@ class OrderController extends Controller
         $order->setPaymentCurrency($order_db->payment_currency);
 
         $order->setUser(user($request));
-        $invoice = $payment_service->pay(new Context(), $order);
+        $invoice = $this->payment_service->pay(new Context(), $order);
 
         return api()->success('success', ['invoice_id' => $invoice->getTransactionId(), 'checkout_link' => $invoice->getCheckoutLink()]);
     }
 
-    private function validatePackages(Request $request, PackageService $package_service)
+    private function validatePackages(Request $request)
     {
         $rules = [
             'items.*.id' => 'required',
@@ -69,7 +78,7 @@ class OrderController extends Controller
         foreach ($request->items as $item) {
             $id = new Id;
             $id->setId($item['id']);
-            $package = $package_service->packageById(new Context(), $id);
+            $package = $this->package_service->packageById(new Context(), $id);
             if (!$package->getId()) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'items' => ['Package does not exist'],

@@ -9,12 +9,6 @@ use Payments\Services\PaymentCurrency;
 
 class OrderRequest extends FormRequest
 {
-    private $order_service;
-
-    public function __construct(OrderService $order_service)
-    {
-        $this->order_service = $order_service;
-    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -53,7 +47,7 @@ class OrderRequest extends FormRequest
      */
     private function getNamePaymentCurrency()
     {
-        $payment_currencies = $this->order_service->getPaymentCurrencies()->getPaymentCurrencies();
+        $payment_currencies = app(OrderService::class)->getPaymentCurrencies()->getPaymentCurrencies();
         $payment_currency_name_array = array();
         foreach ($payment_currencies as $payment_currency) {
             $payment_currency_name_array[] = $payment_currency->getName();
@@ -67,7 +61,7 @@ class OrderRequest extends FormRequest
      */
     private function getNamePaymentType()
     {
-        $payment_types = $this->order_service->getPaymentTypes()->getPaymentTypes();
+        $payment_types = app(OrderService::class)->getPaymentTypes()->getPaymentTypes();
         $payment_type_name_array = array();
         foreach ($payment_types as $payment_type) {
             $payment_type_name_array[] = $payment_type->getName();

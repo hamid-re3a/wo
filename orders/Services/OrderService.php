@@ -6,8 +6,6 @@ namespace Orders\Services;
 
 use Mix\Grpc\Context;
 use Payments\Services\EmptyObject;
-use Payments\Services\PaymentCurrencies;
-use Payments\Services\PaymentCurrency;
 use Payments\Services\PaymentService;
 
 class OrderService implements OrdersServiceInterface

@@ -55,7 +55,7 @@ class PaymentService implements PaymentsServiceInterface
                     'api/v1/stores/' . config('payment.btc-pay-server-store-id') . '/invoices',
                     [
                         'amount' => $order_request->getTotalCostInUsd(),
-                        'currency' => $order_request->getPaymentCurrency()
+                        'currency' => 'usd'
                     ]
                 );
 

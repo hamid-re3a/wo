@@ -13,7 +13,7 @@ class WebhookController extends Controller
      * @group
      * Webhook
      *
-     * ignore
+     * @hideFromAPIDocumentation
      */
     public function index(Request $request)
     {

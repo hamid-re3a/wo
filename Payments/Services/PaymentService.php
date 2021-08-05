@@ -4,7 +4,6 @@ namespace Payments\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
-use Mix\Grpc;
 use Mix\Grpc\Context;
 use Orders\Services;
 use Orders\Services\OrderService;
@@ -131,6 +130,7 @@ class PaymentService implements PaymentsServiceInterface
         $payment_currencies->setPaymentCurrencies($this->mapPaymentCurrency($payment_currency_data));
         return $payment_currencies;
     }
+
 
     /**
      * @inheritDoc

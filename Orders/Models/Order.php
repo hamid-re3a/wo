@@ -91,16 +91,16 @@ class Order extends Model
     }
 
     /**
+     * @param PackageService $package_service
      * @return float|int
      */
     private function orderPackagesPrice()
     {
         $packages_price = 0;
         foreach ($this->packages as $package_order) {
-            $package = new PackageService;
             $id = new Id;
             $id->setId($package_order->package_id);
-            $package_service_object = $package->packageById(new Context(), $id);
+            $package_service_object = app(PackageService::class )->packageById(new Context(), $id);
             $packages_price += $package_service_object->getPrice();
         }
         return $packages_price;

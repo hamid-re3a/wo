@@ -54,7 +54,7 @@ return [
              * The route can be referenced by name or path here. Wildcards are supported.
              */
             'exclude' => [
-                 '*sanctum/csrf-cookie*'
+                '*sanctum/csrf-cookie*'
             ],
 
             /*
@@ -307,7 +307,7 @@ INTRO
     /*
      * The base URL to be used in examples. If this is empty, Scribe will use the value of config('app.url').
      */
-    'base_url' => env('APP_ENV') == 'local' ?  'http://localhost:3561':  'http://vmi370585.contaboserver.net',
+    'base_url' => 'https://staging-subscription.janex.org/',
 
     /*
      * Generate a Postman collection (v2.1.0) in addition to HTML docs.

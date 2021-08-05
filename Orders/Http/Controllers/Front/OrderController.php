@@ -22,11 +22,9 @@ class OrderController extends Controller
      * @group
      * Public User > Orders
      */
-    public function newOrder(OrderRequest $request)
+    public function newOrder(OrderRequest $request,PackageService $package_service,PaymentService $payment_service)
     {
-        dd('f');
-/*        dd('');
-        $this->validatePackages($request);*/
+        $this->validatePackages($request,$package_service);
 
         $order_db = Order::query()->create([
             "user_id" => user($request)->getId(),
@@ -45,7 +43,6 @@ class OrderController extends Controller
         $order_db->refresh();
 
 
-        $payment_service = new PaymentService;
 
         $order = new \Orders\Services\Order();
         $order->setId((int)$order_db->id);
@@ -60,7 +57,7 @@ class OrderController extends Controller
         return api()->success('success', ['invoice_id' => $invoice->getTransactionId(), 'checkout_link' => $invoice->getCheckoutLink()]);
     }
 
-    private function validatePackages(Request $request)
+    private function validatePackages(Request $request, PackageService $package_service)
     {
         $rules = [
             'items.*.id' => 'required',
@@ -70,7 +67,6 @@ class OrderController extends Controller
         $this->validate($request, $rules);
 
         foreach ($request->items as $item) {
-            $package_service = new PackageService;
             $id = new Id;
             $id->setId($item['id']);
             $package = $package_service->packageById(new Context(), $id);

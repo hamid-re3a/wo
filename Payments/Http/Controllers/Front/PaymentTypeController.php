@@ -26,7 +26,7 @@ class PaymentTypeController extends Controller
      */
     public function index()
     {
-        return api()->success('payment.successfully-fetched-all-payment-types',PaymentTypeResource::collection($this->payment_service->getPaymentTypes(new Context(), new EmptyObject())));
+        return api()->success('payment.successfully-fetched-all-payment-types',PaymentTypeResource::collection(collect($this->payment_service->getPaymentTypes(new Context(), new EmptyObject())->getPaymentTypes())));
 
     }
 

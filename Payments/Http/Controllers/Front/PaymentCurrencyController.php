@@ -26,6 +26,7 @@ class PaymentCurrencyController extends Controller
      */
     public function index()
     {
-        return api()->success('payment.successfully-fetched-all-payment-currencies',PaymentCurrencyResource::collection($this->payment_service->getPaymentCurrencies(new Context(), new EmptyObject())));
+
+        return api()->success('payment.successfully-fetched-all-payment-currencies',PaymentCurrencyResource::collection(collect($this->payment_service->getPaymentCurrencies(new Context(), new EmptyObject())->getPaymentCurrencies())));
     }
 }

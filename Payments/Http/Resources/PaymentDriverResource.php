@@ -20,6 +20,7 @@ class PaymentDriverResource extends JsonResource
             'is_active' => $this->getIsActive(),
             'created_at' => $this->getCreatedAt(),
             'updated_at' => $this->getUpdatedAt(),
+
         ];
     }
 }

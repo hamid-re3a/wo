@@ -20,7 +20,7 @@ class PackageService implements PackagesServiceInterface
      */
     public function packageById(Context $context, Id $id): Package
     {
-        ;
+        return new Package();
         $packeage = $this->package_repository->getById($id);
         if (is_null($packeage))
             return new Package();

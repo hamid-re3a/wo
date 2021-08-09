@@ -3,7 +3,6 @@
 namespace Payments\Http\Controllers\Front;
 
 use Illuminate\Routing\Controller;
-use Mix\Grpc\Context;
 use Payments\Http\Resources\PaymentTypeResource;
 use Payments\Models\PaymentCurrency;
 use Payments\Models\PaymentDriver;
@@ -26,7 +25,7 @@ class PaymentTypeController extends Controller
      */
     public function index()
     {
-        return api()->success('payment.successfully-fetched-all-payment-types',PaymentTypeResource::collection(collect($this->payment_service->getPaymentTypes(new Context(), new EmptyObject())->getPaymentTypes())));
+        return api()->success('payment.successfully-fetched-all-payment-types',PaymentTypeResource::collection(collect($this->payment_service->getPaymentTypes( new EmptyObject())->getPaymentTypes())));
 
     }
 

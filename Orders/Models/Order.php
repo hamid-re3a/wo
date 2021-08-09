@@ -4,7 +4,6 @@ namespace Orders\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Mix\Grpc\Context;
 use Orders\Services\User;
 use Packages\Models\Package;
 use Packages\Services\Id;
@@ -100,7 +99,7 @@ class Order extends Model
         foreach ($this->packages as $package_order) {
             $id = new Id;
             $id->setId($package_order->package_id);
-            $package_service_object = app(PackageService::class )->packageById(new Context(), $id);
+            $package_service_object = app(PackageService::class )->packageById($id);
             $packages_price += $package_service_object->getPrice();
         }
         return $packages_price;

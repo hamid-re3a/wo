@@ -4,7 +4,6 @@ namespace Payments\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
-use Mix\Grpc\Context;
 use Orders\Services;
 use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
@@ -29,7 +28,7 @@ class PaymentService implements PaymentsServiceInterface
     /**
      * @inheritDoc
      */
-    public function pay(Context $context, Services\Order $request): Invoice
+    public function pay(Services\Order $request): Invoice
     {
 
         $invoice = new Invoice();
@@ -90,7 +89,7 @@ class PaymentService implements PaymentsServiceInterface
     /**
      * @inheritDoc
      */
-    public function getInvoiceById(Context $context, Id $request): Invoice
+    public function getInvoiceById(Id $request): Invoice
     {
 
         $response_invoice = new Invoice;
@@ -112,7 +111,7 @@ class PaymentService implements PaymentsServiceInterface
         $order_service = new OrderService;
         $order_id = new Services\Id();
         $order_id->setId($response_invoice->getOrderId());
-        $order = $order_service->OrderById(new Context(), $order_id);
+        $order = $order_service->OrderById( $order_id);
         $response_invoice->setOrder($order);
 
         return $response_invoice;
@@ -123,7 +122,7 @@ class PaymentService implements PaymentsServiceInterface
     /**
      * @inheritDoc
      */
-    public function getPaymentCurrencies(Context $context, EmptyObject $request): PaymentCurrencies
+    public function getPaymentCurrencies(EmptyObject $request): PaymentCurrencies
     {
         $payment_currency_data = $this->payment_currency_repository->getAll();
         $payment_currencies = new PaymentCurrencies();
@@ -135,7 +134,7 @@ class PaymentService implements PaymentsServiceInterface
     /**
      * @inheritDoc
      */
-    public function getPaymentTypes(Context $context, EmptyObject $request): PaymentTypes
+    public function getPaymentTypes(EmptyObject $request): PaymentTypes
     {
         $payment_types_data = $this->payment_type_repository->getAll();
         $payment_types = new PaymentTypes();

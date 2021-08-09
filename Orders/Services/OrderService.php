@@ -4,7 +4,6 @@
 namespace Orders\Services;
 
 
-use Mix\Grpc\Context;
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
 
@@ -21,7 +20,7 @@ class OrderService implements OrdersServiceInterface
     /**
      * @inheritDoc
      */
-    public function OrderById(Context $context, Id $request): Order
+    public function OrderById(Id $request): Order
     {
         $response = new Order();
         $order = \Orders\Models\Order::query()->find($request->getId());
@@ -63,15 +62,13 @@ class OrderService implements OrdersServiceInterface
     }
 
     public function getPaymentCurrencies(){
-        $context = new Context();
         $empty_object = new EmptyObject();
-        return $this->payment_service->getPaymentCurrencies($context,$empty_object);
+        return $this->payment_service->getPaymentCurrencies($empty_object);
     }
 
     public function getPaymentTypes(){
-        $context = new Context();
         $empty_object = new EmptyObject();
-        return $this->payment_service->getPaymentTypes($context,$empty_object);
+        return $this->payment_service->getPaymentTypes($empty_object);
     }
 
 }

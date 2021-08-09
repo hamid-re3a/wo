@@ -6,7 +6,6 @@ namespace Orders\Http\Controllers\Front;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Mix\Grpc\Context;
 use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Models\Order;
 use Packages\Services\Id;
@@ -61,7 +60,7 @@ class OrderController extends Controller
         $order->setPaymentCurrency($order_db->payment_currency);
 
         $order->setUser(user($request));
-        $invoice = $this->payment_service->pay(new Context(), $order);
+        $invoice = $this->payment_service->pay( $order);
 
         return api()->success('success', ['invoice_id' => $invoice->getTransactionId(), 'checkout_link' => $invoice->getCheckoutLink()]);
     }
@@ -78,7 +77,7 @@ class OrderController extends Controller
         foreach ($request->items as $item) {
             $id = new Id;
             $id->setId($item['id']);
-            $package = $this->package_service->packageById(new Context(), $id);
+            $package = $this->package_service->packageById( $id);
             if (!$package->getId()) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'items' => ['Package does not exist'],

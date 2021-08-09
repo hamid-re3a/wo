@@ -3,7 +3,6 @@
 namespace Payments\Http\Controllers\Admin;
 
 use Illuminate\Routing\Controller;
-use Mix\Grpc\Context;
 use Payments\Http\Requests\PaymentCurrency\RemovePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\StorePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\UpdatePaymentCurrencyRequest;
@@ -76,6 +75,6 @@ class PaymentCurrencyController extends Controller
     }
 
     public function tt(){
-        dd($this->payment_service->getPaymentCurrencies(new Context(), new EmptyObject()));
+        dd($this->payment_service->getPaymentCurrencies( new EmptyObject()));
     }
 }

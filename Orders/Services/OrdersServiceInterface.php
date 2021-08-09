@@ -4,20 +4,8 @@
 
 namespace Orders\Services;
 
-use Mix\Grpc;
-use Mix\Grpc\Context;
 
-interface OrdersServiceInterface extends Grpc\ServiceInterface
+interface OrdersServiceInterface
 {
-    // GRPC specific service name.
-    public const NAME = "orders.services.OrdersService";
-
-    /**
-    * @param Context $context
-    * @param Id $request
-    * @return Order
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function OrderById(Context $context, Id $request): Order;
+    public function OrderById(Id $request): Order;
 }

@@ -34,12 +34,8 @@ class UserDataJob implements ShouldQueue
      */
     public function handle()
     {
-        $user = new User();
-        $ser = serialize($user);
-
-        unserialize($ser);
-        $data_final = json_encode($this->data['name']);
-        echo "event has been handle. the name of userData is:".$data_final. PHP_EOL;
+        $userDataUnSerialize = unserialize($this->data);
+        echo "event has been handle. the first name and last name of userData is:".$userDataUnSerialize->getFirstName() ." ". $userDataUnSerialize->getLastName(). PHP_EOL;
 
     }
 }

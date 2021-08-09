@@ -4,20 +4,18 @@
 
 namespace Payments\Services;
 
-use Orders\Services;
 
 interface PaymentsServiceInterface
 {
     // GRPC specific service name.
+    public const NAME = "payments.services.PaymentsService";
+
 
     public function getInvoiceById( Id $request): Invoice;
 
-
-    public function pay( Services\Order $request): Invoice;
-
+    public function pay( Invoice $request): Invoice;
 
     public function getPaymentCurrencies( EmptyObject $request): PaymentCurrencies;
-
 
     public function getPaymentTypes( EmptyObject $request): PaymentTypes;
 }

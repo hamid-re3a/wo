@@ -10,6 +10,7 @@ use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Models\Order;
 use Packages\Services\Id;
 use Packages\Services\PackageService;
+use Payments\Services\Invoice;
 use Payments\Services\PaymentService;
 
 class OrderController extends Controller
@@ -35,7 +36,7 @@ class OrderController extends Controller
         $this->validatePackages($request);
 
         $order_db = Order::query()->create([
-            "user_id" => user($request)->getId(),
+            "user_id" => user($request->header('X-user-id'))->getId(),
             "payment_type" => $request->payment_type,
             "payment_currency" => $request->payment_currency,
             "payment_driver" => $request->payment_driver,
@@ -52,15 +53,15 @@ class OrderController extends Controller
 
 
 
-        $order = new \Orders\Services\Order();
-        $order->setId((int)$order_db->id);
-        $order->setTotalCostInUsd($order_db->total_cost_in_usd);
-        $order->setPaymentDriver($order_db->payment_driver);
-        $order->setPaymentType($order_db->payment_type);
-        $order->setPaymentCurrency($order_db->payment_currency);
+        $invoice_request = new Invoice();
+        $invoice_request->setOrderId((int)$order_db->id);
+        $invoice_request->setAmount($order_db->total_cost_in_usd);
+        $invoice_request->setPaymentDriver($order_db->payment_driver);
+        $invoice_request->setPaymentType($order_db->payment_type);
+        $invoice_request->setPaymentCurrency($order_db->payment_currency);
 
-        $order->setUser(user($request));
-        $invoice = $this->payment_service->pay( $order);
+        $invoice_request->setUser(user($request->header('X-user-id')));
+        $invoice = $this->payment_service->pay( $invoice_request);
 
         return api()->success('success', ['invoice_id' => $invoice->getTransactionId(), 'checkout_link' => $invoice->getCheckoutLink()]);
     }

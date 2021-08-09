@@ -50,7 +50,8 @@ class PaymentCurrencies extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Payments\Services\PaymentCurrency::class);
         $this->payment_currencies = $arr;
-        return $this->payment_currencies;
+
+        return $this;
     }
 
 }

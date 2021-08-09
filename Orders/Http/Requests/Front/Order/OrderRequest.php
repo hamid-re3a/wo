@@ -36,7 +36,7 @@ class OrderRequest extends FormRequest
             'plan' => array('in:' . implode(',', ORDER_PLANS)),
 
             'payment_type' => array('required', Rule::in($this->getNamePaymentType())),
-            'payment_driver' => array('required_if:payment_type,=,gate-way'),
+//            'payment_driver' => array('required_if:payment_type,=,gate-way'),
             'payment_currency' => array('required', Rule::in($this->getNamePaymentCurrency())),
         ];
     }

@@ -28,13 +28,13 @@ class PaymentService implements PaymentsServiceInterface
     /**
      * @inheritDoc
      */
-    public function pay(Services\Order $request): Invoice
+    public function pay(Invoice $invoice_request): Invoice
     {
 
         $invoice = new Invoice();
-        switch ($request->getPaymentType()) {
+        switch ($invoice_request->getPaymentType()) {
             case 'gate-way':
-                return $this->payFromGateway($request);
+                return $this->payFromGateway($invoice_request);
             default:
                 break;
         }
@@ -43,46 +43,45 @@ class PaymentService implements PaymentsServiceInterface
 
     }
 
-    private function payFromGateway(Services\Order $order_request): Invoice
+    private function payFromGateway(Invoice $invoice_request): Invoice
     {
-        $invoice = new Invoice();
-        if ($order_request->getPaymentDriver() == 'btc-pay-server') {
+        if (!$invoice_request->getPaymentDriver() || $invoice_request->getPaymentDriver() == 'btc-pay-server') {
 
             $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
                 ->post(
                     config('payment.btc-pay-server-domain') .
                     'api/v1/stores/' . config('payment.btc-pay-server-store-id') . '/invoices',
                     [
-                        'amount' => $order_request->getTotalCostInUsd(),
+                        'amount' => $invoice_request->getTotalCostInUsd(),
                         'currency' => 'usd'
                     ]
                 );
 
             if ($response->ok()) {
-                $invoice->setOrderId((int)$order_request->getId());
-                $invoice->setAmount((double)$response->json()['amount']);
-                $invoice->setTransactionId($response->json()['id']);
-                $invoice->setCheckoutLink($response->json()['checkoutLink']);
-                $invoice->setStatus($response->json()['status']);
-                $invoice->setAdditionalStatus($response->json()['additionalStatus']);
-                $invoice->setExpirationTime($response->json()['expirationTime']);
+                $invoice_request->setAmount((double)$response->json()['amount']);
+                $invoice_request->setTransactionId($response->json()['id']);
+                $invoice_request->setCheckoutLink($response->json()['checkoutLink']);
+                $invoice_request->setStatus($response->json()['status']);
+                $invoice_request->setAdditionalStatus($response->json()['additionalStatus']);
+                $invoice_request->setExpirationTime($response->json()['expirationTime']);
 
 
                 \Payments\Models\Invoice::query()->create([
-                    'order_id' => $invoice->getOrderId(),
-                    'amount' => $invoice->getAmount(),
-                    'transaction_id' => $invoice->getTransactionId(),
-                    'checkout_link' => $invoice->getCheckoutLink(),
-                    'expiration_time' => Carbon::createFromTimestamp($invoice->getExpirationTime()),
-                    'status' => $invoice->getStatus(),
-                    'additional_status' => $invoice->getAdditionalStatus(),
+                    'order_id' => $invoice_request->getOrderId(),
+                    'amount' => $invoice_request->getAmount(),
+                    'transaction_id' => $invoice_request->getTransactionId(),
+                    'checkout_link' => $invoice_request->getCheckoutLink(),
+                    'expiration_time' => Carbon::createFromTimestamp($invoice_request->getExpirationTime()),
+                    'status' => $invoice_request->getStatus(),
+                    'additional_status' => $invoice_request->getAdditionalStatus(),
                 ]);
 
-                EmailJob::dispatch(new EmailInvoiceCreated($order_request->getUser(), $invoice),$order_request->getUser()->getEmail());
+                if(!$invoice_request->getOrderId())
+                    EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
             }
 
         }
-        return $invoice;
+        return $invoice_request;
     }
 
 

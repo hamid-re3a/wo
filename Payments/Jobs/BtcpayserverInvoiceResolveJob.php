@@ -9,7 +9,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
-use Mix\Grpc\Context;
 use Orders\Services\OrderService;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
@@ -65,11 +64,11 @@ class BtcpayserverInvoiceResolveJob implements ShouldQueue
         $order_service = new OrderService();
         $Id = new \Orders\Services\Id();
         $Id->setId((int)$invoice_db->order_id);
-        $order_service = $order_service->OrderById(new Context(), $Id);
+        $order_service = $order_service->OrderById( $Id);
         $invoice_service = new PaymentService();
         $payment_Id = new \Payments\Services\Id();
         $payment_Id->setId((int)$invoice_db->id);
-        $invoice_model = $invoice_service->getInvoiceById(new Context(), $payment_Id);
+        $invoice_model = $invoice_service->getInvoiceById( $payment_Id);
 
         switch ($invoice_db->full_status) {
             case 'New PaidPartial':

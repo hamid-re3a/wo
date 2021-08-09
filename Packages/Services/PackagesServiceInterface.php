@@ -4,20 +4,7 @@
 
 namespace Packages\Services;
 
-use Mix\Grpc;
-use Mix\Grpc\Context;
-
-interface PackagesServiceInterface extends Grpc\ServiceInterface
+interface PackagesServiceInterface
 {
-    // GRPC specific service name.
-    public const NAME = "packages.Services.PackagesService";
-
-    /**
-    * @param Context $context
-    * @param Id $request
-    * @return Package
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function packageById(Context $context, Id $request): Package;
+    public function packageById(Id $request): Package;
 }

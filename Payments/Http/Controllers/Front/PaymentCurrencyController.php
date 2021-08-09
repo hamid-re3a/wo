@@ -3,7 +3,6 @@
 namespace Payments\Http\Controllers\Front;
 
 use Illuminate\Routing\Controller;
-use Mix\Grpc\Context;
 use Payments\Http\Resources\PaymentCurrencyResource;
 use Payments\Models\PaymentCurrency;
 use Payments\Services\EmptyObject;
@@ -27,6 +26,6 @@ class PaymentCurrencyController extends Controller
     public function index()
     {
 
-        return api()->success('payment.successfully-fetched-all-payment-currencies',PaymentCurrencyResource::collection(collect($this->payment_service->getPaymentCurrencies(new Context(), new EmptyObject())->getPaymentCurrencies())));
+        return api()->success('payment.successfully-fetched-all-payment-currencies',PaymentCurrencyResource::collection(collect($this->payment_service->getPaymentCurrencies( new EmptyObject())->getPaymentCurrencies())));
     }
 }

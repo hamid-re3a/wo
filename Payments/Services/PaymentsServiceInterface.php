@@ -4,48 +4,20 @@
 
 namespace Payments\Services;
 
-use Mix\Grpc;
-use Mix\Grpc\Context;
 use Orders\Services;
 
-interface PaymentsServiceInterface extends Grpc\ServiceInterface
+interface PaymentsServiceInterface
 {
     // GRPC specific service name.
-    public const NAME = "payments.services.PaymentsService";
 
-    /**
-    * @param Context $context
-    * @param Id $request
-    * @return Invoice
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function getInvoiceById(Context $context, Id $request): Invoice;
+    public function getInvoiceById( Id $request): Invoice;
 
-    /**
-    * @param Context $context
-    * @param Services\Order $request
-    * @return Invoice
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function pay(Context $context, Services\Order $request): Invoice;
 
-    /**
-    * @param Context $context
-    * @param EmptyObject $request
-    * @return PaymentCurrencies
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function getPaymentCurrencies(Context $context, EmptyObject $request): PaymentCurrencies;
+    public function pay( Services\Order $request): Invoice;
 
-    /**
-    * @param Context $context
-    * @param EmptyObject $request
-    * @return PaymentTypes
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function getPaymentTypes(Context $context, EmptyObject $request): PaymentTypes;
+
+    public function getPaymentCurrencies( EmptyObject $request): PaymentCurrencies;
+
+
+    public function getPaymentTypes( EmptyObject $request): PaymentTypes;
 }

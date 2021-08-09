@@ -3,7 +3,6 @@
 
 namespace Packages\Services;
 
-use Mix\Grpc\Context;
 use Packages\Repository\PackageRepository;
 
 class PackageService implements PackagesServiceInterface
@@ -18,13 +17,12 @@ class PackageService implements PackagesServiceInterface
     /**
      * @inheritDoc
      */
-    public function packageById(Context $context, Id $id): Package
+    public function packageById(Id $id): Package
     {
-        return new Package();
-        $packeage = $this->package_repository->getById($id);
-        if (is_null($packeage))
+        $package = $this->package_repository->getById($id);
+        if (is_null($package))
             return new Package();
-        return $this->setPackage($packeage);
+        return $this->setPackage($package);
     }
 
 

@@ -16,7 +16,7 @@ use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use Payments\Services\PaymentService;
 
-class BtcpayserverInvoiceResolveJob implements ShouldQueue
+class InvoiceResolverBTCPayServerJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -61,14 +61,13 @@ class BtcpayserverInvoiceResolveJob implements ShouldQueue
 
 
         $invoice_db = $this->invoice_db;
-        $order_service = new OrderService();
         $Id = new \Orders\Services\Id();
         $Id->setId((int)$invoice_db->order_id);
-        $order_service = $order_service->OrderById( $Id);
         $invoice_service = new PaymentService();
         $payment_Id = new \Payments\Services\Id();
         $payment_Id->setId((int)$invoice_db->id);
         $invoice_model = $invoice_service->getInvoiceById( $payment_Id);
+        $order_service = $invoice_model->getOrder();
 
         switch ($invoice_db->full_status) {
             case 'New PaidPartial':

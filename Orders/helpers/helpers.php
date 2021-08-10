@@ -11,10 +11,10 @@ const ORDER_PLANS = [
 
 if (!function_exists('user')) {
 
-    function user(int $id ) : ?\Orders\Services\User
+    function user(int $id ) : ?\User\Services\User
     {
         $user_db = OrderUser::query()->find($id);
-        $user = new \Orders\Services\User();
+        $user = new \User\Services\User();
         $user->setId((int)$user_db->id);
         $user->setFirstName($user_db->first_name);
         $user->setLastName($user_db->last_name);

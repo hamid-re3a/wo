@@ -4,7 +4,6 @@ namespace Orders\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Orders\Services\User;
 use Packages\Models\Package;
 use Packages\Services\Id;
 use Packages\Services\PackageService;

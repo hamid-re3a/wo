@@ -53,6 +53,7 @@
             "Orders\\": "Orders/",
             "Wallets\\": "Wallets/",
             "Payments\\": "Payments/",
+            "User\\": "User/",
             "GPBMetadata\\": "GPBMetadata/"
         }
     },

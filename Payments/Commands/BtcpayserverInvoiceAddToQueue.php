@@ -3,7 +3,7 @@
 namespace Payments\Commands;
 
 use Illuminate\Console\Command;
-use Payments\Jobs\BtcpayserverInvoiceResolveJob;
+use Payments\Jobs\InvoiceResolverBTCPayServerJob;
 use Payments\Models\Invoice;
 
 class BtcpayserverInvoiceAddToQueue extends Command
@@ -46,7 +46,7 @@ class BtcpayserverInvoiceAddToQueue extends Command
         $bar->start();
 
         foreach ($invoices as $item) {
-            BtcpayserverInvoiceResolveJob::dispatch($item);
+            InvoiceResolverBTCPayServerJob::dispatch($item);
             $bar->advance();
         }
 

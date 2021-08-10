@@ -82,7 +82,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
      */
     protected $order = null;
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 28;</code>
+     * Generated from protobuf field <code>.user.services.User user = 28;</code>
      */
     protected $user = null;
 
@@ -109,7 +109,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     @type string $created_at
      *     @type string $updated_at
      *     @type \Orders\Services\Order $order
-     *     @type \Orders\Services\User $user
+     *     @type \User\Services\User $user
      * }
      */
     public function __construct($data = NULL) {
@@ -502,8 +502,8 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 28;</code>
-     * @return \Orders\Services\User|null
+     * Generated from protobuf field <code>.user.services.User user = 28;</code>
+     * @return \User\Services\User|null
      */
     public function getUser()
     {
@@ -521,13 +521,13 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 28;</code>
-     * @param \Orders\Services\User $var
+     * Generated from protobuf field <code>.user.services.User user = 28;</code>
+     * @param \User\Services\User $var
      * @return $this
      */
     public function setUser($var)
     {
-        GPBUtil::checkMessage($var, \Orders\Services\User::class);
+        GPBUtil::checkMessage($var, \User\Services\User::class);
         $this->user = $var;
 
         return $this;

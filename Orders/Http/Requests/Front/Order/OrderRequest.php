@@ -29,14 +29,14 @@ class OrderRequest extends FormRequest
     {
             return [
 
-            'items' => 'required|array|min:1|max:1',
+            'package_ids' => 'required|array|min:1|max:1',
 //            'items.*.id' => 'exists:packages,id',
 //            'items.*.qty' => 'required|numeric|min:1',
 //            'to_user_id' => 'nullable|exists:order_users,id',
             'plan' => array('in:' . implode(',', ORDER_PLANS)),
 
             'payment_type' => array('required', Rule::in($this->getNamePaymentType())),
-            'payment_driver' => array('required_if:payment_type,=,gate-way'),
+//            'payment_driver' => array('required_if:payment_type,=,purchase'),
             'payment_currency' => array('required', Rule::in($this->getNamePaymentCurrency())),
         ];
     }

@@ -17,6 +17,7 @@ class CreateInvoicesTable extends Migration
             $table->id();
 
             $table->unsignedBigInteger('order_id')->nullable();
+            $table->unsignedDouble('pf_amount')->default(0);
             $table->unsignedDouble('amount')->default(0);
 
             $table->string('transaction_id')->nullable();
@@ -31,6 +32,12 @@ class CreateInvoicesTable extends Migration
             $table->unsignedDouble('due_amount')->default(0);
 
             $table->timestamp('expiration_time')->nullable();
+
+
+            $table->string('payment_type');
+            $table->string('payment_currency');
+            $table->string('payment_driver')->nullable();
+
             $table->timestamps();
         });
     }

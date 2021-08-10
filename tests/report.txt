@@ -2,6 +2,3 @@ Package Feature (Packages\tests\Feature\PackageFeature)
  [x] Return package list green
 
 Payment Feature (Payments\tests\Feature\PaymentFeature)
- [x] Get payment types
- [x] Get payment currencies
-

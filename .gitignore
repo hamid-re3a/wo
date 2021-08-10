@@ -15,3 +15,5 @@ yarn-error.log
 .ideal
 _ide_helper.php
 server_deploy.sh
+database.sqlite
+composer.lock

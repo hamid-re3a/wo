@@ -18,57 +18,77 @@ class Invoice extends \Google\Protobuf\Internal\Message
      */
     protected $order_id = 0;
     /**
-     * Generated from protobuf field <code>double amount = 2;</code>
+     * Generated from protobuf field <code>double pf_amount = 2;</code>
+     */
+    protected $pf_amount = 0.0;
+    /**
+     * Generated from protobuf field <code>double amount = 3;</code>
      */
     protected $amount = 0.0;
     /**
-     * Generated from protobuf field <code>string transaction_id = 3;</code>
+     * Generated from protobuf field <code>string transaction_id = 4;</code>
      */
     protected $transaction_id = '';
     /**
-     * Generated from protobuf field <code>string checkout_link = 4;</code>
+     * Generated from protobuf field <code>string checkout_link = 5;</code>
      */
     protected $checkout_link = '';
     /**
-     * Generated from protobuf field <code>string status = 5;</code>
+     * Generated from protobuf field <code>string status = 6;</code>
      */
     protected $status = '';
     /**
-     * Generated from protobuf field <code>string additional_status = 6;</code>
+     * Generated from protobuf field <code>string additional_status = 7;</code>
      */
     protected $additional_status = '';
     /**
-     * Generated from protobuf field <code>double paid_amount = 7;</code>
+     * Generated from protobuf field <code>double paid_amount = 8;</code>
      */
     protected $paid_amount = 0.0;
     /**
-     * Generated from protobuf field <code>double due_amount = 8;</code>
+     * Generated from protobuf field <code>double due_amount = 9;</code>
      */
     protected $due_amount = 0.0;
     /**
-     * Generated from protobuf field <code>bool is_paid = 9;</code>
+     * Generated from protobuf field <code>bool is_paid = 10;</code>
      */
     protected $is_paid = false;
     /**
-     * Generated from protobuf field <code>string expiration_time = 10;</code>
+     * Generated from protobuf field <code>string expiration_time = 11;</code>
      */
     protected $expiration_time = '';
     /**
-     * Generated from protobuf field <code>string deleted_at = 11;</code>
+     * Generated from protobuf field <code>string payment_type = 12;</code>
+     */
+    protected $payment_type = '';
+    /**
+     * Generated from protobuf field <code>string payment_currency = 13;</code>
+     */
+    protected $payment_currency = '';
+    /**
+     * Generated from protobuf field <code>string payment_driver = 14;</code>
+     */
+    protected $payment_driver = '';
+    /**
+     * Generated from protobuf field <code>string deleted_at = 15;</code>
      */
     protected $deleted_at = '';
     /**
-     * Generated from protobuf field <code>string created_at = 12;</code>
+     * Generated from protobuf field <code>string created_at = 16;</code>
      */
     protected $created_at = '';
     /**
-     * Generated from protobuf field <code>string updated_at = 13;</code>
+     * Generated from protobuf field <code>string updated_at = 17;</code>
      */
     protected $updated_at = '';
     /**
-     * Generated from protobuf field <code>.orders.services.Order order = 14;</code>
+     * Generated from protobuf field <code>.orders.services.Order order = 18;</code>
      */
     protected $order = null;
+    /**
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
+     */
+    protected $user = null;
 
     /**
      * Constructor.
@@ -77,6 +97,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int|string $order_id
+     *     @type float $pf_amount
      *     @type float $amount
      *     @type string $transaction_id
      *     @type string $checkout_link
@@ -86,10 +107,14 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     @type float $due_amount
      *     @type bool $is_paid
      *     @type string $expiration_time
+     *     @type string $payment_type
+     *     @type string $payment_currency
+     *     @type string $payment_driver
      *     @type string $deleted_at
      *     @type string $created_at
      *     @type string $updated_at
      *     @type \Orders\Services\Order $order
+     *     @type \User\Services\User $user
      * }
      */
     public function __construct($data = NULL) {
@@ -120,7 +145,29 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double amount = 2;</code>
+     * Generated from protobuf field <code>double pf_amount = 2;</code>
+     * @return float
+     */
+    public function getPfAmount()
+    {
+        return $this->pf_amount;
+    }
+
+    /**
+     * Generated from protobuf field <code>double pf_amount = 2;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setPfAmount($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->pf_amount = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>double amount = 3;</code>
      * @return float
      */
     public function getAmount()
@@ -129,7 +176,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double amount = 2;</code>
+     * Generated from protobuf field <code>double amount = 3;</code>
      * @param float $var
      * @return $this
      */
@@ -142,7 +189,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string transaction_id = 3;</code>
+     * Generated from protobuf field <code>string transaction_id = 4;</code>
      * @return string
      */
     public function getTransactionId()
@@ -151,7 +198,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string transaction_id = 3;</code>
+     * Generated from protobuf field <code>string transaction_id = 4;</code>
      * @param string $var
      * @return $this
      */
@@ -164,7 +211,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string checkout_link = 4;</code>
+     * Generated from protobuf field <code>string checkout_link = 5;</code>
      * @return string
      */
     public function getCheckoutLink()
@@ -173,7 +220,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string checkout_link = 4;</code>
+     * Generated from protobuf field <code>string checkout_link = 5;</code>
      * @param string $var
      * @return $this
      */
@@ -186,7 +233,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string status = 5;</code>
+     * Generated from protobuf field <code>string status = 6;</code>
      * @return string
      */
     public function getStatus()
@@ -195,7 +242,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string status = 5;</code>
+     * Generated from protobuf field <code>string status = 6;</code>
      * @param string $var
      * @return $this
      */
@@ -208,7 +255,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string additional_status = 6;</code>
+     * Generated from protobuf field <code>string additional_status = 7;</code>
      * @return string
      */
     public function getAdditionalStatus()
@@ -217,7 +264,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string additional_status = 6;</code>
+     * Generated from protobuf field <code>string additional_status = 7;</code>
      * @param string $var
      * @return $this
      */
@@ -230,7 +277,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double paid_amount = 7;</code>
+     * Generated from protobuf field <code>double paid_amount = 8;</code>
      * @return float
      */
     public function getPaidAmount()
@@ -239,7 +286,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double paid_amount = 7;</code>
+     * Generated from protobuf field <code>double paid_amount = 8;</code>
      * @param float $var
      * @return $this
      */
@@ -252,7 +299,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double due_amount = 8;</code>
+     * Generated from protobuf field <code>double due_amount = 9;</code>
      * @return float
      */
     public function getDueAmount()
@@ -261,7 +308,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double due_amount = 8;</code>
+     * Generated from protobuf field <code>double due_amount = 9;</code>
      * @param float $var
      * @return $this
      */
@@ -274,7 +321,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool is_paid = 9;</code>
+     * Generated from protobuf field <code>bool is_paid = 10;</code>
      * @return bool
      */
     public function getIsPaid()
@@ -283,7 +330,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool is_paid = 9;</code>
+     * Generated from protobuf field <code>bool is_paid = 10;</code>
      * @param bool $var
      * @return $this
      */
@@ -296,7 +343,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string expiration_time = 10;</code>
+     * Generated from protobuf field <code>string expiration_time = 11;</code>
      * @return string
      */
     public function getExpirationTime()
@@ -305,7 +352,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string expiration_time = 10;</code>
+     * Generated from protobuf field <code>string expiration_time = 11;</code>
      * @param string $var
      * @return $this
      */
@@ -318,7 +365,73 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string deleted_at = 11;</code>
+     * Generated from protobuf field <code>string payment_type = 12;</code>
+     * @return string
+     */
+    public function getPaymentType()
+    {
+        return $this->payment_type;
+    }
+
+    /**
+     * Generated from protobuf field <code>string payment_type = 12;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPaymentType($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->payment_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string payment_currency = 13;</code>
+     * @return string
+     */
+    public function getPaymentCurrency()
+    {
+        return $this->payment_currency;
+    }
+
+    /**
+     * Generated from protobuf field <code>string payment_currency = 13;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPaymentCurrency($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->payment_currency = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string payment_driver = 14;</code>
+     * @return string
+     */
+    public function getPaymentDriver()
+    {
+        return $this->payment_driver;
+    }
+
+    /**
+     * Generated from protobuf field <code>string payment_driver = 14;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setPaymentDriver($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->payment_driver = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string deleted_at = 15;</code>
      * @return string
      */
     public function getDeletedAt()
@@ -327,7 +440,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string deleted_at = 11;</code>
+     * Generated from protobuf field <code>string deleted_at = 15;</code>
      * @param string $var
      * @return $this
      */
@@ -340,7 +453,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string created_at = 12;</code>
+     * Generated from protobuf field <code>string created_at = 16;</code>
      * @return string
      */
     public function getCreatedAt()
@@ -349,7 +462,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string created_at = 12;</code>
+     * Generated from protobuf field <code>string created_at = 16;</code>
      * @param string $var
      * @return $this
      */
@@ -362,7 +475,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string updated_at = 13;</code>
+     * Generated from protobuf field <code>string updated_at = 17;</code>
      * @return string
      */
     public function getUpdatedAt()
@@ -371,7 +484,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string updated_at = 13;</code>
+     * Generated from protobuf field <code>string updated_at = 17;</code>
      * @param string $var
      * @return $this
      */
@@ -384,7 +497,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.Order order = 14;</code>
+     * Generated from protobuf field <code>.orders.services.Order order = 18;</code>
      * @return \Orders\Services\Order|null
      */
     public function getOrder()
@@ -403,7 +516,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.Order order = 14;</code>
+     * Generated from protobuf field <code>.orders.services.Order order = 18;</code>
      * @param \Orders\Services\Order $var
      * @return $this
      */
@@ -411,6 +524,38 @@ class Invoice extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Orders\Services\Order::class);
         $this->order = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
+     * @return \User\Services\User|null
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function hasUser()
+    {
+        return isset($this->user);
+    }
+
+    public function clearUser()
+    {
+        unset($this->user);
+    }
+
+    /**
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
+     * @param \User\Services\User $var
+     * @return $this
+     */
+    public function setUser($var)
+    {
+        GPBUtil::checkMessage($var, \User\Services\User::class);
+        $this->user = $var;
 
         return $this;
     }

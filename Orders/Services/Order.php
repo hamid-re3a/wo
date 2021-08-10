@@ -86,11 +86,11 @@ class Order extends \Google\Protobuf\Internal\Message
      */
     protected $updated_at = '';
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
      */
     protected $user = null;
     /**
-     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
+     * Generated from protobuf field <code>.user.services.User to_user = 20;</code>
      */
     protected $to_user = null;
 
@@ -118,8 +118,8 @@ class Order extends \Google\Protobuf\Internal\Message
      *     @type string $deleted_at
      *     @type string $created_at
      *     @type string $updated_at
-     *     @type \Orders\Services\User $user
-     *     @type \Orders\Services\User $to_user
+     *     @type \User\Services\User $user
+     *     @type \User\Services\User $to_user
      * }
      */
     public function __construct($data = NULL) {
@@ -524,8 +524,8 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
-     * @return \Orders\Services\User|null
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
+     * @return \User\Services\User|null
      */
     public function getUser()
     {
@@ -543,21 +543,21 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
-     * @param \Orders\Services\User $var
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
+     * @param \User\Services\User $var
      * @return $this
      */
     public function setUser($var)
     {
-        GPBUtil::checkMessage($var, \Orders\Services\User::class);
+        GPBUtil::checkMessage($var, \User\Services\User::class);
         $this->user = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
-     * @return \Orders\Services\User|null
+     * Generated from protobuf field <code>.user.services.User to_user = 20;</code>
+     * @return \User\Services\User|null
      */
     public function getToUser()
     {
@@ -575,13 +575,13 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
-     * @param \Orders\Services\User $var
+     * Generated from protobuf field <code>.user.services.User to_user = 20;</code>
+     * @param \User\Services\User $var
      * @return $this
      */
     public function setToUser($var)
     {
-        GPBUtil::checkMessage($var, \Orders\Services\User::class);
+        GPBUtil::checkMessage($var, \User\Services\User::class);
         $this->to_user = $var;
 
         return $this;

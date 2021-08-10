@@ -34,7 +34,7 @@ class WebhookJob implements ShouldQueue
             ]);
 
 
-            BtcpayserverInvoiceResolveJob::dispatch($invoice_db);
+            InvoiceResolverBTCPayServerJob::dispatch($invoice_db);
 
 
         } else {

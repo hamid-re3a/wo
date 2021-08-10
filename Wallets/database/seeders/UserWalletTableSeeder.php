@@ -1,6 +1,6 @@
 <?php
 
-namespace Payments\database\seeders;
+namespace Wallets\database\seeders;
 
 use Illuminate\Database\Seeder;
 use Orders\Models\OrderUser;
@@ -9,7 +9,7 @@ use Wallets\Models\WalletUser;
 /**
  * Class AuthTableSeeder.
  */
-class UserTableSeeder extends Seeder
+class UserWalletTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.

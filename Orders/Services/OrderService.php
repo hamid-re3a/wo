@@ -6,6 +6,7 @@ namespace Orders\Services;
 
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
+use User\Services\User;
 
 class OrderService implements OrdersServiceInterface
 {

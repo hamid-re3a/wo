@@ -1,15 +1,14 @@
 <?php
 
-namespace Payments\database\seeders;
+namespace Orders\database\seeders;
 
-use Payments\Models\EmailContentSetting;
 use Illuminate\Database\Seeder;
-use Payments\Models\Setting;
+use Orders\Models\OrderUser;
 
 /**
  * Class AuthTableSeeder.
  */
-class SettingTableSeeder extends Seeder
+class UserTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,33 +17,13 @@ class SettingTableSeeder extends Seeder
      */
     public function run()
     {
-        foreach (SETTINGS as $key => $setting) {
-            $key = Setting::query()->firstOrCreate([
-                'key' => $key
-            ]);
-            if (is_null($key->value)) {
-                $key->value = $setting['value'];
-                $key->description = $setting['description'];
-                $key->category = $setting['category'];
-                $key->save();
-            }
-        }
-        foreach (PAYMENT_EMAIL_CONTENT_SETTINGS as $key => $setting) {
-
-            if (!EmailContentSetting::query()->whereKey($key)->exists()) {
-                EmailContentSetting::query()->create([
-                    'key' => $key,
-                    'is_active' => $setting['is_active'],
-                    'subject' => $setting['subject'],
-                    'from' => $setting['from'],
-                    'from_name' => $setting['from_name'],
-                    'body' => $setting['body'],
-                    'variables' => $setting['variables'],
-                    'variables_description' => $setting['variables_description'],
-                    'type' => $setting['type'],
-                ]);
-            }
-        }
+        $user = OrderUser::query()->firstOrCreate(['id'=>1]);
+        $user->update([
+            'first_name'=>'hamid',
+            'last_name'=>'noruzi',
+            'email'=>'hamidrezanoruzinejad@gmail.com',
+            'username'=>'hamid_re3a',
+        ]);
 
 
     }

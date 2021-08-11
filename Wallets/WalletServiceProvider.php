@@ -48,6 +48,8 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
+        $this->registerWalletsName();
+
         $this->registerMiddlewares();
 
         Route::prefix('v1/wallets')
@@ -91,6 +93,14 @@ class WalletServiceProvider extends ServiceProvider
     {
         $kernel = $this->app->make(Kernel::class);
         $kernel->pushMiddleware(AuthMiddleware::class);
+    }
+
+    protected function registerWalletsName()
+    {
+        config([
+            'depositWallet' => 'Deposit Wallet',
+            'earningWallet' => 'Earning Wallet'
+        ]);
     }
 
 

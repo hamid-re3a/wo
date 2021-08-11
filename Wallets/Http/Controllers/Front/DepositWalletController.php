@@ -12,11 +12,12 @@ use Wallets\Services\BankService;
 class DepositWalletController extends Controller
 {
     private $bankService;
-    private $wallet = 'Deposit Wallet';
+    private $wallet;
 
     public function __construct()
     {
         $this->bankService = new BankService(request()->wallet_user);
+        $this->wallet = config('depositWallet');
         $this->bankService->getWallet($this->wallet);
     }
 

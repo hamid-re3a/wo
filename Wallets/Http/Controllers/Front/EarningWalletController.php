@@ -12,11 +12,12 @@ use Wallets\Services\BankService;
 class EarningWalletController extends Controller
 {
     private $bankService;
-    private $wallet = 'Earning Wallet';
+    private $wallet;
 
     public function __construct()
     {
         $this->bankService = new BankService(request()->wallet_user);
+        $this->wallet = config('earningWallet');
         $this->bankService->getWallet($this->wallet);
     }
 

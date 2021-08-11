@@ -17,10 +17,10 @@ class CreateWalletUsersTable extends Migration
             $table->engine = "InnoDB";
             $table->id();
             $table->unsignedBigInteger('user_id')->unique();
-            $table->string('first_name',100);
-            $table->string('last_name',100);
-            $table->string('username',100)->unique();
-            $table->string('email',100)->unique()->index();
+            $table->string('first_name',100)->nullable();
+            $table->string('last_name',100)->nullable();
+            $table->string('username',100)->nullable()->unique();
+            $table->string('email',100)->nullable()->unique()->index();
 
             $table->softDeletes();
             $table->timestamps();

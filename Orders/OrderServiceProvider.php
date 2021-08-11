@@ -52,7 +52,7 @@ class OrderServiceProvider extends ServiceProvider
             ->group(__DIR__ . '/routes/api.php');
 
         if ($this->app->runningInConsole()) {
-//            $this->seed();
+            $this->seed();
 
             $this->publishes([
                 __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),

@@ -7,15 +7,15 @@ return [
 
     'payment_types' => [
         [
-            'name'=>'gift-code',
+            'name'=>'giftcode',
             'is_active'=>true,
         ],
         [
-            'name'=>'gate-way',
+            'name'=>'purchase',
             'is_active'=>true,
         ],
         [
-            'name'=>'wallet',
+            'name'=>'deposit',
             'is_active'=>true,
         ]
 

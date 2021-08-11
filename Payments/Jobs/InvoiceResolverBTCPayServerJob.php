@@ -15,6 +15,9 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use Payments\Services\PaymentService;
+use User\Services\User;
+use Wallets\Services\Deposit;
+use Wallets\Services\WalletService;
 
 class InvoiceResolverBTCPayServerJob implements ShouldQueue
 {
@@ -85,6 +88,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_service->getUser(), $invoice_model),$order_service->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
+
+
                 break;
             case 'Expired PaidPartial':
             case 'Expired None':

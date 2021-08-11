@@ -43,7 +43,6 @@ class WalletService implements WalletServiceInterface
                 $transaction->getAmount() > 0 AND
                 $transaction->getToWalletName() AND
                 $transaction->getToUserId() AND
-                $transaction->getConfiremd() AND
                 in_array(strtolower($transaction->getToWalletName()) ,['deposit','deposit wallet'])
             ) {
                 $bankService = new BankService($walletUser);
@@ -76,7 +75,6 @@ class WalletService implements WalletServiceInterface
                 $transaction->getAmount() > 0 AND
                 $transaction->getToWalletName() AND
                 $transaction->getToUserId() AND
-                $transaction->getConfiremd() AND
                 in_array(strtolower($transaction->getToWalletName()) ,['earning','earning wallet'])
             ) {
                 $bankService = new BankService($walletUser);
@@ -104,9 +102,10 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
             $transaction = $transfer->getTransaction();
             if (
-                $transaction->getConfiremd() AND
                 $transaction->getAmount() > 0 AND
                 $transaction->getToWalletName() AND
+                $transaction->getFromWalletName() AND
+                $transaction->getFromUserId() AND
                 $transaction->getToUserId() AND
                 $transaction->getConfiremd()
             ) {

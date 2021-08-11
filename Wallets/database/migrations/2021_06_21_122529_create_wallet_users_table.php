@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOrderUsersTable extends Migration
+class CreateWalletUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,14 @@ class CreateOrderUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('wallet_user', function (Blueprint $table) {
+        Schema::create('wallet_users', function (Blueprint $table) {
+            $table->engine = "InnoDB";
             $table->id();
-
-            $table->string('first_name',100)->nullable();
-            $table->string('last_name',100)->nullable();
-            $table->string('username',100)->nullable();
-            $table->string('email',100)->nullable();
+            $table->unsignedBigInteger('user_id')->unique();
+            $table->string('first_name',100);
+            $table->string('last_name',100);
+            $table->string('username',100)->unique();
+            $table->string('email',100)->unique()->index();
 
             $table->softDeletes();
             $table->timestamps();
@@ -33,6 +34,6 @@ class CreateOrderUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('wallet_user');
+        Schema::dropIfExists('wallet_users');
     }
 }

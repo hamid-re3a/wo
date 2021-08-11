@@ -178,6 +178,7 @@ return [
         \Packages\PackageServiceProvider::class,
         \Payments\PaymentServiceProvider::class,
         \Orders\OrderServiceProvider::class,
+        \Wallets\WalletServiceProvider::class,
 
     ],
 

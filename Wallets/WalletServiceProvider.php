@@ -2,15 +2,16 @@
 
 namespace Wallets;
 
+use Illuminate\Contracts\Http\Kernel;
 use Payments\PaymentConfigure;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Wallets\Http\Middlewares\AuthMiddleware;
 
 class WalletServiceProvider extends ServiceProvider
 {
     private $routes_namespace = 'Wallets\Http\Controllers';
-    private $namespace = 'Payments';
+    private $namespace = 'Wallets';
     private $name = 'wallets';
     private $config_file_name = 'wallet';
 
@@ -47,6 +48,8 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
+        $this->registerMiddlewares();
+
         Route::prefix('v1/wallets')
             ->middleware('api')
             ->namespace($this->routes_namespace)
@@ -79,6 +82,15 @@ class WalletServiceProvider extends ServiceProvider
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
         }
+    }
+
+    /**
+     * Register Middlewares
+     */
+    protected function registerMiddlewares()
+    {
+        $kernel = $this->app->make(Kernel::class);
+        $kernel->pushMiddleware(AuthMiddleware::class);
     }
 
 

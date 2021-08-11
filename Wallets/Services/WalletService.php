@@ -31,6 +31,20 @@ class WalletService implements WalletServiceInterface
         ]);
     }
 
+    private function trueResponse()
+    {
+        $response = new Transaction();
+        $response->setConfiremd(true);
+        return $response;
+    }
+
+    private function falseResponse()
+    {
+        $response = new Transaction();
+        $response->setConfiremd(false);
+        return $response;
+    }
+
     public function deposit(Deposit $deposit): Transaction
     {
         try {
@@ -49,17 +63,16 @@ class WalletService implements WalletServiceInterface
 
                 $bankService->deposit($this->depositWallet,$transaction->getAmount(), $transaction->getDescription() ?: null);
 
-                $transactionObject = new Transaction();
-                $transactionObject->setConfiremd(true);
-
                 DB::commit();
-                return $transactionObject;
+
+                return $this->trueResponse();
+
             } else {
                 DB::rollBack();
-                return new Transaction();
+                return $this->falseResponse();
             }
         } catch (\Throwable $exception) {
-            return new Transaction();
+            return $this->falseResponse();
         }
     }
 
@@ -81,18 +94,17 @@ class WalletService implements WalletServiceInterface
 
                 $bankService->withdraw($this->earningWallet,$transaction->getAmount(), $transaction->getDescription() ?: null);
 
-                $transactionObject = new Transaction();
-                $transactionObject->setConfiremd(true);
-
                 DB::commit();
-                return $transactionObject;
+
+                return $this->trueResponse();
+
             } else {
                 DB::rollBack();
-                return new Transaction();
+                return $this->falseResponse();
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
-            return new Transaction();
+            return $this->falseResponse();
         }
     }
 
@@ -118,15 +130,19 @@ class WalletService implements WalletServiceInterface
                 $toWallet = Str::contains(Str::lower($transaction->getToWalletName()), 'deposit') ? $this->depositWallet : $this->earningWallet;
 
                 $fromBankService->transfer($fromWallet,$toBankService->getWallet($toWallet), $transaction->getAmount(), $transaction->getDescription() ?: null);
+
                 DB::commit();
+
+                return $this->trueResponse();
+
             } else {
                 DB::rollBack();
-                return new Transaction();
+                return $this->falseResponse();
             }
         } catch (\Throwable $exception) {
 
             DB::rollBack();
-            return new Transaction();
+            return $this->falseResponse();
         }
     }
 

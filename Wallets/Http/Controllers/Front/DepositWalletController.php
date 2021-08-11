@@ -22,7 +22,7 @@ class DepositWalletController extends Controller
     }
 
     /**
-     * transactions
+     * Get transactions
      * @group Wallets > Deposit Wallet
      * @param TransactionRequest $request
      * @return JsonResponse
@@ -33,7 +33,7 @@ class DepositWalletController extends Controller
     }
 
     /**
-     * transfers
+     * Get transfers
      * @group Wallets > Deposit Wallet
      * @return JsonResponse
      */

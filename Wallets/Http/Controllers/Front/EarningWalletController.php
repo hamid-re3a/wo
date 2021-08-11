@@ -22,7 +22,7 @@ class EarningWalletController extends Controller
     }
 
     /**
-     * transactions
+     * Get transactions
      * @group Wallets > Earning Wallet
      * @param TransactionRequest $request
      * @return JsonResponse
@@ -33,7 +33,7 @@ class EarningWalletController extends Controller
     }
 
     /**
-     * transfers
+     * Get transfers
      * @group Wallets > Earning Wallet
      * @return JsonResponse
      */

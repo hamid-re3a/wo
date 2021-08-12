@@ -29,7 +29,7 @@ class DepositWalletController extends Controller
      */
     public function transactions(TransactionRequest $request)
     {
-        return api()->success(null,TransactionResource::collection($this->bankService->getTransactions($this->wallet)->simplePaginate()));
+        return api()->success(null,TransactionResource::collection($this->bankService->getTransactions($this->wallet)->simplePaginate())->response()->getData());
     }
 
     /**
@@ -39,6 +39,6 @@ class DepositWalletController extends Controller
      */
     public function transfers()
     {
-        return api()->success(null,TransferResource::collection($this->bankService->transfers($this->wallet)->simplePaginate()));
+        return api()->success(null,TransferResource::collection($this->bankService->transfers($this->wallet)->simplePaginate())->response()->getData());
     }
 }

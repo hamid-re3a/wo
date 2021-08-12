@@ -115,7 +115,7 @@ class BankService
         return $transactionQuery;
     }
 
-    public function transfers($wallet_name)
+    public function getTransfers($wallet_name)
     {
         return $this->getWallet($wallet_name)->transfers();
     }

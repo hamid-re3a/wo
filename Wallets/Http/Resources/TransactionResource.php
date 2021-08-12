@@ -18,7 +18,7 @@ class TransactionResource extends JsonResource
             'id' => $this->uuid,
             'wallet' => $this->wallet->name,
             'type' => $this->type,
-            'amount' => $this->amount,
+            'amount' => number_format($this->amountFloat,2),
             'description' => $this->meta ? $this->meta['description'] : null,
             'confirmed' => $this->confirmed,
             'created_at' => $this->created_at,

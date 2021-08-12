@@ -26,7 +26,7 @@ class TransferResource extends JsonResource
                 'wallet' => $this->to->name,
                 'confirmed' => $this->withdraw->confirmed
             ],
-            'amount' => $this->deposit->amount
+            'amount' => number_format($this->deposit->amountFloat,2)
         ];
     }
 }

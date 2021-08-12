@@ -89,6 +89,10 @@ class BankService
         $transactionQuery = $this->owner->transactions()->whereHas('wallet', function($query) use($wallet_name){
             $query->where('name', $wallet_name);
         });
+
+        if(request()->has('transaction_id'))
+            $transactionQuery->where('uuid', request()->get('transaction_id'));
+
         if(request()->has('type'))
             $transactionQuery->whereType(request()->get('type'));
 

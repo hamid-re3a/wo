@@ -15,7 +15,6 @@ class WalletResource extends JsonResource
     public function toArray($request)
     {
         return [
-//            'id' => $this->id,
             'name' => $this->name,
             'balance' => number_format($this->balanceFloat,2),
             'transactions_count' => $this->transactions->count(),

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
 use Wallets\Http\Controllers\Front\WalletController;
+use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
 
 Route::name('wallets.')->group(function () {
     Route::get('', [WalletController::class,'index'])->name('test');
@@ -19,5 +20,17 @@ Route::name('wallets.')->group(function () {
         Route::get('transactions', [EarningWalletController::class, 'transactions'])->name('transactions');
         Route::get('transfers', [EarningWalletController::class, 'transfers'])->name('transfers');
         Route::get('transfers/income', [EarningWalletController::class, 'incomeTransfers'])->name('income-transfers');
+    });
+
+
+    //Admin Routes
+    Route::name('admin.')->prefix('admin')->group(function(){
+        Route::name('users.')->prefix('users')->group(function () {
+            Route::post('wallets-list', [AdminWalletController::class, 'getWalletsList'])->name('deposit');
+            Route::post('deposit', [AdminWalletController::class, 'depositUser'])->name('deposit');
+            Route::post('wallet-transactions', [AdminWalletController::class, 'getWalletTransactions'])->name('wallet-transactions');
+            Route::post('wallet-transfers', [AdminWalletController::class, 'getWalletTransfers'])->name('wallet-transfers');
+            Route::post('wallet-balance', [AdminWalletController::class, 'getWalletBalance'])->name('wallet-balance');
+       });;
     });
 });

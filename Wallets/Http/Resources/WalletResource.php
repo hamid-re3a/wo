@@ -18,6 +18,8 @@ class WalletResource extends JsonResource
 //            'id' => $this->id,
             'name' => $this->name,
             'balance' => number_format($this->balanceFloat,2),
+            'transactions_count' => $this->transactions->count(),
+            'transfers' => $this->transfers->count()
         ];
     }
 }

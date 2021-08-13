@@ -3,10 +3,9 @@
 namespace Wallets;
 
 use Illuminate\Contracts\Http\Kernel;
-use Payments\PaymentConfigure;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Wallets\Http\Middlewares\AuthMiddleware;
+use Wallets\Http\Middlewares\WalletAuthMiddleware;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -92,7 +91,7 @@ class WalletServiceProvider extends ServiceProvider
     protected function registerMiddlewares()
     {
         $kernel = $this->app->make(Kernel::class);
-        $kernel->pushMiddleware(AuthMiddleware::class);
+        $kernel->pushMiddleware(WalletAuthMiddleware::class);
     }
 
     protected function registerWalletsName()
@@ -111,7 +110,7 @@ class WalletServiceProvider extends ServiceProvider
      */
     protected function shouldMigrate()
     {
-        return PaymentConfigure::$runsMigrations;
+        return GiftCodeConfigure::$runsMigrations;
     }
     private function seed()
     {

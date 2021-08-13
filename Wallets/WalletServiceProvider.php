@@ -110,7 +110,7 @@ class WalletServiceProvider extends ServiceProvider
      */
     protected function shouldMigrate()
     {
-        return GiftCodeConfigure::$runsMigrations;
+        return WalletConfigure::$runsMigrations;
     }
     private function seed()
     {

@@ -179,6 +179,7 @@ return [
         \Payments\PaymentServiceProvider::class,
         \Orders\OrderServiceProvider::class,
         \Wallets\WalletServiceProvider::class,
+        \Giftcode\GiftcodeServiceProvider::class,
 
     ],
 

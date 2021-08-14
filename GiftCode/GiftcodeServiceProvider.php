@@ -47,9 +47,7 @@ class GiftcodeServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        $this->registerMiddlewares();
-
-        Route::prefix('v1/giftcodes')
+        Route::prefix('api/v1/giftcode')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');
@@ -81,15 +79,6 @@ class GiftcodeServiceProvider extends ServiceProvider
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
         }
-    }
-
-    /**
-     * Register Middlewares
-     */
-    protected function registerMiddlewares()
-    {
-        $kernel = $this->app->make(Kernel::class);
-        $kernel->pushMiddleware(GiftcodeAuthMiddleware::class);
     }
 
 

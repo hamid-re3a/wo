@@ -2,14 +2,11 @@
 
 namespace Giftcode\Models;
 
-use Bavix\Wallet\Interfaces\WalletFloat;
-use Bavix\Wallet\Traits\HasWalletFloat;
-use Bavix\Wallet\Traits\HasWallets;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * Wallet\Models\WalletUser
+ * Giftcode\Models\GiftcodeUser
  *
  * @property int $id
  * @property string|null $first_name

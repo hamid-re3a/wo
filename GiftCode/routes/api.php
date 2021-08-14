@@ -1,8 +1,9 @@
 <?php
 
+use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::name('giftcodes.')->group(function () {
+Route::name('giftcodes.')->middleware(GiftcodeAuthMiddleware::class)->group(function () {
 
 
     //Admin Routes

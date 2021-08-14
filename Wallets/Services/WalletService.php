@@ -6,8 +6,6 @@ namespace Wallets\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Packages\Services\UserService;
-use User\Services;
 
 class WalletService implements WalletServiceInterface
 {

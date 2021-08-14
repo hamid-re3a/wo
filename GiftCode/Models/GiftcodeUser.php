@@ -31,7 +31,7 @@ class GiftcodeUser extends Model
         'email'
     ];
 
-    protected $table = 'wallet_users';
+    protected $table = 'giftcode_users';
 
     public function getFullNameAttribute()
     {

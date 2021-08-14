@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Packages\Services;
+namespace Wallets\Services;
 
 use Wallets\Models\WalletUser;
 

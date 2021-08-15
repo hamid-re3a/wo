@@ -122,7 +122,7 @@ class PaymentService implements PaymentsServiceInterface
         $response_invoice->setIsPaid((boolean)$invoice->is_paid);
 
 
-        $order_service = new OrderService;
+        $order_service = app(OrderService::class);
         $order_id = new Services\Id();
         $order_id->setId($response_invoice->getOrderId());
         $order = $order_service->OrderById( $order_id);

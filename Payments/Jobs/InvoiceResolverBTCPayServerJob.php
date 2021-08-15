@@ -15,6 +15,9 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use Payments\Services\PaymentService;
+use User\Services\User;
+use Wallets\Services\Deposit;
+use Wallets\Services\WalletService;
 
 class InvoiceResolverBTCPayServerJob implements ShouldQueue
 {
@@ -63,16 +66,23 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
         $invoice_db = $this->invoice_db;
         $Id = new \Orders\Services\Id();
         $Id->setId((int)$invoice_db->order_id);
-        $invoice_service = new PaymentService();
+        $invoice_service = app(PaymentService::class);
         $payment_Id = new \Payments\Services\Id();
         $payment_Id->setId((int)$invoice_db->id);
-        $invoice_model = $invoice_service->getInvoiceById( $payment_Id);
+        $invoice_model = $invoice_service->getInvoiceById($payment_Id);
         $order_service = $invoice_model->getOrder();
 
         switch ($invoice_db->full_status) {
             case 'New PaidPartial':
+                // send web socket notification
+                Http::post('http://0.0.0.0:2121/socket', [
+                    "uid" => $invoice_model->getTransactionId(),
+                    "content" => [
+                        "name" => "partial_paid",
+                        "amount" => $invoice_model->getDueAmount()
+                    ]]);
                 // send email notification for due amount
-                EmailJob::dispatch(new EmailInvoicePaidPartial($order_service->getUser(), $invoice_model),$order_service->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoicePaidPartial($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
                 break;
             case 'Complete Paid':
             case 'Settled Paid':
@@ -81,16 +91,37 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Paid PaidOver':
             case 'Complete PaidOver':
             case 'Settled PaidOver':
+
                 // send thank you email notification
-                EmailJob::dispatch(new EmailInvoicePaidComplete($order_service->getUser(), $invoice_model),$order_service->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoicePaidComplete($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
+            case 'Processing Paid':
+            case 'Processing None':
+            case 'Processing PaidOver':
+
+                if((float)$invoice_model->getDueAmount() == 0)
+                // send web socket notification
+                Http::post('http://0.0.0.0:2121/socket', [
+                "uid" => $invoice_model->getTransactionId(),
+                "content" => [
+                    "name" => "paid",
+                    "amount" => $invoice_model->getDueAmount()
+                ]]);
                 break;
             case 'Expired PaidPartial':
             case 'Expired None':
             case 'Expired PaidLate':
+                // send web socket notification
+                Http::post('http://0.0.0.0:2121/socket', [
+                    "uid" => $invoice_model->getTransactionId(),
+                    "content" => [
+                        "name" => "expired",
+                        "amount" => $invoice_model->getDueAmount()
+                    ]
+                ]);
                 // send email to user to regenerate new invoice for due amount
-                EmailJob::dispatch(new EmailInvoiceExpired($order_service->getUser(), $invoice_model),$order_service->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoiceExpired($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
                 break;
             case 'Invalid Paid':
             case 'Invalid Marked':

@@ -63,7 +63,13 @@ class OrderController extends Controller
         $invoice_request->setUser(user($request->header('X-user-id')));
         $invoice = $this->payment_service->pay( $invoice_request);
 
-        return api()->success('success', ['payment_currency'=>$invoice->getPaymentCurrency(),'amount' => $invoice->getAmount(), 'checkout_link' => $invoice->getCheckoutLink()]);
+        return api()->success('success', [
+            'payment_currency'=>$invoice->getPaymentCurrency(),
+            'amount' => $invoice->getAmount(),
+            'checkout_link' => $invoice->getCheckoutLink(),
+            'transaction_id' => $invoice->getTransactionId(),
+            'expiration_time' => $invoice->getExpirationTime(),
+        ]);
     }
 
     private function validatePackages(Request $request)

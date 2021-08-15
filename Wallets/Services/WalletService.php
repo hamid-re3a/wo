@@ -24,7 +24,7 @@ class WalletService implements  WalletServiceInterface
         // TODO: Implement transfer() method.
     }
 
-    public function getBalance(Services\User $user): Wallet
+    public function getBalance(Wallet $request): Wallet
     {
         // TODO: Implement getBalance() method.
     }

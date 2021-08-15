@@ -16,5 +16,5 @@ interface WalletServiceInterface
 
     public function transfer( Transfer $request): Transaction;
 
-    public function getBalance( Services\User $request): Wallet;
+    public function getBalance( Wallet $request): Wallet;
 }

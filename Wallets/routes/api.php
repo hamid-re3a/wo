@@ -28,7 +28,6 @@ Route::name('wallets.')->middleware(WalletAuthMiddleware::class)->group(function
     Route::name('admin.')->prefix('admin')->group(function(){
         Route::name('users.')->prefix('users')->group(function () {
             Route::post('wallets-list', [AdminWalletController::class, 'getWalletsList'])->name('wallets-list');
-            Route::post('wallet-deposit', [AdminWalletController::class, 'depositUser'])->name('wallet-deposit');
             Route::post('wallet-transactions', [AdminWalletController::class, 'getWalletTransactions'])->name('wallet-transactions');
             Route::post('wallet-transfers', [AdminWalletController::class, 'getWalletTransfers'])->name('wallet-transfers');
             Route::post('wallet-balance', [AdminWalletController::class, 'getWalletBalance'])->name('wallet-balance');

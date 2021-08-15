@@ -86,26 +86,4 @@ class UserWalletController extends Controller
 
     }
 
-    /**
-     * Deposit user's wallet
-     * @group Wallets > Admin
-     * @param UserDepositRequest $request
-     * @return JsonResponseAlias
-     */
-    public function depositUser(UserDepositRequest $request)
-    {
-        $depositDescription = [
-            'description' => $request->has('description') ? ' | ' . $request->get('description'): null,
-            'is_admin' => true,
-            'admin_id' => request()->header('X-user-id'),
-        ];
-        $transaction = $this->bankService->deposit(
-            $request->get('wallet_name'),
-            $request->get('amount'),
-            $depositDescription);
-        return api()->success(null,TransactionResource::make($transaction));
-
-    }
-
-
 }

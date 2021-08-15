@@ -3,37 +3,27 @@
 
 namespace Packages\Services;
 
-use Packages\Repository\PackageRepository;
+use Packages\Repository\PackageHistoryRepository;
 
-class PackageService implements PackagesServiceInterface
+class PackageHistoryService
 {
-    private $package_repository;
+    private $package_history_repository;
 
-    public function __construct(PackageRepository $package_repository)
+    public function __construct(PackageHistoryRepository $package_history_repository)
     {
-        $this->package_repository = $package_repository;
+        $this->package_history_repository = $package_history_repository;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function packageById(Id $id): Package
+    public function createPackageHistory($package): Package
     {
-        $package = $this->package_repository->getById($id);
-        if (is_null($package))
-            return new Package();
-        return $this->setPackage($package);
+        return $this->setPackageHistory($this->package_history_repository->create($package));
     }
-
-
-
-
 
     /**
      * @param $packeage
      * @return Package
      */
-    private function setPackage($packeage): Package
+    private function setPackageHistory($packeage)
     {
         $response_package = new Package();
         $response_package->setId($packeage->id);
@@ -46,16 +36,6 @@ class PackageService implements PackagesServiceInterface
         $response_package->setBinaryPercentage((int)$packeage->binary_percentage);
         $response_package->setCategoryId((int)$packeage->category_id);
         return $response_package;
-    }
-
-    public function editPackage(Id $id, Package $package): \Packages\Models\Package
-    {
-        return $this->package_repository->edit($id, $package);
-    }
-
-    public function getPackages()
-    {
-        return $this->package_repository->getAll();
     }
 
 }

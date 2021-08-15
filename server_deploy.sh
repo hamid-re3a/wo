@@ -25,7 +25,7 @@ composer install
 #chmod 777 .* -R
 #chown -R root:root .
 php artisan vendor:publish --all
-php artisan migrate:fresh
+php artisan migrate
 php artisan db:seed
 php artisan optimize
 php artisan scribe:generate

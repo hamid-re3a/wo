@@ -77,8 +77,8 @@ class PaymentService implements PaymentsServiceInterface
 
                 \Payments\Models\Invoice::query()->create([
                     'order_id' => $invoice_request->getOrderId(),
-                    'pf_amount' => $invoice_request->getAmount(),
-                    'amount'=>$invoice_request->getPfAmount(),
+                    'pf_amount' => $invoice_request->getPfAmount(),
+                    'amount'=>$invoice_request->getAmount(),
                     'due_amount'=>$invoice_request->getDueAmount(),
                     'paid_amount'=>$invoice_request->getPaidAmount(),
                     'transaction_id' => $invoice_request->getTransactionId(),

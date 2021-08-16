@@ -44,6 +44,9 @@
             ]
         }
     },
+    "repositories": [
+        {"type": "composer", "url": "https://ride-to-the-future.repo.repman.io"}
+    ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",

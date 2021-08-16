@@ -16,9 +16,9 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal()) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         }
-//        if(config('app.env') === 'production') {
+        if(config('app.env') === 'production') {
             \URL::forceScheme('https');
-//        }
+        }
     }
 
     /**

@@ -5,9 +5,8 @@ use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
 use Wallets\Http\Controllers\Front\WalletController;
 use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
-use Wallets\Http\Middlewares\WalletAuthMiddleware;
 
-Route::name('wallets.')->middleware(WalletAuthMiddleware::class)->group(function () {
+Route::name('wallets.')->group(function () {
     Route::get('', [WalletController::class,'index'])->name('test');
     Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');
 

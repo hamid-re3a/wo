@@ -46,9 +46,11 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
+        $this->registerMiddlewares();
+
         $this->registerWalletsName();
 
-        Route::prefix('api/v1/wallets')
+        Route::prefix('v1/wallets')
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(__DIR__ . '/routes/api.php');
@@ -61,6 +63,7 @@ class WalletServiceProvider extends ServiceProvider
             ], 'api-response');
         }
     }
+
 
     /**
      * Set Config files.
@@ -82,6 +85,18 @@ class WalletServiceProvider extends ServiceProvider
         }
     }
 
+    /**
+     * Register Middlewares
+     */
+    protected function registerMiddlewares()
+    {
+        $kernel = $this->app->make(Kernel::class);
+        $kernel->pushMiddleware(WalletAuthMiddleware::class);
+    }
+
+    /**
+     * Register wallets name
+     */
     protected function registerWalletsName()
     {
         config([

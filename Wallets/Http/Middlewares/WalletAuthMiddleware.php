@@ -21,7 +21,9 @@ class WalletAuthMiddleware
         if (
             $request->hasHeader('X-user-id')
         ) {
-            $user = WalletUser::with('wallet')->whereUserId($request->header('X-user-id'))->first();
+            $user = WalletUser::firstOrCreate([
+                'user_id' => $request->header('X-user-id')
+            ]);
             $request->merge([
                 'wallet_user' => $user
             ]);

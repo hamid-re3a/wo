@@ -13,14 +13,12 @@ jobs:
         extensions: imagick, swoole
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Composer Clear cache
+      run: composer clear-cache
     - name: Config composer
       run: composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
-    - name: find lock file
-      run: find . -name composer.lock
-    - name: list all files
-      run: ls -lah
     - name: Install Dependencies
-      run: composer update
+      run: composer update --no-cache
     - name: Generate key
       run: php artisan key:generate
     - name: Directory Permissions

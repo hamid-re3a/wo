@@ -7,10 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-        extensions: imagick, swoole
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
     - name: Config composer

@@ -24,7 +24,7 @@ class EarningWalletController extends Controller
 
     /**
      * Get Deposit wallet
-     * @group Wallets > Earning Wallet
+     * @group Public User > Earning Wallet
      */
     public function index()
     {
@@ -33,7 +33,7 @@ class EarningWalletController extends Controller
 
     /**
      * Get transactions
-     * @group Wallets > Earning Wallet
+     * @group Public User > Earning Wallet
      * @param TransactionRequest $request
      * @return JsonResponse
      */
@@ -46,7 +46,7 @@ class EarningWalletController extends Controller
 
     /**
      * Get transfers
-     * @group Wallets > Earning Wallet
+     * @group Public User > Earning Wallet
      * @return JsonResponse
      */
     public function transfers()

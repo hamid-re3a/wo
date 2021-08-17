@@ -24,7 +24,7 @@ class DepositWalletController extends Controller
 
     /**
      * Get Deposit wallet
-     * @group Wallets > Deposit Wallet
+     * @group Public User > Deposit Wallet
      */
     public function index()
     {
@@ -35,7 +35,7 @@ class DepositWalletController extends Controller
 
     /**
      * Get transactions
-     * @group Wallets > Deposit Wallet
+     * @group Public User > Deposit Wallet
      * @param TransactionRequest $request
      * @return JsonResponse
      */
@@ -49,7 +49,7 @@ class DepositWalletController extends Controller
 
     /**
      * Get transfers
-     * @group Wallets > Deposit Wallet
+     * @group Public User > Deposit Wallet
      * @return JsonResponse
      */
     public function transfers()

@@ -36,7 +36,8 @@ class UserWalletController extends Controller
     }
 
     /**
-     * Get user's wallets list
+     * Get user's wallets
+     * @group Admin > Wallets
      * @param UserIdRequest $request
      * @return JsonResponseAlias
      */
@@ -49,7 +50,7 @@ class UserWalletController extends Controller
 
     /**
      * Get user's wallet balance
-     * @group Wallets > Admin
+     * @group Admin > Wallets
      * @param GetUserWalletBalanceRequest $request
      * @return JsonResponseAlias
      */
@@ -64,7 +65,7 @@ class UserWalletController extends Controller
 
     /**
      * Get user's wallet transactions
-     * @group Wallets > Admin
+     * @group Admin > Wallets
      * @param GetUserTransactionsRequest $request
      * @return JsonResponseAlias
      */
@@ -78,6 +79,7 @@ class UserWalletController extends Controller
 
     /**
      * Get user's wallet transfers
+     * @group Admin > Wallets
      * @param GetUserTransfersRequest $request
      * @return JsonResponseAlias
      */

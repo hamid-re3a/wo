@@ -13,7 +13,7 @@ use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
 
 class GiftcodeServiceProvider extends ServiceProvider
 {
-    private $routes_namespace = 'GiftCode\Http\Controllers';
+    private $routes_namespace = 'Giftcode\Http\Controllers';
     private $namespace = 'Giftcode';
     private $name = 'giftcode';
     private $config_file_name = 'giftcode';

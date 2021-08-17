@@ -13,7 +13,7 @@ class CreateGiftcodeSettingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('giftcode_settings', function (Blueprint $table) {
+        Schema::create('Giftcodesettings', function (Blueprint $table) {
             $table->engine = "InnoDB";
             $table->id();
             $table->string('name')->unique();
@@ -30,6 +30,6 @@ class CreateGiftcodeSettingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('giftcode_settings');
+        Schema::dropIfExists('Giftcodesettings');
     }
 }

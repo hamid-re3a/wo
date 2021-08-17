@@ -13,7 +13,7 @@ class CreateGiftCodePackagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('giftcode_packages', function (Blueprint $table) {
+        Schema::create('Giftcodepackages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('package_id');
             $table->string('name')->nullable();
@@ -33,6 +33,6 @@ class CreateGiftCodePackagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('giftcode_packages');
+        Schema::dropIfExists('Giftcodepackages');
     }
 }

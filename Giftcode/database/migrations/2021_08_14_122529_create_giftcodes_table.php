@@ -16,10 +16,10 @@ class CreateGiftcodesTable extends Migration
         Schema::create('giftcodes', function (Blueprint $table) {
             $table->engine = "InnoDB";
             $table->id();
-            $table->foreignId('user_id')->constrained('giftcode_users','id');
-            $table->foreignId('package_id')->constrained('giftcode_packages','id');
+            $table->foreignId('user_id')->constrained('Giftcodeusers','id');
+            $table->foreignId('package_id')->constrained('Giftcodepackages','id');
             $table->string('code')->unique();
-            $table->foreignId('redeem_user_id')->nullable()->constrained('giftcode_users','id');
+            $table->foreignId('redeem_user_id')->nullable()->constrained('Giftcodeusers','id');
             $table->timestamp('redeem_date')->nullable();
 
             $table->softDeletes();

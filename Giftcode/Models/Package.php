@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode_\Models;
+namespace Giftcode\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,7 +31,7 @@ class Package extends Model
         'price' => 'double',
     ];
 
-    protected $table = 'giftcode_packages';
+    protected $table = 'Giftcodepackages';
 
     public function giftcodes()
     {

@@ -1,17 +1,17 @@
 <?php
 
 
-namespace Giftcode_\Observers;
+namespace Giftcode\Observers;
 
-use Giftcode_\Models\GiftcodeUser;
-use Giftcode_\Models\Setting;
+use Giftcode\Models\GiftcodeUser;
+use Giftcode\Models\Setting;
 
 class SettingObserver
 {
     public function updating(Setting $setting)
     {
         $data = array_merge($setting->getOriginal(),[
-            'actor_id' => request()->giftcode_user->id,
+            'actor_id' => request()->Giftcodeuser->id,
             'setting_id' => $setting->id,
         ]);
         unset($data['id']);

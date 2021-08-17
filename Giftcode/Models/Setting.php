@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode_\Models;
+namespace Giftcode\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,7 +24,7 @@ class Setting extends Model
         'value' => 'string',
     ];
 
-    protected $table = 'giftcode_settings';
+    protected $table = 'Giftcodesettings';
 
 
     /**

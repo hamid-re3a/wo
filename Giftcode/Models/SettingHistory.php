@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode_\Models;
+namespace Giftcode\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +28,6 @@ class SettingHistory extends Model
         'value' => 'string',
     ];
 
-    protected $table = 'giftcode_setting_histories';
+    protected $table = 'Giftcodesetting_histories';
 
 }

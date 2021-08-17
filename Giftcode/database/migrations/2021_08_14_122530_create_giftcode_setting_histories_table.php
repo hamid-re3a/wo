@@ -13,11 +13,11 @@ class CreateGiftcodeSettingHistoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('giftcode_setting_histories', function (Blueprint $table) {
+        Schema::create('Giftcodesetting_histories', function (Blueprint $table) {
             $table->engine = "InnoDB";
             $table->id();
-            $table->foreignId('setting_id')->constrained('giftcode_settings');
-            $table->foreignId('actor_id')->constrained('giftcode_users');
+            $table->foreignId('setting_id')->constrained('Giftcodesettings');
+            $table->foreignId('actor_id')->constrained('Giftcodeusers');
             $table->string('name')->nullable();
             $table->string('value')->nullable();
             $table->softDeletes();
@@ -32,6 +32,6 @@ class CreateGiftcodeSettingHistoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('giftcode_setting_histories');
+        Schema::dropIfExists('Giftcodesetting_histories');
     }
 }

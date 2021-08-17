@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode_\Models;
+namespace Giftcode\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;

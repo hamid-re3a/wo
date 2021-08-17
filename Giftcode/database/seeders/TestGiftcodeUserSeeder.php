@@ -1,8 +1,8 @@
 <?php
-namespace Giftcode_\database\seeders;
+namespace Giftcode\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Giftcode_\Models\GiftcodeUser;
+use Giftcode\Models\GiftcodeUser;
 
 class TestGiftcodeUserSeeder extends Seeder
 {

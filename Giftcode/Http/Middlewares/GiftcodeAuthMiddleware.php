@@ -1,10 +1,10 @@
 <?php
 
-namespace Giftcode_\Http\Middlewares;
+namespace Giftcode\Http\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
-use Giftcode_\Models\GiftcodeUser;
+use Giftcode\Models\GiftcodeUser;
 
 class GiftcodeAuthMiddleware
 {
@@ -25,7 +25,7 @@ class GiftcodeAuthMiddleware
                 'user_id' => $request->header('X-user-id')
             ]);;
             $request->merge([
-                'giftcode_user' => $user
+                'Giftcodeuser' => $user
             ]);
             return $next($request);
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode_\Models;
+namespace Giftcode\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -28,7 +28,7 @@ class GiftcodeUser extends Model
         'email'
     ];
 
-    protected $table = 'giftcode_users';
+    protected $table = 'Giftcodeusers';
 
     public function getFullNameAttribute()
     {

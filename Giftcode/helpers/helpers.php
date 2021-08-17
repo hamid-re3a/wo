@@ -4,11 +4,11 @@ if (!function_exists('giftcodeGetSetting')) {
 
     function giftcodeGetSetting($name)
     {
-        $setting = \Giftcode_\Models\Setting::whereName($name)->first();
+        $setting = \Giftcode\Models\Setting::whereName($name)->first();
         if($setting)
             return $setting->value;
 
-        dd(config("giftcode_{$name}"));
+        dd(config("Giftcode{$name}"));
         return config($name);
     }
 }

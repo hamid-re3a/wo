@@ -3,6 +3,7 @@
 namespace Wallets\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class TransactionResource extends JsonResource
 {
@@ -14,12 +15,22 @@ class TransactionResource extends JsonResource
      */
     public function toArray($request)
     {
+        $type = $this->type;
+        $description = null;
+
+        if(!empty($this->meta)){
+            if(array_key_exists('type', $this->meta))
+                $type = $this->meta['type'];
+            if(array_key_exists('description', $this->meta))
+                $description = $this->meta['description'];
+        }
+
         return [
             'id' => $this->uuid,
             'wallet' => $this->wallet->name,
-            'type' => $this->type,
+            'type' => Str::ucfirst($type),
             'amount' => number_format($this->amountFloat,2),
-            'description' => $this->meta ? $this->meta['description'] : null,
+            'description' => $description,
             'confirmed' => $this->confirmed,
             'created_at' => $this->created_at,
         ];

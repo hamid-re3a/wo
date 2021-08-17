@@ -56,7 +56,9 @@ class UserWalletController extends Controller
     public function getWalletBalance(GetUserWalletBalanceRequest $request)
     {
 
-        return api()->success(null,$this->bankService->getBalance($request->get('wallet_name')));
+        return api()->success(null,[
+            'balance' => $this->bankService->getBalance($request->get('wallet_name'))
+        ]);
 
     }
 

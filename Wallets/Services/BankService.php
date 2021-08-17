@@ -38,16 +38,34 @@ class BankService
 
     public function deposit($wallet_name, $amount, $meta = null, $confirmed = true)
     {
-        if (is_string($meta))
-            $meta = ['description' => $meta];
+        if($meta) {
+            if (is_string($meta))
+                $meta = [
+                    'description' => $meta,
+                    'type' => 'Deposit'
+                ];
+        }
+        else
+            $meta = [
+                'type' => 'Deposit'
+            ];
 
         return $this->getWallet($wallet_name)->depositFloat($amount, $meta, $confirmed);
     }
 
     public function withdraw($wallet_name,$amount, $meta = null)
     {
-        if (is_string($meta))
-            $meta = ['description' => $meta];
+        if($meta) {
+            if (is_string($meta))
+                $meta = [
+                    'description' => $meta,
+                    'type' => 'Withdraw'
+                ];
+        }
+        else
+            $meta = [
+                'type' => 'Withdraw'
+            ];
         return $this->getWallet($wallet_name)->withdrawFloat($amount, $meta);
     }
 
@@ -66,9 +84,17 @@ class BankService
         if(!$to_wallet instanceof WalletFloat)
             $to_wallet = $this->getWallet($to_wallet);
 
-        if (is_string($meta))
-            $meta = ['description' => $meta];
-
+        if($meta) {
+            if (is_string($meta))
+                $meta = [
+                    'description' => $meta,
+                    'type' => 'Transfer'
+                ];
+        }
+        else
+            $meta = [
+                'type' => 'Transfer'
+            ];
         return $from_wallet->transferFloat($to_wallet, $amount, $meta);
     }
 

@@ -35,5 +35,9 @@ class GiftcodeUser extends Model
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
     }
 
+    public function giftCodes()
+    {
+        return $this->hasMany(Giftcode::class,'user_id','id');
+    }
 
 }

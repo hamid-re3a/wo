@@ -2,6 +2,10 @@
 
 namespace Giftcode;
 
+use Giftcode\Models\Giftcode;
+use Giftcode\Models\Setting;
+use Giftcode\Observers\GiftcodeObserver;
+use Giftcode\Observers\SettingObserver;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -47,7 +51,11 @@ class GiftcodeServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        Route::prefix('api/v1/giftcode')
+        $this->registerMiddlewares();
+
+        $this->registerObservers();
+
+        Route::prefix('v1/giftcode')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');
@@ -59,6 +67,7 @@ class GiftcodeServiceProvider extends ServiceProvider
                 __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
+
     }
 
     /**
@@ -81,6 +90,23 @@ class GiftcodeServiceProvider extends ServiceProvider
         }
     }
 
+    /**
+     * Register middlewares
+     */
+    protected function registerMiddlewares()
+    {
+        $kernel = $this->app->make(Kernel::class);
+        $kernel->pushMiddleware(GiftcodeAuthMiddleware::class);
+    }
+
+    /**
+     * Register Observers
+     */
+    protected function registerObservers()
+    {
+        Setting::observe(SettingObserver::class);
+        Giftcode::observe(GiftcodeObserver::class);
+    }
 
     /**
      * Determine if we should register the migrations.

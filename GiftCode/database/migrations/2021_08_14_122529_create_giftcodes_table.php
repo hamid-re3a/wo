@@ -17,9 +17,10 @@ class CreateGiftcodesTable extends Migration
             $table->engine = "InnoDB";
             $table->id();
             $table->foreignId('user_id')->constrained('giftcode_users','id');
-            $table->boolean('is_used')->default(false);
-            $table->foreignId('used_user_id')->nullable()->constrained('giftcode_users','id');
-            $table->timestamp('used_date')->nullable();
+            $table->foreignId('package_id')->constrained('giftcode_packages','id');
+            $table->string('code')->unique();
+            $table->foreignId('redeem_user_id')->nullable()->constrained('giftcode_users','id');
+            $table->timestamp('redeem_date')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

@@ -21,7 +21,9 @@ class GiftcodeAuthMiddleware
         if (
         $request->hasHeader('X-user-id')
         ) {
-            $user = GiftcodeUser::with('giftcodes')->find($request->header('X-user-id'));
+            $user = GiftcodeUser::firstOrCreate([
+                'user_id' => $request->header('X-user-id')
+            ]);;
             $request->merge([
                 'giftcode_user' => $user
             ]);

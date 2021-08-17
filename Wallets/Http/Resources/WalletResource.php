@@ -4,7 +4,6 @@ namespace Wallets\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\DB;
 
 class WalletResource extends JsonResource
 {
@@ -16,8 +15,9 @@ class WalletResource extends JsonResource
      */
     public function toArray($request)
     {
-        $totalReceived = number_format($this->transactions()->where('type', 'deposit')->sum('amount') / 100,2);
-        $totalSpent = number_format($this->transactions()->where('type', 'withdraw')->sum('amount') / 100 ,2);
+
+        $totalReceived = number_format($this->transactions()->where('wallet_id',$this->id)->where('type', 'deposit')->sum('amount') / 100,2);
+        $totalSpent = number_format($this->transactions()->where('wallet_id',$this->id)->where('type', 'withdraw')->sum('amount') / 100 ,2);
         return [
             'name' => $this->name,
             'balance' => number_format($this->balanceFloat,2),

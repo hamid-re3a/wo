@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
+use Wallets\Http\Resources\WalletResource;
 use Wallets\Services\BankService;
 
 class DepositWalletController extends Controller
@@ -19,6 +20,17 @@ class DepositWalletController extends Controller
         $this->bankService = new BankService(request()->wallet_user);
         $this->wallet = config('depositWallet');
         $this->bankService->getWallet($this->wallet);
+    }
+
+    /**
+     * Get Deposit wallet
+     * @group Wallets > Deposit Wallet
+     */
+    public function index()
+    {
+
+        return api()->success(null,WalletResource::make($this->bankService->getWallet($this->wallet)));
+
     }
 
     /**

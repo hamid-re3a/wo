@@ -1,15 +1,12 @@
 <?php
 
-namespace Wallets\Models;
+namespace Giftcode\Models;
 
-use Bavix\Wallet\Interfaces\WalletFloat;
-use Bavix\Wallet\Traits\HasWalletFloat;
-use Bavix\Wallet\Traits\HasWallets;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * Wallet\Models\WalletUser
+ * Giftcode\Models\GiftcodeUser
  *
  * @property int $id
  * @property string|null $first_name
@@ -21,10 +18,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read mixed $full_name
  */
-class WalletUser extends Model implements WalletFloat
+class GiftcodeUser extends Model
 {
-    use HasWalletFloat,HasWallets;
-
     protected $fillable = [
         'user_id',
         'first_name',
@@ -33,7 +28,7 @@ class WalletUser extends Model implements WalletFloat
         'email'
     ];
 
-    protected $table = 'wallet_users';
+    protected $table = 'giftcode_users';
 
     public function getFullNameAttribute()
     {

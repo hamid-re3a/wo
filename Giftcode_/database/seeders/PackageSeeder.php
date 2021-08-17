@@ -1,7 +1,7 @@
 <?php
-namespace Giftcode\database\seeders;
+namespace Giftcode_\database\seeders;
 
-use Giftcode\Models\Package;
+use Giftcode_\Models\Package;
 use Illuminate\Database\Seeder;
 
 class PackageSeeder extends Seeder

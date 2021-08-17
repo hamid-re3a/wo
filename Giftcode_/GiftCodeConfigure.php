@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode;
+namespace Giftcode_;
 
 use Illuminate\Support\Facades\Artisan;
 

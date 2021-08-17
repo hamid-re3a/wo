@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Giftcode\Observers;
+namespace Giftcode_\Observers;
 
-use Giftcode\Models\Giftcode;
+use Giftcode_\Models\Giftcode;
 
 class GiftcodeObserver
 {

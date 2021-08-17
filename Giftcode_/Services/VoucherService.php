@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Giftcode\Services;
+namespace Giftcode_\Services;
 
 
 class VoucherService

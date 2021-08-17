@@ -1,10 +1,10 @@
 <?php
 
-namespace Giftcode\Http\Middlewares;
+namespace Giftcode_\Http\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
-use Giftcode\Models\GiftcodeUser;
+use Giftcode_\Models\GiftcodeUser;
 
 class GiftcodeAuthMiddleware
 {

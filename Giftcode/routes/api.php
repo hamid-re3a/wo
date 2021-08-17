@@ -1,7 +1,7 @@
 <?php
 
-use Giftcode\Http\Controllers\TestController;
-use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
+use Giftcode_\Http\Controllers\TestController;
+use Giftcode_\Http\Middlewares\GiftcodeAuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::name('giftcodes.')->middleware(GiftcodeAuthMiddleware::class)->group(function () {

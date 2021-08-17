@@ -1,15 +1,15 @@
 <?php
 
-namespace Giftcode;
+namespace Giftcode_;
 
-use Giftcode\Models\Giftcode;
-use Giftcode\Models\Setting;
-use Giftcode\Observers\GiftcodeObserver;
-use Giftcode\Observers\SettingObserver;
+use Giftcode_\Models\Giftcode;
+use Giftcode_\Models\Setting;
+use Giftcode_\Observers\GiftcodeObserver;
+use Giftcode_\Observers\SettingObserver;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
+use Giftcode_\Http\Middlewares\GiftcodeAuthMiddleware;
 
 class GiftcodeServiceProvider extends ServiceProvider
 {

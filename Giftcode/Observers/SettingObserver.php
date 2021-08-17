@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Giftcode\Observers;
+namespace Giftcode_\Observers;
 
-use Giftcode\Models\GiftcodeUser;
-use Giftcode\Models\Setting;
+use Giftcode_\Models\GiftcodeUser;
+use Giftcode_\Models\Setting;
 
 class SettingObserver
 {

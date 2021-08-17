@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Giftcode\Http\Controllers;
+namespace Giftcode_\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Giftcode\Models\Giftcode;
+use Giftcode_\Models\Giftcode;
 
 class TestController extends Controller
 {

@@ -79,7 +79,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     "uid" => $invoice_model->getTransactionId(),
                     "content" => [
                         "name" => "partial_paid",
-                        "amount" => $invoice_model->getDueAmount()
+                        "amount" => $invoice_model->getDueAmount(),
+                        "checkout_link" => $invoice_model->getCheckoutLink()
                     ]]);
                 // send email notification for due amount
                 EmailJob::dispatch(new EmailInvoicePaidPartial($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
@@ -96,18 +97,27 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
+                // send web socket notification
+                Http::post('http://0.0.0.0:2121/socket', [
+                    "uid" => $invoice_model->getTransactionId(),
+                    "content" => [
+                        "name" => "confirmed",
+                        "amount" => $invoice_model->getDueAmount(),
+                        "checkout_link" => $invoice_model->getCheckoutLink()
+                    ]]);
+                break;
             case 'Processing Paid':
             case 'Processing None':
             case 'Processing PaidOver':
 
-                if((float)$invoice_model->getDueAmount() == 0)
                 // send web socket notification
                 Http::post('http://0.0.0.0:2121/socket', [
-                "uid" => $invoice_model->getTransactionId(),
-                "content" => [
-                    "name" => "paid",
-                    "amount" => $invoice_model->getDueAmount()
-                ]]);
+                    "uid" => $invoice_model->getTransactionId(),
+                    "content" => [
+                        "name" => "paid",
+                        "amount" => $invoice_model->getDueAmount(),
+                        "checkout_link" => $invoice_model->getCheckoutLink()
+                    ]]);
                 break;
             case 'Expired PaidPartial':
             case 'Expired None':
@@ -117,7 +127,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     "uid" => $invoice_model->getTransactionId(),
                     "content" => [
                         "name" => "expired",
-                        "amount" => $invoice_model->getDueAmount()
+                        "amount" => $invoice_model->getDueAmount(),
+                        "checkout_link" => $invoice_model->getCheckoutLink()
                     ]
                 ]);
                 // send email to user to regenerate new invoice for due amount

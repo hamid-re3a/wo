@@ -96,7 +96,7 @@ class GiftcodeServiceProvider extends ServiceProvider
     protected function registerMiddlewares()
     {
         $kernel = $this->app->make(Kernel::class);
-        $kernel->pushMiddleware(GiftcodeAuthMiddleware::class);
+        $kernel->prependMiddlewareToGroup('api',GiftcodeAuthMiddleware::class);
     }
 
     /**

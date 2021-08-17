@@ -91,7 +91,7 @@ class WalletServiceProvider extends ServiceProvider
     protected function registerMiddlewares()
     {
         $kernel = $this->app->make(Kernel::class);
-        $kernel->pushMiddleware(WalletAuthMiddleware::class);
+        $kernel->prependMiddlewareToGroup('api',WalletAuthMiddleware::class);
     }
 
     /**

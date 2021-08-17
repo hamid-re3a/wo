@@ -144,6 +144,7 @@ class WalletService implements WalletServiceInterface
         }
     }
 
+
     public function getBalance(Wallet $wallet): Wallet
     {
         try {

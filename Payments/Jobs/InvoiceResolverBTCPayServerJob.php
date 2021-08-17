@@ -80,7 +80,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     "content" => [
                         "name" => "partial_paid",
                         "amount" => $invoice_model->getDueAmount(),
-                        "checkout_link" => $invoice_model->getCheckoutLink()
+                        "checkout_link" => $invoice_model->getCheckoutLink(),
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
                 // send email notification for due amount
                 EmailJob::dispatch(new EmailInvoicePaidPartial($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
@@ -103,7 +104,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     "content" => [
                         "name" => "confirmed",
                         "amount" => $invoice_model->getDueAmount(),
-                        "checkout_link" => $invoice_model->getCheckoutLink()
+                        "checkout_link" => $invoice_model->getCheckoutLink(),
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
                 break;
             case 'Processing Paid':
@@ -116,7 +118,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     "content" => [
                         "name" => "paid",
                         "amount" => $invoice_model->getDueAmount(),
-                        "checkout_link" => $invoice_model->getCheckoutLink()
+                        "checkout_link" => $invoice_model->getCheckoutLink(),
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
                 break;
             case 'Expired PaidPartial':
@@ -128,7 +131,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     "content" => [
                         "name" => "expired",
                         "amount" => $invoice_model->getDueAmount(),
-                        "checkout_link" => $invoice_model->getCheckoutLink()
+                        "checkout_link" => $invoice_model->getCheckoutLink(),
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]
                 ]);
                 // send email to user to regenerate new invoice for due amount

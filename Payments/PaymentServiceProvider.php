@@ -10,7 +10,7 @@ class PaymentServiceProvider extends ServiceProvider
 {
     private $routes_namespace = 'Payments\Http\Controllers';
     private $namespace = 'Payments';
-    private $name = 'payments'; 
+    private $name = 'payments';
     private $config_file_name = 'payment';
 
     /**

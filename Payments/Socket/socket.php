@@ -48,7 +48,8 @@ $sender_io->on('workerStart', function () {
 
             global $sender_io;
             if (isset($data['uid']) && isset($data['content'])) {
-                $sender_io->to($data['uid'])->emit('invoice_transaction_status', $data['content']);
+                $sender_io->to($data['uid'])->emit('invoice_transaction_status', json_encode($data['content']));
+                return $connection->send((new Response())->withBody('sent'));
             }
         } else {
             return $connection->send(new Response(404, array(), '<h3>404 Not Found</h3>'));

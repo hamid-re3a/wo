@@ -1,5 +1,6 @@
 /node_modules
 /public/hot
+/public/vendor/scribe
 /public/storage
 /storage/*.key
 /vendor
@@ -14,6 +15,5 @@ yarn-error.log
 .idea
 .ideal
 _ide_helper.php
-server_deploy.sh
 database.sqlite
 composer.lock

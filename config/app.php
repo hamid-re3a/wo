@@ -180,7 +180,8 @@ return [
         \Payments\PaymentServiceProvider::class,
         \Orders\OrderServiceProvider::class,
         \User\UserServiceProvider::class,
-
+        \Wallets\WalletServiceProvider::class,
+        \Giftcode\GiftcodeServiceProvider::class,
     ],
 
     /*

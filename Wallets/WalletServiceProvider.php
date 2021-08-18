@@ -2,15 +2,14 @@
 
 namespace Wallets;
 
-use Payments\PaymentConfigure;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Wallets\Http\Middlewares\WalletAuthMiddleware;
 
 class WalletServiceProvider extends ServiceProvider
 {
-    private $routes_namespace = 'Wallets\Http\Controllers';
-    private $namespace = 'Payments';
+    private $namespace = 'Wallets';
     private $name = 'wallets';
     private $config_file_name = 'wallet';
 
@@ -47,9 +46,11 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
+        $this->registerWalletsName();
+
         Route::prefix('v1/wallets')
             ->middleware('api')
-            ->namespace($this->routes_namespace)
+            ->namespace($this->namespace)
             ->group(__DIR__ . '/routes/api.php');
 
         if ($this->app->runningInConsole()) {
@@ -60,6 +61,7 @@ class WalletServiceProvider extends ServiceProvider
             ], 'api-response');
         }
     }
+
 
     /**
      * Set Config files.
@@ -81,6 +83,17 @@ class WalletServiceProvider extends ServiceProvider
         }
     }
 
+    /**
+     * Register wallets name
+     */
+    protected function registerWalletsName()
+    {
+        config([
+            'depositWallet' => 'Deposit Wallet',
+            'earningWallet' => 'Earning Wallet'
+        ]);
+    }
+
 
     /**
      * Determine if we should register the migrations.
@@ -89,7 +102,7 @@ class WalletServiceProvider extends ServiceProvider
      */
     protected function shouldMigrate()
     {
-        return PaymentConfigure::$runsMigrations;
+        return WalletConfigure::$runsMigrations;
     }
     private function seed()
     {

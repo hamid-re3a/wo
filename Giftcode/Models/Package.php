@@ -31,7 +31,7 @@ class Package extends Model
         'price' => 'double',
     ];
 
-    protected $table = 'Giftcodepackages';
+    protected $table = 'giftcode_packages';
 
     public function giftcodes()
     {

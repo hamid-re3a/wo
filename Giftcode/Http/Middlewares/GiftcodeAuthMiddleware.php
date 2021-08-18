@@ -4,7 +4,7 @@ namespace Giftcode\Http\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
-use Giftcode\Models\GiftcodeUser;
+use Giftcode\Models\User;
 
 class GiftcodeAuthMiddleware
 {
@@ -21,7 +21,7 @@ class GiftcodeAuthMiddleware
         if (
         $request->hasHeader('X-user-id')
         ) {
-            $user = GiftcodeUser::firstOrCreate([
+            $user = User::firstOrCreate([
                 'user_id' => $request->header('X-user-id')
             ]);;
             $request->merge([

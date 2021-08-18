@@ -17,6 +17,34 @@ class SettingSeeder extends Seeder
             [
                 'name' => 'length',
                 'value' => 6
+            ],
+            [
+                'name' => 'separator',
+                'value' => '-'
+            ],
+            [
+                'name' => 'prefix',
+                'value' => 'janex'
+            ],
+            [
+                'name' => 'use_prefix',
+                'value' => true
+            ],
+            [
+                'name' => 'postfix',
+                'value' => 'team'
+            ],
+            [
+                'name' => 'use_postfix',
+                'value' => true
+            ],
+            [
+                'name' => 'has_expiration_date',
+                'value' => true
+            ],
+            [
+                'name' => 'giftcode_lifetime',
+                'value' => '10'
             ]
         ]);
     }

@@ -2,7 +2,7 @@
 namespace Giftcode\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Giftcode\Models\GiftcodeUser;
+use Giftcode\Models\User;
 
 class TestGiftcodeUserSeeder extends Seeder
 {
@@ -11,7 +11,7 @@ class TestGiftcodeUserSeeder extends Seeder
         // Load local seeder
         if (app()->environment() === 'local')
         {
-            GiftcodeUser::create([
+            User::create([
                 'user_id' => 1,
                 'first_name' => 'Nima',
                 'last_name' => 'Nouri',
@@ -19,7 +19,7 @@ class TestGiftcodeUserSeeder extends Seeder
                 'email' => 'nima.nouri.d@gmail.com'
             ]);
 
-            GiftcodeUser::create([
+            User::create([
                 'user_id' => 2,
                 'first_name' => 'Ali',
                 'last_name' => 'Gholami',

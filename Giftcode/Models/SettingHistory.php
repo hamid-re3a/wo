@@ -28,6 +28,6 @@ class SettingHistory extends Model
         'value' => 'string',
     ];
 
-    protected $table = 'Giftcodesetting_histories';
+    protected $table = 'giftcode_setting_histories';
 
 }

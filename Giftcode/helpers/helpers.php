@@ -1,5 +1,9 @@
 <?php
 
+use Giftcode\Models\Giftcode;
+use Giftcode\Traits\CodeGenerator;
+use Illuminate\Support\Str;
+
 if (!function_exists('giftcodeGetSetting')) {
 
     function giftcodeGetSetting($name)
@@ -8,7 +12,19 @@ if (!function_exists('giftcodeGetSetting')) {
         if($setting)
             return $setting->value;
 
-        dd(config("Giftcode{$name}"));
-        return config($name);
+        return config("api.giftcode.{$name}");
+    }
+}
+
+if (!function_exists('newGiftcode')) {
+
+    function newGiftcode()
+    {
+        $giftcodeModel = new Giftcode();
+        $code = $giftcodeModel->generateCode();
+        while($giftcodeModel->whereCode($code)->first())
+            $code = $giftcodeModel->generateCode();
+
+        return $code;
     }
 }

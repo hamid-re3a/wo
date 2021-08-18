@@ -91,8 +91,7 @@ class PaymentService implements PaymentsServiceInterface
                     'payment_currency' => $invoice_request->getPaymentCurrency(),
                 ]);
 
-                if(!$invoice_request->getOrderId())
-                    EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
             }
 
         }

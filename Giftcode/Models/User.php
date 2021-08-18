@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read mixed $full_name
  */
-class GiftcodeUser extends Model
+class User extends Model
 {
     protected $fillable = [
         'user_id',
@@ -28,7 +28,7 @@ class GiftcodeUser extends Model
         'email'
     ];
 
-    protected $table = 'Giftcodeusers';
+    protected $table = 'giftcode_users';
 
     public function getFullNameAttribute()
     {

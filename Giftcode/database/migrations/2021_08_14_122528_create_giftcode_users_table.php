@@ -13,7 +13,7 @@ class CreateGiftcodeUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('Giftcodeusers', function (Blueprint $table) {
+        Schema::create('giftcode_users', function (Blueprint $table) {
             $table->engine = "InnoDB";
             $table->id();
             $table->unsignedBigInteger('user_id')->unique();
@@ -34,6 +34,6 @@ class CreateGiftcodeUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('Giftcodeusers');
+        Schema::dropIfExists('giftcode_users');
     }
 }

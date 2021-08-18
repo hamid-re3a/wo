@@ -2,6 +2,7 @@
 
 namespace Giftcode\Models;
 
+use Giftcode\Traits\CodeGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -21,11 +22,13 @@ use Illuminate\Support\Carbon;
  */
 class Giftcode extends Model
 {
+    use CodeGenerator;
 
     protected $fillable = [
         'user_id',
         'package_id',
         'code',
+        'expiration_date',
         'redeem_date',
         'redeem_user_id'
     ];
@@ -34,6 +37,7 @@ class Giftcode extends Model
         'user_id' => 'integer',
         'package_id' => 'integer',
         'code' => 'string',
+        'expiration_date' => 'datetime',
         'redeem_date' => 'datetime',
         'redeem_user_id' => 'integer'
     ];
@@ -45,7 +49,7 @@ class Giftcode extends Model
      */
     public function creator()
     {
-        return $this->belongsTo(GiftcodeUser::class,'user_id','id');
+        return $this->belongsTo(User::class,'user_id','id');
     }
 
     public function package()
@@ -55,8 +59,26 @@ class Giftcode extends Model
 
     public function redeemer()
     {
-        return $this->belongsTo(GiftcodeUser::class,'redeem_user_id','id');
+        return $this->belongsTo(User::class,'redeem_user_id','id');
     }
+
+    /**
+     * Mutators
+     */
+
+    /**
+     * Auto fill code field for new giftcode
+     */
+    public function setUserIdAttribute($value)
+    {
+        $this->attributes['user_id'] = $value;
+
+        list($code,$expirationDate) = $this->generateCode();
+
+        $this->attributes['code'] = $code;
+        $this->attributes['expiration_date'] = $expirationDate;
+    }
+
 
 
 

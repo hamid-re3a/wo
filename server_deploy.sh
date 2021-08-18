@@ -27,7 +27,7 @@ composer install
 php artisan vendor:publish --all
 php artisan migrate:fresh
 php artisan db:seed
-php artisan optimize
+php artisan optimize:clear
 php artisan scribe:generate
 # Exit maintenance mode
 #php artisan up

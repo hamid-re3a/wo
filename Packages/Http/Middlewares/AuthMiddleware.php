@@ -4,7 +4,7 @@ namespace Packages\Http\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
-use Packages\Models\PackageUser;
+use User\Models\User;
 
 class AuthMiddleware
 {
@@ -25,7 +25,7 @@ class AuthMiddleware
             $request->hasHeader('X-user-email') &&
             $request->hasHeader('X-user-username')
         ) {
-            $user = PackageUser::query()->firstOrCreate([
+            $user = User::query()->firstOrCreate([
                 'id' => $request->header('X-user-id')
             ]);
             $user->update([

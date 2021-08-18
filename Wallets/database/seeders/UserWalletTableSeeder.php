@@ -3,7 +3,7 @@
 namespace Wallets\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Orders\Models\OrderUser;
+use User\Models\User;
 use Wallets\Models\WalletUser;
 
 /**
@@ -18,7 +18,7 @@ class UserWalletTableSeeder extends Seeder
      */
     public function run()
     {
-        $user = WalletUser::query()->firstOrCreate(['id'=>1]);
+        $user = User::query()->firstOrCreate(['id'=>1]);
         $user->update([
             'first_name'=>'hamid',
             'last_name'=>'noruzi',

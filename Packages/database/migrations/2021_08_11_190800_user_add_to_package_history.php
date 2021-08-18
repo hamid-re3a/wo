@@ -18,7 +18,7 @@ class UserAddToPackageHistory extends Migration
         });
 
         Schema::table('package_histories', function (Blueprint $table) {
-            $table->foreign('user_id')->on('package_users')
+            $table->foreign('user_id')->on('users')
                 ->references('id')->onDelete('cascade')->onUpdate('cascade');
         });
     }

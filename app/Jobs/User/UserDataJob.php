@@ -9,7 +9,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use User\Services\User;
+use Orders\Services\OrderService;
+use Packages\Services\PackageService;
+use User\Services\UserService;
 
 class UserDataJob implements ShouldQueue
 {
@@ -20,7 +22,8 @@ class UserDataJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @return void
+     * @param $data
+     * @param OrderService $order_service
      */
     public function __construct($data)
     {
@@ -35,7 +38,8 @@ class UserDataJob implements ShouldQueue
     public function handle()
     {
         $userDataUnSerialize = unserialize($this->data);
-        echo "event has been handle. the first name and last name of userData is:".$userDataUnSerialize->getFirstName() ." ". $userDataUnSerialize->getLastName(). PHP_EOL;
+        app(UserService::class)->userUpdate($userDataUnSerialize);
+        echo "event has been handle. the first name and last name of userData is:".$userDataUnSerialize->getUsername() ." ". $userDataUnSerialize->getLastName(). PHP_EOL;
 
     }
 }

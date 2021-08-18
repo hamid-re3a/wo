@@ -3,7 +3,7 @@
 namespace Orders\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Orders\Models\OrderUser;
+use User\Models\User;
 
 /**
  * Class AuthTableSeeder.
@@ -17,7 +17,7 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        $user = OrderUser::query()->firstOrCreate(['id'=>1]);
+        $user = User::query()->firstOrCreate(['id'=>1]);
         $user->update([
             'first_name'=>'hamid',
             'last_name'=>'noruzi',

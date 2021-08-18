@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWalletUsersTable extends Migration
+class CreateGiftcodeUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateWalletUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('wallet_users', function (Blueprint $table) {
+        Schema::create('Giftcodeusers', function (Blueprint $table) {
             $table->engine = "InnoDB";
             $table->id();
             $table->unsignedBigInteger('user_id')->unique();
@@ -34,6 +34,6 @@ class CreateWalletUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('wallet_users');
+        Schema::dropIfExists('Giftcodeusers');
     }
 }

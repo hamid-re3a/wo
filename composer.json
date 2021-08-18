@@ -55,6 +55,7 @@
             "Packages\\": "Packages/",
             "Orders\\": "Orders/",
             "Wallets\\": "Wallets/",
+            "Giftcode\\": "Giftcode/",
             "Payments\\": "Payments/",
             "User\\": "User/",
             "GPBMetadata\\": "GPBMetadata/"

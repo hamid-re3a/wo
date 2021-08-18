@@ -1,17 +1,22 @@
 <?php
 
-namespace Wallets;
+namespace Giftcode;
 
+use Giftcode\Models\Giftcode;
+use Giftcode\Models\Setting;
+use Giftcode\Observers\GiftcodeObserver;
+use Giftcode\Observers\SettingObserver;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Wallets\Http\Middlewares\WalletAuthMiddleware;
+use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
 
-class WalletServiceProvider extends ServiceProvider
+class GiftcodeServiceProvider extends ServiceProvider
 {
-    private $namespace = 'Wallets';
-    private $name = 'wallets';
-    private $config_file_name = 'wallet';
+    private $routes_namespace = 'Giftcode\Http\Controllers';
+    private $namespace = 'Giftcode';
+    private $name = 'giftcode';
+    private $config_file_name = 'giftcode';
 
     /**
      * Register API class.
@@ -48,11 +53,11 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerMiddlewares();
 
-        $this->registerWalletsName();
+        $this->registerObservers();
 
-        Route::prefix('v1/wallets')
+        Route::prefix('v1/giftcode')
             ->middleware('api')
-            ->namespace($this->namespace)
+            ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');
 
         if ($this->app->runningInConsole()) {
@@ -62,8 +67,8 @@ class WalletServiceProvider extends ServiceProvider
                 __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
-    }
 
+    }
 
     /**
      * Set Config files.
@@ -86,25 +91,22 @@ class WalletServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register Middlewares
+     * Register middlewares
      */
     protected function registerMiddlewares()
     {
         $kernel = $this->app->make(Kernel::class);
-        $kernel->prependMiddlewareToGroup('api',WalletAuthMiddleware::class);
+        $kernel->prependMiddlewareToGroup('api',GiftcodeAuthMiddleware::class);
     }
 
     /**
-     * Register wallets name
+     * Register Observers
      */
-    protected function registerWalletsName()
+    protected function registerObservers()
     {
-        config([
-            'depositWallet' => 'Deposit Wallet',
-            'earningWallet' => 'Earning Wallet'
-        ]);
+        Setting::observe(SettingObserver::class);
+        Giftcode::observe(GiftcodeObserver::class);
     }
-
 
     /**
      * Determine if we should register the migrations.
@@ -113,13 +115,13 @@ class WalletServiceProvider extends ServiceProvider
      */
     protected function shouldMigrate()
     {
-        return WalletConfigure::$runsMigrations;
+        return GiftCodeConfigure::$runsMigrations;
     }
     private function seed()
     {
         if (isset($_SERVER['argv']))
             if (array_search('db:seed', $_SERVER['argv'])) {
-                WalletConfigure::seed();
+                GiftCodeConfigure::seed();
             }
     }
 

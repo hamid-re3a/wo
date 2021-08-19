@@ -4,6 +4,7 @@ namespace User\Models;
 use Giftcode\Models\Giftcode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Orders\Models\Order;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -55,6 +56,16 @@ class User extends Model
     public function giftCodes()
     {
         return $this->hasMany(Giftcode::class,'user_id','id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class,'user_id','id');
+    }
+
+    public function paidOrders()
+    {
+        return $this->hasMany(Order::class,'user_id','id')->whereNotNull('is_paid_at');
     }
 
 }

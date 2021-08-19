@@ -11,11 +11,14 @@ class WalletService implements WalletServiceInterface
 {
     private $depositWallet;
     private $earningWallet;
+    private $wallets = [];
 
     public function __construct()
     {
         $this->depositWallet = config('depositWallet');
         $this->earningWallet = config('earningWallet');
+        $this->wallets[] = $this->depositWallet;
+        $this->wallets[] = $this->earningWallet;
     }
 
     private function walletUser($user)
@@ -51,11 +54,10 @@ class WalletService implements WalletServiceInterface
 
             $transaction = $deposit->getTransaction();
             if (
-                $transaction->getConfiremd() AND
                 $transaction->getAmount() > 0 AND
                 $transaction->getToWalletName() AND
                 $transaction->getToUserId() AND
-                in_array(strtolower($transaction->getToWalletName()) ,['deposit','deposit wallet'])
+                in_array(strtolower($transaction->getToWalletName()) ,$this->wallets)
             ) {
                 $bankService = new BankService($walletUser);
 

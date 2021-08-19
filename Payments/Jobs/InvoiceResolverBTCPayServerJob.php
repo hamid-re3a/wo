@@ -64,13 +64,33 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
 
         $invoice_db = $this->invoice_db;
-        $Id = new \Orders\Services\Id();
-        $Id->setId((int)$invoice_db->order_id);
-        $invoice_service = app(PaymentService::class);
         $payment_Id = new \Payments\Services\Id();
         $payment_Id->setId((int)$invoice_db->id);
-        $invoice_model = $invoice_service->getInvoiceById($payment_Id);
-        $order_service = $invoice_model->getOrder();
+        $invoice_model = app(PaymentService::class)->getInvoiceById($payment_Id);
+
+
+
+        if(is_null($invoice_db->order_id)){
+            switch($invoice_db->status){
+                case 'Complete':
+                case 'Settled':
+                case 'Paid':
+
+                $pf_paid  = number_format(
+                ($invoice_model->getPfAmount()/$invoice_model->getAmount()) * $invoice_model->getPaidAmount()
+                ,2, '.', '');
+                if($pf_paid > (double) $invoice_db->deposit_amount){
+                    $deposit_model = new Deposit;
+//                    $deposit_model
+                    app( WalletService::class)->deposit();
+                }
+                    break;
+            }
+
+            return;
+        }
+
+        $order_model = $invoice_model->getOrder();
 
         switch ($invoice_db->full_status) {
             case 'New PaidPartial':
@@ -84,7 +104,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
                 // send email notification for due amount
-                EmailJob::dispatch(new EmailInvoicePaidPartial($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoicePaidPartial($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 break;
             case 'Complete Paid':
             case 'Settled Paid':
@@ -95,9 +115,11 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Settled PaidOver':
 
                 // send thank you email notification
-                EmailJob::dispatch(new EmailInvoicePaidComplete($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
+                $order_model->setIsPaidAt(now()->toString());
+                app(OrderService::class)->updateOrder($order_model);
                 // send web socket notification
                 Http::post('http://0.0.0.0:2121/socket', [
                     "uid" => $invoice_model->getTransactionId(),
@@ -136,7 +158,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     ]
                 ]);
                 // send email to user to regenerate new invoice for due amount
-                EmailJob::dispatch(new EmailInvoiceExpired($order_service->getUser(), $invoice_model), $order_service->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoiceExpired($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 break;
             case 'Invalid Paid':
             case 'Invalid Marked':

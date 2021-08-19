@@ -8,4 +8,6 @@ namespace Orders\Services;
 interface OrdersServiceInterface
 {
     public function OrderById(Id $request): Order;
+
+    public function updateOrder(Order $order): Order;
 }

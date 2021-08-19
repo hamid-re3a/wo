@@ -5,6 +5,7 @@ namespace Giftcode\Models;
 use Giftcode\Traits\CodeGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use User\Models\User;
 
 /**
  * Giftcode\Models\Giftcode

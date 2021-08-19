@@ -17,7 +17,7 @@ class CreateGiftcodeSettingHistoriesTable extends Migration
             $table->engine = "InnoDB";
             $table->id();
             $table->foreignId('setting_id')->constrained('giftcode_settings');
-            $table->foreignId('actor_id')->constrained('giftcode_users');
+            $table->foreignId('actor_id')->constrained('users');
             $table->string('name')->nullable();
             $table->string('value')->nullable();
             $table->softDeletes();

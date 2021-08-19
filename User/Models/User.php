@@ -1,9 +1,13 @@
 <?php
 namespace User\Models;
 
+use Bavix\Wallet\Interfaces\WalletFloat;
+use Bavix\Wallet\Traits\HasWalletFloat;
+use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Orders\Models\Order;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -31,8 +35,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @mixin \Eloquent
  * @property-read mixed $full_name
  */
-class User extends Model
+class User extends Model implements WalletFloat
 {
+    use HasWalletFloat,HasWallets, HasFactory, HasRoles;
     protected $table = "users";
     protected $fillable = [
         "id",
@@ -41,8 +46,6 @@ class User extends Model
         "email",
         "username",
     ];
-
-    use HasFactory, HasRoles;
 
     Protected $guard_name ='api';
 
@@ -55,6 +58,16 @@ class User extends Model
     public function giftCodes()
     {
         return $this->hasMany(Giftcode::class,'user_id','id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class,'user_id','id');
+    }
+
+    public function paidOrders()
+    {
+        return $this->hasMany(Order::class,'user_id','id')->whereNotNull('is_paid_at');
     }
 
 }

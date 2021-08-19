@@ -33,6 +33,15 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Model
 {
+    protected $table = "users";
+    protected $fillable = [
+        "id",
+        "first_name",
+        "last_name",
+        "email",
+        "username",
+    ];
+
     use HasFactory, HasRoles;
 
     Protected $guard_name ='api';

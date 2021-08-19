@@ -4,9 +4,9 @@ namespace Orders\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Packages\Models\Package;
 use Packages\Services\Id;
 use Packages\Services\PackageService;
+use User\Models\User;
 
 /**
  * Orders\Models\Order
@@ -51,8 +51,8 @@ use Packages\Services\PackageService;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
  * @mixin \Eloquent
- * @property-read \Orders\Models\OrderUser $user
- * @property-read \Orders\Models\OrderUser $toUser
+ * @property-read \Orders\Models\User $user
+ * @property-read \Orders\Models\User $toUser
  * @property-read \Illuminate\Database\Eloquent\Collection|\Orders\Models\OrderPackage[] $packages
  * @property-read int|null $packages_count
  */
@@ -73,13 +73,13 @@ class Order extends Model
 
     public function user()
     {
-        return $this->belongsTo(OrderUser::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
 
     public function toUser()
     {
-        return $this->belongsTo(OrderUser::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function packages()

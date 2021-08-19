@@ -2,7 +2,7 @@
 namespace Giftcode\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Giftcode\Models\User;
+use User\Models\User;
 
 class TestGiftcodeUserSeeder extends Seeder
 {

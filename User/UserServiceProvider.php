@@ -1,18 +1,17 @@
 <?php
 
-namespace Packages;
+namespace User;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Packages\Models\Package;
-use Packages\Observer\PackageHistoryObserver;
 
-class PackageServiceProvider extends ServiceProvider
+class UserServiceProvider extends ServiceProvider
 {
-    private $routes_namespace = 'Packages\Http\Controllers';
-    private $namespace = 'Packages';
-    private $name = 'packages';
-    private $config_file_name = 'package';
+    private $routes_namespace = 'User\Http\Controllers';
+    private $namespace = 'User';
+    private $name = 'User';
+    private $config_file_name = 'user';
 
     /**
      * Register API class.
@@ -46,7 +45,8 @@ class PackageServiceProvider extends ServiceProvider
         $this->setupConfig();
 
         $this->registerHelpers();
-        Route::prefix('v1/packages')
+
+        Route::prefix('v1/user')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');
@@ -55,11 +55,9 @@ class PackageServiceProvider extends ServiceProvider
             $this->seed();
 
             $this->publishes([
-                __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
+                __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
-
-        $this->obServers();
     }
 
     /**
@@ -90,24 +88,14 @@ class PackageServiceProvider extends ServiceProvider
      */
     protected function shouldMigrate()
     {
-        return PackageConfigure::$runsMigrations;
+        return UserConfigure::$runsMigrations;
     }
-
-
     private function seed()
     {
         if (isset($_SERVER['argv']))
             if (array_search('db:seed', $_SERVER['argv'])) {
-                PackageConfigure::seed();
+                UserConfigure::seed();
             }
-    }
-
-    /**
-     * Observer List Entities
-     */
-    private function obServers()
-    {
-        Package::observe(PackageHistoryObserver::class);
     }
 
 }

@@ -3,7 +3,6 @@
 
 namespace Giftcode\Observers;
 
-use Giftcode\Models\User;
 use Giftcode\Models\Setting;
 
 class SettingObserver

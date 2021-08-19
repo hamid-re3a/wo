@@ -68,5 +68,7 @@ class Kernel extends HttpKernel
         'auth_user_order' => AuthMiddleware::class,
         'auth_user_wallet' => WalletAuthMiddleware::class,
         'auth_user_gift_code' => GiftCodeAuthMiddleware::class,
+        'auth_user_package' => \Packages\Http\Middlewares\AuthMiddleware::class,
+
     ];
 }

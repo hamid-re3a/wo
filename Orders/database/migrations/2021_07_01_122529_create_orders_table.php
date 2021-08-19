@@ -16,10 +16,10 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('order_users');
+            $table->foreign('user_id')->references('id')->on('users');
 
             $table->unsignedBigInteger('to_user_id')->nullable();
-            $table->foreign('to_user_id')->references('id')->on('order_users');
+            $table->foreign('to_user_id')->references('id')->on('users');
 
             $table->unsignedBigInteger('total_cost_in_usd')->default(0);
             $table->unsignedBigInteger('packages_cost_in_usd')->default(0);

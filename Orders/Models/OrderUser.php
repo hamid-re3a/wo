@@ -39,24 +39,4 @@ class OrderUser extends Model
     {
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
     }
-
-    public function orders()
-    {
-        return $this->hasMany(Order::class,'user_id','id');
-    }
-
-    public function paidOrders()
-    {
-        return $this->orders()->whereNotNull('is_paid_at');
-    }
-
-    public function pendingOrders()
-    {
-        return $this->orders()->whereNull('is_paid_at');
-    }
-
-    public function refundedOrders()
-    {
-        return $this->orders()->whereNotNull('is_resolved_at');
-    }
 }

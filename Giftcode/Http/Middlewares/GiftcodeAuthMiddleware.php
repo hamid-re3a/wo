@@ -4,7 +4,7 @@ namespace Giftcode\Http\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
-use Giftcode\Models\User;
+use User\Models\User;
 
 class GiftcodeAuthMiddleware
 {

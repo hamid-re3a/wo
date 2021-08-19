@@ -42,6 +42,26 @@ class PackageController extends Controller
         return api()->success(null,PackageResource::collection($packages));
     }
 
+    /**
+     * Has a valid package
+     * @group
+     * Public User > Orders
+     */
+    public function hasValidPackage()
+    {
+        $orders = request()->order_user->paidOrders()->whereHas('packages')->with('packages')->get();
+        foreach($orders AS $order) {
+            foreach($order->packages AS $key => $package) {
+                $packageDetails = $this->getPackage($package->package_id);
+                $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());
+                if( $packageExpireDate > now() )
+                    return api()->success(true,null);
+
+            }
+        }
+        return api()->success(false,null);
+    }
+
     private function getPackage($id)
     {
         $request = new \Packages\Services\Id();

@@ -10,6 +10,7 @@ Route::name('orders.')->middleware('auth_user_order')->group(function () {
 });
 
 Route::name('packages.')->prefix('packages')->middleware('auth_user_order')->group(function(){
-    Route::get('available-packages',[PackageController::class, 'paidPackages']);
+    Route::get('available-packages',[PackageController::class, 'paidPackages'])->name('paid-packages');
+    Route::get('has-valid-package',[PackageController::class, 'hasValidPackage'])->name('has-valid-package');
 });
 

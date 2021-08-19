@@ -55,11 +55,15 @@ class PackageController extends Controller
                 $packageDetails = $this->getPackage($package->package_id);
                 $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());
                 if( $packageExpireDate > now() )
-                    return api()->success(true,null);
+                    return api()->success(null,[
+                        'has_valid_package' => true
+                    ]);
 
             }
         }
-        return api()->success(false,null);
+        return api()->success( null,[
+            'has_valid_package' => false
+        ]);
     }
 
     private function getPackage($id)

@@ -4,8 +4,7 @@ namespace Orders\database\seeders;
 
 use Illuminate\Database\Seeder;
 use Orders\Models\Order;
-use Orders\Models\OrderPackage;
-use Orders\Models\OrderUser;
+use User\Models\User;
 
 /**
  * Class AuthTableSeeder.
@@ -21,7 +20,7 @@ class OrderTableSeeder extends Seeder
     {
         // Load local seeder
         if (app()->environment() === 'local') {
-            OrderUser::query()->firstOrCreate(['id' => 1]);
+            User::query()->firstOrCreate(['id' => 1]);
             $order = Order::query()->create([
                 'user_id' => 1,
                 'total_cost_in_usd' => 119,

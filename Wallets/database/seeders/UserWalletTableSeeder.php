@@ -4,7 +4,6 @@ namespace Wallets\database\seeders;
 
 use Illuminate\Database\Seeder;
 use User\Models\User;
-use Wallets\Models\WalletUser;
 
 /**
  * Class AuthTableSeeder.

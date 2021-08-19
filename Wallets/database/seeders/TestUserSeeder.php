@@ -2,7 +2,7 @@
 namespace Wallets\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Wallets\Models\WalletUser;
+use User\Models\User;
 
 class TestUserSeeder extends Seeder
 {
@@ -11,7 +11,7 @@ class TestUserSeeder extends Seeder
         // Load local seeder
         if (app()->environment() === 'local')
         {
-            WalletUser::create([
+            User::create([
                 'user_id' => 1,
                 'first_name' => 'Nima',
                 'last_name' => 'Nouri',
@@ -19,7 +19,7 @@ class TestUserSeeder extends Seeder
                 'email' => 'nima.nouri.d@gmail.com'
             ]);
 
-            WalletUser::create([
+            User::create([
                 'user_id' => 2,
                 'first_name' => 'Ali',
                 'last_name' => 'Gholami',

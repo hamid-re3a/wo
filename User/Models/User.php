@@ -1,6 +1,7 @@
 <?php
 namespace User\Models;
 
+use Giftcode\Models\Giftcode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
@@ -40,6 +41,11 @@ class User extends Model
     public function getFullNameAttribute()
     {
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
+    }
+
+    public function giftCodes()
+    {
+        return $this->hasMany(Giftcode::class,'user_id','id');
     }
 
 }

@@ -61,6 +61,16 @@ class Order extends Model
     use HasFactory;
     protected $guarded = [];
 
+    protected $casts = [
+        'is_paid_at' => 'datetime',
+        'is_resolved_at' => 'datetime',
+        'is_refund_at' => 'datetime',
+        'is_expired_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
@@ -74,7 +84,7 @@ class Order extends Model
 
     public function packages()
     {
-        return $this->hasMany(OrderPackage::class, '', '');
+        return $this->hasMany(OrderPackage::class);
     }
 
 
@@ -88,10 +98,6 @@ class Order extends Model
         $this->save();
     }
 
-    /**
-     * @param PackageService $package_service
-     * @return float|int
-     */
     private function orderPackagesPrice()
     {
         $packages_price = 0;
@@ -102,5 +108,34 @@ class Order extends Model
             $packages_price += $package_service_object->getPrice();
         }
         return $packages_price;
+    }
+
+    /**
+     * Scopes
+     */
+    public function scopeFilter($query)
+    {
+        if(request()->has('is_paid_at_from'))
+            $query->whereDate('is_paid_at', ' >' , request()->get('is_paid_at_from'));
+
+        if(request()->has('is_paid_at_to'))
+            $query->whereDate('is_paid_at', ' <' , request()->get('is_paid_at_to'));
+
+        if(request()->has('created_at_from'))
+            $query->whereDate('created_at', ' >' , request()->get('created_at_from'));
+
+        if(request()->has('created_at_to'))
+            $query->whereDate('created_at', ' <' , request()->get('created_at_to'));
+
+        if(request()->has('is_paid') AND request()->get('is_paid'))
+            $query->whereNotNull('is_paid_at');
+
+        if(request()->has('is_refunded') AND request()->get('is_refunded'))
+            $query->whereNotNull('is_refunded');
+
+        if(request()->has('is_expired') AND request()->get('is_expired'))
+            $query->whereNotNull('is_expired');
+
+        return $query;
     }
 }

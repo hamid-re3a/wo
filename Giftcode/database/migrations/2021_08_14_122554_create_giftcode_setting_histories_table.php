@@ -18,8 +18,10 @@ class CreateGiftcodeSettingHistoriesTable extends Migration
             $table->id();
             $table->foreignId('setting_id')->constrained('giftcode_settings');
             $table->foreignId('actor_id')->constrained('users');
-            $table->string('name')->nullable();
+            $table->string('name')->unique();
             $table->string('value')->nullable();
+            $table->string('title')->nullable();
+            $table->mediumText('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

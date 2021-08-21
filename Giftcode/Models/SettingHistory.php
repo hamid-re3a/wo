@@ -19,6 +19,8 @@ class SettingHistory extends Model
         'actor_id',
         'name',
         'value',
+        'title',
+        'description'
     ];
 
     protected $casts = [

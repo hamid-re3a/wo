@@ -27,7 +27,9 @@ class UpdateSettingRequest extends FormRequest
     {
         return [
             'name' => 'required|string|exists:giftcode_settings,name',
-            'value' => 'required|' . $this->valueValidation()
+            'value' => 'required|' . $this->valueValidation(),
+            'title' => 'nullable|string',
+            'description' => 'nullable|string'
         ];
     }
 

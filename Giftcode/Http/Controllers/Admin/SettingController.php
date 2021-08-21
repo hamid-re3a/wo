@@ -5,7 +5,7 @@ namespace Giftcode\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Giftcode\Http\Requests\Admin\UpdateSettingRequest;
-use Giftcode\Http\Resources\SettingResource;
+use Giftcode\Http\Resources\Admin\SettingResource;
 use Giftcode\Models\Setting;
 
 class SettingController extends Controller
@@ -31,9 +31,11 @@ class SettingController extends Controller
     {
         $setting = Setting::query()->whereName($request->get('name'))->first();
         $setting->update([
-            'value' => $request->get('value')
+            'value' => $request->get('value'),
+            'title' => $request->has('title') ? $request->get('title') : $setting->title,
+            'description' => $request->has('description') ? $request->get('description') : $setting->description
         ]);
 
-        return api()->success(null, SettingResource::make($setting));
+        return api()->success(null, SettingResource::make($setting->fresh()));
     }
 }

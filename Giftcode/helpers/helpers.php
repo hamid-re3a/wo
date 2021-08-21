@@ -1,13 +1,14 @@
 <?php
 
-use Giftcode\Models\Giftcode;
-use Giftcode\Traits\CodeGenerator;
-use Illuminate\Support\Str;
-
 if (!function_exists('giftcodeGetSetting')) {
 
     function giftcodeGetSetting($key)
     {
+        //Check if settings are available in cache
+        if(cache()->has('giftcode_settings'))
+            if($setting = collect(cache('giftcode_settings'))->where('name', $key)->first())
+                return $setting['value'];
+
         $setting = \Giftcode\Models\Setting::whereName($key)->first();
         if($setting)
             return $setting->value;
@@ -16,23 +17,16 @@ if (!function_exists('giftcodeGetSetting')) {
     }
 }
 
-if (!function_exists('newGiftcode')) {
-
-    function newGiftcode()
-    {
-        $giftcodeModel = new Giftcode();
-        $code = $giftcodeModel->generateCode();
-        while($giftcodeModel->whereCode($code)->first())
-            $code = $giftcodeModel->generateCode();
-
-        return $code;
-    }
-}
-
 if(!function_exists('giftcodeGetEmailContent')) {
 
     function giftcodeGetEmailContent($key)
     {
+        //Check if email content is available in cache
+        if(cache()->has('giftcode_email_contents'))
+            if($email = collect(cache('giftcode_email_contents'))->where('key', $key)->first())
+                return $email;
+
+
         if($email = \Giftcode\Models\EmailContent::where('key',$key)->first())
             return $email->toArray();
 

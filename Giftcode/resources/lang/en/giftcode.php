@@ -9,6 +9,7 @@ return [
         'global-error' => 'An error occurred, Try again please.',
         'ok'=>'ok',
         'email-key-doesnt-exists' => "giftcode email content doesn't exists",
+        'not-valid-giftcode-id' => 'Giftcode ID is not valid'
 
     ],
     'validation' => [

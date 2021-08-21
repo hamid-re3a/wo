@@ -40,7 +40,7 @@ class GiftcodeController extends Controller
             DB::beginTransaction();
 
             //All stuff fixed in GiftcodeObserver
-            $giftcode = Giftcode::create([
+            $giftcode = $request->user->giftcodes()->create([
                 'package_id' => $request->get('package_id')
             ]);
 
@@ -102,6 +102,12 @@ class GiftcodeController extends Controller
     public function show()
     {
 
+        $giftcode = request()->user->giftcodes()->where('uuid',request()->uuid)->first();
+
+        if(!$giftcode)
+            return api()->error(trans('giftcode.responses.not-valid-giftcode-id'),null,404);
+
+        return api()->success(null,GiftcodeResource::make($giftcode));
     }
 
     /**

@@ -3,9 +3,11 @@
 
 namespace Giftcode\Observers;
 
+use Exception;
 use Giftcode\Jobs\UrgentEmailJob;
 use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Models\Giftcode;
+use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 
 class GiftcodeObserver
@@ -25,8 +27,12 @@ class GiftcodeObserver
         $giftcode->uuid = $uuid;
 
         //Giftcode costs
+        if(empty($giftcode->package_id)) {
+            Log::error('GiftcodeObserver Line 31, package_id is null');
+            throw new Exception(trans('giftcode.responses.global-error'),500);
+        }
 
-        $giftcode->packages_cost_in_usd = $giftcode->package()->exists() ? (float)$giftcode->package->price : null;
+        $giftcode->packages_cost_in_usd = (float)$giftcode->package->price ;
 
         if (giftcodeGetSetting('include_registration_fee') AND request()->has('include_registration_fee') AND request()->get('include_registration_fee'))
             $giftcode->registration_fee_in_usd = (float)giftcodeGetSetting('registration_fee');

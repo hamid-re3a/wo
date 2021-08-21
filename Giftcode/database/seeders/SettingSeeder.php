@@ -80,7 +80,7 @@ class SettingSeeder extends Seeder
                 'name' => 'include_expiration_fee',
                 'value' => true,
                 'title' => 'Include expiration fee',
-                'description' => 'Include expiration fee for giftcode or nit'
+                'description' => 'Include expiration fee for giftcode or not'
             ],
             [
                 'name' => 'expiration_fee',

@@ -13,18 +13,29 @@ class GiftcodeObserver
     public function creating(Giftcode $giftcode)
     {
 
-        list($code,$expirationDate) = $giftcode->generateCode();
+        //Giftcode code and expiration date
+        list($code, $expirationDate) = $giftcode->generateCode();
         $giftcode->code = $code;
         $giftcode->expiration_date = $expirationDate;
 
+        //Giftcode UUID field
         $uuid = Uuid::uuid4()->toString();
-        while($giftcode->where('uuid', $uuid)->first())
+        while ($giftcode->where('uuid', $uuid)->first())
             $uuid = Uuid::uuid4()->toString();
-        $giftcode->uuid = $uuid ;
+        $giftcode->uuid = $uuid;
+
+        //Giftcode costs
+        $giftcode->packages_cost_in_usd = (float)$giftcode->package->price;
+
+        if (giftcodeGetSetting('include_registration_fee') AND request()->has('include_registration_fee') AND request()->get('include_registration_fee'))
+            $giftcode->registration_fee_in_usd = (float)giftcodeGetSetting('registration_fee');
+
+        $giftcode->total_cost_in_usd = $giftcode->packages_cost_in_usd + $giftcode->registration_fee_in_usd;
 
     }
+
     public function created(Giftcode $giftcode)
     {
-        UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
+        UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
     }
 }

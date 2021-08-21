@@ -13,13 +13,14 @@ CONST EMAIL_CONTENTS = [
                 <p></p>
                 <p>Code : <b>{{code}}</b></p>
                 <p>Package : <b>{{package_name}}</b></p>
+                <p>Total cost : <b>{{total_cost}}</b></p>
                 <p>Expiration date : <b>{{expiration_date}}</b></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,code,package_name,expiration_date',
-        'variables_description'=>'full_name user full name, code giftcode code,package_name name of package,expiration_date giftcode expiration date',
+        'variables'=>'full_name,code,package_name,expiration_date,total_cost',
+        'variables_description'=>'full_name user full name, code giftcode code,package_name name of package,expiration_date giftcode expiration date,total_cost giftcode total cost',
         'type'=>'email',
     ]
 ];

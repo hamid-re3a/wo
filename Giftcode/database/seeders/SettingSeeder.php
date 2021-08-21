@@ -87,6 +87,18 @@ class SettingSeeder extends Seeder
                 'value' => 1,
                 'title' => 'Expiration fee',
                 'description' => 'Giftcode expiration fee in percent'
+            ],
+            [
+                'name' => 'include_registration_fee',
+                'value' => true,
+                'title' => 'Include registration fee',
+                'description' => 'Include registration fee for giftcode or not (If it is true, User can choose)'
+            ],
+            [
+                'name' => 'registration_fee',
+                'value' => 20,
+                'title' => 'Registration fee',
+                'description' => 'Registration fee will add in users payable amount'
             ]
         ];
         Setting::insert($settings);

@@ -9,11 +9,8 @@ use Giftcode\Http\Requests\User\CreateGiftcodeRequest;
 use Giftcode\Http\Resources\GiftcodeResource;
 use Giftcode\Jobs\UpdatePackages;
 use Giftcode\Models\Giftcode;
-use Illumina\te\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
-use Wallets\Services\Wallet;
 use Wallets\Services\WalletService;
 use Wallets\Services\Withdraw;
 

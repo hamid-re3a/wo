@@ -4,6 +4,7 @@ namespace Wallets\database\seeders;
 
 use Illuminate\Database\Seeder;
 use User\Models\User;
+use Wallets\Services\BankService;
 
 /**
  * Class AuthTableSeeder.
@@ -24,6 +25,9 @@ class UserWalletTableSeeder extends Seeder
             'email'=>'hamidrezanoruzinejad@gmail.com',
             'username'=>'hamid_re3a',
         ]);
+        $bankService = new BankService($user);
+        $bankService->deposit('Deposit Wallet',10000);
+        $bankService->deposit('Earning Wallet',1000);
 
 
     }

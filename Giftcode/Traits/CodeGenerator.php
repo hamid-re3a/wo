@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 trait CodeGenerator
 {
 
-    private function generateCode()
+    public function generateCode()
     {
         $giftcodeModel = new Giftcode();
         $code = $this->makeCode();

@@ -14,12 +14,16 @@ use User\Models\User;
  * @property int $user_id
  * @property int $package_id
  * @property string $code
+ * @property string $package_name
  * @property boolean $is_used
  * @property string|null $used_date
  * @property int $used_user_id
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property Carbon|null $expiration_date
+ * @property-read Package $package
+ * @property-read User $creator
  */
 class Giftcode extends Model
 {
@@ -78,6 +82,14 @@ class Giftcode extends Model
 
         $this->attributes['code'] = $code;
         $this->attributes['expiration_date'] = $expirationDate;
+    }
+
+    public function getPackageNameAttribute()
+    {
+        if($this->package()->exists() AND !is_null($this->package->name))
+            return $this->package->name;
+
+        return null;
     }
 
 

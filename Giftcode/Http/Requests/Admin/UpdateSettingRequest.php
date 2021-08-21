@@ -54,11 +54,13 @@ class UpdateSettingRequest extends FormRequest
             case 'prefix':
                 return 'string';
                 break;
+            case 'include_cancelation_fee':
             case 'use_postfix':
             case 'use_prefix':
             case 'has_expiration_date':
                 return 'boolean';
                 break;
+            case 'cancelation_fee':
             case 'giftcode_lifetime':
                 return 'integer|min:1';
                 break;

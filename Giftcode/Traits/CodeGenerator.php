@@ -28,8 +28,10 @@ trait CodeGenerator
 
     private function getExpirationDate()
     {
-        if(giftcodeGetSetting('has_expiration_date'))
+        if(giftcodeGetSetting('has_expiration_date') AND !empty(giftcodeGetSetting('giftcode_lifetime')))
             return now()->addDays(intval(giftcodeGetSetting('giftcode_lifetime')))->toDateTimeString();
+
+        return null;
     }
 
     private function getSeparator()

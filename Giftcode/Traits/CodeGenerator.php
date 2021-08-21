@@ -4,12 +4,23 @@
 namespace Giftcode\Traits;
 
 
+use Giftcode\Models\Giftcode;
 use Illuminate\Support\Str;
 
 trait CodeGenerator
 {
 
-    public function generateCode()
+    private function generateCode()
+    {
+        $giftcodeModel = new Giftcode();
+        $code = $this->makeCode();
+        while($giftcodeModel->where('code',$code)->first())
+            $code = $this->makeCode();
+
+        return $code;
+    }
+
+    private function makeCode()
     {
         $characters = collect(str_split(giftcodeGetSetting('characters')));
         $length = giftcodeGetSetting('length');

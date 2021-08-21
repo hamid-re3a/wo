@@ -9,7 +9,7 @@ class SettingSeeder extends Seeder
 {
     public function run()
     {
-        Setting::insert([
+        $settings = [
             [
                 'name' => 'characters',
                 'value' => '23456789ABCDEFGHJKLMNPQRSTUVWXYZ',
@@ -88,7 +88,9 @@ class SettingSeeder extends Seeder
                 'title' => 'Expiration fee',
                 'description' => 'Giftcode expiration fee in percent'
             ]
-        ]);
+        ];
+        Setting::insert($settings);
+        cache(['giftcode_settings' =>  $settings]);
     }
 
 }

@@ -7,7 +7,10 @@ namespace Giftcode\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Giftcode\Http\Requests\User\CreateGiftcodeRequest;
 use Giftcode\Http\Resources\GiftcodeResource;
+use Giftcode\Jobs\UpdatePackages;
 use Giftcode\Models\Giftcode;
+use Illumina\te\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
 use Wallets\Services\Wallet;
@@ -31,11 +34,57 @@ class GiftcodeController extends Controller
      * Create giftcode
      * @group Public User > Giftcode
      * @param CreateGiftcodeRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(CreateGiftcodeRequest $request)
     {
+        UpdatePackages::dispatchSync();
+        try {
+            DB::beginTransaction();
+
+            //All stuff fixed in GiftcodeObserver
+            $giftcode = Giftcode::create([
+                'package_id' => $request->get('package_id')
+            ]);
 
 
+            //Check wallet balance
+            $wallet = prepareGiftcodeWallet(request()->user,$request->get('wallet'));
+            $walletService = app(WalletService::class);
+            $wallet = $walletService->getBalance($wallet);
+
+            if($wallet->getBalance() < $giftcode->total_cost_in_usd)
+                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),422);
+
+
+            //Withdraw amount from user's wallet
+            $preparedUser = prepareGiftcodeUser($request->user);
+            $withdrawService = app(Withdraw::class);
+            $withdrawService->setUser($preparedUser);
+            $transactionService = app(Transaction::class);
+            $transactionService->setConfiremd(true);
+            $transactionService->setAmount($giftcode->total_cost_in_usd);
+            $transactionService->setFromWalletName($request->get('wallet'));
+            $transactionService->setFromUserId($request->user->id);
+            $transactionService->setDescription(trans('giftcode.phrases.buy-a-giftcode'));
+            $withdrawService->setTransaction($transactionService);
+            $withdrawService->setUser($preparedUser);
+            $finalTransaction = $walletService->withdraw($withdrawService);
+
+            //Wallet transaction failed [Server error]
+            if(!$finalTransaction->getConfiremd())
+                throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
+
+
+            //Successful
+            DB::commit();
+            return api()->success(null,GiftcodeResource::make($giftcode));
+
+        } catch (\Throwable $exception) {
+            //Handle exceptions
+            DB::rollBack();
+            return api()->error($exception->getMessage(),null,$exception->getCode());
+        }
     }
 
     /**
@@ -55,6 +104,5 @@ class GiftcodeController extends Controller
     {
 
     }
-
 
 }

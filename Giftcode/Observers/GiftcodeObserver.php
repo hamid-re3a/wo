@@ -25,12 +25,19 @@ class GiftcodeObserver
         $giftcode->uuid = $uuid;
 
         //Giftcode costs
-        $giftcode->packages_cost_in_usd = (float)$giftcode->package->price;
+
+        $giftcode->packages_cost_in_usd = $giftcode->package()->exists() ? (float)$giftcode->package->price : null;
 
         if (giftcodeGetSetting('include_registration_fee') AND request()->has('include_registration_fee') AND request()->get('include_registration_fee'))
             $giftcode->registration_fee_in_usd = (float)giftcodeGetSetting('registration_fee');
 
         $giftcode->total_cost_in_usd = $giftcode->packages_cost_in_usd + $giftcode->registration_fee_in_usd;
+
+        if(empty($giftcode->user_id))
+            $giftcode->user_id = request()->user->id;
+
+        if(empty($giftcode->package_id) AND request()->has('package_id'))
+            $giftcode->package_id = request()->get('package_id');
 
     }
 

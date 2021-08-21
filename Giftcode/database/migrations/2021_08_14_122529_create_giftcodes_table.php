@@ -16,8 +16,14 @@ class CreateGiftcodesTable extends Migration
         Schema::create('giftcodes', function (Blueprint $table) {
             $table->engine = "InnoDB";
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->foreignId('user_id')->constrained('users','id');
             $table->foreignId('package_id')->constrained('giftcode_packages','id');
+
+            $table->unsignedBigInteger('packages_cost_in_usd')->default(0);
+            $table->unsignedBigInteger('registration_fee_in_usd')->default(0);
+            $table->unsignedBigInteger('total_cost_in_usd')->default(0);
+
             $table->string('code')->unique();
             $table->timestamp('expiration_date')->nullable();
             $table->foreignId('redeem_user_id')->nullable()->constrained('users','id');

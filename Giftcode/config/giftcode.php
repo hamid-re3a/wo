@@ -14,5 +14,7 @@ return [
     'include_cancellation_fee' => true,
     'cancellation_fee' => 1,
     'include_expiration_fee' => true,
-    'expiration_fee' => 1
+    'expiration_fee' => 1,
+    'include_registration_fee' => true,
+    'registration_fee' => 10
 ];

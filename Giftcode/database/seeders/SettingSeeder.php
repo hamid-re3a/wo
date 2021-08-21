@@ -72,9 +72,21 @@ class SettingSeeder extends Seeder
             ],
             [
                 'name' => 'cancellation_fee',
-                'value' => 10,
+                'value' => 1,
                 'title' => 'Cancelation fee',
-                'description' => 'Cancellation fee for giftcode'
+                'description' => 'Cancellation fee for giftcode in percent'
+            ],
+            [
+                'name' => 'include_expiration_fee',
+                'value' => true,
+                'title' => 'Include expiration fee',
+                'description' => 'Include expiration fee for giftcode or nit'
+            ],
+            [
+                'name' => 'expiration_fee',
+                'value' => 1,
+                'title' => 'Expiration fee',
+                'description' => 'Giftcode expiration fee in percent'
             ]
         ]);
     }

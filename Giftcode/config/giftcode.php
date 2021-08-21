@@ -12,5 +12,7 @@ return [
     'has_expiration_date' => true,
     'giftcode_lifetime' => '10', // if has_expiration_date is true , giftcode_lifetime should be in days
     'include_cancellation_fee' => true,
-    'cancellation_fee' => 10
+    'cancellation_fee' => 1,
+    'include_expiration_fee' => true,
+    'expiration_fee' => 1
 ];

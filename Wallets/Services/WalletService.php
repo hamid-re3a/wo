@@ -81,13 +81,12 @@ class WalletService implements WalletServiceInterface
             if (
                 $transaction->getConfiremd() AND
                 $transaction->getAmount() > 0 AND
-                $transaction->getToWalletName() AND
-                $transaction->getToUserId() AND
-                in_array(strtolower($transaction->getToWalletName()) ,['earning','earning wallet'])
+                $transaction->getFromWalletName() AND
+                $transaction->getFromUserId() AND
+                in_array($transaction->getFromWalletName() ,[$this->depositWallet,$this->earningWallet])
             ) {
                 $bankService = new BankService($walletUser);
-
-                $bankService->withdraw($this->earningWallet,$transaction->getAmount(), $transaction->getDescription() ?: null);
+                $bankService->withdraw($transaction->getFromWalletName(),$transaction->getAmount(), $transaction->getDescription() ?: null);
 
                 DB::commit();
 

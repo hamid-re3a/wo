@@ -22,10 +22,10 @@ class GiftcodeAuthMiddleware
         $request->hasHeader('X-user-id')
         ) {
             $user = User::firstOrCreate([
-                'user_id' => $request->header('X-user-id')
+                'id' => $request->header('X-user-id')
             ]);;
             $request->merge([
-                'Giftcodeuser' => $user
+                'user' => $user
             ]);
             return $next($request);
         }

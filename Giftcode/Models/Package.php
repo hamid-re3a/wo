@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 class Package extends Model
 {
     protected $fillable = [
-        'package_id',
         'name',
         'short_name',
         'validity_in_days',
@@ -24,7 +23,6 @@ class Package extends Model
     ];
 
     protected $casts = [
-        'package_id',
         'name' => 'string',
         'short_name' => 'string',
         'validity_in_days' => 'integer',

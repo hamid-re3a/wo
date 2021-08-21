@@ -57,19 +57,30 @@ class GiftcodeController extends Controller
                 throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),422);
 
 
-            //Withdraw amount from user's wallet
+            /**
+             * Start Withdraw
+             */
             $preparedUser = prepareGiftcodeUser($request->user);
-            $withdrawService = app(Withdraw::class);
-            $withdrawService->setUser($preparedUser);
+
+            //Prepare Transaction
             $transactionService = app(Transaction::class);
             $transactionService->setConfiremd(true);
             $transactionService->setAmount($giftcode->total_cost_in_usd);
             $transactionService->setFromWalletName($request->get('wallet'));
             $transactionService->setFromUserId($request->user->id);
             $transactionService->setDescription(trans('giftcode.phrases.buy-a-giftcode'));
+
+            //Prepare Withdraw Service
+            $withdrawService = app(Withdraw::class);
             $withdrawService->setTransaction($transactionService);
             $withdrawService->setUser($preparedUser);
+
+            //Withdraw transaction
             $finalTransaction = $walletService->withdraw($withdrawService);
+
+            /**
+             * End withdraw
+             */
 
             //Wallet transaction failed [Server error]
             if(!$finalTransaction->getConfiremd())

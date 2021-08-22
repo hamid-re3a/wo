@@ -46,8 +46,6 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        $this->registerMiddlewares();
-
         $this->registerWalletsName();
 
         Route::prefix('v1/wallets')
@@ -83,15 +81,6 @@ class WalletServiceProvider extends ServiceProvider
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
         }
-    }
-
-    /**
-     * Register Middlewares
-     */
-    protected function registerMiddlewares()
-    {
-        $kernel = $this->app->make(Kernel::class);
-        $kernel->prependMiddlewareToGroup('api',WalletAuthMiddleware::class);
     }
 
     /**

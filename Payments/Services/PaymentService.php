@@ -76,7 +76,7 @@ class PaymentService implements PaymentsServiceInterface
 
 
                 \Payments\Models\Invoice::query()->create([
-                    'order_id' => $invoice_request->getOrderId(),
+                    'order_id' => $invoice_request->getOrderId()  ,
                     'pf_amount' => $invoice_request->getPfAmount(),
                     'amount'=>$invoice_request->getAmount(),
                     'due_amount'=>$invoice_request->getDueAmount(),
@@ -91,8 +91,7 @@ class PaymentService implements PaymentsServiceInterface
                     'payment_currency' => $invoice_request->getPaymentCurrency(),
                 ]);
 
-                if(!$invoice_request->getOrderId())
-                    EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
+                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
             }
 
         }

@@ -25,7 +25,28 @@ class PackageService implements PackagesServiceInterface
         return $this->setPackage($package);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function packageFullById(Id $id): Package
+    {
+        $package = $this->package_repository->getById($id);
+        if (is_null($package))
+            return new Package();
 
+        if(empty($package->validity_in_days))
+            $package->validity_in_days = $package->category->package_validity_in_days;
+
+        if(empty($package->roi_percentage))
+            $package->roi_percentage = $package->category->roi_percentage;
+
+        if(empty($package->direct_percentage))
+            $package->direct_percentage = $package->category->direct_percentage;
+
+        if(empty($package->binary_percentage))
+            $package->binary_percentage = $package->category->binary_percentage;
+        return $this->setPackage($package);
+    }
 
 
 
@@ -57,4 +78,5 @@ class PackageService implements PackagesServiceInterface
     {
         return $this->package_repository->getAll();
     }
+
 }

@@ -4,9 +4,12 @@ namespace Orders\Http\Controllers\Front;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderRequest;
+use Orders\Http\Resources\OrderResource;
 use Orders\Models\Order;
 use Packages\Services\Id;
 use Packages\Services\PackageService;
@@ -24,6 +27,19 @@ class OrderController extends Controller
     {
         $this->payment_service = $payment_service;
         $this->package_service = $package_service;
+    }
+
+    /**
+     * List orders
+     * @group
+     * Public User > Orders
+     * @param ListOrderRequest $request
+     * @return JsonResponse
+     */
+    public function index(ListOrderRequest $request)
+    {
+        $orders = Order::query()->filter()->simplePaginate();
+        return api()->success(null,OrderResource::collection($orders)->response()->getData());
     }
 
     /**

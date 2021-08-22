@@ -4,6 +4,8 @@ namespace Packages;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Packages\Models\Package;
+use Packages\Observer\PackageHistoryObserver;
 
 class PackageServiceProvider extends ServiceProvider
 {
@@ -56,6 +58,8 @@ class PackageServiceProvider extends ServiceProvider
                 __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
+
+        $this->obServers();
     }
 
     /**
@@ -96,6 +100,14 @@ class PackageServiceProvider extends ServiceProvider
             if (array_search('db:seed', $_SERVER['argv'])) {
                 PackageConfigure::seed();
             }
+    }
+
+    /**
+     * Observer List Entities
+     */
+    private function obServers()
+    {
+        Package::observe(PackageHistoryObserver::class);
     }
 
 }

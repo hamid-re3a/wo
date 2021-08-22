@@ -4,7 +4,7 @@ namespace Wallets\Http\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
-use Wallets\Models\WalletUser;
+use User\Models\User;
 
 class WalletAuthMiddleware
 {
@@ -21,7 +21,7 @@ class WalletAuthMiddleware
         if (
             $request->hasHeader('X-user-id')
         ) {
-            $user = WalletUser::firstOrCreate([
+            $user = User::firstOrCreate([
                 'user_id' => $request->header('X-user-id')
             ]);
             $request->merge([

@@ -5,32 +5,46 @@ namespace Giftcode\Models;
 use Giftcode\Traits\CodeGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use User\Models\User;
 
 /**
  * Giftcode\Models\Giftcode
  *
  * @property int $id
+ * @property string $uuid
  * @property int $user_id
  * @property int $package_id
  * @property string $code
+ * @property string $package_name
  * @property boolean $is_used
  * @property string|null $used_date
- * @property int $used_user_id
+ * @property int $redeem_user_id
+ * @property int $packages_cost_in_usd
+ * @property int $registration_fee_in_usd
+ * @property int $total_cost_in_usd
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property Carbon|null $expiration_date
+ * @property-read Package $package
+ * @property-read User $creator
+ * @property-read User $redeemer
  */
 class Giftcode extends Model
 {
     use CodeGenerator;
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'package_id',
         'code',
         'expiration_date',
         'redeem_date',
-        'redeem_user_id'
+        'redeem_user_id',
+        'packages_cost_in_usd',
+        'registration_fee_in_usd',
+        'total_cost_in_usd'
     ];
 
     protected $casts = [
@@ -40,6 +54,10 @@ class Giftcode extends Model
         'expiration_date' => 'datetime',
         'redeem_date' => 'datetime',
         'redeem_user_id' => 'integer'
+    ];
+
+    protected $hidden = [
+        'id'
     ];
 
     protected $table = 'giftcodes';
@@ -66,17 +84,12 @@ class Giftcode extends Model
      * Mutators
      */
 
-    /**
-     * Auto fill code field for new giftcode
-     */
-    public function setUserIdAttribute($value)
+    public function getPackageNameAttribute()
     {
-        $this->attributes['user_id'] = $value;
+        if($this->package()->exists() AND !is_null($this->package->name))
+            return $this->package->name;
 
-        list($code,$expirationDate) = $this->generateCode();
-
-        $this->attributes['code'] = $code;
-        $this->attributes['expiration_date'] = $expirationDate;
+        return null;
     }
 
 

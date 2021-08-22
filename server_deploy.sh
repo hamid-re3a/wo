@@ -17,17 +17,17 @@ shopt -s dotglob
 rsync -rv --exclude=.git temp-project/* .
 rm -rf temp-project/
 cp -u .env.staging  .env
-
+composer dumpautoload
 composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
-composer install
+composer update
 
 # Update codebas
 #chmod 777 .* -R
 #chown -R root:root .
+php artisan optimize:clear
 php artisan vendor:publish --all
 php artisan migrate:fresh
 php artisan db:seed
-php artisan optimize:clear
 php artisan scribe:generate
 # Exit maintenance mode
 #php artisan up

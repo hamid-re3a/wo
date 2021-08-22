@@ -17,7 +17,9 @@ class CreateGiftcodeSettingsTable extends Migration
             $table->engine = "InnoDB";
             $table->id();
             $table->string('name')->unique();
-            $table->string('value');
+            $table->string('value')->nullable();
+            $table->string('title')->nullable();
+            $table->mediumText('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

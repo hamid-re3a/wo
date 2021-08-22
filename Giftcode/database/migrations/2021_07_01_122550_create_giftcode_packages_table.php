@@ -15,11 +15,10 @@ class CreateGiftCodePackagesTable extends Migration
     {
         Schema::create('giftcode_packages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('package_id');
             $table->string('name')->nullable();
             $table->string('short_name',20)->nullable();
             $table->integer('validity_in_days')->nullable();
-            $table->double('price');
+            $table->double('price')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

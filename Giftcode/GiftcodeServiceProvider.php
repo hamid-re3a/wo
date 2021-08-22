@@ -2,14 +2,14 @@
 
 namespace Giftcode;
 
+use Giftcode\Models\EmailContent;
 use Giftcode\Models\Giftcode;
 use Giftcode\Models\Setting;
+use Giftcode\Observers\EmailContentObserver;
 use Giftcode\Observers\GiftcodeObserver;
 use Giftcode\Observers\SettingObserver;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
 
 class GiftcodeServiceProvider extends ServiceProvider
 {
@@ -33,9 +33,6 @@ class GiftcodeServiceProvider extends ServiceProvider
                 __DIR__ . '/database/migrations',
             ]);
         }
-        $this->publishes([
-            __DIR__ . '/database/migrations' => database_path('migrations'),
-        ], $this->name . '-migrations');
 
     }
 
@@ -60,12 +57,15 @@ class GiftcodeServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->seed();
-
-            $this->publishes([
-                __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
-            ], 'api-response');
         }
 
+        $this->publishes([
+            __DIR__ . '/resources/lang' => resource_path('lang'),
+        ], 'user-resources');
+
+        $this->publishes([
+            __DIR__ . '/config/' => config_path(),
+        ]);
     }
 
     /**
@@ -83,6 +83,9 @@ class GiftcodeServiceProvider extends ServiceProvider
      */
     protected function registerHelpers()
     {
+        if (file_exists($helperFile = __DIR__ . '/helpers/emails.php')) {
+            require_once($helperFile);
+        }
 
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
@@ -96,6 +99,7 @@ class GiftcodeServiceProvider extends ServiceProvider
     {
         Setting::observe(SettingObserver::class);
         Giftcode::observe(GiftcodeObserver::class);
+        EmailContent::observe(EmailContentObserver::class);
     }
 
     /**

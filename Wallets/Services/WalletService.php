@@ -6,6 +6,7 @@ namespace Wallets\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use User\Models\User;
 
 class WalletService implements WalletServiceInterface
 {
@@ -23,13 +24,11 @@ class WalletService implements WalletServiceInterface
 
     private function walletUser($user)
     {
-        return UserService::getUser([
-            'user_id' => $user->getId(),
-            'first_name' => $user->getFirstName(),
-            'last_name' => $user->getLastName(),
-            'email' => $user->getEmail(),
-            'username' => $user->getUsername()
-        ]);
+
+        return User::firstOrCreate(
+            [ 'id' => $user->getId() ]
+        );
+
     }
 
     private function trueResponse()
@@ -51,7 +50,6 @@ class WalletService implements WalletServiceInterface
         try {
             DB::beginTransaction();
             $walletUser = $this->walletUser($deposit->getUser());
-
             $transaction = $deposit->getTransaction();
             if (
                 $transaction->getAmount() > 0 AND
@@ -60,7 +58,6 @@ class WalletService implements WalletServiceInterface
                 in_array(strtolower($transaction->getToWalletName()) ,$this->wallets)
             ) {
                 $bankService = new BankService($walletUser);
-
                 $bankService->deposit($this->depositWallet,$transaction->getAmount(), $transaction->getDescription() ?: null);
 
                 DB::commit();
@@ -86,13 +83,12 @@ class WalletService implements WalletServiceInterface
             if (
                 $transaction->getConfiremd() AND
                 $transaction->getAmount() > 0 AND
-                $transaction->getToWalletName() AND
-                $transaction->getToUserId() AND
-                in_array(strtolower($transaction->getToWalletName()) ,['earning','earning wallet'])
+                $transaction->getFromWalletName() AND
+                $transaction->getFromUserId() AND
+                in_array($transaction->getFromWalletName() ,[$this->depositWallet,$this->earningWallet])
             ) {
                 $bankService = new BankService($walletUser);
-
-                $bankService->withdraw($this->earningWallet,$transaction->getAmount(), $transaction->getDescription() ?: null);
+                $bankService->withdraw($transaction->getFromWalletName(),$transaction->getAmount(), $transaction->getDescription() ?: null);
 
                 DB::commit();
 

@@ -22,7 +22,7 @@ class WalletAuthMiddleware
             $request->hasHeader('X-user-id')
         ) {
             $user = User::firstOrCreate([
-                'user_id' => $request->header('X-user-id')
+                'id' => $request->header('X-user-id')
             ]);
             $request->merge([
                 'wallet_user' => $user

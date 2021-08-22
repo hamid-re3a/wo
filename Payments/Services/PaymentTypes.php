@@ -58,9 +58,8 @@ class PaymentTypes extends \Google\Protobuf\Internal\Message
      */
     public function setPaymentTypes($var)
     {
-        GPBUtil::checkMessage($var, \Payments\Services\PaymentType::class);
+//        GPBUtil::checkMessage($var, \Payments\Services\PaymentType::class);
         $this->payment_types = $var;
-
         return $this;
     }
 

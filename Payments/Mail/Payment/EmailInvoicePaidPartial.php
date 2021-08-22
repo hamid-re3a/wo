@@ -45,7 +45,7 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{due_amount}}',(is_null($this->getInvoiceDueAmount()) || empty($this->getInvoiceDueAmount())) ? 'Unknown': $this->getInvoiceDueAmount(),$setting['body']);
         $setting['body'] = str_replace('{{invoice_expire_duration}}',(is_null($this->getInvoiceExpirationTime()) || empty($this->getInvoiceExpirationTime())) ? 'Unknown': $this->getInvoiceExpirationTime(),$setting['body']);
         $setting['body'] = str_replace('{{amount_in_usd}}',(is_null($this->getPartialInPf()) || empty($this->getPartialInPf())) ? 'Unknown': $this->getPartialInPf(),$setting['body']);
-        $setting['body'] = str_replace('{{expiry_date}}',(is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown': Carbon::createFromTimestamp($this->invoice->getExpirationTime()),$setting['body']);
+        $setting['body'] = str_replace('{{expiry_date}}',(is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown': Carbon::createFromTimestamp($this->invoice->getExpirationTime())->toString(),$setting['body']);
 
 
         return $this

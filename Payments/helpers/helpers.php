@@ -141,11 +141,11 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Please pay the amount by logging in to the system or clicking the button below.
                 </p>
                 <p><a href="{{invoice_link}}">Pay Now</a></p>
-                <p>Your package will be activated after the payment is received in the system.</br>
+                <p>Your package will be activated after the payment is received in the system.<br/>
                     Note:</br>
-                    A) This invoice will expire after {{expiry_date}}</br>
-                    B) The invoice updates every two hours</br>
-                    C) Package price doesn't include the Transaction Charges.</br>
+                    A) This invoice will expire after {{expiry_date}}<br/>
+                    B) The invoice updates every two hours<br/>
+                    C) Package price doesn't include the Transaction Charges.<br/>
                     D) In case of partial payment, the customer should pay the due amount on the same link.
                     </p>
                 <p>Cheers,</p>

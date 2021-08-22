@@ -57,8 +57,24 @@ class WalletService implements WalletServiceInterface
                 $transaction->getToUserId() AND
                 in_array(strtolower($transaction->getToWalletName()) ,$this->wallets)
             ) {
+
                 $bankService = new BankService($walletUser);
-                $bankService->deposit($this->depositWallet,$transaction->getAmount(), $transaction->getDescription() ?: null);
+
+                $type = null;
+                $description = $transactionDescription = @unserialize($transaction->getDescription());
+
+                if ($transaction->getDescription() === 'b:0;' || $description === false) {
+                    $description = $transaction->getDescription();
+                }
+
+                if(is_array($transactionDescription)) {
+                    if(array_key_exists('description', $transactionDescription))
+                        $description['description'] = $transactionDescription['description'];
+                    if(array_key_exists('type',$transactionDescription))
+                        $description['type'] = $transactionDescription['type'];
+                }
+
+                $bankService->deposit($this->depositWallet,$transaction->getAmount(), $description ?: null);
 
                 DB::commit();
 

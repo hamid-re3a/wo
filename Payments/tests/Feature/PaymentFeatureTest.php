@@ -1,11 +1,7 @@
 <?php
 namespace Payments\tests\Feature;
 
-use Orders\Services\Order;
-use Payments\Services\PaymentService;
-use Payments\Services\PaymentsServiceClient;
 use Payments\tests\PaymentTest;
-use function Swoole\Coroutine\run;
 
 class PaymentFeatureTest extends PaymentTest
 {

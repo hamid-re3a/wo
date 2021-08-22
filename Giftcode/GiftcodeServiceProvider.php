@@ -83,6 +83,7 @@ class GiftcodeServiceProvider extends ServiceProvider
      */
     protected function registerHelpers()
     {
+
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
         }

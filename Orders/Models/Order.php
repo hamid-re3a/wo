@@ -4,9 +4,9 @@ namespace Orders\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Packages\Models\Package;
 use Packages\Services\Id;
 use Packages\Services\PackageService;
+use User\Models\User;
 
 /**
  * Orders\Models\Order
@@ -51,8 +51,8 @@ use Packages\Services\PackageService;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
  * @mixin \Eloquent
- * @property-read \Orders\Models\OrderUser $user
- * @property-read \Orders\Models\OrderUser $toUser
+ * @property-read \Orders\Models\User $user
+ * @property-read \Orders\Models\User $toUser
  * @property-read \Illuminate\Database\Eloquent\Collection|\Orders\Models\OrderPackage[] $packages
  * @property-read int|null $packages_count
  */
@@ -61,20 +61,30 @@ class Order extends Model
     use HasFactory;
     protected $guarded = [];
 
+    protected $casts = [
+        'is_paid_at' => 'datetime',
+        'is_resolved_at' => 'datetime',
+        'is_refund_at' => 'datetime',
+        'is_expired_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+
+    ];
+
     public function user()
     {
-        return $this->belongsTo(OrderUser::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
 
     public function toUser()
     {
-        return $this->belongsTo(OrderUser::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function packages()
     {
-        return $this->hasMany(OrderPackage::class, '', '');
+        return $this->hasMany(OrderPackage::class);
     }
 
 
@@ -88,10 +98,6 @@ class Order extends Model
         $this->save();
     }
 
-    /**
-     * @param PackageService $package_service
-     * @return float|int
-     */
     private function orderPackagesPrice()
     {
         $packages_price = 0;
@@ -102,5 +108,34 @@ class Order extends Model
             $packages_price += $package_service_object->getPrice();
         }
         return $packages_price;
+    }
+
+    /**
+     * Scopes
+     */
+    public function scopeFilter($query)
+    {
+        if(request()->has('is_paid_at_from'))
+            $query->whereDate('is_paid_at', ' >' , request()->get('is_paid_at_from'));
+
+        if(request()->has('is_paid_at_to'))
+            $query->whereDate('is_paid_at', ' <' , request()->get('is_paid_at_to'));
+
+        if(request()->has('created_at_from'))
+            $query->whereDate('created_at', ' >' , request()->get('created_at_from'));
+
+        if(request()->has('created_at_to'))
+            $query->whereDate('created_at', ' <' , request()->get('created_at_to'));
+
+        if(request()->has('is_paid') AND request()->get('is_paid'))
+            $query->whereNotNull('is_paid_at');
+
+        if(request()->has('is_refunded') AND request()->get('is_refunded'))
+            $query->whereNotNull('is_refunded');
+
+        if(request()->has('is_expired') AND request()->get('is_expired'))
+            $query->whereNotNull('is_expired');
+
+        return $query;
     }
 }

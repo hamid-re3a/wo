@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use Orders\Models\OrderUser;
 const ORDER_PLAN_UPGRADE = 'ORDER_PLAN_UPGRADE';
 const ORDER_PLAN_START = 'ORDER_PLAN_START';
 const ORDER_PLANS = [
@@ -13,7 +12,7 @@ if (!function_exists('user')) {
 
     function user(int $id ) : ?\User\Services\User
     {
-        $user_db = OrderUser::query()->find($id);
+        $user_db = \User\Models\User::query()->find($id);
         $user = new \User\Services\User();
         $user->setId((int)$user_db->id);
         $user->setFirstName($user_db->first_name);

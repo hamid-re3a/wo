@@ -62,12 +62,14 @@ class OrderService implements OrdersServiceInterface
         return $response;
     }
 
-    public function getPaymentCurrencies(){
+    public function getPaymentCurrencies()
+    {
         $empty_object = new EmptyObject();
         return $this->payment_service->getPaymentCurrencies($empty_object);
     }
 
-    public function getPaymentTypes(){
+    public function getPaymentTypes()
+    {
         $empty_object = new EmptyObject();
         return $this->payment_service->getPaymentTypes($empty_object);
     }

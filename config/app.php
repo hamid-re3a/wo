@@ -162,6 +162,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        Spatie\Permission\PermissionServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -178,9 +179,9 @@ return [
         \Packages\PackageServiceProvider::class,
         \Payments\PaymentServiceProvider::class,
         \Orders\OrderServiceProvider::class,
+        \User\UserServiceProvider::class,
         \Wallets\WalletServiceProvider::class,
         \Giftcode\GiftcodeServiceProvider::class,
-
     ],
 
     /*

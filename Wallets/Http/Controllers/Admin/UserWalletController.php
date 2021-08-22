@@ -4,6 +4,7 @@ namespace Wallets\Http\Controllers\Admin;
 
 use Illuminate\Http\JsonResponse as JsonResponseAlias;
 use Illuminate\Routing\Controller;
+use User\Models\User;
 use Wallets\Http\Requests\Admin\GetUserWalletBalanceRequest;
 use Wallets\Http\Requests\Admin\GetUserTransfersRequest;
 use Wallets\Http\Requests\Admin\GetUserTransactionsRequest;
@@ -12,7 +13,6 @@ use Wallets\Http\Requests\Admin\UserIdRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\WalletResource;
-use Wallets\Models\WalletUser;
 use Wallets\Services\BankService;
 
 class UserWalletController extends Controller
@@ -23,7 +23,7 @@ class UserWalletController extends Controller
 
     public function __construct(UserIdRequest $request)
     {
-        $user = WalletUser::find($request->get('user_id'))->first();
+        $user = User::find($request->get('user_id'))->first();
         $this->bankService = new BankService($user);
 
         $this->earningWallet = config('earningWallet');

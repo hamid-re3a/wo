@@ -24,7 +24,7 @@ class Setting extends Model
         'value' => 'string',
     ];
 
-    protected $table = 'Giftcodesettings';
+    protected $table = 'giftcode_settings';
 
 
     /**

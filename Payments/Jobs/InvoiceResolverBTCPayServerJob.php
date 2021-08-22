@@ -33,6 +33,19 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     public function handle()
     {
+        switch($this->invoice_db->full_status){
+            case 'Complete Paid':
+            case 'Settled Paid':
+            case 'Complete None':
+            case 'Settled None':
+            case 'Paid PaidOver':
+            case 'Complete PaidOver':
+            case 'Settled PaidOver':
+                return ;
+        }
+
+
+
         $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->get(
                 config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
@@ -80,13 +93,13 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 ($invoice_model->getPfAmount()/$invoice_model->getAmount()) * $invoice_model->getPaidAmount()
                 ,2, '.', '');
                 if($pf_paid > (double) $invoice_db->deposit_amount){
+                    $deposit_amount = $pf_paid - ((double)$invoice_db->deposit_amount);
                     $deposit_model = new Deposit;
 //                    $deposit_model
                     app( WalletService::class)->deposit();
                 }
                     break;
             }
-
             return;
         }
 
@@ -105,6 +118,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     ]]);
                 // send email notification for due amount
                 EmailJob::dispatch(new EmailInvoicePaidPartial($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
+
+
                 break;
             case 'Complete Paid':
             case 'Settled Paid':
@@ -129,6 +144,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "checkout_link" => $invoice_model->getCheckoutLink(),
                         "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
+
+                //MLM dispatch job dispatch
                 break;
             case 'Processing Paid':
             case 'Processing None':

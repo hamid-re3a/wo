@@ -17,6 +17,7 @@ use Wallets\Services\Withdraw;
 class GiftcodeController extends Controller
 {
 
+    private $walletService;
     /**
      * Giftcodes list
      * @group Public User > Giftcode
@@ -45,44 +46,24 @@ class GiftcodeController extends Controller
             ]);
 
 
-            //Check wallet balance
-            $wallet = prepareGiftcodeWallet(request()->user,$request->get('wallet'));
-            $walletService = app(WalletService::class);
-            $wallet = $walletService->getBalance($wallet);
+            /**
+             * Start User wallet process
+             */
+            $this->walletService = app(WalletService::class);
 
-            if($wallet->getBalance() < $giftcode->total_cost_in_usd)
+            //Check User Balance
+            if($this->checkUserBalance($request) < $giftcode->total_cost_in_usd)
                 throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),422);
 
-
-            /**
-             * Start Withdraw
-             */
-            $preparedUser = prepareGiftcodeUser($request->user);
-
-            //Prepare Transaction
-            $transactionService = app(Transaction::class);
-            $transactionService->setConfiremd(true);
-            $transactionService->setAmount($giftcode->total_cost_in_usd);
-            $transactionService->setFromWalletName($request->get('wallet'));
-            $transactionService->setFromUserId($request->user->id);
-            $transactionService->setDescription(trans('giftcode.phrases.buy-a-giftcode'));
-
-            //Prepare Withdraw Service
-            $withdrawService = app(Withdraw::class);
-            $withdrawService->setTransaction($transactionService);
-            $withdrawService->setUser($preparedUser);
-
-            //Withdraw transaction
-            $finalTransaction = $walletService->withdraw($withdrawService);
-
-            /**
-             * End withdraw
-             */
+            //Withdraw Balance
+            $finalTransaction = $this->withdrawUserWallet($giftcode);
 
             //Wallet transaction failed [Server error]
             if(!$finalTransaction->getConfiremd())
                 throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
-
+            /**
+             * End User wallet process
+             */
 
             //Successful
             DB::commit();
@@ -117,6 +98,35 @@ class GiftcodeController extends Controller
     public function cancel()
     {
 
+    }
+
+    private function withdrawUserWallet($giftcode)
+    {
+        $preparedUser = prepareGiftcodeUser(request()->user);
+
+        //Prepare Transaction
+        $transactionService = app(Transaction::class);
+        $transactionService->setConfiremd(true);
+        $transactionService->setAmount($giftcode->total_cost_in_usd);
+        $transactionService->setFromWalletName(request()->get('wallet'));
+        $transactionService->setFromUserId(request()->user->id);
+        $transactionService->setDescription(trans('giftcode.phrases.buy-a-giftcode'));
+
+        //Prepare Withdraw Service
+        $withdrawService = app(Withdraw::class);
+        $withdrawService->setTransaction($transactionService);
+        $withdrawService->setUser($preparedUser);
+
+        //Withdraw transaction
+        return $finalTransaction = $this->walletService->withdraw($withdrawService);
+
+
+    }
+
+    private function checkUserBalance($request)
+    {
+        $wallet = prepareGiftcodeWallet(request()->user,$request->get('wallet'));
+        return $this->walletService->getBalance($wallet)->getBalance();
     }
 
 }

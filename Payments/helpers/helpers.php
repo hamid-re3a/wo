@@ -137,7 +137,6 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>We have received your order for the package {{package_name}}.</p>
                 <p>Please pay the amount by logging in to the system or clicking the button below.
                 </p>
                 <p><a href="{{invoice_link}}">Pay Now</a></p>

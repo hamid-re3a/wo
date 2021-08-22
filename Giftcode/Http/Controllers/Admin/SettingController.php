@@ -29,12 +29,14 @@ class SettingController extends Controller
      */
     public function update(UpdateSettingRequest $request)
     {
-        $setting = Setting::query()->whereName($request->get('name'))->first();
+        $setting = Setting::query()->where('name',$request->get('name'))->first();
         $setting->update([
             'value' => $request->get('value'),
             'title' => $request->has('title') ? $request->get('title') : $setting->title,
             'description' => $request->has('description') ? $request->get('description') : $setting->description
         ]);
+        $settings = Setting::all()->toArray();
+        cache(['giftcode_settings' =>  $settings]);
 
         return api()->success(null, SettingResource::make($setting->fresh()));
     }

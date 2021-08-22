@@ -14,10 +14,12 @@ trait CodeGenerator
     {
         $giftcodeModel = new Giftcode();
         $code = $this->makeCode();
+
         while($giftcodeModel->where('code',$code)->first())
             $code = $this->makeCode();
 
-        return $code;
+
+        return [$code,$this->getExpirationDate()];
     }
 
     private function makeCode()
@@ -30,10 +32,9 @@ trait CodeGenerator
         for($i = 0; $i < $length; $i++) {
             $mask =  Str::replaceFirst('*', $characters->random(1)->first(), $mask);
         }
-
         $code .= $mask;
         $code .= $this->getPostfix();
-        return [$code,$this->getExpirationDate()];
+        return $code;
 
     }
 
@@ -47,14 +48,17 @@ trait CodeGenerator
 
     private function getSeparator()
     {
-        return giftcodeGetSetting('separator');
+        if(!empty(giftcodeGetSetting('separator')))
+            return giftcodeGetSetting('separator');
+
+        return '-';
     }
 
     private function getPrefix()
     {
         $usePostFix = giftcodeGetSetting('use_prefix');
         $prefix = giftcodeGetSetting('prefix');
-        if($usePostFix)
+        if($usePostFix AND !empty($prefix))
             return $prefix . $this->getSeparator();
 
         return null;
@@ -65,7 +69,7 @@ trait CodeGenerator
         $usePrefix = giftcodeGetSetting('use_postfix');
         $postfix = giftcodeGetSetting('postfix');
 
-        if($usePrefix)
+        if($usePrefix AND !empty($postfix))
             return $this->getSeparator() . $postfix;
 
         return null;

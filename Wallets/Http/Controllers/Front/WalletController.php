@@ -27,7 +27,7 @@ class WalletController extends Controller
     }
     /**
      * Wallets list
-     * @group Wallets
+     * @group Public User > Wallets
      */
     public function index()
     {
@@ -37,7 +37,7 @@ class WalletController extends Controller
 
     /**
      * Get transaction details
-     * @group Wallets
+     * @group Public User > Wallets
      * @param GetTransactionRequest $request
      * @return JsonResponse
      */

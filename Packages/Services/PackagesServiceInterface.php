@@ -7,4 +7,6 @@ namespace Packages\Services;
 interface PackagesServiceInterface
 {
     public function packageById(Id $request): Package;
+
+    public function packageFullById(Id $request): Package;
 }

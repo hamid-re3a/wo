@@ -3,7 +3,7 @@
 
 namespace Wallets\Services;
 
-use Wallets\Models\WalletUser;
+use User\Models\User;
 
 class UserService
 {
@@ -12,7 +12,7 @@ class UserService
         if(is_object($data))
             $data = (array) $data;
 
-        return WalletUser::updateOrCreate(
+        return User::updateOrCreate(
             [ 'user_id' => $data['user_id'] ],
             [
                 'first_name' => array_key_exists('first_name', $data) ? $data['first_name'] : null,

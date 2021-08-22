@@ -35,9 +35,9 @@ class OrderRequest extends FormRequest
 //            'to_user_id' => 'nullable|exists:order_users,id',
             'plan' => array('in:' . implode(',', ORDER_PLANS)),
 
-            'payment_type' => array('required', Rule::in($this->getNamePaymentType())),
+            //'payment_type' => array('required', Rule::in($this->getNamePaymentType())),
 //            'payment_driver' => array('required_if:payment_type,=,purchase'),
-            'payment_currency' => array('required', Rule::in($this->getNamePaymentCurrency())),
+            //'payment_currency' => array('required', Rule::in($this->getNamePaymentCurrency())),
         ];
     }
 

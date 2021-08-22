@@ -15,7 +15,7 @@ class DepositWalletController extends Controller
     private $bankService;
     private $wallet;
 
-    public function __construct()
+    private function prepareDepositWallet()
     {
         $this->bankService = new BankService(request()->wallet_user);
         $this->wallet = config('depositWallet');
@@ -28,7 +28,7 @@ class DepositWalletController extends Controller
      */
     public function index()
     {
-
+        $this->prepareDepositWallet();
         return api()->success(null,WalletResource::make($this->bankService->getWallet($this->wallet)));
 
     }
@@ -42,6 +42,7 @@ class DepositWalletController extends Controller
     public function transactions(TransactionRequest $request)
     {
 
+        $this->prepareDepositWallet();
         $data = $this->bankService->getTransactions($this->wallet)->simplePaginate();
         return api()->success(null,TransactionResource::collection($data)->response()->getData());
 
@@ -55,6 +56,7 @@ class DepositWalletController extends Controller
     public function transfers()
     {
 
+        $this->prepareDepositWallet();
         $data = $this->bankService->getTransfers($this->wallet)->simplePaginate();
         return api()->success(null,TransferResource::collection($data)->response()->getData());
 

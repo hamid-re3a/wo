@@ -36,9 +36,7 @@ class PaymentFeatureTest extends PaymentTest
             'X-user-email'=>'admin@site.com',
             'X-user-username'=>'admin',
         ]);
-        dd($response->json());
         $response->assertOk();
-        $response->json()['data'];
     }
 
 

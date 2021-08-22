@@ -90,7 +90,7 @@ class PaymentService implements PaymentsServiceInterface
                     'payment_driver' => $invoice_request->getPaymentDriver(),
                     'payment_currency' => $invoice_request->getPaymentCurrency(),
                 ]);
-                
+
                 EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
             }
 

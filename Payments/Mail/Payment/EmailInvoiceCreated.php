@@ -2,6 +2,7 @@
 
 namespace Payments\Mail\Payment;
 
+use Carbon\Carbon;
 use User\Services\User;
 use Payments\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
@@ -22,7 +23,7 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
      * @param User $user
      * @param Invoice $invoice
      */
-    public function __construct(User $user,Invoice $invoice)
+    public function __construct(User $user, Invoice $invoice)
     {
         $this->user = $user;
         $this->invoice = $invoice;
@@ -39,16 +40,17 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
     {
         $setting = $this->getSetting();
 
-        $setting['body'] = str_replace('{{full_name}}',(is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown': $this->getUserFullName(),$setting['body']);
-        $setting['body'] = str_replace('{{invoice_link}}',(is_null($this->invoice->getCheckoutLink()) || empty($this->invoice->getCheckoutLink())) ? 'Unknown': $this->invoice->getCheckoutLink(),$setting['body']);
+        $setting['body'] = str_replace('{{full_name}}', (is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown' : $this->getUserFullName(), $setting['body']);
+        $setting['body'] = str_replace('{{invoice_link}}', (is_null($this->getCheckoutLink()) || empty($this->getCheckoutLink())) ? 'Unknown' : $this->getCheckoutLink(), $setting['body']);
+        $setting['body'] = str_replace('{{expiry_date}}',(is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown': Carbon::createFromTime($this->invoice->getExpirationTime()),$setting['body']);
 
         return $this
             ->from($setting['from'], $setting['from_name'])
             ->subject($setting['subject'])
-            ->html( $setting['body']);
+            ->html($setting['body']);
     }
 
-    public function getSetting() : array
+    public function getSetting(): array
     {
         return getPaymentEmailSetting('INVOICE_CRATED_EMAIL');
     }
@@ -57,6 +59,13 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
     private function getUserFullName()
     {
         return ucwords(strtolower($this->user->getFirstName() . ' ' . $this->user->getLastName()));
+    }
+
+    private function getCheckoutLink()
+    {
+        if (is_null($this->invoice->getCheckoutLink()))
+            return null;
+        return 'bitcoin:' . $this->invoice->getCheckoutLink() . '?amount=' . $this->invoice->getAmount();
     }
 
 }

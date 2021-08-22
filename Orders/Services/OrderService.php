@@ -73,4 +73,25 @@ class OrderService implements OrdersServiceInterface
         $empty_object = new EmptyObject();
         return $this->payment_service->getPaymentTypes($empty_object);
     }
+
+    public function updateOrder(Order $order): Order
+    {
+        $order_db = \Orders\Models\Order::query()->find($order->getId());
+        $order_db->user_id = $order->getUserId();
+        $order_db->to_user_id = $order->getToUserId();
+        $order_db->total_cost_in_usd = $order->getTotalCostInUsd();
+        $order_db->packages_cost_in_usd = $order->getPackagesCostInUsd();
+        $order_db->registration_fee_in_usd = $order->getRegistrationFeeInUsd();
+        $order_db->is_paid_at = $order->getIsPaidAt();
+        $order_db->is_resolved_at = $order->getIsResolvedAt();
+        $order_db->is_refund_at = $order->getIsRefundAt();
+        $order_db->is_expired_at = $order->getIsExpiredAt();
+        $order_db->is_commission_resolved_at = $order->getIsCommissionResolvedAt();
+        $order_db->payment_type = $order->getPaymentType();
+        $order_db->payment_currency = $order->getPaymentCurrency();
+        $order_db->payment_driver = $order->getPaymentDriver();
+        $order_db->plan = $order->getPlan();
+        $order_db->save();
+
+    }
 }

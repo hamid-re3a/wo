@@ -7,7 +7,7 @@ use Wallets\Http\Controllers\Front\WalletController;
 use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
 
 Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
-    Route::get('', [WalletController::class, 'index'])->name('test');
+    Route::get('', [WalletController::class, 'index'])->name('index');
     Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');
 
     Route::name('deposit.')->prefix('deposit')->group(function () {

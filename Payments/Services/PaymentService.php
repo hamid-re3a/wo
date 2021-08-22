@@ -74,6 +74,7 @@ class PaymentService implements PaymentsServiceInterface
                 $invoice_request->setAdditionalStatus($response->json()['additionalStatus']);
                 $invoice_request->setExpirationTime($response->json()['expirationTime']);
 
+                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
 
                 \Payments\Models\Invoice::query()->create([
                     'order_id' => $invoice_request->getOrderId()  ,
@@ -91,7 +92,6 @@ class PaymentService implements PaymentsServiceInterface
                     'payment_currency' => $invoice_request->getPaymentCurrency(),
                 ]);
 
-                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
             }
 
         }

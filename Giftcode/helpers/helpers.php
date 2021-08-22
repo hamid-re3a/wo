@@ -1,5 +1,6 @@
 <?php
 
+
 if (!function_exists('giftcodeGetSetting')) {
 
     function giftcodeGetSetting($key)
@@ -35,6 +36,34 @@ if(!function_exists('giftcodeGetEmailContent')) {
 
         \Illuminate\Support\Facades\Log::error('giftcodeEmailContentError => ' . $key);
         throw new Exception(trans('giftcode.responses.email-key-doesnt-exists'));
+    }
+
+}
+
+if(!function_exists('prepareGiftcodeUser')) {
+
+    function prepareGiftcodeUser(\User\Models\User $user)
+    {
+        $userService = app(\User\Services\User::class);
+        $userService->setId($user->id);
+        $userService->setFirstName($user->first_name);
+        $userService->setLastName($user->last_name);
+        $userService->setUsername($user->username);
+        $userService->setEmail($user->email);
+        $userService->setRole('User');
+        return $userService;
+    }
+
+}
+
+if(!function_exists('prepareGiftcodeWallet')) {
+
+    function prepareGiftcodeWallet(\User\Models\User $user,$wallet)
+    {
+        $walletService = app(\Wallets\Services\Wallet::class);
+        $walletService->setUser(prepareGiftcodeUser($user));
+        $walletService->setName($wallet);
+        return $walletService;
     }
 
 }

@@ -4,15 +4,15 @@
 namespace Giftcode\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Giftcode\Http\Resources\GiftcodeResource;
 use Giftcode\Models\Giftcode;
 
 class TestController extends Controller
 {
     public function test()
     {
-        return Giftcode::create([
-            'user_id' => 1,
-            'package_id' => 1
-        ]);
+        return api()->success(null,GiftcodeResource::make(Giftcode::create([
+            'package_id' => 3,
+        ])));
     }
 }

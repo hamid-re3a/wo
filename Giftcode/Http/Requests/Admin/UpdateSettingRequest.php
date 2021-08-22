@@ -27,7 +27,9 @@ class UpdateSettingRequest extends FormRequest
     {
         return [
             'name' => 'required|string|exists:giftcode_settings,name',
-            'value' => 'required|' . $this->valueValidation()
+            'value' => 'required|' . $this->valueValidation(),
+            'title' => 'nullable|string',
+            'description' => 'nullable|string'
         ];
     }
 
@@ -54,13 +56,16 @@ class UpdateSettingRequest extends FormRequest
             case 'prefix':
                 return 'string';
                 break;
-            case 'include_cancelation_fee':
             case 'use_postfix':
             case 'use_prefix':
-            case 'has_expiration_date':
+            case 'include_cancellation_fee':
+            case 'include_expiration_fee':
+            case 'include_registration_fee':
                 return 'boolean';
                 break;
-            case 'cancelation_fee':
+            case 'cancellation_fee':
+            case 'registration_fee':
+            case 'expiration_fee':
             case 'giftcode_lifetime':
                 return 'integer|min:1';
                 break;

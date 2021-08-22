@@ -17,11 +17,15 @@ class Setting extends Model
     protected $fillable = [
         'name',
         'value',
+        'title',
+        'description'
     ];
 
     protected $casts = [
         'name' => 'string',
         'value' => 'string',
+        'title' => 'string',
+        'description' => 'string',
     ];
 
     protected $table = 'giftcode_settings';

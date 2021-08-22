@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode\Http\Resources;
+namespace Giftcode\Http\Resources\Admin;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
@@ -18,7 +18,9 @@ class SettingResource extends JsonResource
 
         return [
             'name' => $this->name,
-            'value' => $this->value
+            'value' => $this->value,
+            'title' => $this->title,
+            'description' => $this->description
         ];
     }
 }

@@ -83,25 +83,25 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
 
 
-        if(is_null($invoice_db->order_id)){
-            switch($invoice_db->status){
-                case 'Complete':
-                case 'Settled':
-                case 'Paid':
-
-                $pf_paid  = number_format(
-                ($invoice_model->getPfAmount()/$invoice_model->getAmount()) * $invoice_model->getPaidAmount()
-                ,2, '.', '');
-                if($pf_paid > (double) $invoice_db->deposit_amount){
-                    $deposit_amount = $pf_paid - ((double)$invoice_db->deposit_amount);
-                    $deposit_model = new Deposit;
-//                    $deposit_model
-                    app( WalletService::class)->deposit();
-                }
-                    break;
-            }
-            return;
-        }
+//        if(is_null($invoice_db->order_id)){
+//            switch($invoice_db->status){
+//                case 'Complete':
+//                case 'Settled':
+//                case 'Paid':
+//
+//                $pf_paid  = number_format(
+//                ($invoice_model->getPfAmount()/$invoice_model->getAmount()) * $invoice_model->getPaidAmount()
+//                ,2, '.', '');
+//                if($pf_paid > (double) $invoice_db->deposit_amount){
+//                    $deposit_amount = $pf_paid - ((double)$invoice_db->deposit_amount);
+//                    $deposit_model = new Deposit;
+////                    $deposit_model
+//                    app( WalletService::class)->deposit();
+//                }
+//                    break;
+//            }
+//            return;
+//        }
 
         $order_model = $invoice_model->getOrder();
 

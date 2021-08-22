@@ -87,7 +87,7 @@ class PaymentService implements PaymentsServiceInterface
                     'status' => $invoice_request->getStatus(),
                     'additional_status' => $invoice_request->getAdditionalStatus(),
                     'payment_type' => $invoice_request->getPaymentType(),
-                    'payment_driver' => $invoice_request->getAdditionalStatus(),
+                    'payment_driver' => $invoice_request->getPaymentDriver(),
                     'payment_currency' => $invoice_request->getPaymentCurrency(),
                 ]);
 

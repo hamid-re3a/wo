@@ -23,12 +23,13 @@ composer dump-autoload
 
 # Update codebas
 #chmod 777 .* -R
-#chown -R root:root .
-php artisan optimize:clear
+#chown -R root:root
+php artisan key:generate
 php artisan vendor:publish --all
 php artisan migrate:fresh
 php artisan db:seed
 php artisan scribe:generate
+php artisan optimize:clear
 # Exit maintenance mode
 #php artisan up
 

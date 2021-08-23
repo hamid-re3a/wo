@@ -53,7 +53,7 @@ const WEBHOOK_EVENT_TYPES = [
     WEBHOOK_EVENT_TYPE_INVOICE_INVALID,
 ];
 
-const REGISTRATION_FEE = '20' ;
+const REGISTRATION_FEE = '20';
 
 /**
  *  main settings
@@ -80,17 +80,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>We find out that you have paid part of the invoice .</p>
-                <p>This invoice is valid only for {{invoice_expire_duration}} please complete your payment.</p>
-                <p>Your invoice due amount is {{due_amount}} .</p>
+                <p>We noticed that you paid the invoice partially. Please pay the due amount {{amount_in_usd}} ≈ {{due_amount}} on time.</p>
+                <p>This invoice will be expire at {{expiry_date}}</p>
                 <p></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,due_amount,amount_in_usd,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
     'INVOICE_COMPLETE_PAID_EMAIL' => [
         'is_active' => true,
@@ -107,9 +106,9 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
     'INVOICE_EXPIRED_EMAIL' => [
         'is_active' => true,
@@ -119,16 +118,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>Your previous invoice is expired now, please open new invoice with this <a href="">link </a> .</p>
-                <p>Thank your for completing your payment.</p>
+                <p>The invoice {{invoice_number}} has expired in {{expiry_date}}.</p>
+                <p>Please login to the system to place a new order.</p>
                 <p></p>
-                <p>Cheers,</p>
+                <p>Cheers!</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,invoice_number,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
     'INVOICE_CRATED_EMAIL' => [
         'is_active' => true,
@@ -138,16 +137,23 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>Invoice created.</p>
-                <p>Please complete your payment with this <a href="{{invoice_link}}">link</a></p>
-                <p></p>
+                <p>Please pay the amount by logging in to the system or clicking the button below.
+                </p>
+                <p><a href="{{invoice_link}}">Pay Now</a></p>
+                <p>Your package will be activated after the payment is received in the system.<br/>
+                    Note:</br>
+                    A) This invoice will expire after {{expiry_date}}<br/>
+                    B) The invoice updates every two hours<br/>
+                    C) Package price doesn't include the Transaction Charges.<br/>
+                    D) In case of partial payment, the customer should pay the due amount on the same link.
+                    </p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,package_name,invoice_link,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
 ];
 if (!function_exists('getSetting')) {

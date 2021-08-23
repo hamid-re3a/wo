@@ -89,6 +89,10 @@ class Invoice extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.user.services.User user = 19;</code>
      */
     protected $user = null;
+    /**
+     * Generated from protobuf field <code>double deposit_amount = 20;</code>
+     */
+    protected $deposit_amount = 0.0;
 
     /**
      * Constructor.
@@ -115,6 +119,7 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     @type string $updated_at
      *     @type \Orders\Services\Order $order
      *     @type \User\Services\User $user
+     *     @type float $deposit_amount
      * }
      */
     public function __construct($data = NULL) {
@@ -556,6 +561,28 @@ class Invoice extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \User\Services\User::class);
         $this->user = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>double deposit_amount = 20;</code>
+     * @return float
+     */
+    public function getDepositAmount()
+    {
+        return $this->deposit_amount;
+    }
+
+    /**
+     * Generated from protobuf field <code>double deposit_amount = 20;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setDepositAmount($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->deposit_amount = $var;
 
         return $this;
     }

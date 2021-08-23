@@ -2,15 +2,11 @@
 
 namespace App\Jobs\User;
 
-use Google\Protobuf\Internal\GPBUtil;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Orders\Services\OrderService;
-use Packages\Services\PackageService;
 use User\Services\UserService;
 
 class UserDataJob implements ShouldQueue
@@ -19,12 +15,6 @@ class UserDataJob implements ShouldQueue
 
     private $data;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param $data
-     * @param OrderService $order_service
-     */
     public function __construct($data)
     {
         $this->data = $data;

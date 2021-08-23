@@ -74,9 +74,10 @@ class PaymentService implements PaymentsServiceInterface
                 $invoice_request->setAdditionalStatus($response->json()['additionalStatus']);
                 $invoice_request->setExpirationTime($response->json()['expirationTime']);
 
+                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
 
                 \Payments\Models\Invoice::query()->create([
-                    'order_id' => $invoice_request->getOrderId(),
+                    'order_id' => $invoice_request->getOrderId()  ,
                     'pf_amount' => $invoice_request->getPfAmount(),
                     'amount'=>$invoice_request->getAmount(),
                     'due_amount'=>$invoice_request->getDueAmount(),
@@ -87,11 +88,10 @@ class PaymentService implements PaymentsServiceInterface
                     'status' => $invoice_request->getStatus(),
                     'additional_status' => $invoice_request->getAdditionalStatus(),
                     'payment_type' => $invoice_request->getPaymentType(),
-                    'payment_driver' => $invoice_request->getAdditionalStatus(),
+                    'payment_driver' => $invoice_request->getPaymentDriver(),
                     'payment_currency' => $invoice_request->getPaymentCurrency(),
                 ]);
 
-                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
             }
 
         }
@@ -109,6 +109,7 @@ class PaymentService implements PaymentsServiceInterface
         $invoice = \Payments\Models\Invoice::query()->find($request->getId());
         $invoice->refresh();
         $response_invoice->setOrderId((int)$invoice->order_id);
+        $response_invoice->setPfAmount((double)$invoice->pf_amount);
         $response_invoice->setAmount((double)$invoice->amount);
         $response_invoice->setTransactionId($invoice->transaction_id);
         $response_invoice->setCheckoutLink($invoice->checkout_link);

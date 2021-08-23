@@ -60,7 +60,6 @@ class PaymentTypes extends \Google\Protobuf\Internal\Message
     {
 //        GPBUtil::checkMessage($var, \Payments\Services\PaymentType::class);
         $this->payment_types = $var;
-
         return $this;
     }
 

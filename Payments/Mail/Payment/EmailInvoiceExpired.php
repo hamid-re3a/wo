@@ -2,6 +2,7 @@
 
 namespace Payments\Mail\Payment;
 
+use Carbon\Carbon;
 use User\Services\User;
 use Payments\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
@@ -40,6 +41,8 @@ class EmailInvoiceExpired extends Mailable implements SettingableMail
         $setting = $this->getSetting();
 
         $setting['body'] = str_replace('{{full_name}}',(is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown': $this->getUserFullName(),$setting['body']);
+        $setting['body'] = str_replace('{{invoice_number}}',(is_null($this->invoice->getTransactionId()) || empty($this->invoice->getTransactionId())) ? 'Unknown': $this->invoice->getTransactionId(),$setting['body']);
+        $setting['body'] = str_replace('{{expiry_date}}',(is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown': Carbon::createFromTimestamp($this->invoice->getExpirationTime())->toString(),$setting['body']);
 
         return $this
             ->from($setting['from'], $setting['from_name'])

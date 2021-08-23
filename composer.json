@@ -16,6 +16,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
+        "rap2hpoutre/laravel-log-viewer": "^1.7",
         "ride-to-the-future/response-transformer": "^0.0.2",
         "spatie/laravel-permission": "^4.2",
         "vladimir-yuldashev/laravel-queue-rabbitmq": "^11.3",

@@ -30,6 +30,7 @@ php artisan migrate:fresh
 php artisan db:seed
 php artisan scribe:generate
 php artisan optimize:clear
+php artisan queue:restart
 # Exit maintenance mode
 #php artisan up
 

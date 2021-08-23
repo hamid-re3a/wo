@@ -32,4 +32,4 @@ php artisan scribe:generate
 # Exit maintenance mode
 #php artisan up
 
-echo "Application deployed!"
+echo "Application is up and running"

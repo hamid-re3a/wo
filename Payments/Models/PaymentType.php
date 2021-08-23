@@ -25,6 +25,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentType whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentType whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Query\Builder|PaymentType onlyTrashed()
+ * @method static \Illuminate\Database\Query\Builder|PaymentType withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|PaymentType withoutTrashed()
  */
 class PaymentType extends Model
 {

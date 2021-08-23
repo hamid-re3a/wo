@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage wherePackageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Orders\Models\Order $order
  */
 class OrderPackage extends Model
 {

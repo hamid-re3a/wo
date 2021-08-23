@@ -55,6 +55,7 @@ use User\Models\User;
  * @property-read \Orders\Models\User $toUser
  * @property-read \Illuminate\Database\Eloquent\Collection|\Orders\Models\OrderPackage[] $packages
  * @property-read int|null $packages_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Order filter()
  */
 class Order extends Model
 {

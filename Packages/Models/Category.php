@@ -34,6 +34,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Category whereShortName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Category whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Packages\Models\CategoriesIndirectCommission[] $categoryIndirectCommission
+ * @property-read int|null $category_indirect_commission_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Packages\Models\Package[] $packages
+ * @property-read int|null $packages_count
  */
 class Category extends Model
 {

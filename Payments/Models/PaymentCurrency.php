@@ -25,6 +25,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentCurrency whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentCurrency whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int|null $driver_id
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Payments\Models\PaymentDriver[] $paymentDriver
+ * @property-read int|null $payment_driver_count
+ * @method static \Illuminate\Database\Query\Builder|PaymentCurrency onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|PaymentCurrency whereDriverId($value)
+ * @method static \Illuminate\Database\Query\Builder|PaymentCurrency withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|PaymentCurrency withoutTrashed()
  */
 class PaymentCurrency extends Model
 {

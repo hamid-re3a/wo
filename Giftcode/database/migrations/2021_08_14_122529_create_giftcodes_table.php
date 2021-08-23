@@ -29,6 +29,8 @@ class CreateGiftcodesTable extends Migration
             $table->foreignId('redeem_user_id')->nullable()->constrained('users','id');
             $table->timestamp('redeem_date')->nullable();
 
+            $table->boolean('is_canceled')->default(FALSE);
+
             $table->softDeletes();
             $table->timestamps();
         });

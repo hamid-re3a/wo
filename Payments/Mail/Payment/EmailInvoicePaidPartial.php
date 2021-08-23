@@ -68,7 +68,7 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
     private function getPartialInPf()
     {
         return number_format(
-            ($this->invoice->getPfAmount()/$this->invoice->getAmount()) * $this->invoice->getDueAmount()
+            (($this->invoice->getPfAmount()/$this->invoice->getAmount()) * $this->invoice->getDueAmount())
             ,2, '.', '');
     }
 

@@ -40,6 +40,14 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereIsPaid($value)
  * @property string|null $expiration_time
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereExpirationTime($value)
+ * @property float $pf_amount
+ * @property string $payment_type
+ * @property string $payment_currency
+ * @property string|null $payment_driver
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaymentCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaymentDriver($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaymentType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePfAmount($value)
  */
 class Invoice extends Model
 {

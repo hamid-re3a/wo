@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission whereUpdatedAt($value)
  * @mixin \Eloquent
  * @method static \Illuminate\Database\Eloquent\Builder|PackagesIndirectCommission wherePackageId($value)
+ * @property-read \Packages\Models\Package $package
  */
 class PackagesIndirectCommission extends Model
 {

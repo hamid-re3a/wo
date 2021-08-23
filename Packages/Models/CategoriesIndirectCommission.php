@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|CategoriesIndirectCommission wherePercentage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CategoriesIndirectCommission whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Packages\Models\Category $category
  */
 class CategoriesIndirectCommission extends Model
 {

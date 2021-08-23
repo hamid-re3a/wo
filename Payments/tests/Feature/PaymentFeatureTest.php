@@ -4,8 +4,11 @@ namespace Payments\tests\Feature;
 
 use Illuminate\Support\Facades\Mail;
 use Payments\Mail\Payment\EmailInvoiceCreated;
+use Payments\Mail\Payment\EmailInvoicePaidComplete;
+use Payments\Services\Invoice;
 use Payments\tests\PaymentTest;
 use User\Mail\User\TooManyLoginAttemptTemporaryBlockedEmail;
+use User\Services\User;
 
 class PaymentFeatureTest extends PaymentTest
 {
@@ -26,7 +29,7 @@ class PaymentFeatureTest extends PaymentTest
     public function submit_order_with_email()
     {
 
-        Mail::fake();
+//        Mail::fake();
         $response = $this->post(route('orders.store'), [
             'package_ids' => [['id' => 1, 'qty' => 1]],
             'to_user_id' => '1',
@@ -42,7 +45,8 @@ class PaymentFeatureTest extends PaymentTest
             'X-user-username' => 'admin',
         ]);
         $response->assertOk();
-        Mail::assertSent(EmailInvoiceCreated::class);
+
+//        Mail::assertSent(EmailInvoicePaidComplete::class);
     }
 
 

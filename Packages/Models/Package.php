@@ -36,6 +36,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Package whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Package whereValidityInDays($value)
  * @mixin \Eloquent
+ * @property-read \Packages\Models\Category $Category
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Packages\Models\PackagesIndirectCommission[] $packageIndirectCommission
+ * @property-read int|null $package_indirect_commission_count
  */
 class Package extends Model
 {

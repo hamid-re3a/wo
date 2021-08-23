@@ -109,6 +109,7 @@ class PaymentService implements PaymentsServiceInterface
         $invoice = \Payments\Models\Invoice::query()->find($request->getId());
         $invoice->refresh();
         $response_invoice->setOrderId((int)$invoice->order_id);
+        $response_invoice->setPfAmount((double)$invoice->pf_amount);
         $response_invoice->setAmount((double)$invoice->amount);
         $response_invoice->setTransactionId($invoice->transaction_id);
         $response_invoice->setCheckoutLink($invoice->checkout_link);

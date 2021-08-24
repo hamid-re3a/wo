@@ -206,8 +206,20 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         array_key_exists('status', $transaction) AND !empty($transaction['status']) AND
                         array_key_exists('destination', $transaction) AND !empty($transaction['destination'])
                     ) {
+                        $this->invoice_db->transactions()->updateOrCreate(
+                            [ 'hash' => $transaction['id'] ],
+                            [
+                                'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
+                                'value' => $transaction['value'],
+                                'fee' => $transaction['fee'],
+                                'status' => $transaction['status'],
+                                'destination' => $transaction['destination'],
+                                'created_at' => $now,
+                                'updated_at' => $now
+                            ]
+                        );
                         $db_transactions[] = [
-                            'invoice_id' => 1,
+                            'invoice_id' => $this->invoice_db->id,
                             'hash' => $transaction['id'],
                             'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
                             'value' => $transaction['value'],
@@ -219,7 +231,6 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         ];
                     }
                 }
-                $this->invoice_db->transactions()->insert($db_transactions);
                 return $db_transactions;
             }
         } catch (\Throwable $exception) {

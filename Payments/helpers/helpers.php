@@ -136,28 +136,34 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
-                <p>Hello&nbsp;{{full_name}},</p>
-                <p>We received your order and created an invoice for you. Please&nbsp;pay&nbsp;the invoice by either logging&nbsp;into&nbsp;the&nbsp;system&nbsp;or&nbsp;copy&nbsp;the&nbsp;below&nbsp;payment&nbsp;address to your crypto wallet.</p>
-                <p>Due Amount: {{usd_amount}}&nbsp;<strong>&asymp;&nbsp;</strong> {{btc_amount}}</p>
+                <p>Hello {{full_name}},</p>
+                <p>We received your order and created an invoice for you. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p>Due Amount: {{usd_amount}}&nbsp;<strong>&asymp;&nbsp;</strong> {{due_amount}}</p>
                 <p>Payment address:&nbsp;{{payment_address}}</p>
-                <p>Your&nbsp;package&nbsp;will&nbsp;be&nbsp;activated&nbsp;after&nbsp;the full payment&nbsp;is&nbsp;received&nbsp;in&nbsp;the&nbsp;system.</p>
+                <p>Your package will be activated after the full payment is received in the system.</p>
                 <p>&nbsp;</p>
                 <h2><strong>Note:</strong></h2>  
                 <ol>
                     <li>
-                    <p>This&nbsp;invoice&nbsp;will&nbsp;expire&nbsp;after&nbsp;{{expiry_date}}</p>
+                    <p>Pay this invoice in {{crypto}}</p>
                     </li>
                     <li>
-                    <p>This invoice&nbsp;updates&nbsp;every {{update_hour}} hours and the due amount may change</p>
+                    <p>This invoice will expire after {{expiry_date}}</p>
                     </li>
                     <li>
-                    <p>The package price&nbsp;doesn&#39;t&nbsp;include&nbsp;the&nbsp;Transaction&nbsp;Fee.</p>
+                    <p>This invoice updates every {{update_hours}} hours and the due amount may change</p>
                     </li>
                     <li>
-                    <p>In&nbsp;case&nbsp;of&nbsp;partial&nbsp;payment, the customer will receive a new email with the due amount and payment instructions.&nbsp;</p>
+                    <p>The package price doesn&#39;t include the Transaction Fee.</p>
                     </li>
                     <li>
-                    <p>If in case you received multiple invoice emails, please pay the latest one.</p>
+                    <p>In case of partial payment, the customer will receive a new email with the due amount and payment instructions. </p>
+                    </li>
+                    <li>
+                    <p>If in case you received multiple invoices emails, please consider the latest one.</p>
+                    </li>
+                    <li>
+                    <p>This is the conversion rate confirmation of the due amount at the moment of creating the invoice: <a href="https://blockchain.info/frombtc?value={{due_amount}}&amp;currency=USD&amp;time=1468858800000&amp;textual=true&amp;nosavecurrency=true" target="_blank">Click Here</a></p>
                     </li>
                 </ol>
                 <p>&nbsp;</p>
@@ -165,7 +171,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name,package_name,usd_amount,btc_amount,payment_address,expiry_date',
+        'variables' => 'full_name,package_name,usd_amount,due_amount,crypto,payment_address,expiry_date',
         'variables_description' => 'full_name user full name',
         'type' => 'email',
     ],

@@ -138,8 +138,8 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <div>
                 <p>Hello {{full_name}},</p>
                 <p>We received your order and created an invoice for you. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
-                <p>Due Amount: {{usd_amount}}&nbsp;<strong>&asymp;&nbsp;</strong> {{due_amount}}</p>
-                <p>Payment address:&nbsp;{{payment_address}}</p>
+                <p><strong>Due Amount:</strong> {{usd_amount}}&nbsp;<strong>&asymp;&nbsp;</strong> {{due_amount}}</p>
+                <p><strong>Payment address:</strong> {{payment_address}}</p>
                 <p>Your package will be activated after the full payment is received in the system.</p>
                 <p>&nbsp;</p>
                 <h2><strong>Note:</strong></h2>  

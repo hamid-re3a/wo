@@ -161,7 +161,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                     <p>If in case you received multiple invoices emails, please consider the latest one.</p>
                     </li>
                     <li>
-                    <p>Here is the confirmation of the conversion rate of the due amount ({{usd_amount}} USD) to {{crypto}} at the moment of creating the invoice: <a href="https://blockchain.info/frombtc?value={{due_amount}}&currency=USD&time={{current_time}}&textual=true&nosavecurrency=true" target="_blank">Click Here</a></p>
+                    <p>Here is the confirmation of the conversion rate of the due amount ({{usd_amount}} USD) to {{crypto}} at the moment of creating the invoice: <a href="https://blockchain.info/tobtc?value={{usd_amount}}&currency=USD&time={{current_time}}&textual=true&nosavecurrency=true" target="_blank">Click Here</a></p>
                     </li>
                     <li>
                     <p>If the due amount is more than the package price, then it includes the registration fee.</p>

@@ -164,6 +164,9 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                     <p>Here is the confirmation of the conversion rate of the due amount at the moment of creating the invoice: <a href="https://blockchain.info/tobtc?value={{usd_amount}}&currency=USD&time={{current_time}}&textual=true&nosavecurrency=true" target="_blank">Click Here</a></p>
                     </li>
                     <li>
+                    <p>If the due amount is more than the package price, then it includes the registration fee.</p>
+                    </li>
+                    <li>
                     <p>Your package will be activated after the full payment is received in the system.</p>
                     </li>
                 </ol>

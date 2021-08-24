@@ -2,13 +2,13 @@
 
 namespace Payments\Mail\Payment;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Payments\Mail\SettingableMail;
 use Payments\Services\Invoice;
 use User\Services\User;
-use Carbon\Carbon;
 
 class EmailInvoiceCreated extends Mailable implements SettingableMail
 {
@@ -60,15 +60,6 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
     private function getUserFullName()
     {
         return ucwords(strtolower($this->user->getFirstName() . ' ' . $this->user->getLastName()));
-    }
-
-    private function getCheckoutLink()
-    {
-        if (is_null($this->invoice->getCheckoutLink())) {
-            return null;
-        }
-
-        return 'bitcoin:' . $this->invoice->getCheckoutLink() . '?amount=' . $this->invoice->getAmount();
     }
 
 }

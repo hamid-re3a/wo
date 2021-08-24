@@ -163,7 +163,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                     <p>If in case you received multiple invoices emails, please consider the latest one.</p>
                     </li>
                     <li>
-                    <p>This is the conversion rate confirmation of the due amount at the moment of creating the invoice: <a href="https://blockchain.info/frombtc?value={{due_amount}}&amp;currency=USD&amp;time=1468858800000&amp;textual=true&amp;nosavecurrency=true" target="_blank">Click Here</a></p>
+                    <p>This is the conversion rate confirmation of the due amount at the moment of creating the invoice: <a href="https://blockchain.info/tobtc?value={{usd_amount}}&currency=USD&time={{current_time}}&textual=true&nosavecurrency=true" target="_blank">Click Here</a></p>
                     </li>
                 </ol>
                 <p>&nbsp;</p>
@@ -171,7 +171,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name,package_name,usd_amount,due_amount,crypto,payment_address,expiry_date',
+        'variables' => 'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
         'variables_description' => 'full_name user full name',
         'type' => 'email',
     ],

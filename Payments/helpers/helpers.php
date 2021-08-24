@@ -140,8 +140,6 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>We received your order and created an invoice for you. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
                 <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
                 <p><strong>Payment address:</strong> {{payment_address}}</p>
-                <p>Your package will be activated after the full payment is received in the system.</p>
-                <p>&nbsp;</p>
                 <h2><strong>Note:</strong></h2>  
                 <ol>
                     <li>
@@ -164,6 +162,9 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                     </li>
                     <li>
                     <p>Here is the confirmation of the conversion rate of the due amount at the moment of creating the invoice: <a href="https://blockchain.info/tobtc?value={{usd_amount}}&currency=USD&time={{current_time}}&textual=true&nosavecurrency=true" target="_blank">Click Here</a></p>
+                    </li>
+                    <li>
+                    <p>Your package will be activated after the full payment is received in the system.</p>
                     </li>
                 </ol>
                 <p>&nbsp;</p>

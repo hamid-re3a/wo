@@ -8,6 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Payments\Mail\SettingableMail;
 use Payments\Services\Invoice;
 use User\Services\User;
+use Carbon\Carbon;
 
 class EmailInvoiceCreated extends Mailable implements SettingableMail
 {

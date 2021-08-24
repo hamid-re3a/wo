@@ -17,7 +17,8 @@ use User\Models\User;
  * @property string $code
  * @property string $package_name
  * @property boolean $is_used
- * @property string|null $used_date
+ * @property string| $redeemer_full_name
+ * @property string| $creator_full_name
  * @property int $redeem_user_id
  * @property int $packages_cost_in_usd
  * @property int $registration_fee_in_usd
@@ -26,6 +27,7 @@ use User\Models\User;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $expiration_date
+ * @property Carbon|null $redeem_date
  * @property-read Package $package
  * @property-read User $creator
  * @property-read User $redeemer
@@ -44,7 +46,8 @@ class Giftcode extends Model
         'redeem_user_id',
         'packages_cost_in_usd',
         'registration_fee_in_usd',
-        'total_cost_in_usd'
+        'total_cost_in_usd',
+        'is_canceled'
     ];
 
     protected $casts = [
@@ -53,7 +56,8 @@ class Giftcode extends Model
         'code' => 'string',
         'expiration_date' => 'datetime',
         'redeem_date' => 'datetime',
-        'redeem_user_id' => 'integer'
+        'redeem_user_id' => 'integer',
+        'is_canceled' => 'boolean'
     ];
 
     protected $hidden = [
@@ -92,7 +96,37 @@ class Giftcode extends Model
         return null;
     }
 
+    public function getRedeemerFullNameAttribute()
+    {
+        if($this->redeemer()->exists() AND !is_null($this->redeemer->first_name))
+            return $this->redeemer->full_name;
 
+        return null;
+    }
+
+    public function getCreatorFullNameAttribute()
+    {
+        if($this->creator()->exists() AND !is_null($this->creator->first_name))
+            return $this->creator->full_name;
+
+        return null;
+    }
+
+
+    /**
+     * Methods
+     */
+    public function getRefundAmount()
+    {
+        //Check we should calculate cancelation fee or not
+        if(!giftcodeGetSetting('include_cancellation_fee'))
+            return $this->total_cost_in_usd;
+
+        //Calculate cancelation fee in fiat (USD)
+        $cancelation_fee_in_percent = giftcodeGetSetting('cancellation_fee');
+        $cancelation_fee_in_fiat = ($this->total_cost_in_usd * $cancelation_fee_in_percent) / 100 ;
+        return $this->total_cost_in_usd - $cancelation_fee_in_fiat;
+    }
 
 
 

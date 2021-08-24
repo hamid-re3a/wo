@@ -4,7 +4,7 @@ namespace Giftcode\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateGiftcodeRequest extends FormRequest
+class CancelGiftcodeRequest extends FormRequest
 {
 
     /**
@@ -24,10 +24,9 @@ class CreateGiftcodeRequest extends FormRequest
      */
     public function rules()
     {
+        $user_id = !empty(request()->user) ?  request()->user->id : null;
         return [
-            'package_id' => 'required|exists:giftcode_packages,id',
-            'include_registration_fee' => 'required|boolean',
-            'wallet' => 'required|in:Deposit Wallet'
+            'id' => 'required|uuid|exists:giftcodes,uuid,user_id,' . $user_id
         ];
     }
 

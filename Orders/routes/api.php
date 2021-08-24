@@ -6,6 +6,7 @@ use Orders\Http\Controllers\Front\PackageController;
 
 Route::name('orders.')->middleware('auth_user_order')->group(function () {
     Route::post('', [OrderController::class, 'index'])->name('list');
+    Route::post('show', [OrderController::class, 'showOrder'])->name('show');
     Route::post('store',[OrderController::class,'newOrder'])->name('store');
 });
 

@@ -25,6 +25,10 @@ Route::name('payments.')->group(function () {
         Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
     });
 
+    Route::name('invoice.')->group(function(){
+        Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'getTransactionsByOrderId'])->name('transactions-by-order-id');
+    });
+
     Route::post('test',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'tt'])->name('tt');
 
 });

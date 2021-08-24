@@ -134,6 +134,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
+                $order_model->setId($this->invoice_db->order_id);
                 app(OrderService::class)->updateOrder($order_model);
                 // send web socket notification
                 Http::post('http://0.0.0.0:2121/socket', [

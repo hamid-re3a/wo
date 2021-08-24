@@ -79,6 +79,7 @@ class OrderService implements OrdersServiceInterface
     {
         Log::info('Update Order');
         Log::info('getIsPaidAt ' . $order->getIsPaidAt());
+        Log::info('getId ' . $order->getId());
         $order_db = \Orders\Models\Order::query()->find($order->getId());
         $order_db->user_id = $order->getUserId();
         $order_db->to_user_id = $order->getToUserId();

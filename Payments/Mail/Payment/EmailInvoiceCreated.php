@@ -39,8 +39,8 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
         $setting = $this->getSetting();
 
         $setting['body'] = str_replace('{{full_name}}', (is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown' : $this->getUserFullName(), $setting['body']);
-        $setting['body'] = str_replace('{{due_amount}}', (is_null($this->invoice->getInvoiceDueAmount()) || empty($this->invoice->getInvoiceDueAmount())) ? 'Unknown' : $this->invoice->getInvoiceDueAmount(), $setting['body']);
-        $setting['body'] = str_replace('{{amount_in_usd}}', (is_null($this->invoice->getPartialInPf()) || empty($this->invoice->getPartialInPf())) ? 'Unknown' : $this->invoice->getPartialInPf(), $setting['body']);
+        $setting['body'] = str_replace('{{due_amount}}', (is_null($this->invoice->getAmount()) || empty($this->invoice->getAmount())) ? 'Unknown' : $this->invoice->getAmount(), $setting['body']);
+        $setting['body'] = str_replace('{{amount_in_usd}}', (is_null($this->invoice->getDueAmount()) || empty($this->invoice->getDueAmount())) ? 'Unknown' : $this->invoice->getDueAmount(), $setting['body']);
         $setting['body'] = str_replace('{{payment_address}}', (is_null($this->invoice->getCheckoutLink()) || empty($this->invoice->getCheckoutLink())) ? 'Unknown' : $this->invoice->getCheckoutLink(), $setting['body']);
         $setting['body'] = str_replace('{{crypto}}', (is_null($this->invoice->getPaymentCurrency()) || empty($this->invoice->getPaymentCurrency())) ? 'Unknown' : $this->invoice->getPaymentCurrency(), $setting['body']);
 

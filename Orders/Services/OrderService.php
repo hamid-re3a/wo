@@ -4,6 +4,7 @@
 namespace Orders\Services;
 
 
+use Illuminate\Support\Facades\Log;
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
 use User\Services\User;
@@ -76,6 +77,8 @@ class OrderService implements OrdersServiceInterface
 
     public function updateOrder(Order $order): Order
     {
+        Log::info('Update Order');
+        Log::info('getIsPaidAt ' . $order->getIsPaidAt());
         $order_db = \Orders\Models\Order::query()->find($order->getId());
         $order_db->user_id = $order->getUserId();
         $order_db->to_user_id = $order->getToUserId();

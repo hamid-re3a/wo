@@ -196,7 +196,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             $db_transactions = [];
             if (is_array($transactions)) {
                 foreach ($transactions AS $transaction) {
-                    $now = now();
+                    $now = now()->toDateTimeString();
                     if (
                         is_array($transaction) AND
                         array_key_exists('id', $transaction) AND !empty($transaction['id']) AND
@@ -207,6 +207,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         array_key_exists('destination', $transaction) AND !empty($transaction['destination'])
                     ) {
                         $db_transactions[] = [
+                            'invoice_id' => 1,
                             'hash' => $transaction['id'],
                             'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
                             'value' => $transaction['value'],
@@ -222,7 +223,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 return $db_transactions;
             }
         } catch (\Throwable $exception) {
-            Log::error('Record transactions error , InvoiceID' . $this->invoice_db->id);
+            Log::error('Record transactions error , InvoiceID ' . $this->invoice_db->id);
         }
     }
 }

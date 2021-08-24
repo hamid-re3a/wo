@@ -44,12 +44,7 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{payment_address}}', (is_null($this->invoice->getCheckoutLink()) || empty($this->invoice->getCheckoutLink())) ? 'Unknown' : $this->invoice->getCheckoutLink(), $setting['body']);
         $setting['body'] = str_replace('{{crypto}}', (is_null($this->invoice->getPaymentCurrency()) || empty($this->invoice->getPaymentCurrency())) ? 'Unknown' : $this->invoice->getPaymentCurrency(), $setting['body']);
         $setting['body'] = str_replace('{{current_time}}', round(microtime(true) * 1000), $setting['body']);
-
-        // $setting['body'] = str_replace('{{expiry_date}}',
-        // (is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime()))
-        //         ? 'Unknown':
-        //         Carbon::createFromTimestamp($this->invoice->getExpirationTime())->toString()
-        //     ,$setting['body']);
+        $setting['body'] = str_replace('{{expiry_date}}', (is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown' : Carbon::createFromTimestamp($this->invoice->getExpirationTime())->toString(), $setting['body']);
         return $this
             ->from($setting['from'], $setting['from_name'])
             ->subject($setting['subject'])

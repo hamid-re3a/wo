@@ -15,13 +15,14 @@ class CreatePaymentInvoiceTransactionsTable extends Migration
     {
         Schema::create('payment_invoice_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained('invoices');
+            $table->foreignId('invoice_id')->nullable()->constrained('invoices');
             $table->mediumText('hash');
             $table->timestamp('received_date');
             $table->string('value');
             $table->string('fee');
             $table->string('status');
             $table->string('destination');
+            $table->timestamps();
 
         });
     }

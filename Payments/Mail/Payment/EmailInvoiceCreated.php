@@ -39,7 +39,7 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
         $setting = $this->getSetting();
 
         $setting['body'] = str_replace('{{full_name}}', (is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown' : $this->getUserFullName(), $setting['body']);
-        $setting['body'] = str_replace('{{invoice_link}}', (is_null($this->getCheckoutLink()) || empty($this->getCheckoutLink())) ? 'Unknown' : $this->getCheckoutLink(), $setting['body']);
+        $setting['body'] = str_replace('{{payment_address}}', (is_null($this->getCheckoutLink()) || empty($this->getCheckoutLink())) ? 'Unknown' : $this->getCheckoutLink(), $setting['body']);
         // $setting['body'] = str_replace('{{expiry_date}}',
         // (is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime()))
         //         ? 'Unknown':

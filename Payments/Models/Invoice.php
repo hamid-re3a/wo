@@ -58,4 +58,9 @@ class Invoice extends Model
     {
         return $this->status .' '. $this->additional_status;
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(InvoiceTransaction::class,'invoice_id','id');
+    }
 }

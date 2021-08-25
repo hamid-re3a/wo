@@ -35,7 +35,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     public function handle()
     {
         if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled')
-                return;
+            return;
 
         $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->get(
@@ -122,11 +122,10 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
                 $order_model->setId($this->invoice_db->order_id);
-                app(OrderService::class)->updateOrder($order_model);
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
 
-            // send web socket notification
-                $ws = Http::post('http://0.0.0.0:2121/socket', [
+                // send web socket notification
+                Http::post('http://0.0.0.0:2121/socket', [
                     "uid" => $invoice_model->getTransactionId(),
                     "content" => [
                         "name" => "confirmed",
@@ -134,6 +133,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "checkout_link" => $invoice_model->getCheckoutLink(),
                         "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
+                @app(OrderService::class)->updateOrder($order_model);
 
                 //MLM dispatch job dispatch
                 break;
@@ -182,7 +182,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     private function recordTransactions($transactions)
     {
-        try{
+        try {
             $db_transactions = [];
             if (is_array($transactions)) {
                 foreach ($transactions AS $transaction) {
@@ -197,7 +197,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         array_key_exists('destination', $transaction) AND !empty($transaction['destination'])
                     ) {
                         $this->invoice_db->transactions()->updateOrCreate(
-                            [ 'hash' => $transaction['id'] ],
+                            ['hash' => $transaction['id']],
                             [
                                 'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
                                 'value' => $transaction['value'],

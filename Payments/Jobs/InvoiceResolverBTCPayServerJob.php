@@ -10,7 +10,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Orders\Services\Order;
 use Orders\Services\OrderService;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
@@ -36,7 +35,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     public function handle()
     {
         if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled')
-            return;
+                return;
 
         Log::info('Handle Invoice started ' . $this->invoice_db->id);
         Log::info('Handle Invoice Status ' . $this->invoice_db->status);
@@ -124,17 +123,16 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Paid PaidOver':
             case 'Complete PaidOver':
             case 'Settled PaidOver':
-                Log::info('Paid Started');
+            Log::info('Paid Started');
 
                 // send thank you email notification
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 Log::info('Email Dispatched and Start DB update');
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
-                $order_service = new Order();
-                $order_service->setId($this->invoice_db->order_id);
-                $order_service->setIsPaidAt(now()->toString());
-                app(OrderService::class)->updateOrder($order_service);
+                $order_model->setIsPaidAt(now()->toString());
+                $order_model->setId($this->invoice_db->order_id);
+                app(OrderService::class)->updateOrder($order_model);
                 // send web socket notification
                 Log::info('Send WS confirmed');
                 $ws = Http::post('http://0.0.0.0:2121/socket', [
@@ -194,7 +192,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     private function recordTransactions($transactions)
     {
-        try {
+        try{
             $db_transactions = [];
             if (is_array($transactions)) {
                 foreach ($transactions AS $transaction) {
@@ -209,7 +207,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         array_key_exists('destination', $transaction) AND !empty($transaction['destination'])
                     ) {
                         $this->invoice_db->transactions()->updateOrCreate(
-                            ['hash' => $transaction['id']],
+                            [ 'hash' => $transaction['id'] ],
                             [
                                 'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
                                 'value' => $transaction['value'],

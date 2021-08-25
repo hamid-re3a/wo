@@ -95,5 +95,7 @@ class OrderService implements OrdersServiceInterface
             'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
         ]);
 
+        return $order;
+
     }
 }

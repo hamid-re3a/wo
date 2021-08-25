@@ -35,9 +35,11 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     public function handle()
     {
         if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled')
-                return;
+            return;
 
-
+        Log::info('Handle Invoice started ' . $this->invoice_db->id);
+        Log::info('Handle Invoice Status ' . $this->invoice_db->status);
+        Log::info('Handle Invoice AdditionalStatus ' . $this->invoice_db->additional_status);
         $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->get(
                 config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
@@ -59,7 +61,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 'paid_amount' => $amount_paid,
                 'due_amount' => $amount_due
             ]);
-
+            Log::info('Call Resolve');
             $this->resolve();
         }
 
@@ -68,7 +70,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     private function resolve()
     {
 
-
+        Log::info('Resolve Started');
         $invoice_db = $this->invoice_db;
         $payment_Id = new \Payments\Services\Id();
         $payment_Id->setId((int)$invoice_db->id);
@@ -96,9 +98,10 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
         }
 
         $order_model = $invoice_model->getOrder();
-
+        Log::info('FulLStatus Switch started');
         switch ($invoice_db->full_status) {
             case 'New PaidPartial':
+                Log::info('New PaidPartial');
                 // send web socket notification
                 Http::post('http://0.0.0.0:2121/socket', [
                     "uid" => $invoice_model->getTransactionId(),
@@ -120,11 +123,12 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Paid PaidOver':
             case 'Complete PaidOver':
             case 'Settled PaidOver':
+                Log::info('Paid Started');
 
                 // send thank you email notification
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
+                Log::info('Email Dispatched and Start DB update');
                 $this->invoice_db->is_paid = true;
-                $this->invoice_db->websocket_complete_sent = true;
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
                 $order_model->setId($this->invoice_db->order_id);
@@ -188,7 +192,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     private function recordTransactions($transactions)
     {
-        try{
+        try {
             $db_transactions = [];
             if (is_array($transactions)) {
                 foreach ($transactions AS $transaction) {
@@ -203,7 +207,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         array_key_exists('destination', $transaction) AND !empty($transaction['destination'])
                     ) {
                         $this->invoice_db->transactions()->updateOrCreate(
-                            [ 'hash' => $transaction['id'] ],
+                            ['hash' => $transaction['id']],
                             [
                                 'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
                                 'value' => $transaction['value'],

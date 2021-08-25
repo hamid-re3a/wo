@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Wallets\Http\Controllers\Admin\InvoiceWalletController;
 use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
 use Wallets\Http\Controllers\Front\WalletController;
@@ -9,6 +10,7 @@ use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController
 Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
     Route::get('', [WalletController::class, 'index'])->name('index');
     Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');
+    Route::get('invoiceWallet', [InvoiceWalletController::class, 'invoiceWallet'])->name('get-transaction');
 
     Route::name('deposit.')->prefix('deposit')->group(function () {
         Route::get('',[DepositWalletController::class, 'index'])->name('get-wallet');

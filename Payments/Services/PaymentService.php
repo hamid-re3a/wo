@@ -26,11 +26,11 @@ class PaymentService implements PaymentsServiceInterface
     }
 
     /**
+     * pay by every payment Driver
      * @inheritDoc
      */
     public function pay(Invoice $invoice_request): Invoice
     {
-
         $invoice = new Invoice();
         switch ($invoice_request->getPaymentType()) {
             case 'purchase':
@@ -45,59 +45,66 @@ class PaymentService implements PaymentsServiceInterface
 
     private function payFromGateway(Invoice $invoice_request): Invoice
     {
-        if (!$invoice_request->getPaymentDriver() || $invoice_request->getPaymentDriver() == 'btc-pay-server') {
+        switch ($invoice_request->getPaymentDriver()) {
+            case 'btc-pay-server':
+                return $this->payBtcServer($invoice_request);
+            default:
+                break;
+                return $invoice_request;
+        }
+    }
 
-            $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
-                ->post(
-                    config('payment.btc-pay-server-domain') .
-                    'api/v1/stores/' . config('payment.btc-pay-server-store-id') . '/invoices',
-                    [
-                        'amount' => $invoice_request->getPfAmount(),
-                        'currency' => 'usd'
-                    ]
-                );
-            $payment_response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
-                ->get(
-                    config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
-                    config('payment.btc-pay-server-store-id') . '/invoices/' .$response->json()['id'] . '/payment-methods'
-                );
-            if ($response->ok() && preg_match('/:(?P<address>.*?)\?amount/',$payment_response[0]['paymentLink'],$btc_link)) {
+    private function payBtcServer($invoice_request)
+    {
+        $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
+            ->post(
+                config('payment.btc-pay-server-domain') .
+                'api/v1/stores/' . config('payment.btc-pay-server-store-id') . '/invoices',
+                [
+                    'amount' => $invoice_request->getPfAmount(),
+                    'currency' => 'usd'
+                ]
+            );
+        $payment_response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
+            ->get(
+                config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
+                config('payment.btc-pay-server-store-id') . '/invoices/' . $response->json()['id'] . '/payment-methods'
+            );
+        if ($response->ok() && preg_match('/:(?P<address>.*?)\?amount/', $payment_response[0]['paymentLink'], $btc_link)) {
 
 
-                $invoice_request->setPfAmount((double)$response->json()['amount']);
-                $invoice_request->setAmount((double)$payment_response[0]['amount']);
-                $invoice_request->setDueAmount((double)$payment_response[0]['due']);
-                $invoice_request->setPaidAmount((double)$payment_response[0]['totalPaid']);
-                $invoice_request->setTransactionId($response->json()['id']);
-                $invoice_request->setCheckoutLink($btc_link['address']);
-                $invoice_request->setStatus($response->json()['status']);
-                $invoice_request->setAdditionalStatus($response->json()['additionalStatus']);
-                $invoice_request->setExpirationTime($response->json()['expirationTime']);
+            $invoice_request->setPfAmount((double)$response->json()['amount']);
+            $invoice_request->setAmount((double)$payment_response[0]['amount']);
+            $invoice_request->setDueAmount((double)$payment_response[0]['due']);
+            $invoice_request->setPaidAmount((double)$payment_response[0]['totalPaid']);
+            $invoice_request->setTransactionId($response->json()['id']);
+            $invoice_request->setCheckoutLink($btc_link['address']);
+            $invoice_request->setStatus($response->json()['status']);
+            $invoice_request->setAdditionalStatus($response->json()['additionalStatus']);
+            $invoice_request->setExpirationTime($response->json()['expirationTime']);
 
-                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request),$invoice_request->getUser()->getEmail());
+            EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
 
-                \Payments\Models\Invoice::query()->create([
-                    'order_id' => $invoice_request->getOrderId()  ,
-                    'pf_amount' => $invoice_request->getPfAmount(),
-                    'amount'=>$invoice_request->getAmount(),
-                    'due_amount'=>$invoice_request->getDueAmount(),
-                    'paid_amount'=>$invoice_request->getPaidAmount(),
-                    'transaction_id' => $invoice_request->getTransactionId(),
-                    'checkout_link' => $invoice_request->getCheckoutLink(),
-                    'expiration_time' => Carbon::createFromTimestamp($invoice_request->getExpirationTime()),
-                    'status' => $invoice_request->getStatus(),
-                    'additional_status' => $invoice_request->getAdditionalStatus(),
-                    'payment_type' => $invoice_request->getPaymentType(),
-                    'payment_driver' => $invoice_request->getPaymentDriver(),
-                    'payment_currency' => $invoice_request->getPaymentCurrency(),
-                ]);
-
-            }
+            \Payments\Models\Invoice::query()->create([
+                'order_id' => $invoice_request->getOrderId(),
+                'pf_amount' => $invoice_request->getPfAmount(),
+                'amount' => $invoice_request->getAmount(),
+                'due_amount' => $invoice_request->getDueAmount(),
+                'paid_amount' => $invoice_request->getPaidAmount(),
+                'transaction_id' => $invoice_request->getTransactionId(),
+                'checkout_link' => $invoice_request->getCheckoutLink(),
+                'expiration_time' => Carbon::createFromTimestamp($invoice_request->getExpirationTime()),
+                'status' => $invoice_request->getStatus(),
+                'additional_status' => $invoice_request->getAdditionalStatus(),
+                'payment_type' => $invoice_request->getPaymentType(),
+                'payment_driver' => $invoice_request->getPaymentDriver(),
+                'payment_currency' => $invoice_request->getPaymentCurrency(),
+            ]);
 
         }
         return $invoice_request;
-    }
 
+    }
 
     /**
      * @inheritDoc
@@ -125,7 +132,7 @@ class PaymentService implements PaymentsServiceInterface
         $order_service = app(OrderService::class);
         $order_id = new Services\Id();
         $order_id->setId($response_invoice->getOrderId());
-        $order = $order_service->OrderById( $order_id);
+        $order = $order_service->OrderById($order_id);
         $response_invoice->setOrder($order);
 
         return $response_invoice;
@@ -293,7 +300,7 @@ class PaymentService implements PaymentsServiceInterface
     }
 
     /**
-     * createDriver
+     * delete driver
      * @param $payment_driver
      * @return mixed
      */
@@ -303,7 +310,7 @@ class PaymentService implements PaymentsServiceInterface
     }
 
     /**
-     * createCurrency
+     * create PaymentType
      * @param $payment_currency
      * @return mixed
      */
@@ -319,7 +326,7 @@ class PaymentService implements PaymentsServiceInterface
     }
 
     /**
-     * createType
+     * update PaymentType
      * @param $payment_type
      * @return mixed
      */
@@ -335,7 +342,7 @@ class PaymentService implements PaymentsServiceInterface
     }
 
     /**
-     * createType
+     * delete PaymentType
      * @param $payment_type
      * @return mixed
      */

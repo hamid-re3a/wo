@@ -34,16 +34,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     public function handle()
     {
-        switch ($this->invoice_db->full_status) {
-            case 'Complete Paid':
-            case 'Settled Paid':
-            case 'Complete None':
-            case 'Settled None':
-            case 'Paid PaidOver':
-            case 'Complete PaidOver':
-            case 'Settled PaidOver':
+        if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled')
                 return;
-        }
 
 
         $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
@@ -132,12 +124,14 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 // send thank you email notification
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
+                $this->invoice_db->websocket_complete_sent = true;
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
                 $order_model->setId($this->invoice_db->order_id);
                 app(OrderService::class)->updateOrder($order_model);
                 // send web socket notification
-                Http::post('http://0.0.0.0:2121/socket', [
+                Log::info('Send WS confirmed');
+                $ws = Http::post('http://0.0.0.0:2121/socket', [
                     "uid" => $invoice_model->getTransactionId(),
                     "content" => [
                         "name" => "confirmed",
@@ -145,6 +139,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "checkout_link" => $invoice_model->getCheckoutLink(),
                         "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
+                Log::info('WS Confirmed SENT ' . $ws->ok());
 
                 //MLM dispatch job dispatch
                 break;

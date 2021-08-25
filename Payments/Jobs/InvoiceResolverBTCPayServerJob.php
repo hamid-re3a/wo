@@ -118,13 +118,14 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Settled PaidOver':
 
                 // send thank you email notification
-                EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
                 $order_model->setId($this->invoice_db->order_id);
-                app(OrderService::class)->updateOrder($order_model);
-                // send web socket notification
+                $order_model = app(OrderService::class)->updateOrder($order_model);
+                EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
+
+            // send web socket notification
                 $ws = Http::post('http://0.0.0.0:2121/socket', [
                     "uid" => $invoice_model->getTransactionId(),
                     "content" => [

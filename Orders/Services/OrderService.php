@@ -4,7 +4,6 @@
 namespace Orders\Services;
 
 
-use Illuminate\Support\Facades\Log;
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
 use User\Services\User;

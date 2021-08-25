@@ -95,7 +95,7 @@ class OrderService implements OrdersServiceInterface
             'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
         ]);
         $id = new Id();
-        $id->setId($order_db->id);
+        $id->setId($order->getId());
         return $this->OrderById($id);
 
     }

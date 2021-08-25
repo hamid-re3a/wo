@@ -97,7 +97,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'body'=><<<EOT
                 <div>
                 <p>Hi {{full_name}}</p>
-                <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice {{invoice_no})</p>
+                <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
                 <p>Your package ({{package_name}}) will automatically activate.</p>
                 <p></p>
                 <p>Cheers,</p>

@@ -4,22 +4,27 @@
 namespace Wallets\Services;
 
 
+use http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Payments\Services\Invoice;
+use Payments\Services\PaymentService;
 use User\Models\User;
 
 class WalletService implements WalletServiceInterface
 {
     private $depositWallet;
     private $earningWallet;
+    private $payment_service;
     private $wallets = [];
 
-    public function __construct()
+    public function __construct(PaymentService $payment_service)
     {
         $this->depositWallet = config('depositWallet');
         $this->earningWallet = config('earningWallet');
         $this->wallets[] = $this->depositWallet;
         $this->wallets[] = $this->earningWallet;
+        $this->payment_service = $payment_service;
     }
 
     private function walletUser($user)
@@ -184,5 +189,20 @@ class WalletService implements WalletServiceInterface
         } catch (\Throwable $exception) {
             return new Wallet();
         }
+    }
+
+    /**
+     * @param $request
+     * @return Invoice
+     */
+    public function invoiceWallet($request)
+    {
+        $invoice_request = new Invoice();
+        $invoice_request->setPfAmount(1);
+        $invoice_request->setPaymentDriver('btc-pay-server');
+        $invoice_request->setPaymentType('purchase');
+        $invoice_request->setPaymentCurrency('BTC');
+        $invoice_request->setUser(user($request->header('X-user-id')));
+        return $this->payment_service->pay( $invoice_request);
     }
 }

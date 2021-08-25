@@ -15,12 +15,14 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use Payments\Services\PaymentService;
+use User\Services\User;
 use Wallets\Services\Deposit;
 use Wallets\Services\WalletService;
 
 class InvoiceResolverBTCPayServerJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
 
     private $invoice_db;
 
@@ -31,7 +33,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     public function handle()
     {
-        switch ($this->invoice_db->full_status) {
+        switch($this->invoice_db->full_status){
             case 'Complete Paid':
             case 'Settled Paid':
             case 'Complete None':
@@ -39,8 +41,10 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Paid PaidOver':
             case 'Complete PaidOver':
             case 'Settled PaidOver':
-                return;
+                return ;
         }
+
+
 
         $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->get(
@@ -60,7 +64,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 'status' => $response->json()['status'],
                 'additional_status' => $response->json()['additionalStatus'],
                 'paid_amount' => $amount_paid,
-                'due_amount' => $amount_due,
+                'due_amount' => $amount_due
             ]);
 
             $this->resolve();
@@ -71,26 +75,29 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     private function resolve()
     {
 
+
         $invoice_db = $this->invoice_db;
         $payment_Id = new \Payments\Services\Id();
-        $payment_Id->setId((int) $invoice_db->id);
+        $payment_Id->setId((int)$invoice_db->id);
         $invoice_model = app(PaymentService::class)->getInvoiceById($payment_Id);
 
-        if (is_null($invoice_db->order_id)) {
-            switch ($invoice_db->status) {
+
+
+        if(is_null($invoice_db->order_id)){
+            switch($invoice_db->status){
                 case 'Complete':
                 case 'Settled':
                 case 'Paid':
 
-                    $pf_paid = number_format(
-                        ($invoice_model->getPfAmount() / $invoice_model->getAmount()) * $invoice_model->getPaidAmount()
-                        , 2, '.', '');
-                    if ($pf_paid > (double) $invoice_db->deposit_amount) {
-                        $deposit_amount = $pf_paid - ((double) $invoice_db->deposit_amount);
-                        $deposit_model = new Deposit;
-                        // $deposit_model
-                        app(WalletService::class)->deposit();
-                    }
+                $pf_paid  = number_format(
+                ($invoice_model->getPfAmount()/$invoice_model->getAmount()) * $invoice_model->getPaidAmount()
+                ,2, '.', '');
+                if($pf_paid > (double) $invoice_db->deposit_amount){
+                    $deposit_amount = $pf_paid - ((double)$invoice_db->deposit_amount);
+                    $deposit_model = new Deposit;
+//                    $deposit_model
+                    app( WalletService::class)->deposit();
+                }
                     break;
             }
             return;
@@ -107,10 +114,11 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "name" => "partial_paid",
                         "amount" => $invoice_model->getDueAmount(),
                         "checkout_link" => $invoice_model->getCheckoutLink(),
-                        "payment_currency" => $invoice_model->getPaymentCurrency(),
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
                 // send email notification for due amount
                 EmailJob::dispatch(new EmailInvoicePaidPartial($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
+
 
                 break;
             case 'Complete Paid':
@@ -134,7 +142,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "name" => "confirmed",
                         "amount" => $invoice_model->getDueAmount(),
                         "checkout_link" => $invoice_model->getCheckoutLink(),
-                        "payment_currency" => $invoice_model->getPaymentCurrency(),
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
 
                 //MLM dispatch job dispatch
@@ -150,7 +158,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "name" => "paid",
                         "amount" => $invoice_model->getDueAmount(),
                         "checkout_link" => $invoice_model->getCheckoutLink(),
-                        "payment_currency" => $invoice_model->getPaymentCurrency(),
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
                     ]]);
                 break;
             case 'Expired PaidPartial':
@@ -163,8 +171,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         "name" => "expired",
                         "amount" => $invoice_model->getDueAmount(),
                         "checkout_link" => $invoice_model->getCheckoutLink(),
-                        "payment_currency" => $invoice_model->getPaymentCurrency(),
-                    ],
+                        "payment_currency" => $invoice_model->getPaymentCurrency()
+                    ]
                 ]);
                 // send email to user to regenerate new invoice for due amount
                 EmailJob::dispatch(new EmailInvoiceExpired($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());

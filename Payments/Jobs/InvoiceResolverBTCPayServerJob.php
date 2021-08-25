@@ -122,7 +122,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
                 $order_model->setId($this->invoice_db->order_id);
-                $order_model = app(OrderService::class)->updateOrder($order_model);
+                app(OrderService::class)->updateOrder($order_model);
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
 
             // send web socket notification

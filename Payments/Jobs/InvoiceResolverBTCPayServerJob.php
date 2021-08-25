@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Orders\Services\OrderService;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
@@ -33,7 +34,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     public function handle()
     {
-        switch($this->invoice_db->full_status){
+        switch ($this->invoice_db->full_status) {
             case 'Complete Paid':
             case 'Settled Paid':
             case 'Complete None':
@@ -41,9 +42,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Paid PaidOver':
             case 'Complete PaidOver':
             case 'Settled PaidOver':
-                return ;
+                return;
         }
-
 
 
         $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
@@ -59,6 +59,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
         if ($response->ok() && $payment_response->ok()) {
             $amount_paid = $payment_response->json()[0]['totalPaid'];
             $amount_due = $payment_response->json()[0]['due'];
+            $this->recordTransactions($payment_response->json()[0]['payments']);
             $this->invoice_db->update([
                 'expiration_time' => Carbon::createFromTimestamp($response->json()['expirationTime']),
                 'status' => $response->json()['status'],
@@ -82,22 +83,21 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
         $invoice_model = app(PaymentService::class)->getInvoiceById($payment_Id);
 
 
-
-        if(is_null($invoice_db->order_id)){
-            switch($invoice_db->status){
+        if (is_null($invoice_db->order_id)) {
+            switch ($invoice_db->status) {
                 case 'Complete':
                 case 'Settled':
                 case 'Paid':
 
-                $pf_paid  = number_format(
-                ($invoice_model->getPfAmount()/$invoice_model->getAmount()) * $invoice_model->getPaidAmount()
-                ,2, '.', '');
-                if($pf_paid > (double) $invoice_db->deposit_amount){
-                    $deposit_amount = $pf_paid - ((double)$invoice_db->deposit_amount);
-                    $deposit_model = new Deposit;
+                    $pf_paid = number_format(
+                        ($invoice_model->getPfAmount() / $invoice_model->getAmount()) * $invoice_model->getPaidAmount()
+                        , 2, '.', '');
+                    if ($pf_paid > (double)$invoice_db->deposit_amount) {
+                        $deposit_amount = $pf_paid - ((double)$invoice_db->deposit_amount);
+                        $deposit_model = new Deposit;
 //                    $deposit_model
-                    app( WalletService::class)->deposit();
-                }
+                        app(WalletService::class)->deposit();
+                    }
                     break;
             }
             return;
@@ -134,6 +134,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
+                $order_model->setId($this->invoice_db->order_id);
                 app(OrderService::class)->updateOrder($order_model);
                 // send web socket notification
                 Http::post('http://0.0.0.0:2121/socket', [
@@ -187,6 +188,54 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             default:
                 // throw new \Exception('btc pay server issues');
                 break;
+        }
+    }
+
+    private function recordTransactions($transactions)
+    {
+        try{
+            $db_transactions = [];
+            if (is_array($transactions)) {
+                foreach ($transactions AS $transaction) {
+                    $now = now()->toDateTimeString();
+                    if (
+                        is_array($transaction) AND
+                        array_key_exists('id', $transaction) AND !empty($transaction['id']) AND
+                        array_key_exists('receivedDate', $transaction) AND !empty($transaction['receivedDate']) AND
+                        array_key_exists('value', $transaction) AND !empty($transaction['value']) AND
+                        array_key_exists('fee', $transaction) AND !empty($transaction['fee']) AND
+                        array_key_exists('status', $transaction) AND !empty($transaction['status']) AND
+                        array_key_exists('destination', $transaction) AND !empty($transaction['destination'])
+                    ) {
+                        $this->invoice_db->transactions()->updateOrCreate(
+                            [ 'hash' => $transaction['id'] ],
+                            [
+                                'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
+                                'value' => $transaction['value'],
+                                'fee' => $transaction['fee'],
+                                'status' => $transaction['status'],
+                                'destination' => $transaction['destination'],
+                                'created_at' => $now,
+                                'updated_at' => $now
+                            ]
+                        );
+                        $db_transactions[] = [
+                            'invoice_id' => $this->invoice_db->id,
+                            'hash' => $transaction['id'],
+                            'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
+                            'value' => $transaction['value'],
+                            'fee' => $transaction['fee'],
+                            'status' => $transaction['status'],
+                            'destination' => $transaction['destination'],
+                            'created_at' => $now,
+                            'updated_at' => $now
+                        ];
+                    }
+                }
+                return $db_transactions;
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Record transactions error , InvoiceID ' . $this->invoice_db->id);
         }
     }
 }

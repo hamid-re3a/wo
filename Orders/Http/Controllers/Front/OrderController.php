@@ -9,12 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderRequest;
+use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
 use Orders\Models\Order;
 use Packages\Services\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Invoice;
 use Payments\Services\PaymentService;
+use User\Models\User;
 
 class OrderController extends Controller
 {
@@ -38,8 +40,21 @@ class OrderController extends Controller
      */
     public function index(ListOrderRequest $request)
     {
-        $orders = Order::query()->filter()->simplePaginate();
+        $orders = $request->user->orders()->filter()->simplePaginate();
         return api()->success(null,OrderResource::collection($orders)->response()->getData());
+    }
+
+    /**
+     * Get order details
+     * @group
+     * Public User > Orders
+     * @param ShowRequest $request
+     * @return JsonResponse
+     */
+    public function showOrder(ShowRequest $request)
+    {
+        $order = $request->user->orders()->find($request->get('id'))->first();
+        return api()->success(null,OrderResource::make($order));
     }
 
     /**

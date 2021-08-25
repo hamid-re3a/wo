@@ -137,21 +137,45 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>Please pay the amount by logging in to the system or clicking the button below.
-                </p>
-                <p><a href="{{invoice_link}}">Pay Now</a></p>
-                <p>Your package will be activated after the payment is received in the system.<br/>
-                    Note:</br>
-                    A) This invoice will expire after {{expiry_date}}<br/>
-                    B) The invoice updates every two hours<br/>
-                    C) Package price doesn't include the Transaction Charges.<br/>
-                    D) In case of partial payment, the customer should pay the due amount on the same link.
-                    </p>
+                <p>We received your order and created an invoice for you. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
+                <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <h2><strong>Note:</strong></h2>  
+                <ol>
+                    <li>
+                    <p>Pay this invoice in {{crypto}}</p>
+                    </li>
+                    <li>
+                    <p>This invoice will expire after {{expiry_date}}</p>
+                    </li>
+                    <li>
+                    <p>This invoice updates every {{update_hours}} hours and the due amount may change</p>
+                    </li>
+                    <li>
+                    <p>The package price doesn&#39;t include the Transaction Fee.</p>
+                    </li>
+                    <li>
+                    <p>In case of partial payment, the customer will receive a new email with the due amount and payment instructions. </p>
+                    </li>
+                    <li>
+                    <p>If in case you received multiple invoices emails, please consider the latest one.</p>
+                    </li>
+                    <li>
+                    <p>Here is the confirmation of the conversion rate of the due amount ({{usd_amount}} USD) to {{crypto}} at the moment of creating the invoice: <a href="https://blockchain.info/tobtc?value={{usd_amount}}&currency=USD&time={{current_time}}&textual=true&nosavecurrency=true" target="_blank">Click Here</a></p>
+                    </li>
+                    <li>
+                    <p>If the due amount is more than the package price, then it includes the registration fee.</p>
+                    </li>
+                    <li>
+                    <p>Your package will be activated after the full payment is received in the system.</p>
+                    </li>
+                </ol>
+                <p>&nbsp;</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name,package_name,invoice_link,expiry_date',
+        'variables' => 'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
         'variables_description' => 'full_name user full name',
         'type' => 'email',
     ],

@@ -32,7 +32,7 @@ class TransactionResource extends JsonResource
             'amount' => number_format($this->amountFloat,2),
             'description' => $description,
             'confirmed' => $this->confirmed,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->timestamp,
         ];
     }
 }

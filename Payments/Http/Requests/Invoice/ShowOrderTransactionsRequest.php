@@ -1,12 +1,14 @@
 <?php
 
-namespace Giftcode\Http\Requests\User;
+
+namespace Payments\Http\Requests\Invoice;
+
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class CreateGiftcodeRequest extends FormRequest
+class ShowOrderTransactionsRequest extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -24,11 +26,9 @@ class CreateGiftcodeRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-            'package_id' => 'required|exists:giftcode_packages,id',
-            'include_registration_fee' => 'required|boolean',
-            'wallet' => 'required|in:Deposit Wallet'
+            'order_id' => 'required|integer|exists:invoices,order_id',
         ];
     }
-
 }

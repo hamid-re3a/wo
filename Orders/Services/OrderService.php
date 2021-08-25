@@ -4,6 +4,7 @@
 namespace Orders\Services;
 
 
+use Illuminate\Support\Facades\Log;
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
 use User\Services\User;
@@ -78,22 +79,23 @@ class OrderService implements OrdersServiceInterface
     public function updateOrder(Order $order): Order
     {
         $order_db = \Orders\Models\Order::query()->find($order->getId());
-        $order_db->user_id = $order->getUserId();
-        $order_db->to_user_id = $order->getToUserId();
-        $order_db->package_id = $order->getPackageId();
-        $order_db->total_cost_in_usd = $order->getTotalCostInUsd();
-        $order_db->packages_cost_in_usd = $order->getPackagesCostInUsd();
-        $order_db->registration_fee_in_usd = $order->getRegistrationFeeInUsd();
-        $order_db->is_paid_at = $order->getIsPaidAt();
-        $order_db->is_resolved_at = $order->getIsResolvedAt();
-        $order_db->is_refund_at = $order->getIsRefundAt();
-        $order_db->is_expired_at = $order->getIsExpiredAt();
-        $order_db->is_commission_resolved_at = $order->getIsCommissionResolvedAt();
-        $order_db->payment_type = $order->getPaymentType();
-        $order_db->payment_currency = $order->getPaymentCurrency();
-        $order_db->payment_driver = $order->getPaymentDriver();
-        $order_db->plan = $order->getPlan();
-        $order_db->save();
+        $order_db->update([
+            'user_id' => !empty($order->getUserId()) ? $order->getUserId() : $order_db->user_id,
+            'to_user_id' => !empty($order->getToUserId()) ? $order->getToUserId() : $order_db->to_user_id,
+            'packageId' => !empty($order->getPackageId()) ? $order->getPackageId() : $order_db->package_id,
+            'total_cost_in_usd' => !empty($order->getTotalCostInUsd()) ? $order->getTotalCostInUsd() : $order_db->total_cost_in_usd,
+            'packages_cost_in_usd' => !empty($order->getPackagesCostInUsd()) ? $order->getPackagesCostInUsd() : $order_db->packages_cost_in_usd,
+            'registration_fee_in_usd' => !empty($order->getRegistrationFeeInUsd()) ? $order->getRegistrationFeeInUsd() : $order_db->registration_fee_in_usd,
+            'is_paid_at' => !empty($order->getIsPaidAt()) ? $order->getIsPaidAt() : $order_db->is_paid_at,
+            'is_resolved_at' => !empty($order->getIsResolvedAt()) ? $order->getIsResolvedAt() : $order_db->is_resolved_at,
+            'is_refund_at' => !empty($order->getIsRefundAt()) ? $order->getIsRefundAt() : $order_db->is_refund_at,
+            'is_expired_at' => !empty($order->getIsExpiredAt()) ? $order->getIsExpiredAt() : $order_db->is_expired_at,
+            'is_commission_resolved_at' => !empty($order->getIsCommissionResolvedAt()) ? $order->getIsCommissionResolvedAt() : $order_db->is_commission_resolved_at,
+            'payment_type' => !empty($order->getPaymentType()) ? $order->getPaymentType() : $order_db->payment_type,
+            'payment_currency' => !empty($order->getPaymentCurrency()) ? $order->getPaymentCurrency() : $order_db->payment_currency,
+            'payment_driver' => !empty($order->getPaymentDriver()) ? $order->getPaymentDriver() : $order_db->payment_driver,
+            'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
+        ]);
 
     }
 }

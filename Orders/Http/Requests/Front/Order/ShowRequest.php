@@ -1,10 +1,10 @@
 <?php
 
-namespace Giftcode\Http\Requests\User;
+namespace Orders\Http\Requests\Front\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateGiftcodeRequest extends FormRequest
+class ShowRequest extends FormRequest
 {
 
     /**
@@ -25,10 +25,9 @@ class CreateGiftcodeRequest extends FormRequest
     public function rules()
     {
         return [
-            'package_id' => 'required|exists:giftcode_packages,id',
-            'include_registration_fee' => 'required|boolean',
-            'wallet' => 'required|in:Deposit Wallet'
+            'id' => 'required|integer|exists:orders,id,user_id,' . request()->user->id
         ];
     }
+
 
 }

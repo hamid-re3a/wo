@@ -124,7 +124,6 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 // send thank you email notification
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
-                $this->invoice_db->websocket_complete_sent = true;
                 $this->invoice_db->save();
                 $order_model->setIsPaidAt(now()->toString());
                 $order_model->setId($this->invoice_db->order_id);

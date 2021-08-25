@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Orders\Services\Order;
 use Orders\Services\OrderService;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
@@ -130,9 +131,10 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 Log::info('Email Dispatched and Start DB update');
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
-                $order_model->setIsPaidAt(now()->toString());
-                $order_model->setId($this->invoice_db->order_id);
-                app(OrderService::class)->updateOrder($order_model);
+                $order_service = new Order();
+                $order_service->setId($this->invoice_db->order_id);
+                $order_service->setIsPaidAt(now()->toString());
+                app(OrderService::class)->updateOrder($order_service);
                 // send web socket notification
                 Log::info('Send WS confirmed');
                 $ws = Http::post('http://0.0.0.0:2121/socket', [

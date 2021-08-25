@@ -4,7 +4,6 @@
 namespace Orders\Services;
 
 
-use Illuminate\Support\Facades\Log;
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
 use User\Services\User;
@@ -94,9 +93,10 @@ class OrderService implements OrdersServiceInterface
             'payment_driver' => !empty($order->getPaymentDriver()) ? $order->getPaymentDriver() : $order_db->payment_driver,
             'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
         ]);
-        $id = new Id();
-        $id->setId($order->getId());
-        return $this->OrderById($id);
+        $order_id = new Id();
+        $order_id->setId($order->getId());
+        $order = $this->OrderById($order_id);
+        return $order;
 
     }
 }

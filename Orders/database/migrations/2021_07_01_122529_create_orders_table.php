@@ -35,6 +35,8 @@ class CreateOrdersTable extends Migration
             $table->string('payment_currency');
             $table->string('payment_driver')->nullable()->default(null);
 
+            $table->unsignedBigInteger('package_id');
+
             $table->string('plan')->default(ORDER_PLAN_START);
             $table->softDeletes();
             $table->timestamps();

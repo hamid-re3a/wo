@@ -12,10 +12,6 @@ if (!function_exists('user')) {
 
     function user(int $id ) : ?\User\Services\User
     {
-
-
-
-
         $user_db = \User\Models\User::query()->find($id);
 
         $user = new \User\Services\User();

@@ -48,6 +48,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaymentDriver($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaymentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePfAmount($value)
+ * @property float $deposit_amount
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDepositAmount($value)
  */
 class Invoice extends Model
 {

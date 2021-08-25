@@ -27,6 +27,7 @@ class OrderService implements OrdersServiceInterface
         $order = \Orders\Models\Order::query()->find($request->getId());
         $response->setUserId((int)$order->user_id);
         $response->setToUserId((int)$order->to_user_id);
+        $response->setPackageId((int)$order->package_id);
         $response->setTotalCostInUsd((double)$order->total_cost_in_usd);
         $response->setPackagesCostInUsd((double)$order->packages_cost_in_usd);
         $response->setRegistrationFeeInUsd((double)$order->registration_fee_in_usd);
@@ -79,6 +80,7 @@ class OrderService implements OrdersServiceInterface
         $order_db = \Orders\Models\Order::query()->find($order->getId());
         $order_db->user_id = $order->getUserId();
         $order_db->to_user_id = $order->getToUserId();
+        $order_db->package_id = $order->getPackageId();
         $order_db->total_cost_in_usd = $order->getTotalCostInUsd();
         $order_db->packages_cost_in_usd = $order->getPackagesCostInUsd();
         $order_db->registration_fee_in_usd = $order->getRegistrationFeeInUsd();

@@ -56,6 +56,8 @@ use User\Models\User;
  * @property-read \Illuminate\Database\Eloquent\Collection|\Orders\Models\OrderPackage[] $packages
  * @property-read int|null $packages_count
  * @method static \Illuminate\Database\Eloquent\Builder|Order filter()
+ * @property int $package_id
+ * @method static \Illuminate\Database\Eloquent\Builder|Order wherePackageId($value)
  */
 class Order extends Model
 {
@@ -83,11 +85,6 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function packages()
-    {
-        return $this->hasMany(OrderPackage::class);
-    }
-
 
     public function reCalculateCosts()
     {
@@ -101,14 +98,10 @@ class Order extends Model
 
     private function orderPackagesPrice()
     {
-        $packages_price = 0;
-        foreach ($this->packages as $package_order) {
-            $id = new Id;
-            $id->setId($package_order->package_id);
-            $package_service_object = app(PackageService::class )->packageById($id);
-            $packages_price += $package_service_object->getPrice();
-        }
-        return $packages_price;
+        $id = new Id;
+        $id->setId($this->package_id);
+        $package_service_object = app(PackageService::class )->packageById($id);
+        return $package_service_object->getPrice();
     }
 
     /**

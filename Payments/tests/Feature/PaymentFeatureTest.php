@@ -29,9 +29,9 @@ class PaymentFeatureTest extends PaymentTest
     public function submit_order_with_email()
     {
 
-//        Mail::fake();
+        Mail::fake();
         $response = $this->post(route('orders.store'), [
-            'package_ids' => [['id' => 1, 'qty' => 1]],
+            'package_id' => 1,
             'to_user_id' => '1',
             'plan' => ORDER_PLAN_START,
             'payment_type' => 'purchase',
@@ -46,7 +46,7 @@ class PaymentFeatureTest extends PaymentTest
         ]);
         $response->assertOk();
 
-//        Mail::assertSent(EmailInvoicePaidComplete::class);
+        Mail::assertSent(EmailInvoiceCreated::class);
     }
 
 

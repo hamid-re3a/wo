@@ -28,7 +28,6 @@ class PackageUnitTest extends PackageTest
 
     private function runGrpcServer(): void
     {
-        dd(Package::count());
 //        $_this = $this;
 //        run(function() use ($_this){
 //

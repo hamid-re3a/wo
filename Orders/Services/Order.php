@@ -93,6 +93,10 @@ class Order extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.user.services.User to_user = 20;</code>
      */
     protected $to_user = null;
+    /**
+     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     */
+    protected $package_id = 0;
 
     /**
      * Constructor.
@@ -120,6 +124,7 @@ class Order extends \Google\Protobuf\Internal\Message
      *     @type string $updated_at
      *     @type \User\Services\User $user
      *     @type \User\Services\User $to_user
+     *     @type int|string $package_id
      * }
      */
     public function __construct($data = NULL) {
@@ -583,6 +588,28 @@ class Order extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \User\Services\User::class);
         $this->to_user = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     * @return int|string
+     */
+    public function getPackageId()
+    {
+        return $this->package_id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setPackageId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->package_id = $var;
 
         return $this;
     }

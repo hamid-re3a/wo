@@ -5,12 +5,16 @@ namespace Wallets\Http\Controllers\Front;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\WalletResource;
+use Wallets\Mail\DepositWallet\ReceiverFundEmail;
+use Wallets\Mail\DepositWallet\SenderFundEmail;
 use Wallets\Services\BankService;
 
 class DepositWalletController extends Controller
@@ -77,13 +81,14 @@ class DepositWalletController extends Controller
         try {
             DB::beginTransaction();
             //Check logged in user balance for transfer
-            if($this->bankService->getBalance($this->wallet) < $this->calculateNeededAmount($request->get('amount')))
+            $balance = $this->bankService->getBalance($this->wallet);
+            if($balance < $this->calculateNeededAmount($request->get('amount')))
                 return api()->error(trans('wallet.responses.not-enough-balance'), null,406);
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
             $receiver_bank_service = new BankService($to_user);
-            $fee = $this->calculateTransferFee($request->get('amount'));
+            list($amount, $fee) = $this->calculateTransferFee($request->get('amount'));
 
 
             $transfer = $this->bankService->transfer(
@@ -100,11 +105,16 @@ class DepositWalletController extends Controller
                 'type' => 'Transfer fee'
             ]);
 
+            UrgentEmailJob::dispatch(new SenderFundEmail(request()->wallet_user,$transfer), request()->wallet_user->email);
+            UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user,$transfer), $to_user->email);
+
             DB::commit();
 
             return api()->success(null,TransferResource::make($transfer));
         } catch (\Throwable $exception) {
             DB::rollBack();
+            Log::error('Transfer funds error .' . $exception->getMessage());
+            throw $exception;
         }
 
     }
@@ -126,6 +136,6 @@ class DepositWalletController extends Controller
         if(!empty($percentage_fee) AND $percentage_fee > 0)
             $transaction_fee = $amount * $percentage_fee / 100;
 
-        return $transaction_fee;
+        return [$amount + $transaction_fee, $transaction_fee];
     }
 }

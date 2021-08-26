@@ -17,3 +17,25 @@ if (!function_exists('walletGetSetting')) {
         return config("wallet.{$key}");
     }
 }
+
+if(!function_exists('walletGetEmailContent')) {
+
+    function walletGetEmailContent($key)
+    {
+        //Check if email content is available in cache
+        if(cache()->has('wallet_email_contents'))
+            if($email = collect(cache('wallet_email_contents'))->where('key', $key)->first())
+                return $email;
+
+
+        if($email = \Wallets\Models\EmailContent::where('key',$key)->first())
+            return $email->toArray();
+
+        if(defined('WALLET_EMAIL_CONTENTS') AND is_array(WALLET_EMAIL_CONTENTS) AND array_key_exists($key,WALLET_EMAIL_CONTENTS))
+            return WALLET_EMAIL_CONTENTS[$key];
+
+        \Illuminate\Support\Facades\Log::error('walletEmailContentError => ' . $key);
+        throw new Exception(trans('wallet.responses.email-key-doesnt-exists'));
+    }
+
+}

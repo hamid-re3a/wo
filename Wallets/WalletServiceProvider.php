@@ -78,6 +78,10 @@ class WalletServiceProvider extends ServiceProvider
      */
     protected function registerHelpers()
     {
+        if (file_exists($helperFile = __DIR__ . '/helpers/emails.php')) {
+            require_once($helperFile);
+        }
+
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
         }

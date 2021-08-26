@@ -38,42 +38,17 @@ class BankService
 
     public function deposit($wallet_name, $amount, $meta = null, $confirmed = true)
     {
-        if($meta) {
-            if (is_string($meta))
-                $meta = [
-                    'description' => $meta,
-                    'type' => 'Deposit'
-                ];
-        }
-        else
-            $meta = [
-                'type' => 'Deposit'
-            ];
-
-        return $this->getWallet($wallet_name)->depositFloat($amount, $meta, $confirmed);
+        return $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($meta,'Deposit'), $confirmed);
     }
 
     public function withdraw($wallet_name,$amount, $meta = null)
     {
-        if($meta) {
-            if (is_string($meta))
-                $meta = [
-                    'description' => $meta,
-                    'type' => 'Withdraw'
-                ];
-        }
-        else
-            $meta = [
-                'type' => 'Withdraw'
-            ];
-        return $this->getWallet($wallet_name)->withdrawFloat($amount, $meta);
+        return $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($meta,'Withdraw'));
     }
 
     public function forceWithdraw($wallet_name,$amount, $meta = null)
     {
-        if (is_string($meta))
-            $meta = ['description' => $meta];
-        return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $meta);
+        return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($meta,'Withdraw'));
     }
 
     public function transfer($from_wallet , $to_wallet, $amount, $meta = null)
@@ -84,18 +59,8 @@ class BankService
         if(!$to_wallet instanceof WalletFloat)
             $to_wallet = $this->getWallet($to_wallet);
 
-        if($meta) {
-            if (is_string($meta))
-                $meta = [
-                    'description' => $meta,
-                    'type' => 'Transfer'
-                ];
-        }
-        else
-            $meta = [
-                'type' => 'Transfer'
-            ];
-        return $from_wallet->transferFloat($to_wallet, $amount, $meta);
+
+        return $from_wallet->transferFloat($to_wallet, $amount, $this->createMeta($meta,'Transfer'));
     }
 
     public function getBalance($wallet_name)
@@ -115,7 +80,6 @@ class BankService
         $transactionQuery = $this->owner->transactions()->whereHas('wallet', function($query) use($wallet_name){
             $query->where('name', $wallet_name);
         });
-
         if(request()->has('transaction_id'))
             $transactionQuery->where('uuid', request()->get('transaction_id'));
 
@@ -148,6 +112,25 @@ class BankService
     public function getTransfers($wallet_name)
     {
         return $this->getWallet($wallet_name)->transfers();
+    }
+
+    private function createMeta($meta,$type)
+    {
+        if(!empty($meta)) {
+            if (is_string($meta))
+                $meta = [
+                    'description' => $meta,
+                    'type' => $type
+                ];
+            else
+                if(!array_key_exists('type', $meta))
+                    $meta['type'] = $type;
+        }
+        else
+            $meta = [
+                'type' => $type
+            ];
+        return $meta;
     }
 
 

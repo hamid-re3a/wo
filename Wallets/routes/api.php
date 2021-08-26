@@ -15,6 +15,7 @@ Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
     Route::name('deposit.')->prefix('deposit')->group(function () {
         Route::get('',[DepositWalletController::class, 'index'])->name('get-wallet');
         Route::get('transactions', [DepositWalletController::class, 'transactions'])->name('transactions');
+        Route::post('transfer', [DepositWalletController::class, 'transfer'])->name('transfer-fund');
         Route::get('transfers', [DepositWalletController::class, 'transfers'])->name('transfers');
         Route::get('transfers/income', [DepositWalletController::class, 'incomeTransfers'])->name('income-transfers');
     });

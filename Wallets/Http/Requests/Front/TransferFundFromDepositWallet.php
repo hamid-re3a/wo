@@ -4,7 +4,7 @@ namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TransferRequest extends FormRequest
+class TransferFundFromDepositWallet extends FormRequest
 {
 
     /**
@@ -24,7 +24,11 @@ class TransferRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        $user_id = request()->wallet_user ? request()->wallet_user->id : null;
+        return [
+            'member_id' => 'required|integer|exists:users,member_id',
+            'amount' => 'required|integer|min:1'
+        ];
 
     }
 

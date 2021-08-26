@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\UserDataJob;
+use App\Jobs\User\UserDataJob;
 use Illuminate\Console\Command;
 use Payments\Models\PaymentType;
 

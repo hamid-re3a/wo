@@ -16,9 +16,9 @@ class User
         }
         $pool->internalAddGeneratedFile(
             '
-ç
+‡
 
-user.protouser.services"h
+user.protouser.services"∫
 User
 
 id (
@@ -27,7 +27,14 @@ first_name (	
 	last_name (	
 username (	
 email (	
-role (	bproto3'
+role (	
+
+sponsor_id (
+
+block_type (	
+	is_freeze	 (
+is_deactivate
+ (bproto3'
         , true);
 
         static::$is_initialized = true;

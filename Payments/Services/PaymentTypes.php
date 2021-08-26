@@ -14,9 +14,9 @@ use Google\Protobuf\Internal\GPBUtil;
 class PaymentTypes extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>.payments.services.PaymentType payment_types = 1;</code>
+     * Generated from protobuf field <code>repeated .payments.services.PaymentType payment_types = 1;</code>
      */
-    protected $payment_types = null;
+    private $payment_types;
 
     /**
      * Constructor.
@@ -24,7 +24,7 @@ class PaymentTypes extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \Payments\Services\PaymentType $payment_types
+     *     @type \Payments\Services\PaymentType[]|\Google\Protobuf\Internal\RepeatedField $payment_types
      * }
      */
     public function __construct($data = NULL) {
@@ -33,33 +33,24 @@ class PaymentTypes extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.payments.services.PaymentType payment_types = 1;</code>
-     * @return \Payments\Services\PaymentType|null
+     * Generated from protobuf field <code>repeated .payments.services.PaymentType payment_types = 1;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getPaymentTypes()
     {
         return $this->payment_types;
     }
 
-    public function hasPaymentTypes()
-    {
-        return isset($this->payment_types);
-    }
-
-    public function clearPaymentTypes()
-    {
-        unset($this->payment_types);
-    }
-
     /**
-     * Generated from protobuf field <code>.payments.services.PaymentType payment_types = 1;</code>
-     * @param \Payments\Services\PaymentType $var
+     * Generated from protobuf field <code>repeated .payments.services.PaymentType payment_types = 1;</code>
+     * @param \Payments\Services\PaymentType[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setPaymentTypes($var)
     {
-//        GPBUtil::checkMessage($var, \Payments\Services\PaymentType::class);
-        $this->payment_types = $var;
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Payments\Services\PaymentType::class);
+        $this->payment_types = $arr;
+
         return $this;
     }
 

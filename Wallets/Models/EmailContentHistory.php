@@ -2,13 +2,27 @@
 
 namespace Wallets\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use User\Models\User;
 
 /**
- * Wallets\Models\Giftcode
+ * Wallets\Models\EmailContentHistory
  *
  * @property int $id
+ * @property int $email_id
+ * @property int $actor_id
+ * @property string $key
+ * @property boolean $is_active
+ * @property string $subject
+ * @property string $from
+ * @property string $from_name
+ * @property string $body
+ * @property string $variables
+ * @property string $variables_description
+ * @property string $type
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class EmailContentHistory extends Model
 {

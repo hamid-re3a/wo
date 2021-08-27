@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Wallets\Http\Controllers\Admin\EmailContentController;
 use Wallets\Http\Controllers\Admin\InvoiceWalletController;
+use Wallets\Http\Controllers\Admin\SettingController;
 use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
 use Wallets\Http\Controllers\Front\WalletController;
@@ -36,5 +38,15 @@ Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
             Route::post('wallet-transfers', [AdminWalletController::class, 'getWalletTransfers'])->name('wallet-transfers');
             Route::post('wallet-balance', [AdminWalletController::class, 'getWalletBalance'])->name('wallet-balance');
         });;
+
+        Route::name('settings.')->prefix('settings')->group(function(){
+            Route::get('', [SettingController::class, 'index'])->name('list');
+            Route::patch('update', [SettingController::class, 'update'])->name('update');
+        });
+
+        Route::name('email-contents.')->prefix('email-contents')->group(function(){
+            Route::get('', [EmailContentController::class, 'index'])->name('list');
+            Route::patch('update', [EmailContentController::class, 'update'])->name('update');
+        });
     });
 });

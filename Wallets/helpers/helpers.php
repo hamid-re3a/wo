@@ -14,7 +14,12 @@ if (!function_exists('walletGetSetting')) {
         if($setting)
             return $setting->value;
 
-        return config("wallet.{$key}");
+
+        if(defined('WALLET_SETTINGS') AND is_array(WALLET_SETTINGS) AND array_key_exists($key,WALLET_SETTINGS))
+            return WALLET_SETTINGS[$key]['value'];
+
+        \Illuminate\Support\Facades\Log::error('walletGetSetting => ' . $key);
+        throw new Exception(trans('wallet.responses.email-key-doesnt-exists'));
     }
 }
 

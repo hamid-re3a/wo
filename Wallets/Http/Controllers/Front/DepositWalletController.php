@@ -73,6 +73,7 @@ class DepositWalletController extends Controller
      * @group Public User > Deposit Wallet
      * @param TransferFundFromDepositWallet $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function transfer(TransferFundFromDepositWallet $request)
     {
@@ -114,7 +115,7 @@ class DepositWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-            throw $exception;
+            return api()->error(trans('wallet.responses.something-went-wrong'));
         }
 
     }
@@ -132,10 +133,15 @@ class DepositWalletController extends Controller
     private function calculateTransferFee($amount)
     {
         $percentage_fee = walletGetSetting('percentage_transfer_fee');
-        $transaction_fee = walletGetSetting('fix_transfer_fee');
-        if(!empty($percentage_fee) AND $percentage_fee > 0)
-            $transaction_fee = $amount * $percentage_fee / 100;
+        $fix_fee = walletGetSetting('fix_transfer_fee');
+        $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
 
-        return [$amount + $transaction_fee, $transaction_fee];
+        if(!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($percentage_fee) AND $percentage_fee > 0)
+            $fix_fee = $amount * $percentage_fee / 100;
+
+        if(empty($fix_fee) OR $fix_fee <= 0)
+            $fix_fee = 10;
+
+        return [$amount + $fix_fee, $fix_fee];
     }
 }

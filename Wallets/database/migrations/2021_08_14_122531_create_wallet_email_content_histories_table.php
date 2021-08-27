@@ -15,7 +15,7 @@ class CreateWalletEmailContentHistoriesTable extends Migration
     {
         Schema::create('wallet_email_content_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('email_id')->constrained('giftcode_email_contents');
+            $table->foreignId('email_id')->constrained('wallet_email_contents');
             $table->foreignId('actor_id')->constrained('users');
             $table->string('key');
             $table->boolean('is_active')->default(true);

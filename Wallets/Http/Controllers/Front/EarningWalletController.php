@@ -46,7 +46,9 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        $data = $this->bankService->getTransactions($this->wallet)->simplePaginate();
+        $data = $this->bankService->getTransactions($this->wallet)->select('*')
+            ->selectRaw('( SELECT IFNULL(SUM(amount), 0) FROM transactions t2 WHERE t2.confirmed=1 AND t2.wallet_id=transactions.wallet_id AND t2.id <= transactions.id ) new_balance')
+            ->simplePaginate();
         return api()->success(null,TransactionResource::collection($data)->response()->getData());
 
     }

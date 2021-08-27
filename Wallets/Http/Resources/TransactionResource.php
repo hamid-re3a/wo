@@ -30,6 +30,7 @@ class TransactionResource extends JsonResource
             'wallet' => $this->wallet->name,
             'type' => Str::ucfirst($type),
             'amount' => number_format($this->amountFloat,2),
+            'new_balance' => number_format($this->new_balance / 100,2),
             'description' => $description,
             'confirmed' => $this->confirmed,
             'created_at' => $this->created_at->timestamp,

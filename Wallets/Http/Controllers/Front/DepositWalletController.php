@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Http\Resources\TransactionHistoryResource;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
@@ -35,7 +36,7 @@ class DepositWalletController extends Controller
     public function index()
     {
         $this->prepareDepositWallet();
-        return api()->success(null,WalletResource::make($this->bankService->getWallet($this->wallet)));
+        return api()->success(null, WalletResource::make($this->bankService->getWallet($this->wallet)));
 
     }
 
@@ -49,8 +50,10 @@ class DepositWalletController extends Controller
     {
 
         $this->prepareDepositWallet();
-        $data = $this->bankService->getTransactions($this->wallet)->simplePaginate();
-        return api()->success(null,TransactionResource::collection($data)->response()->getData());
+        $data = $this->bankService->getTransactions($this->wallet)->select('*')
+            ->selectRaw('( SELECT IFNULL(SUM(amount), 0) FROM transactions t2 WHERE t2.confirmed=1 AND t2.wallet_id=transactions.wallet_id AND t2.id <= transactions.id ) new_balance')
+            ->simplePaginate();
+        return api()->success(null, TransactionResource::collection($data)->response()->getData());
 
     }
 
@@ -64,7 +67,7 @@ class DepositWalletController extends Controller
 
         $this->prepareDepositWallet();
         $data = $this->bankService->getTransfers($this->wallet)->simplePaginate();
-        return api()->success(null,TransferResource::collection($data)->response()->getData());
+        return api()->success(null, TransferResource::collection($data)->response()->getData());
 
     }
 
@@ -83,8 +86,8 @@ class DepositWalletController extends Controller
             DB::beginTransaction();
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->wallet);
-            if($balance < $this->calculateNeededAmount($request->get('amount')))
-                return api()->error(trans('wallet.responses.not-enough-balance'), null,406);
+            if ($balance < $this->calculateNeededAmount($request->get('amount')))
+                return api()->error(trans('wallet.responses.not-enough-balance'), null, 406);
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -102,16 +105,16 @@ class DepositWalletController extends Controller
                 ]
             );
 
-            $this->bankService->withdraw($this->wallet,$fee,[
+            $this->bankService->withdraw($this->wallet, $fee, [
                 'type' => 'Transfer fee'
             ]);
 
-            UrgentEmailJob::dispatch(new SenderFundEmail(request()->wallet_user,$transfer), request()->wallet_user->email);
-            UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user,$transfer), $to_user->email);
+            UrgentEmailJob::dispatch(new SenderFundEmail(request()->wallet_user, $transfer), request()->wallet_user->email);
+            UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user, $transfer), $to_user->email);
 
             DB::commit();
 
-            return api()->success(null,TransferResource::make($transfer));
+            return api()->success(null, TransferResource::make($transfer));
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
@@ -124,8 +127,8 @@ class DepositWalletController extends Controller
     {
         $percentage_fee = walletGetSetting('percentage_transfer_fee');
         $fix_fee = walletGetSetting('fix_transfer_fee');
-        if(!empty($percentage_fee) AND $percentage_fee > 0)
-            return $amount + ($amount*$percentage_fee / 100);
+        if (!empty($percentage_fee) AND $percentage_fee > 0)
+            return $amount + ($amount * $percentage_fee / 100);
 
         return $amount + $fix_fee;
     }
@@ -136,10 +139,10 @@ class DepositWalletController extends Controller
         $fix_fee = walletGetSetting('fix_transfer_fee');
         $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
 
-        if(!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($percentage_fee) AND $percentage_fee > 0)
+        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($percentage_fee) AND $percentage_fee > 0)
             $fix_fee = $amount * $percentage_fee / 100;
 
-        if(empty($fix_fee) OR $fix_fee <= 0)
+        if (empty($fix_fee) OR $fix_fee <= 0)
             $fix_fee = 10;
 
         return [$amount + $fix_fee, $fix_fee];

@@ -49,11 +49,18 @@ class User extends Model implements WalletFloat
 
     Protected $guard_name ='api';
 
+    /**
+     * Mutators
+     */
 
     public function getFullNameAttribute()
     {
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
     }
+
+    /**
+     * Relations
+     */
 
     public function giftCodes()
     {
@@ -68,6 +75,20 @@ class User extends Model implements WalletFloat
     public function paidOrders()
     {
         return $this->hasMany(Order::class,'user_id','id')->whereNotNull('is_paid_at');
+    }
+
+    /**
+     * Methods
+     */
+    public function getUserService()
+    {
+        $user = new \User\Services\User();
+        $user->setId((int)$this->attributes['id']);
+        $user->setFirstName($this->attributes['first_name']);
+        $user->setLastName($this->attributes['last_name']);
+        $user->setUsername($this->attributes['username']);
+        $user->setEmail($this->attributes['email']);
+        return $user;
     }
 
 }

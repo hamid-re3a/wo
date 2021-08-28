@@ -23,15 +23,13 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
 
     private $invoice_db;
-    private $socket_service;
     private $invoice_model;
     private $order_model;
 
-    public function __construct(Invoice $invoice_db, \Payments\Services\Invoice $invoice_model, Socket $socket)
+    public function __construct(Invoice $invoice_db)
     {
         $this->invoice_db = $invoice_db;
-        $this->socket_service = $socket;
-        $this->invoice_model = $invoice_model;
+        $this->invoice_model = new \Payments\Services\Invoice();
     }
 
     public function handle()

@@ -18,7 +18,7 @@ class CreateInvoicesTable extends Migration
 
             $table->string('payable_type')->nullable();
             $table->string('payable_id')->nullable();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->unsignedDouble('pf_amount')->default(0);
             $table->unsignedDouble('amount')->default(0);
 

@@ -4,7 +4,7 @@
 namespace Wallets\Services;
 
 
-use http\Client\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Payments\Services\Invoice;
@@ -195,14 +195,15 @@ class WalletService implements WalletServiceInterface
      * @param $request
      * @return Invoice
      */
-    public function invoiceWallet($request)
+    public function invoiceWallet(Request $request)
     {
         $invoice_request = new Invoice();
-        $invoice_request->setPfAmount(1);
+        $invoice_request->setPfAmount($request->get('amount'));
         $invoice_request->setPaymentDriver('btc-pay-server');
         $invoice_request->setPaymentType('purchase');
         $invoice_request->setPaymentCurrency('BTC');
-        $invoice_request->setUser(user($request->header('X-user-id')));
+        $invoice_request->setUser($request->wallet_user->getUserService());
         return $this->payment_service->pay( $invoice_request);
     }
+
 }

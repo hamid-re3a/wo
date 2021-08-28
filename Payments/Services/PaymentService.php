@@ -4,8 +4,6 @@ namespace Payments\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
-use Orders\Services;
-use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
 use Payments\Repository\PaymentCurrencyRepository;
@@ -49,8 +47,8 @@ class PaymentService implements PaymentsServiceInterface
             case 'btc-pay-server':
                 return $this->payBtcServer($invoice_request);
             default:
-                break;
                 return $invoice_request;
+                break;
         }
     }
 
@@ -86,7 +84,9 @@ class PaymentService implements PaymentsServiceInterface
             EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
 
             \Payments\Models\Invoice::query()->create([
-                'order_id' => $invoice_request->getOrderId(),
+                'user_id' => $invoice_request->getUser()->getId(),
+                'payable_id' => $invoice_request->getPayableId(),
+                'payable_type' => $invoice_request->getPayableType(),
                 'pf_amount' => $invoice_request->getPfAmount(),
                 'amount' => $invoice_request->getAmount(),
                 'due_amount' => $invoice_request->getDueAmount(),
@@ -115,7 +115,8 @@ class PaymentService implements PaymentsServiceInterface
         $response_invoice = new Invoice;
         $invoice = \Payments\Models\Invoice::query()->find($request->getId());
         $invoice->refresh();
-        $response_invoice->setOrderId((int)$invoice->order_id);
+        $response_invoice->setPayableId((int)$invoice->payable_id);
+        $response_invoice->setPayableType($invoice->payable_type);
         $response_invoice->setPfAmount((double)$invoice->pf_amount);
         $response_invoice->setAmount((double)$invoice->amount);
         $response_invoice->setTransactionId($invoice->transaction_id);
@@ -127,13 +128,6 @@ class PaymentService implements PaymentsServiceInterface
         if ($invoice->expiration_time)
             $response_invoice->setExpirationTime((string)Carbon::make($invoice->expiration_time)->timestamp);
         $response_invoice->setIsPaid((boolean)$invoice->is_paid);
-
-
-        $order_service = app(OrderService::class);
-        $order_id = new Services\Id();
-        $order_id->setId($response_invoice->getOrderId());
-        $order = $order_service->OrderById($order_id);
-        $response_invoice->setOrder($order);
 
         return $response_invoice;
 

@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
 use Wallets\Http\Resources\TransactionHistoryResource;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
@@ -17,6 +18,7 @@ use Wallets\Http\Resources\WalletResource;
 use Wallets\Mail\DepositWallet\ReceiverFundEmail;
 use Wallets\Mail\DepositWallet\SenderFundEmail;
 use Wallets\Services\BankService;
+use Wallets\Services\WalletService;
 
 class DepositWalletController extends Controller
 {
@@ -121,6 +123,25 @@ class DepositWalletController extends Controller
             return api()->error(trans('wallet.responses.something-went-wrong'));
         }
 
+    }
+
+    /**
+     * Deposit funds
+     * @group Public User > Deposit Wallet
+     * @param ChargeDepositWalletRequest $request
+     * @return float|int|mixed
+     */
+    public function deposit(ChargeDepositWalletRequest $request)
+    {
+        $wallet_service = app(WalletService::class);
+        $invoice = $wallet_service->invoiceWallet($request);
+        return api()->success('success', [
+            'payment_currency'=>$invoice->getPaymentCurrency(),
+            'amount' => $invoice->getAmount(),
+            'checkout_link' => $invoice->getCheckoutLink(),
+            'transaction_id' => $invoice->getTransactionId(),
+            'expiration_time' => $invoice->getExpirationTime(),
+        ]);
     }
 
     private function calculateNeededAmount($amount)

@@ -16,7 +16,9 @@ class CreateInvoicesTable extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('order_id')->nullable();
+            $table->string('payable_type')->nullable();
+            $table->string('payable_id')->nullable();
+            $table->foreignId('user_id')->constrained('users');
             $table->unsignedDouble('pf_amount')->default(0);
             $table->unsignedDouble('amount')->default(0);
 

@@ -202,6 +202,7 @@ class WalletService implements WalletServiceInterface
         $invoice_request->setPaymentDriver('btc-pay-server');
         $invoice_request->setPaymentType('purchase');
         $invoice_request->setPaymentCurrency('BTC');
+        $invoice_request->setPayableType('DepositWallet');
         $invoice_request->setUser($request->wallet_user->getUserService());
         return $this->payment_service->pay( $invoice_request);
     }

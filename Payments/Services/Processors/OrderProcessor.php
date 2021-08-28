@@ -34,7 +34,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_model, 'partial_paid');
 
         // send email notification for due amount
-        EmailJob::dispatch(new EmailInvoicePaidPartial($this->order_model->getUser(), $this->invoice_model), $this->order_model->getUser()->getEmail());
+        EmailJob::dispatch(new EmailInvoicePaidPartial($this->order_model->getUser(), $this->invoice_model,$this->order_model), $this->order_model->getUser()->getEmail());
 
 
     }
@@ -62,8 +62,7 @@ class OrderProcessor extends ProcessorAbstract
 
         //Update order
         $this->order_model->setIsPaidAt(now()->toDateTimeString());
-        @app(OrderService::class)->updateOrder($this->order_model);
-
+        app(OrderService::class)->updateOrder($this->order_model);
     }
 
     public function expired()

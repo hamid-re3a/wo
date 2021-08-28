@@ -56,13 +56,13 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
             $walletUser = $this->walletUser($deposit->getUser());
             $transaction = $deposit->getTransaction();
+
             if (
                 $transaction->getAmount() > 0 AND
                 $transaction->getToWalletName() AND
                 $transaction->getToUserId() AND
-                in_array(strtolower($transaction->getToWalletName()) ,$this->wallets)
+                in_array($transaction->getToWalletName() ,[$this->earningWallet,$this->depositWallet])
             ) {
-
                 $bankService = new BankService($walletUser);
 
                 $type = null;
@@ -79,7 +79,8 @@ class WalletService implements WalletServiceInterface
                         $description['type'] = $transactionDescription['type'];
                 }
 
-                $bankService->deposit($this->depositWallet,$transaction->getAmount(), $description ?: null);
+
+                $bankService->deposit($transaction->getToWalletName(),$transaction->getAmount(), $description ?: null);
 
                 DB::commit();
 

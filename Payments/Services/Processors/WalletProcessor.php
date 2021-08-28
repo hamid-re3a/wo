@@ -4,12 +4,13 @@
 namespace Payments\Services;
 
 
+use Payments\Services\Processors\ProcessorInterface;
 use Payments\Services\Resolves\ProcessorAbstract;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
 use Wallets\Services\WalletService;
 
-class WalletProcessor extends ProcessorAbstract
+class WalletProcessor extends ProcessorAbstract implements ProcessorInterface
 {
     private $wallet_service;
 

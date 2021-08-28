@@ -1,16 +1,16 @@
 <?php
 
 
-namespace Payments\Services;
+namespace Payments\Services\Processors;
 
 
-use Payments\Services\Processors\ProcessorInterface;
-use Payments\Services\Resolves\ProcessorAbstract;
+use Illuminate\Support\Facades\Log;
+use User\Models\User;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
 use Wallets\Services\WalletService;
 
-class WalletProcessor extends ProcessorAbstract implements ProcessorInterface
+class WalletProcessor extends ProcessorAbstract
 {
     private $wallet_service;
 
@@ -50,14 +50,17 @@ class WalletProcessor extends ProcessorAbstract implements ProcessorInterface
 
         if ($pf_paid > (double)$this->invoice_db->deposit_amount) {
             $deposit_amount = $pf_paid - ((double)$this->invoice_db->deposit_amount);
-            $preparedUser = request()->user->getUserService();
+
+            //Prepare user service
+            $user_db = User::find($this->invoice_db->user_id);
+            $preparedUser = $user_db->getUserService();
 
             //Prepare Transaction
             $transactionService = app(Transaction::class);
             $transactionService->setConfiremd(true);
             $transactionService->setAmount($deposit_amount);
             $transactionService->setToWalletName('Deposit Wallet');
-            $transactionService->setToUserId(request()->user->id);
+            $transactionService->setToUserId($user_db->id);
             $transactionService->setDescription(serialize([
                 'description' => 'Payment #' . $this->invoice_model->getTransactionId(),
                 'type' => 'Deposit'
@@ -69,7 +72,19 @@ class WalletProcessor extends ProcessorAbstract implements ProcessorInterface
             $depositService->setUser($preparedUser);
 
             //Deposit transaction
-            $this->wallet_service->deposit($depositService);
+            $transaction = $this->wallet_service->deposit($depositService);
+            if($transaction->getConfiremd()) {
+                $this->invoice_db->update([
+                    'is_paid' => true
+                ]);
+
+                // send web socket notification
+                $this->socket_service->sendInvoiceMessage($this->invoice_model, 'confirmed');
+            } else {
+                Log::error('Deposit wallet user error , InvoiceID => ' . $this->invoice_db->id);
+                //TODO email admin/dev-team email
+            }
+
 
             //TODO send deposited amount email
         }

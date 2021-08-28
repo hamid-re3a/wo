@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Payments\Services\Resolves;
+namespace Payments\Services\Processors;
 
 
 use Payments\Models\Invoice;

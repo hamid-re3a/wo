@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Payments\Services;
+namespace Payments\Services\Processors;
 
 
 use Orders\Services\Id;
@@ -10,10 +10,8 @@ use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
-use Payments\Services\Processors\ProcessorInterface;
-use Payments\Services\Resolves\ProcessorAbstract;
 
-class OrderProcessor extends ProcessorAbstract implements ProcessorInterface
+class OrderProcessor extends ProcessorAbstract
 {
     private $order_model;
 

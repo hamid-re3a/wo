@@ -2,6 +2,7 @@
 
 namespace Payments\Models;
 
+use GPBMetadata\User;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -61,8 +62,17 @@ class Invoice extends Model
         return $this->status .' '. $this->additional_status;
     }
 
+    /**
+     * Relations
+     */
+
     public function transactions()
     {
         return $this->hasMany(InvoiceTransaction::class,'invoice_id','id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

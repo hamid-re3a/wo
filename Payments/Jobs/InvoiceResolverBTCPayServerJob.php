@@ -12,10 +12,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Payments\Models\Invoice;
-use Payments\Services\OrderProcessor;
-use Payments\Services\Resolves\ProcessorAbstract;
-use Payments\Services\Socket;
-use Payments\Services\WalletProcessor;
+use Payments\Services\Processors\OrderProcessor;
+use Payments\Services\Processors\ProcessorAbstract;
+use Payments\Services\Processors\WalletProcessor;
 
 class InvoiceResolverBTCPayServerJob implements ShouldQueue
 {
@@ -50,7 +49,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     config('payment.btc-pay-server-store-id') . '/invoices/' . $this->invoice_db->transaction_id . '/payment-methods'
                 );
 
-            if ( $response->ok() && $payment_response->ok() ) {
+            if ($response->ok() && $payment_response->ok()) {
                 $amount_paid = $payment_response->json()[0]['totalPaid'];
                 $amount_due = $payment_response->json()[0]['due'];
                 $this->recordTransactions($payment_response->json()[0]['payments']);
@@ -79,6 +78,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             //TODO send admin AND dev-team notification
             Log::error('InvoiceResolverBTCPayServerJob error for InvoiceID => ' . $this->invoice_db->id);
             Log::error('InvoiceResolverBTCPayServerJob Exception => ' . $e->getMessage() . ' - Line => ' . $e->getLine() . '\n Trace String => ' . $e->getTraceAsString());
+            throw $e;
         }
 
     }
@@ -116,13 +116,15 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Invalid Marked':
             case 'Invalid PaidOver':
                 // send admin email notification
-
                 $processor->invalid();
                 break;
 
                 // send admin email notification and complete user request
                 break;
 
+            case 'New None':
+                //
+                break;
             default:
                 throw new \Exception('BTCPayServerError');
                 break;

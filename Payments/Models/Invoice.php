@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * Payments\Models\Invoice
  *
  * @property int $id
- * @property int|null $order_id
+ * @property int $payable_id
+ * @property string $payable_type
  * @property int $amount
  * @property string|null $transaction_id
  * @property string|null $checkout_link
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaidAmount($value)
  * @property int $is_paid
  * @property float $due_amount
+ * @property float $deposit_amount
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDueAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereIsPaid($value)
  * @property string|null $expiration_time

@@ -25,6 +25,7 @@ class OrderService implements OrdersServiceInterface
     {
         $response = new Order();
         $order = \Orders\Models\Order::query()->find($request->getId());
+        $response->setId($order->id);
         $response->setUserId((int)$order->user_id);
         $response->setToUserId((int)$order->to_user_id);
         $response->setTotalCostInUsd((double)$order->total_cost_in_usd);

@@ -94,9 +94,7 @@ class OrderService implements OrdersServiceInterface
             'payment_driver' => !empty($order->getPaymentDriver()) ? $order->getPaymentDriver() : $order_db->payment_driver,
             'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
         ]);
-        $order_id = new Id();
-        $order_id->setId($order->getId());
-        $order = $this->OrderById($order_id);
+
         return $order;
 
     }

@@ -74,6 +74,43 @@ class DepositWalletController extends Controller
     }
 
     /**
+     * Transfer funds preview
+     * @group Public User > Deposit Wallet
+     * @param TransferFundFromDepositWallet $request
+     * @return JsonResponse
+     */
+    public function transferPreview(TransferFundFromDepositWallet $request)
+    {
+        $this->prepareDepositWallet(); //Prepare logged in user wallet
+
+        try {
+            //Check logged in user balance for transfer
+            $balance = $this->bankService->getBalance($this->wallet);
+            if ($balance < $this->calculateNeededAmount($request->get('amount')))
+                return api()->error(trans('wallet.responses.not-enough-balance'), null, 406);
+
+
+            $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
+            list($total, $fee) = $this->calculateTransferFee($request->get('amount'));
+
+            $remain_balance = $balance - $total;
+
+            return api()->success(null, [
+                'receiver_member_id' => $to_user->member_id,
+                'receiver_full_name' => $to_user->full_name,
+                'received_amount' => (float) $request->get('amount'),
+                'transfer_fee' => (float) $fee,
+                'current_balance' => (float) number_format($balance,2),
+                'balance_after_transfer' => (float) number_format($remain_balance,2)
+            ]);
+
+        } catch (\Throwable $exception) {
+            Log::error('Transfer funds error .' . $exception->getMessage());
+            return api()->error(trans('wallet.responses.something-went-wrong'));
+        }
+    }
+
+    /**
      * Transfer Funds
      * @group Public User > Deposit Wallet
      * @param TransferFundFromDepositWallet $request
@@ -165,7 +202,7 @@ class DepositWalletController extends Controller
 
         if (empty($fix_fee) OR $fix_fee <= 0)
             $fix_fee = 10;
-
-        return [$amount + $fix_fee, $fix_fee];
+        $total = $amount + $fix_fee;
+        return [$total, $fix_fee];
     }
 }

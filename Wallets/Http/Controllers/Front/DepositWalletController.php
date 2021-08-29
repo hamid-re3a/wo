@@ -98,10 +98,10 @@ class DepositWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
-                'received_amount' => (float) $request->get('amount'),
-                'transfer_fee' => (float) $fee,
-                'current_balance' => (float) number_format($balance,2),
-                'balance_after_transfer' => (float) number_format($remain_balance,2)
+                'received_amount' => (float) walletPfAmount($request->get('amount')),
+                'transfer_fee' => (float) walletPfAmount($fee),
+                'current_balance' => (float) walletPfAmount($balance),
+                'balance_after_transfer' => (float) walletPfAmount($remain_balance)
             ]);
 
         } catch (\Throwable $exception) {

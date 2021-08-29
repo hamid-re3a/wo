@@ -65,7 +65,7 @@ class WalletProcessor extends ProcessorAbstract
             //Prepare Transaction
             $transactionService = app(Transaction::class);
             $transactionService->setConfiremd(true);
-            $transactionService->setAmount($deposit_amount);
+            $transactionService->setAmount($this->invoice_model->getPfAmount());
             $transactionService->setToWalletName('Deposit Wallet');
             $transactionService->setToUserId($this->user_db->id);
             $transactionService->setType('Deposit');

@@ -56,3 +56,12 @@ if (!function_exists('walletPfAmount')) {
         return $value;
     }
 }
+
+
+if (!function_exists('walletConvertAmountToDecimal')) {
+
+    function walletConvertAmountToDecimal($value)
+    {
+        return $value * 100;
+    }
+}

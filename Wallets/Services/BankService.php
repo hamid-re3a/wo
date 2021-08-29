@@ -37,7 +37,7 @@ class BankService
     {
         $data = [
             'wallet_before_balance' => $this->getBalance($wallet_name),
-            'wallet_after_balance' => $this->getBalance($wallet_name) + walletConvertAmountToDecimal($amount),
+            'wallet_after_balance' => $this->getBalance($wallet_name) + $amount,
             'type' => $type
         ];
 
@@ -52,7 +52,7 @@ class BankService
 
         $data = [
             'wallet_before_balance' => $this->getBalance($wallet_name),
-            'wallet_after_balance' => $this->getBalance($wallet_name) - walletConvertAmountToDecimal($amount),
+            'wallet_after_balance' => $this->getBalance($wallet_name) - $amount,
             'type' => $type
         ];
         $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description));
@@ -75,14 +75,14 @@ class BankService
             $to_wallet = $this->getWallet($to_wallet);
 
         $withdrawMeta = [
-            'wallet_before_balance' => $from_wallet->balance,
-            'wallet_after_balance' => $from_wallet->balance - walletConvertAmountToDecimal($amount),
+            'wallet_before_balance' => $from_wallet->balanceFloat,
+            'wallet_after_balance' => $from_wallet->balanceFloat - $amount,
             'type' => 'Transfer'
         ];
 
         $depositMeta = [
-            'wallet_before_balance' => $to_wallet->balance,
-            'wallet_after_balance' => $to_wallet->balance + walletConvertAmountToDecimal($amount),
+            'wallet_before_balance' => $to_wallet->balanceFloat,
+            'wallet_after_balance' => $to_wallet->balanceFloat + $amount,
             'type' => 'Transfer'
         ];
 

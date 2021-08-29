@@ -95,12 +95,14 @@ class DepositWalletController extends Controller
         try {
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->wallet);
-            if ($balance < $this->calculateNeededAmount($request->get('amount')))
+            list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
+
+            if ($balance < $amount)
                 return api()->error(null, null, 406,trans('wallet.responses.not-enough-balance'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
-            list($total, $fee) = $this->calculateTransferFee($request->get('amount'));
+            list($total, $fee) = $this->calculateTransferAmount($request->get('amount'));
 
             $remain_balance = $balance - $total;
 
@@ -135,13 +137,14 @@ class DepositWalletController extends Controller
             DB::beginTransaction();
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->wallet);
-            if ($balance < $this->calculateNeededAmount($request->get('amount')))
+            list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
+
+            if ($balance < $amount)
                 return api()->error(null, null,406, trans('wallet.responses.not-enough-balance'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
             $receiver_bank_service = new BankService($to_user);
-            list($amount, $fee) = $this->calculateTransferFee($request->get('amount'));
 
 
             $transfer = $this->bankService->transfer(
@@ -192,17 +195,7 @@ class DepositWalletController extends Controller
         ]);
     }
 
-    private function calculateNeededAmount($amount)
-    {
-        $percentage_fee = walletGetSetting('percentage_transfer_fee');
-        $fix_fee = walletGetSetting('fix_transfer_fee');
-        if (!empty($percentage_fee) AND $percentage_fee > 0)
-            return $amount + ($amount * $percentage_fee / 100);
-
-        return $amount + $fix_fee;
-    }
-
-    private function calculateTransferFee($amount)
+    private function calculateTransferAmount($amount)
     {
         $percentage_fee = walletGetSetting('percentage_transfer_fee');
         $fix_fee = walletGetSetting('fix_transfer_fee');

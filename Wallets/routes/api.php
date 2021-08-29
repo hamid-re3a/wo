@@ -22,7 +22,8 @@ Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
         Route::get('transfers', [DepositWalletController::class, 'transfers'])->name('transfers');
         Route::post('transfer-preview', [DepositWalletController::class, 'transferPreview'])->name('transfer-fund-preview');
         Route::post('transfer-funds', [DepositWalletController::class, 'transferFunds'])->name('transfer-fund');
-        Route::post('payment-request', [DepositWalletController::class, 'deposit'])->name('payment-request  ');
+        Route::post('deposit', [DepositWalletController::class, 'deposit'])->name('deposit');
+        Route::post('payment-request', [DepositWalletController::class, 'deposit'])->name('payment-request');
     });
 
     Route::name('earning.')->prefix('earning')->group(function () {

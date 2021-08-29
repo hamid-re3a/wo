@@ -5,6 +5,10 @@ namespace Payments\Services\Processors;
 
 
 use Illuminate\Support\Facades\Log;
+use Payments\Jobs\EmailJob;
+use Payments\Mail\Payment\Wallet\EmailWalletInvoiceExpired;
+use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidComplete;
+use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidPartial;
 use User\Models\User;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
@@ -13,6 +17,7 @@ use Wallets\Services\WalletService;
 class WalletProcessor extends ProcessorAbstract
 {
     private $wallet_service;
+    private $user_db;
 
     public function __construct(\Payments\Models\Invoice $invoice_db)
     {
@@ -20,6 +25,8 @@ class WalletProcessor extends ProcessorAbstract
         parent::__construct($invoice_db);
 
         $this->wallet_service = app(WalletService::class);
+
+        $this->user_db = User::find($invoice_db->user_id);
 
     }
 
@@ -29,7 +36,8 @@ class WalletProcessor extends ProcessorAbstract
         //send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_model, 'partial_paid');
 
-        //TODO send email notification for due amount
+        //send user email
+        EmailJob::dispatch(new EmailWalletInvoicePaidPartial($this->user_db, $this->invoice_model), $this->user_db->email);
 
     }
 
@@ -52,18 +60,17 @@ class WalletProcessor extends ProcessorAbstract
             $deposit_amount = $pf_paid - ((double)$this->invoice_db->deposit_amount);
 
             //Prepare user service
-            $user_db = User::find($this->invoice_db->user_id);
-            $preparedUser = $user_db->getUserService();
+            $preparedUser = $this->user_db->getUserService();
 
             //Prepare Transaction
             $transactionService = app(Transaction::class);
             $transactionService->setConfiremd(true);
             $transactionService->setAmount($deposit_amount);
             $transactionService->setToWalletName('Deposit Wallet');
-            $transactionService->setToUserId($user_db->id);
+            $transactionService->setToUserId($this->user_db->id);
+            $transactionService->setType('Deposit');
             $transactionService->setDescription(serialize([
-                'description' => 'Payment #' . $this->invoice_model->getTransactionId(),
-                'type' => 'Deposit'
+                'description' => 'Payment #' . $this->invoice_model->getTransactionId()
             ]));
 
             //Deposit Service
@@ -86,7 +93,8 @@ class WalletProcessor extends ProcessorAbstract
             }
 
 
-            //TODO send deposited amount email
+            // send user email
+            EmailJob::dispatch(new EmailWalletInvoicePaidComplete($this->user_db, $this->invoice_model),$this->user_db->email);
         }
 
     }
@@ -97,7 +105,8 @@ class WalletProcessor extends ProcessorAbstract
         // send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_model, 'expired');
 
-        //TODO send expired email
+        // send user email
+        EmailJob::dispatch(new EmailWalletInvoiceExpired($this->user_db, $this->invoice_model), $this->user_db->email);
 
     }
 

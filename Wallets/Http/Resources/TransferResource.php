@@ -19,7 +19,7 @@ class TransferResource extends JsonResource
             $fee = $this->withdraw->meta['fee'];
 
         return [
-            'id' => $this->uuid,
+            'id' => $this->member_id,
             'to_member_id' => $this->deposit->payable->member_id,
             'from' => [
                 'transaction_id' => $this->deposit->uuid,
@@ -31,8 +31,8 @@ class TransferResource extends JsonResource
                 'wallet' => $this->to->name,
                 'confirmed' => $this->withdraw->confirmed
             ],
-            'amount' => (float) number_format($this->deposit->amountFloat,2),
-            'fee' =>  (float) number_format($fee,2),
+            'amount' => (float) walletPfAmount($this->deposit->amountFloat),
+            'fee' =>  (float) walletPfAmount($fee),
             'created_at' => $this->created_at->timestamp
         ];
     }

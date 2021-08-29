@@ -52,8 +52,7 @@ class DepositWalletController extends Controller
     {
 
         $this->prepareDepositWallet();
-        $data = $this->bankService->getTransactions($this->wallet)->select('*')
-            ->selectRaw('( SELECT IFNULL(SUM(amount), 0) FROM transactions t2 WHERE t2.confirmed=1 AND t2.wallet_id=transactions.wallet_id AND t2.id <= transactions.id ) new_balance')
+        $data = $this->bankService->getTransactions($this->wallet)
             ->simplePaginate();
         return api()->success(null, TransactionResource::collection($data)->response()->getData());
 
@@ -74,6 +73,16 @@ class DepositWalletController extends Controller
     }
 
     /**
+     * Payment request
+     * @group Public User > Deposit Wallet
+     * @return JsonResponse
+     */
+    public function paymentRequest()
+    {
+
+    }
+
+    /**
      * Transfer funds preview
      * @group Public User > Deposit Wallet
      * @param TransferFundFromDepositWallet $request
@@ -87,7 +96,7 @@ class DepositWalletController extends Controller
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->wallet);
             if ($balance < $this->calculateNeededAmount($request->get('amount')))
-                return api()->error(trans('wallet.responses.not-enough-balance'), null, 406);
+                return api()->error(null, null, 406,trans('wallet.responses.not-enough-balance'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -95,13 +104,14 @@ class DepositWalletController extends Controller
 
             $remain_balance = $balance - $total;
 
+
             return api()->success(null, [
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
-                'received_amount' => (float) $request->get('amount'),
-                'transfer_fee' => (float) $fee,
-                'current_balance' => (float) number_format($balance,2),
-                'balance_after_transfer' => (float) number_format($remain_balance,2)
+                'received_amount' => walletPfAmount($request->get('amount')),
+                'transfer_fee' =>  walletPfAmount($fee),
+                'current_balance' =>  walletPfAmount($balance),
+                'balance_after_transfer' =>  walletPfAmount($remain_balance)
             ]);
 
         } catch (\Throwable $exception) {
@@ -117,7 +127,7 @@ class DepositWalletController extends Controller
      * @return JsonResponse
      * @throws \Throwable
      */
-    public function transfer(TransferFundFromDepositWallet $request)
+    public function transferFunds(TransferFundFromDepositWallet $request)
     {
         $this->prepareDepositWallet(); //Prepare logged in user wallet
 
@@ -126,7 +136,7 @@ class DepositWalletController extends Controller
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->wallet);
             if ($balance < $this->calculateNeededAmount($request->get('amount')))
-                return api()->error(trans('wallet.responses.not-enough-balance'), null, 406);
+                return api()->error(null, null,406, trans('wallet.responses.not-enough-balance'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -140,13 +150,14 @@ class DepositWalletController extends Controller
                 $request->get('amount'),
                 [
                     'member_id' => $request->get('member_id'),
-                    'fee' => $fee
+                    'fee' => $fee,
+                    'type' => 'Transfer'
                 ]
             );
 
-            $this->bankService->withdraw($this->wallet, $fee, [
-                'type' => 'Transfer fee'
-            ]);
+            $this->bankService->withdraw($this->wallet, $fee,[
+                'transfer_id' => $transfer->id
+            ],'Transfer fee');
 
             UrgentEmailJob::dispatch(new SenderFundEmail(request()->wallet_user, $transfer), request()->wallet_user->email);
             UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user, $transfer), $to_user->email);

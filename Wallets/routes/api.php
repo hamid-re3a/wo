@@ -8,6 +8,7 @@ use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
 use Wallets\Http\Controllers\Front\WalletController;
 use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
+use Wallets\Services\BankService;
 
 Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
     Route::get('', [WalletController::class, 'index'])->name('index');
@@ -17,10 +18,11 @@ Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
     Route::name('deposit.')->prefix('deposit')->group(function () {
         Route::get('',[DepositWalletController::class, 'index'])->name('get-wallet');
         Route::get('transactions', [DepositWalletController::class, 'transactions'])->name('transactions');
-        Route::post('transfer-preview', [DepositWalletController::class, 'transferPreview'])->name('transfer-fund-preview');
         Route::post('transfer', [DepositWalletController::class, 'transfer'])->name('transfer-fund');
         Route::get('transfers', [DepositWalletController::class, 'transfers'])->name('transfers');
-        Route::post('add-funds', [DepositWalletController::class, 'deposit'])->name('deposit');
+        Route::post('transfer-preview', [DepositWalletController::class, 'transferPreview'])->name('transfer-fund-preview');
+        Route::post('transfer-funds', [DepositWalletController::class, 'transferFunds'])->name('transfer-fund');
+        Route::post('payment-request', [DepositWalletController::class, 'deposit'])->name('payment-request  ');
     });
 
     Route::name('earning.')->prefix('earning')->group(function () {
@@ -51,3 +53,4 @@ Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
         });
     });
 });
+

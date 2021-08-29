@@ -180,6 +180,111 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
         'variables_description'=>'full_name user full name',
         'type'=>'email',
     ],
+
+
+    'WALLET_INVOICE_PARTIAL_PAID_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Deposit fund partial paid',
+        'from' => 'support@janex.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>We noticed that you paid the invoice partially. Please pay the due amount {{amount_in_usd}} ≈ {{due_amount}} on time.</p>
+                <p>This invoice will be expire at {{expiry_date}}</p>
+                <p></p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,due_amount,amount_in_usd,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+    'WALLET_INVOICE_COMPLETE_PAID_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit fund payment received',
+        'from'=>'support@janex.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hi {{full_name}}</p>
+                <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
+                <p>Your deposit wallet will automatically charge.</p>
+                <p></p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+
+
+    'WALLET_INVOICE_EXPIRED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit fund invoice expired',
+        'from'=>'support@janex.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>The invoice #{{invoice_no}} for {{usd_amount}} was due at {{expiry_date}}. But we don't have any record of payment</p>
+                <p>We appreciate if you can create a new invoice and set on time</p>
+                <p></p>
+                <p>Cheers!</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,invoice_no,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+
+
+    'WALLET_INVOICE_CRATED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit fund new invoice',
+        'from'=>'support@janex.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
+                <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <p>&nbsp;</p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+
+
+    'WALLET_INVOICE_CREATED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit funds new invoice',
+        'from'=>'support@janex.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
+                <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <p>&nbsp;</p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
 ];
 if (!function_exists('getSetting')) {
     function getSetting($key)

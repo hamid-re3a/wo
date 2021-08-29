@@ -44,3 +44,15 @@ if(!function_exists('walletGetEmailContent')) {
     }
 
 }
+
+
+if (!function_exists('walletPfAmount')) {
+
+    function walletPfAmount($value)
+    {
+        if(is_numeric($value))
+            return number_format($value,2);
+
+        return $value;
+    }
+}

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
+use Payments\Mail\Payment\Wallet\EmailWalletInvoiceCreated;
 use Payments\Repository\PaymentCurrencyRepository;
 use Payments\Repository\PaymentDriverRepository;
 use Payments\Repository\PaymentTypesRepository;
@@ -81,7 +82,11 @@ class PaymentService implements PaymentsServiceInterface
             $invoice_request->setAdditionalStatus($response->json()['additionalStatus']);
             $invoice_request->setExpirationTime($response->json()['expirationTime']);
 
-            EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
+            if($invoice_request->getPayableType() == 'Order')
+                EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
+
+            if($invoice_request->getPayableType() == 'DepositWallet')
+                EmailJob::dispatch(new EmailWalletInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
 
             \Payments\Models\Invoice::query()->create([
                 'user_id' => $invoice_request->getUser()->getId(),

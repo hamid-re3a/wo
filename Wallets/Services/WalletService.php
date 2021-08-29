@@ -65,22 +65,7 @@ class WalletService implements WalletServiceInterface
             ) {
                 $bankService = new BankService($walletUser);
 
-                $type = null;
-                $description = $transactionDescription = @unserialize($transaction->getDescription());
-
-                if ($transaction->getDescription() === 'b:0;' || $description === false) {
-                    $description = $transaction->getDescription();
-                }
-
-                if(is_array($transactionDescription)) {
-                    if(array_key_exists('description', $transactionDescription))
-                        $description['description'] = $transactionDescription['description'];
-                    if(array_key_exists('type',$transactionDescription))
-                        $description['type'] = $transactionDescription['type'];
-                }
-
-
-                $bankService->deposit($transaction->getToWalletName(),$transaction->getAmount(), $description ?: null);
+                $bankService->deposit($transaction->getToWalletName(),$transaction->getAmount(), $transaction->getDescription() ?: null, $transaction->getType());
 
                 DB::commit();
 
@@ -107,21 +92,12 @@ class WalletService implements WalletServiceInterface
                 $transaction->getAmount() > 0 AND
                 $transaction->getFromWalletName() AND
                 $transaction->getFromUserId() AND
+                $transaction->getType() AND
                 in_array($transaction->getFromWalletName() ,[$this->depositWallet,$this->earningWallet])
             ) {
                 $bankService = new BankService($walletUser);
 
-                $type = null;
-                $description = $transactionDescription = unserialize($transaction->getDescription());
-
-                if(is_array($transactionDescription)) {
-                    if(array_key_exists('description', $transactionDescription))
-                        $description['description'] = $transactionDescription['description'];
-                    if(array_key_exists('type',$transactionDescription))
-                        $description['type'] = $transactionDescription['type'];
-                }
-
-                $bankService->withdraw($transaction->getFromWalletName(),$transaction->getAmount(), $description ?: null);
+                $bankService->withdraw($transaction->getFromWalletName(),$transaction->getAmount(), $transaction->getDescription() ?: null,$transaction->getType());
 
                 DB::commit();
 

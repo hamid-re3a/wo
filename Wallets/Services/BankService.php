@@ -36,22 +36,40 @@ class BankService
         return $this->owner->wallets()->get();
     }
 
-    public function deposit($wallet_name, $amount, $meta = null, $confirmed = true)
+    public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit')
     {
-        return $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($meta,'Deposit'), $confirmed);
+        $data = [
+            'wallet_before_balance' => $this->getBalance($wallet_name),
+            'wallet_after_balance' => $this->getBalance($wallet_name) + $amount,
+            'type' => $type
+        ];
+
+        $transaction = $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($description), $confirmed);
+        $transaction->syncMetaData($data);
+
+        return $transaction;
     }
 
-    public function withdraw($wallet_name,$amount, $meta = null)
+    public function withdraw($wallet_name,$amount, $description = null, $type = 'Withdraw')
     {
-        return $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($meta,'Withdraw'));
+
+        $data = [
+            'wallet_before_balance' => $this->getBalance($wallet_name),
+            'wallet_after_balance' => $this->getBalance($wallet_name) - $amount,
+            'type' => $type
+        ];
+        $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description));
+        $transaction->syncMetaData($data);
+
+        return $transaction;
     }
 
-    public function forceWithdraw($wallet_name,$amount, $meta = null)
+    public function forceWithdraw($wallet_name,$amount, $description = null)
     {
-        return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($meta,'Withdraw'));
+        return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($description));
     }
 
-    public function transfer($from_wallet , $to_wallet, $amount, $meta = null)
+    public function transfer($from_wallet , $to_wallet, $amount, $description = null)
     {
         if(!$from_wallet instanceof WalletFloat)
             $from_wallet = $this->getWallet($from_wallet);
@@ -59,8 +77,22 @@ class BankService
         if(!$to_wallet instanceof WalletFloat)
             $to_wallet = $this->getWallet($to_wallet);
 
+        $withdrawMeta = [
+            'wallet_before_balance' => $from_wallet->balance,
+            'wallet_after_balance' => $from_wallet->balance - $amount,
+            'type' => 'Transfer'
+        ];
 
-        return $from_wallet->transferFloat($to_wallet, $amount, $this->createMeta($meta,'Transfer'));
+        $depositMeta = [
+            'wallet_before_balance' => $to_wallet->balance,
+            'wallet_after_balance' => $to_wallet->balance + $amount,
+            'type' => 'Transfer'
+        ];
+
+        $transfer = $from_wallet->transferFloat($to_wallet, $amount, $this->createMeta($description));
+        $transfer->withdraw->syncMetaData($withdrawMeta);
+        $transfer->deposit->syncMetaData($depositMeta);
+        return $transfer;
     }
 
     public function getBalance($wallet_name)
@@ -80,6 +112,7 @@ class BankService
         $transactionQuery = $this->owner->transactions()->whereHas('wallet', function($query) use($wallet_name){
             $query->where('name', $wallet_name);
         });
+
         if(request()->has('transaction_id'))
             $transactionQuery->where('uuid', request()->get('transaction_id'));
 
@@ -106,6 +139,7 @@ class BankService
                 $transactionQuery->where('meta->description', 'LIKE', "%{$word}%");
         }
 
+
         return $transactionQuery;
     }
 
@@ -114,23 +148,14 @@ class BankService
         return $this->getWallet($wallet_name)->transfers();
     }
 
-    private function createMeta($meta,$type)
+    private function createMeta($meta)
     {
-        if(!empty($meta)) {
-            if (is_string($meta))
-                $meta = [
-                    'description' => $meta,
-                    'type' => $type
-                ];
-            else
-                if(!array_key_exists('type', $meta))
-                    $meta['type'] = $type;
-        }
-        else
-            $meta = [
-                'type' => $type
-            ];
-        return $meta;
+        if(is_array($meta))
+            return $meta;
+
+        return [
+            'description' => $meta
+        ];
     }
 
 

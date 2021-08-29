@@ -216,10 +216,8 @@ class GiftcodeController extends Controller
         $transactionService->setAmount($giftcode->total_cost_in_usd);
         $transactionService->setFromWalletName(request()->get('wallet'));
         $transactionService->setFromUserId(request()->user->id);
-        $transactionService->setDescription(serialize([
-            'description' => 'Giftcode #' . $giftcode->uuid,
-            'type' => 'Giftcode'
-        ]));
+        $transactionService->setType('Giftcode');
+        $transactionService->setDescription('Create Giftcode #' . $giftcode->uuid);
 
         //Prepare Withdraw Service
         $withdrawService = app(Withdraw::class);
@@ -240,10 +238,8 @@ class GiftcodeController extends Controller
         $transactionService->setAmount($giftcode->getRefundAmount());
         $transactionService->setToWalletName('Deposit Wallet');
         $transactionService->setToUserId(request()->user->id);
-        $transactionService->setDescription(serialize([
-            'description' => 'Refund Giftcode #' . $giftcode->uuid,
-            'type' => 'Giftcode'
-        ]));
+        $transactionService->setType('Giftcode');
+        $transactionService->setDescription('Refund Giftcode #' . $giftcode->uuid);
 
         //Prepare Deposit Service
         $depositService = app(Deposit::class);

@@ -67,10 +67,10 @@ class WalletProcessor extends ProcessorAbstract
             $transactionService->setConfiremd(true);
             $transactionService->setAmount($deposit_amount);
             $transactionService->setToWalletName('Deposit Wallet');
-            $transactionService->setToUserId($user_db->id);
+            $transactionService->setToUserId($this->user_db->id);
+            $transactionService->setType('Deposit');
             $transactionService->setDescription(serialize([
-                'description' => 'Payment #' . $this->invoice_model->getTransactionId(),
-                'type' => 'Deposit'
+                'description' => 'Payment #' . $this->invoice_model->getTransactionId()
             ]));
 
             //Deposit Service

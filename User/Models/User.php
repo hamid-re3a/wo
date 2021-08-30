@@ -21,6 +21,11 @@ use Wallets\Models\Transaction;
  * @property string|null $last_name
  * @property string|null $username
  * @property string|null $email
+ * @property string|null $block_type
+ * @property boolean|null $is_freeze
+ * @property boolean|null $is_deactivate
+ * @property integer|null $member_id
+ * @property integer|null $sponsor_id
  * @property string|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -48,6 +53,11 @@ class User extends Model implements WalletFloat
         "last_name",
         "email",
         "username",
+        'member_id',
+        'sponsor_id',
+        'is_deactivate',
+        'is_freeze',
+        'block_type',
     ];
 
     Protected $guard_name ='api';

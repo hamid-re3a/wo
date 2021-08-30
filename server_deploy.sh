@@ -10,6 +10,7 @@ rm -rf Orders/
 rm -rf Wallets/
 rm -rf payments/
 rm -rf routes/
+rm -rf Giftcode/
 #git clone git@github.com:Ride-To-The-Future/subscriptions.git
 #cp -r subscriptions/* .
 #rm -rf subscriptions/

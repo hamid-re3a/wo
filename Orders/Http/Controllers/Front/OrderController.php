@@ -67,7 +67,6 @@ class OrderController extends Controller
     public function newOrder(OrderRequest $request)
     {
         $this->validatePackage($request);
-
         $order_db = Order::query()->create([
             "user_id" => user($request->header('X-user-id'))->getId(),
             "payment_type" => $request->payment_type,
@@ -75,7 +74,6 @@ class OrderController extends Controller
             "payment_driver" => $request->payment_driver,
             "package_id" => $request->package_id
         ]);
-
         $order_db->refreshOrder();
 
         $invoice_request = new Invoice();
@@ -85,7 +83,6 @@ class OrderController extends Controller
         $invoice_request->setPaymentDriver($order_db->payment_driver);
         $invoice_request->setPaymentType($order_db->payment_type);
         $invoice_request->setPaymentCurrency($order_db->payment_currency);
-
         $invoice_request->setUser($request->user->getUserService());
 
         $invoice = $this->payment_service->pay($invoice_request);

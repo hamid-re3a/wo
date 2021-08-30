@@ -75,6 +75,6 @@ class PaymentCurrencyController extends Controller
     }
 
     public function tt(){
-        dd($this->payment_service->getPaymentCurrencies( new EmptyObject()));
+//        dd($this->payment_service->getPaymentCurrencies( new EmptyObject()));
     }
 }

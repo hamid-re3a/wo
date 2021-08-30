@@ -6,3 +6,6 @@ Payment Feature (Payments\tests\Feature\PaymentFeature)
  [x] Submit order with email
  [x] Get payment currencies
 
+Consume Data User Update (User\tests\Feature\ConsumeDataUserUpdate)
+ [x] Update exist user consume change rabbit
+

@@ -16,7 +16,7 @@ class User
         }
         $pool->internalAddGeneratedFile(
             '
-‡
+ù
 
 user.protouser.services"∫
 User
@@ -34,7 +34,14 @@ sponsor_id (
 block_type (	
 	is_freeze	 (
 is_deactivate
- (bproto3'
+ (";
+
+UserUpdate
+
+id (
+to_id (
+
+queue_name (	bproto3'
         , true);
 
         static::$is_initialized = true;

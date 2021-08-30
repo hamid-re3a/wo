@@ -11,6 +11,7 @@ use Packages\PackageConfigure;
 use Payments\PaymentConfigure;
 use Tests\CreatesApplication;
 use Tests\TestCase;
+use User\UserConfigure;
 
 class PaymentTest extends TestCase
 {
@@ -21,6 +22,7 @@ class PaymentTest extends TestCase
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
+        UserConfigure::seed();
         PackageConfigure::seed();
         PaymentConfigure::seed();
         $this->app->setLocale('en');

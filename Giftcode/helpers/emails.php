@@ -4,7 +4,7 @@ CONST EMAIL_CONTENTS = [
     'GIFT_CODE_CREATED' => [
         'is_active' => true,
         'subject'=>'Gift code created',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -26,7 +26,7 @@ CONST EMAIL_CONTENTS = [
     'GIFT_CODE_CANCELED' => [
         'is_active' => true,
         'subject'=>'Gift code canceled',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -46,7 +46,7 @@ CONST EMAIL_CONTENTS = [
     'GIFTCODE_REDEEMED_CREATOR_EMAIL' => [
         'is_active' => true,
         'subject'=>'Your Giftcode redeemed',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -68,7 +68,7 @@ CONST EMAIL_CONTENTS = [
     'GIFTCODE_REDEEMED_REDEEMER_EMAIL' => [
         'is_active' => true,
         'subject'=>'You redeemed a gift code',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>

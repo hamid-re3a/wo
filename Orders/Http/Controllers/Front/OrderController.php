@@ -74,8 +74,7 @@ class OrderController extends Controller
             "package_id" => $request->package_id
         ]);
 
-        $order_db->reCalculateCosts();
-        $order_db->refresh();
+        $order_db->refreshOrder();
 
 
 

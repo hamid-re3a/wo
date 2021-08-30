@@ -61,6 +61,10 @@ class Package extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string updated_at = 12;</code>
      */
     protected $updated_at = '';
+    /**
+     * Generated from protobuf field <code>repeated .packages.services.IndirectCommission IndirectCommission = 13;</code>
+     */
+    private $IndirectCommission;
 
     /**
      * Constructor.
@@ -80,6 +84,7 @@ class Package extends \Google\Protobuf\Internal\Message
      *     @type string $deleted_at
      *     @type string $created_at
      *     @type string $updated_at
+     *     @type \Packages\Services\IndirectCommission[]|\Google\Protobuf\Internal\RepeatedField $IndirectCommission
      * }
      */
     public function __construct($data = NULL) {
@@ -347,6 +352,28 @@ class Package extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->updated_at = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>repeated .packages.services.IndirectCommission IndirectCommission = 13;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getIndirectCommission()
+    {
+        return $this->IndirectCommission;
+    }
+
+    /**
+     * Generated from protobuf field <code>repeated .packages.services.IndirectCommission IndirectCommission = 13;</code>
+     * @param \Packages\Services\IndirectCommission[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setIndirectCommission($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Packages\Services\IndirectCommission::class);
+        $this->IndirectCommission = $arr;
 
         return $this;
     }

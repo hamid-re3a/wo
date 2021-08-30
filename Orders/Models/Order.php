@@ -85,6 +85,10 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    public function refreshOrder(){
+        $this->refreshOrder();
+        $this->refresh();
+    }
 
     public function reCalculateCosts()
     {
@@ -103,6 +107,7 @@ class Order extends Model
         $package_service_object = app(PackageService::class )->packageById($id);
         return $package_service_object->getPrice();
     }
+
 
     /**
      * Scopes

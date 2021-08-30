@@ -4,6 +4,7 @@
 namespace Orders\Services;
 
 
+use Packages\Services\PackageService;
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
 use User\Services\User;
@@ -81,7 +82,7 @@ class OrderService implements OrdersServiceInterface
         $order_db->update([
             'user_id' => !empty($order->getUserId()) ? $order->getUserId() : $order_db->user_id,
             'to_user_id' => !empty($order->getToUserId()) ? $order->getToUserId() : $order_db->to_user_id,
-            'packageId' => !empty($order->getPackageId()) ? $order->getPackageId() : $order_db->package_id,
+            'package_id' => !empty($order->getPackageId()) ? $order->getPackageId() : $order_db->package_id,
             'total_cost_in_usd' => !empty($order->getTotalCostInUsd()) ? $order->getTotalCostInUsd() : $order_db->total_cost_in_usd,
             'packages_cost_in_usd' => !empty($order->getPackagesCostInUsd()) ? $order->getPackagesCostInUsd() : $order_db->packages_cost_in_usd,
             'registration_fee_in_usd' => !empty($order->getRegistrationFeeInUsd()) ? $order->getRegistrationFeeInUsd() : $order_db->registration_fee_in_usd,
@@ -95,6 +96,29 @@ class OrderService implements OrdersServiceInterface
             'payment_driver' => !empty($order->getPaymentDriver()) ? $order->getPaymentDriver() : $order_db->payment_driver,
             'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
         ]);
+        return $order;
+    }
 
+
+    public function startOrder(Order $order): Order
+    {
+        $order_db = \Orders\Models\Order::query()->find($order->getId());
+        $id = new \Packages\Services\Id;
+        $id->setId($order_db->package_id);
+        $package_model = app(PackageService::class)->packageById($id);
+        if ($order->getPlan() == ORDER_PLAN_UPGRADE) {
+            $order_db->update([
+                'is_paid_at' => now(),
+            ]);
+        } else
+            $order_db->update([
+                'is_paid_at' => now(),
+                'is_expired_at' => now()->addDays($package_model->getValidityInDays()),
+            ]);
+
+        $order->setIsPaidAt($order_db->is_paid_at);
+        $order->setIsExpiredAt($order_db->is_expired_at);
+
+        return $order;
     }
 }

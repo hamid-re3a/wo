@@ -16,7 +16,6 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use Payments\Services\PaymentService;
-use User\Services\User;
 use Wallets\Services\Deposit;
 use Wallets\Services\WalletService;
 
@@ -133,9 +132,9 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 EmailJob::dispatch(new EmailInvoicePaidComplete($order_model->getUser(), $invoice_model), $order_model->getUser()->getEmail());
                 $this->invoice_db->is_paid = true;
                 $this->invoice_db->save();
-                $order_model->setIsPaidAt(now()->toString());
+
                 $order_model->setId($this->invoice_db->order_id);
-                app(OrderService::class)->updateOrder($order_model);
+                app(OrderService::class)->startOrder($order_model);
                 // send web socket notification
                 Http::post('http://0.0.0.0:2121/socket', [
                     "uid" => $invoice_model->getTransactionId(),
@@ -193,7 +192,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     private function recordTransactions($transactions)
     {
-        try{
+        try {
             $db_transactions = [];
             if (is_array($transactions)) {
                 foreach ($transactions AS $transaction) {
@@ -208,7 +207,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                         array_key_exists('destination', $transaction) AND !empty($transaction['destination'])
                     ) {
                         $this->invoice_db->transactions()->updateOrCreate(
-                            [ 'hash' => $transaction['id'] ],
+                            ['hash' => $transaction['id']],
                             [
                                 'received_date' => date("Y-m-d H:m:s", $transaction['receivedDate']),
                                 'value' => $transaction['value'],

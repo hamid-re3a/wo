@@ -36,6 +36,7 @@ class AuthMiddleware
                 'first_name' => $request->header('X-user-first-name'),
                 'last_name' => $request->header('X-user-last-name'),
                 'email' => $request->header('X-user-email'),
+                'username' => $request->header('X-user-username'),
                 'member_id' => $request->header('X-user-member-id'),
                 'sponsor_id' => $request->header('X-user-sponsor-id'),
                 'block_type' => $request->header('X-user-block-type'),

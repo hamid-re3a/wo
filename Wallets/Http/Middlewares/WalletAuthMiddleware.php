@@ -38,10 +38,10 @@ class WalletAuthMiddleware
                 'email' => $request->header('X-user-email'),
                 'username' => $request->header('X-user-username'),
                 'member_id' => $request->header('X-user-member-id'),
-                'sponsor_id' => $request->header('X-user-sponsor-id'),
-                'block_type' => $request->header('X-user-block-type'),
-                'is_freeze' => $request->header('X-user-is-freeze'),
-                'is_deactivate' => $request->header('X-user-is-deactivate'),
+                'sponsor_id' => !empty($request->header('X-user-sponsor-id')) ? $request->header('X-user-sponsor-id') : null,
+                'block_type' => !empty($request->header('X-user-block-type')) ? $request->header('X-user-block-type') : null,
+                'is_freeze' => !empty($request->header('X-user-is-freeze')) ? $request->header('X-user-is-freeze') : null,
+                'is_deactivate' => !empty($request->header('X-user-is-deactivate')) ? $request->header('X-user-is-deactivate') : null,
             ]);
             $request->merge([
                 'wallet_user' => $user

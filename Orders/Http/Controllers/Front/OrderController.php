@@ -16,7 +16,6 @@ use Packages\Services\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Invoice;
 use Payments\Services\PaymentService;
-use User\Models\User;
 
 class OrderController extends Controller
 {
@@ -61,6 +60,9 @@ class OrderController extends Controller
      * Submit new Order
      * @group
      * Public User > Orders
+     * @param OrderRequest $request
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function newOrder(OrderRequest $request)
     {
@@ -76,17 +78,17 @@ class OrderController extends Controller
 
         $order_db->refreshOrder();
 
-
-
         $invoice_request = new Invoice();
-        $invoice_request->setOrderId((int)$order_db->id);
+        $invoice_request->setPayableId((int)$order_db->id);
+        $invoice_request->setPayableType('Order');
         $invoice_request->setPfAmount($order_db->total_cost_in_usd);
         $invoice_request->setPaymentDriver($order_db->payment_driver);
         $invoice_request->setPaymentType($order_db->payment_type);
         $invoice_request->setPaymentCurrency($order_db->payment_currency);
 
-        $invoice_request->setUser(user($request->header('X-user-id')));
-        $invoice = $this->payment_service->pay( $invoice_request);
+        $invoice_request->setUser($request->user->getUserService());
+
+        $invoice = $this->payment_service->pay($invoice_request);
 
         return api()->success('success', [
             'payment_currency'=>$invoice->getPaymentCurrency(),

@@ -2,6 +2,7 @@
 namespace User\Models;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
+use Bavix\Wallet\Models\Wallet as WalletModel;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Orders\Models\Order;
 use Spatie\Permission\Traits\HasRoles;
+use Wallets\Models\Transaction;
 
 /**
  * User\Models\User
@@ -49,10 +51,22 @@ class User extends Model implements WalletFloat
 
     Protected $guard_name ='api';
 
+    /**
+     * Mutators
+     */
 
     public function getFullNameAttribute()
     {
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
+    }
+
+    /**
+     * Relations
+     */
+
+    public function transactions()
+    {
+        return $this->morphMany(config('wallet.transaction.model', \Bavix\Wallet\Models\Transaction::class), 'payable');
     }
 
     public function giftCodes()
@@ -68,6 +82,20 @@ class User extends Model implements WalletFloat
     public function paidOrders()
     {
         return $this->hasMany(Order::class,'user_id','id')->whereNotNull('is_paid_at');
+    }
+
+    /**
+     * Methods
+     */
+    public function getUserService()
+    {
+        $user = new \User\Services\User();
+        $user->setId((int)$this->attributes['id']);
+        $user->setFirstName($this->attributes['first_name']);
+        $user->setLastName($this->attributes['last_name']);
+        $user->setUsername($this->attributes['username']);
+        $user->setEmail($this->attributes['email']);
+        return $user;
     }
 
 }

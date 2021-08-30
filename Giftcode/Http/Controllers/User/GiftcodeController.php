@@ -28,6 +28,12 @@ class GiftcodeController extends Controller
 {
 
     private $walletService;
+
+    public function __construct(WalletService $walletService)
+    {
+        $this->walletService = $walletService;
+    }
+
     /**
      * Giftcodes list
      * @group Public User > Giftcode
@@ -59,8 +65,6 @@ class GiftcodeController extends Controller
             /**
              * Start User wallet process
              */
-            $this->walletService = app(WalletService::class);
-
             //Check User Balance
             if($this->checkUserBalance($request) < $giftcode->total_cost_in_usd)
                 throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),422);
@@ -129,7 +133,6 @@ class GiftcodeController extends Controller
              * Refund Giftcode total paid - cancelation fee
              */
             //Refund giftcode pay fee
-            $this->walletService = app(WalletService::class);
             $finalTransaction = $this->depositUserWallet($giftcode);
 
             //Wallet transaction failed [Server error]
@@ -205,7 +208,7 @@ class GiftcodeController extends Controller
 
     private function withdrawUserWallet($giftcode)
     {
-        $preparedUser = prepareGiftcodeUser(request()->user);
+        $preparedUser = request()->user->getUserService();
 
         //Prepare Transaction
         $transactionService = app(Transaction::class);
@@ -213,10 +216,8 @@ class GiftcodeController extends Controller
         $transactionService->setAmount($giftcode->total_cost_in_usd);
         $transactionService->setFromWalletName(request()->get('wallet'));
         $transactionService->setFromUserId(request()->user->id);
-        $transactionService->setDescription(serialize([
-            'description' => 'Giftcode #' . $giftcode->uuid,
-            'type' => 'Giftcode'
-        ]));
+        $transactionService->setType('Giftcode');
+        $transactionService->setDescription('Create Giftcode #' . $giftcode->uuid);
 
         //Prepare Withdraw Service
         $withdrawService = app(Withdraw::class);
@@ -229,7 +230,7 @@ class GiftcodeController extends Controller
 
     private function depositUserWallet($giftcode)
     {
-        $preparedUser = prepareGiftcodeUser(request()->user);
+        $preparedUser = request()->user->getUserService();
 
         //Prepare Transaction
         $transactionService = app(Transaction::class);
@@ -237,16 +238,14 @@ class GiftcodeController extends Controller
         $transactionService->setAmount($giftcode->getRefundAmount());
         $transactionService->setToWalletName('Deposit Wallet');
         $transactionService->setToUserId(request()->user->id);
-        $transactionService->setDescription(serialize([
-            'description' => 'Refund Giftcode #' . $giftcode->uuid,
-            'type' => 'Giftcode'
-        ]));
+        $transactionService->setType('Giftcode');
+        $transactionService->setDescription('Refund Giftcode #' . $giftcode->uuid);
 
-        //Prepare Withdraw Service
+        //Prepare Deposit Service
         $depositService = app(Deposit::class);
         $depositService->setTransaction($transactionService);
         $depositService->setUser($preparedUser);
-        //Withdraw transaction
+        //Deposit transaction
         return $finalTransaction = $this->walletService->deposit($depositService);
     }
 

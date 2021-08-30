@@ -18,31 +18,35 @@ class Transaction extends \Google\Protobuf\Internal\Message
      */
     protected $id = 0;
     /**
-     * Generated from protobuf field <code>double amount = 2;</code>
+     * Generated from protobuf field <code>string type = 2;</code>
+     */
+    protected $type = '';
+    /**
+     * Generated from protobuf field <code>double amount = 3;</code>
      */
     protected $amount = 0.0;
     /**
-     * Generated from protobuf field <code>int64 from_user_id = 3;</code>
+     * Generated from protobuf field <code>int64 from_user_id = 4;</code>
      */
     protected $from_user_id = 0;
     /**
-     * Generated from protobuf field <code>int64 to_user_id = 4;</code>
+     * Generated from protobuf field <code>int64 to_user_id = 5;</code>
      */
     protected $to_user_id = 0;
     /**
-     * Generated from protobuf field <code>string description = 5;</code>
+     * Generated from protobuf field <code>string description = 6;</code>
      */
     protected $description = '';
     /**
-     * Generated from protobuf field <code>string from_wallet_name = 6;</code>
+     * Generated from protobuf field <code>string from_wallet_name = 7;</code>
      */
     protected $from_wallet_name = '';
     /**
-     * Generated from protobuf field <code>string to_wallet_name = 7;</code>
+     * Generated from protobuf field <code>string to_wallet_name = 8;</code>
      */
     protected $to_wallet_name = '';
     /**
-     * Generated from protobuf field <code>bool confiremd = 8;</code>
+     * Generated from protobuf field <code>bool confiremd = 9;</code>
      */
     protected $confiremd = false;
 
@@ -53,6 +57,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int|string $id
+     *     @type string $type
      *     @type float $amount
      *     @type int|string $from_user_id
      *     @type int|string $to_user_id
@@ -90,7 +95,29 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double amount = 2;</code>
+     * Generated from protobuf field <code>string type = 2;</code>
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Generated from protobuf field <code>string type = 2;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setType($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>double amount = 3;</code>
      * @return float
      */
     public function getAmount()
@@ -99,7 +126,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double amount = 2;</code>
+     * Generated from protobuf field <code>double amount = 3;</code>
      * @param float $var
      * @return $this
      */
@@ -112,7 +139,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 from_user_id = 3;</code>
+     * Generated from protobuf field <code>int64 from_user_id = 4;</code>
      * @return int|string
      */
     public function getFromUserId()
@@ -121,7 +148,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 from_user_id = 3;</code>
+     * Generated from protobuf field <code>int64 from_user_id = 4;</code>
      * @param int|string $var
      * @return $this
      */
@@ -134,7 +161,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 to_user_id = 4;</code>
+     * Generated from protobuf field <code>int64 to_user_id = 5;</code>
      * @return int|string
      */
     public function getToUserId()
@@ -143,7 +170,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 to_user_id = 4;</code>
+     * Generated from protobuf field <code>int64 to_user_id = 5;</code>
      * @param int|string $var
      * @return $this
      */
@@ -156,7 +183,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string description = 5;</code>
+     * Generated from protobuf field <code>string description = 6;</code>
      * @return string
      */
     public function getDescription()
@@ -165,7 +192,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string description = 5;</code>
+     * Generated from protobuf field <code>string description = 6;</code>
      * @param string $var
      * @return $this
      */
@@ -178,7 +205,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string from_wallet_name = 6;</code>
+     * Generated from protobuf field <code>string from_wallet_name = 7;</code>
      * @return string
      */
     public function getFromWalletName()
@@ -187,7 +214,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string from_wallet_name = 6;</code>
+     * Generated from protobuf field <code>string from_wallet_name = 7;</code>
      * @param string $var
      * @return $this
      */
@@ -200,7 +227,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string to_wallet_name = 7;</code>
+     * Generated from protobuf field <code>string to_wallet_name = 8;</code>
      * @return string
      */
     public function getToWalletName()
@@ -209,7 +236,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string to_wallet_name = 7;</code>
+     * Generated from protobuf field <code>string to_wallet_name = 8;</code>
      * @param string $var
      * @return $this
      */
@@ -222,7 +249,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool confiremd = 8;</code>
+     * Generated from protobuf field <code>bool confiremd = 9;</code>
      * @return bool
      */
     public function getConfiremd()
@@ -231,7 +258,7 @@ class Transaction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool confiremd = 8;</code>
+     * Generated from protobuf field <code>bool confiremd = 9;</code>
      * @param bool $var
      * @return $this
      */

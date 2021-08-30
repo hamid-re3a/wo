@@ -7,7 +7,6 @@ use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::name('giftcodes.')->middleware('auth_user_gift_code')->group(function () {
-    Route::get('test',[TestController::class, 'test']);
     Route::get('', [GiftcodeController::class,'index'])->name('list');
     Route::post('create',[GiftcodeController::class,'store'])->name('create');
     Route::get('show/{uuid}', [GiftcodeController::class,'show'])->name('show');

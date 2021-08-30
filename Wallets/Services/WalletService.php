@@ -4,7 +4,7 @@
 namespace Wallets\Services;
 
 
-use http\Client\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Payments\Services\Invoice;
@@ -56,30 +56,16 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
             $walletUser = $this->walletUser($deposit->getUser());
             $transaction = $deposit->getTransaction();
+
             if (
                 $transaction->getAmount() > 0 AND
                 $transaction->getToWalletName() AND
                 $transaction->getToUserId() AND
-                in_array(strtolower($transaction->getToWalletName()) ,$this->wallets)
+                in_array($transaction->getToWalletName() ,[$this->earningWallet,$this->depositWallet])
             ) {
-
                 $bankService = new BankService($walletUser);
 
-                $type = null;
-                $description = $transactionDescription = @unserialize($transaction->getDescription());
-
-                if ($transaction->getDescription() === 'b:0;' || $description === false) {
-                    $description = $transaction->getDescription();
-                }
-
-                if(is_array($transactionDescription)) {
-                    if(array_key_exists('description', $transactionDescription))
-                        $description['description'] = $transactionDescription['description'];
-                    if(array_key_exists('type',$transactionDescription))
-                        $description['type'] = $transactionDescription['type'];
-                }
-
-                $bankService->deposit($this->depositWallet,$transaction->getAmount(), $description ?: null);
+                $bankService->deposit($transaction->getToWalletName(),$transaction->getAmount(), $transaction->getDescription() ?: null, $transaction->getType());
 
                 DB::commit();
 
@@ -106,21 +92,12 @@ class WalletService implements WalletServiceInterface
                 $transaction->getAmount() > 0 AND
                 $transaction->getFromWalletName() AND
                 $transaction->getFromUserId() AND
+                $transaction->getType() AND
                 in_array($transaction->getFromWalletName() ,[$this->depositWallet,$this->earningWallet])
             ) {
                 $bankService = new BankService($walletUser);
 
-                $type = null;
-                $description = $transactionDescription = unserialize($transaction->getDescription());
-
-                if(is_array($transactionDescription)) {
-                    if(array_key_exists('description', $transactionDescription))
-                        $description['description'] = $transactionDescription['description'];
-                    if(array_key_exists('type',$transactionDescription))
-                        $description['type'] = $transactionDescription['type'];
-                }
-
-                $bankService->withdraw($transaction->getFromWalletName(),$transaction->getAmount(), $description ?: null);
+                $bankService->withdraw($transaction->getFromWalletName(),$transaction->getAmount(), $transaction->getDescription() ?: null,$transaction->getType());
 
                 DB::commit();
 
@@ -195,14 +172,16 @@ class WalletService implements WalletServiceInterface
      * @param $request
      * @return Invoice
      */
-    public function invoiceWallet($request)
+    public function invoiceWallet(Request $request)
     {
         $invoice_request = new Invoice();
-        $invoice_request->setPfAmount(1);
+        $invoice_request->setPfAmount($request->get('amount'));
         $invoice_request->setPaymentDriver('btc-pay-server');
         $invoice_request->setPaymentType('purchase');
         $invoice_request->setPaymentCurrency('BTC');
-        $invoice_request->setUser(user($request->header('X-user-id')));
+        $invoice_request->setPayableType('DepositWallet');
+        $invoice_request->setUser($request->wallet_user->getUserService());
         return $this->payment_service->pay( $invoice_request);
     }
+
 }

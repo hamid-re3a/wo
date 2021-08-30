@@ -6,6 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Orders\Services\Id;
+use Orders\Services\Order;
+use Orders\Services\OrderService;
 use Payments\Mail\SettingableMail;
 use Payments\Services\Invoice;
 use User\Services\User;
@@ -16,17 +19,20 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
 
     public $user;
     public $invoice;
+    public $order;
 
     /**
      * Create a new message instance.
      *
      * @param User $user
      * @param Invoice $invoice
+     * @param Order $order
      */
-    public function __construct(User $user, Invoice $invoice)
+    public function __construct(User $user, Invoice $invoice, Order $order)
     {
         $this->user = $user;
         $this->invoice = $invoice;
+        $this->order = $order;
     }
 
     /**
@@ -70,7 +76,7 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
 
     private function getInvoiceDueAmount()
     {
-        return $this->invoice->getDueAmount() . ' ' . $this->invoice->getOrder()->getPaymentCurrency();
+        return $this->invoice->getDueAmount() . ' ' . $this->order->getPaymentCurrency();
     }
 
     private function getInvoiceExpirationTime()

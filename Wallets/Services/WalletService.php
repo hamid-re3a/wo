@@ -68,14 +68,13 @@ class WalletService implements WalletServiceInterface
                 $bankService->deposit($transaction->getToWalletName(),$transaction->getAmount(), $transaction->getDescription() ?: null, $transaction->getType());
 
                 DB::commit();
-
                 return $this->trueResponse();
 
             } else {
-                DB::rollBack();
-                return $this->falseResponse();
+                throw new \Exception();
             }
         } catch (\Throwable $exception) {
+            DB::rollBack();
             return $this->falseResponse();
         }
     }
@@ -104,8 +103,7 @@ class WalletService implements WalletServiceInterface
                 return $this->trueResponse();
 
             } else {
-                DB::rollBack();
-                return $this->falseResponse();
+                throw new \Exception();
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
@@ -141,8 +139,7 @@ class WalletService implements WalletServiceInterface
                 return $this->trueResponse();
 
             } else {
-                DB::rollBack();
-                return $this->falseResponse();
+                throw new \Exception();
             }
         } catch (\Throwable $exception) {
 

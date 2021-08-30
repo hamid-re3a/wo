@@ -5,6 +5,7 @@ namespace Wallets\Services;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
 use Illuminate\Support\Str;
+use User\Models\User;
 
 class BankService
 {
@@ -56,14 +57,34 @@ class BankService
             'type' => $type
         ];
         $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description));
+        $this->toAdminDepositWallet($transaction,$amount,$description,$type);
         $transaction->syncMetaData($data);
-
         return $transaction;
+
+
     }
 
     public function forceWithdraw($wallet_name, $amount, $description = null)
     {
         return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($description));
+    }
+
+    private function toAdminDepositWallet($transaction,$amount,$description,$type)
+    {
+        $admin_user = User::query()->find(1);
+        $admin_wallet = $admin_user->getWallet(Str::slug('Deposit Wallet'));
+        //Prepare description
+        $description = $this->createMeta($description);
+        $description['user_transaction_id'] = $transaction->id;
+
+        $data = [
+            'wallet_before_balance' => $admin_wallet->balanceFloat,
+            'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
+            'type' => $type
+        ];
+        $transaction = $admin_wallet->depositFloat($amount, $description);
+        $transaction->syncMetaData($data);
+
     }
 
     public function transfer($from_wallet, $to_wallet, $amount, $description = null)
@@ -141,7 +162,7 @@ class BankService
 
     public function getTransfers($wallet_name)
     {
-        return $this->getWallet($wallet_name)->transfers();
+        return $this->getWallet($wallet_name)->transfers()->where('to_id','!=',1);
     }
 
     private function createMeta($meta)

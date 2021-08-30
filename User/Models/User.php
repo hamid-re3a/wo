@@ -8,6 +8,7 @@ use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Orders\Models\Order;
 use Spatie\Permission\Traits\HasRoles;
 use Wallets\Models\Transaction;
@@ -64,7 +65,7 @@ class User extends Model implements WalletFloat
      * Relations
      */
 
-    public function transactions()
+    public function transactions() : MorphMany
     {
         return $this->morphMany(config('wallet.transaction.model', \Bavix\Wallet\Models\Transaction::class), 'payable');
     }

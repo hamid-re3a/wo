@@ -34,10 +34,11 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     public function handle()
     {
         try {
-            DB::beginTransaction();
-            if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled')
+            if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled'){
                 return;
+            }
 
+            DB::beginTransaction();
             $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
                 ->get(
                     config('payment.btc-pay-server-domain') . 'api/v1/stores/' .

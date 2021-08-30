@@ -1,7 +1,7 @@
 <?php
 
 CONST WALLET_EMAIL_CONTENTS = [
-    'TRANSFER_FUNDS_SENDER' => array(
+    'TRANSFER_FUNDS_SENDER' => [
         'is_active' => true,
         'subject'=>'You transferred funds',
         'from'=>'support@janex.com',
@@ -22,7 +22,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'variables'=>'full_name,amount,fee,receiver_name,receiver_member_id',
         'variables_description'=>'full_name user full name, amount transfer amount,fee transfer fee,receiver_name to user full name,receiver_member_id to user member id',
         'type'=>'email',
-    ),
+    ],
     'TRANSFER_FUNDS_RECEIVER' => [
         'is_active' => true,
         'subject'=>'You received funds',
@@ -44,6 +44,25 @@ CONST WALLET_EMAIL_CONTENTS = [
         'variables_description'=>'full_name user full name, amount transfer amount,sender_name from user full name,sender_member_id from user member id',
         'type'=>'email',
     ],
+    'PAYMENT_REQUEST' => [
+        'is_active' => true,
+        'subject'=>'Someone sent you a payment request',
+        'from'=>'support@janex.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello <b>{{full_name}}</b>,</p>
+                <p>You have a payment request from {{request_full_name}}</p>
+                <p></p>
+                <p>Amount : <b>{{amount}}</b></p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,amount,request_full_name',
+        'variables_description'=>'full_name user full name, amount payment request amount,request_full_name payment requester',
+        'type'=>'email',
+    ]
 
 
 ];

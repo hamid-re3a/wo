@@ -7,8 +7,10 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Http\Requests\Front\AskFundRequest;
 use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
 use Wallets\Http\Resources\TransactionHistoryResource;
+use Wallets\Jobs\TrivialEmailJob;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
@@ -16,6 +18,7 @@ use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\WalletResource;
 use Wallets\Mail\DepositWallet\ReceiverFundEmail;
+use Wallets\Mail\DepositWallet\RequestFundEmail;
 use Wallets\Mail\DepositWallet\SenderFundEmail;
 use Wallets\Services\BankService;
 use Wallets\Services\WalletService;
@@ -75,10 +78,15 @@ class DepositWalletController extends Controller
     /**
      * Payment request
      * @group Public User > Deposit Wallet
+     * @param AskFundRequest $request
      * @return JsonResponse
      */
-    public function paymentRequest()
+    public function paymentRequest(AskFundRequest $request)
     {
+        $user = User::query()->where('member_id',$request->get('member_id'))->first();
+        UrgentEmailJob::dispatch(new RequestFundEmail($user,$request->wallet_user,$request->get('amount')),$user->email);
+
+        return api()->success();
 
     }
 
@@ -98,7 +106,9 @@ class DepositWalletController extends Controller
             list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
 
             if ($balance < $amount)
-                return api()->error(null, null, 406,trans('wallet.responses.not-enough-balance'));
+                return api()->error(null, null,406, [
+                    'balance' => trans('wallet.responses.not-enough-balance')
+                ]);
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -118,7 +128,9 @@ class DepositWalletController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error .' . $exception->getMessage());
-            return api()->error(trans('wallet.responses.something-went-wrong'));
+            return api()->error(null,null,null,[
+                'error' => trans('wallet.responses.something-went-wrong')
+            ]);
         }
     }
 
@@ -140,7 +152,9 @@ class DepositWalletController extends Controller
             list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
 
             if ($balance < $amount)
-                return api()->error(null, null,406, trans('wallet.responses.not-enough-balance'));
+                return api()->error(null, null,406, [
+                    'balance' => trans('wallet.responses.not-enough-balance')
+                ]);
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -171,7 +185,9 @@ class DepositWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-            return api()->error(trans('wallet.responses.something-went-wrong'));
+            return api()->error(null,null,null,[
+                'error' => trans('wallet.responses.something-went-wrong')
+            ]);
         }
 
     }

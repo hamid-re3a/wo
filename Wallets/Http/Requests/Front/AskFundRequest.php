@@ -4,7 +4,7 @@ namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TransferFundFromDepositWallet extends FormRequest
+class AskFundRequest extends FormRequest
 {
 
     /**

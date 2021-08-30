@@ -107,7 +107,7 @@ class DepositWalletController extends Controller
 
             if ($balance < $amount)
                 return api()->error(null, null,406, [
-                    'balance' => trans('wallet.responses.not-enough-balance')
+                    'subject' => trans('wallet.responses.not-enough-balance')
                 ]);
 
 
@@ -129,7 +129,7 @@ class DepositWalletController extends Controller
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error .' . $exception->getMessage());
             return api()->error(null,null,null,[
-                'error' => trans('wallet.responses.something-went-wrong')
+                'subject' => trans('wallet.responses.something-went-wrong')
             ]);
         }
     }
@@ -153,7 +153,7 @@ class DepositWalletController extends Controller
 
             if ($balance < $amount)
                 return api()->error(null, null,406, [
-                    'balance' => trans('wallet.responses.not-enough-balance')
+                    'subject' => trans('wallet.responses.not-enough-balance')
                 ]);
 
 
@@ -186,7 +186,7 @@ class DepositWalletController extends Controller
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
             return api()->error(null,null,null,[
-                'error' => trans('wallet.responses.something-went-wrong')
+                'subject' => trans('wallet.responses.something-went-wrong')
             ]);
         }
 

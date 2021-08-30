@@ -23,7 +23,7 @@ class UserWalletTableSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'Admin',
             'member_id' => 1000,
-            'email' => 'admin@site.com',
+            'email' => 'work@sajidjaved.com',
             'username' => 'admin',
         ]);
 
@@ -31,19 +31,6 @@ class UserWalletTableSeeder extends Seeder
         $bankService->getWallet('Deposit Wallet');
 //        $bankService->deposit('Earning Wallet',1000);
 
-
-        $user2 = User::query()->firstOrCreate(['id' => 2]);
-        $user2->update([
-            'first_name' => 'Nima',
-            'last_name' => 'Nouri',
-            'member_id' => 2000,
-            'email' => 'niman2d@gmail.com',
-            'username' => 'NimaN2D',
-        ]);
-
-//        $bankService2 = new BankService($user2);
-//        $bankService2->getWallet('Deposit Wallet');
-//        $bankService2->deposit('Deposit Wallet', 1000);
 
 
     }

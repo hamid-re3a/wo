@@ -4,7 +4,7 @@ CONST WALLET_EMAIL_CONTENTS = [
     'TRANSFER_FUNDS_SENDER' => [
         'is_active' => true,
         'subject'=>'You transferred funds',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -26,7 +26,7 @@ CONST WALLET_EMAIL_CONTENTS = [
     'TRANSFER_FUNDS_RECEIVER' => [
         'is_active' => true,
         'subject'=>'You received funds',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -47,7 +47,7 @@ CONST WALLET_EMAIL_CONTENTS = [
     'PAYMENT_REQUEST' => [
         'is_active' => true,
         'subject'=>'Someone sent you a payment request',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>

@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Http\Requests\Front\AskFundRequest;
 use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
-use Wallets\Http\Resources\TransactionHistoryResource;
-use Wallets\Jobs\TrivialEmailJob;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
@@ -86,7 +84,9 @@ class DepositWalletController extends Controller
         $user = User::query()->where('member_id',$request->get('member_id'))->first();
         UrgentEmailJob::dispatch(new RequestFundEmail($user,$request->wallet_user,$request->get('amount')),$user->email);
 
-        return api()->success();
+        return api()->success(null,[
+            'receiver_full_name' => $user->full_name
+        ]);
 
     }
 

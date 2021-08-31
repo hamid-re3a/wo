@@ -58,9 +58,10 @@ class Invoice extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'created_at',
-        'updated_at',
-        'expiration_time'
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'expiration_time' => 'datetime',
+        'is_paid' => 'boolean'
     ];
 
     public function getFullStatusAttribute()

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Orders\Models\Order;
 use Spatie\Permission\Traits\HasRoles;
+use User\database\factories\UserFactory;
 use Wallets\Models\Transaction;
 
 /**
@@ -59,6 +60,11 @@ class User extends Model implements WalletFloat
         'is_freeze',
         'block_type',
     ];
+
+    protected static function newFactory()
+    {
+        return UserFactory::new();
+    }
 
     Protected $guard_name ='api';
 

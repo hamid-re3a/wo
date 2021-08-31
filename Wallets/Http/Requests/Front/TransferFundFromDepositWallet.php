@@ -26,8 +26,8 @@ class TransferFundFromDepositWallet extends FormRequest
      */
     public function rules()
     {
-        $this->minimum_amount = walletGetSetting('minimum_transfer_fund_amount');
-        $this->maximum_amount = walletGetSetting('maximum_transfer_fund_amount');
+        $this->minimum_amount = walletPfAmount(walletGetSetting('minimum_transfer_fund_amount'));
+        $this->maximum_amount = walletPfAmount(walletGetSetting('maximum_transfer_fund_amount'));
         return [
             'member_id' => 'required|integer|exists:users,member_id',
             'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}"

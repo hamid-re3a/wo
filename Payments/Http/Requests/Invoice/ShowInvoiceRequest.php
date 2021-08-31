@@ -7,7 +7,7 @@ namespace Payments\Http\Requests\Invoice;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ShowOrderTransactionsRequest extends FormRequest
+class ShowInvoiceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class ShowOrderTransactionsRequest extends FormRequest
     {
 
         return [
-            'invoice_id' => 'required|string|exists:invoices,transaction_id',
+            'transaction_id' => 'required|string|exists:invoices,transaction_id',
         ];
     }
 }

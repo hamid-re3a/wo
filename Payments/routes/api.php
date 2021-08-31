@@ -25,8 +25,10 @@ Route::name('payments.')->group(function () {
         Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
     });
 
-    Route::name('invoice.')->group(function(){
-        Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'getTransactionsByOrderId'])->name('transactions-by-order-id');
+    Route::name('invoice.')->prefix('invoices')->group(function(){
+        Route::get('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'index'])->name('get-list');
+        Route::post('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'show'])->name('get-invoice-details');
+        Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'transactions'])->name('transactions');
     });
 
     Route::post('test',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'tt'])->name('tt');

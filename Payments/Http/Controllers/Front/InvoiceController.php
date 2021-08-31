@@ -4,25 +4,65 @@ namespace Payments\Http\Controllers\Front;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Payments\Http\Requests\Invoice\ShowInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
+use Payments\Http\Resources\InvoiceResource;
 use Payments\Http\Resources\InvoiceTransactionResource;
+use Payments\Models\Invoice;
 use Payments\Models\InvoiceTransaction;
 
 class InvoiceController extends Controller
 {
 
     /**
-     * Get Invoice transactions by order id
+     * Get user pending package invoice
+     * @group
+     * Public User > Invoices
+     */
+    public function pendingOrderInvoice()
+    {
+        $invoice = request()->user->invoices()->where('payable_type','Order')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
+
+        if(!$invoice)
+            return api()->error(null,null,406);
+
+        return api()->success('success', InvoiceResource::make($invoice));
+    }
+
+    /**
+     * Get invoices list
+     * @group
+     * Public User > Invoices
+     */
+    public function index()
+    {
+        $invoices = Invoice::query()->where('user_id',request()->header('X-user-id'))->simplePaginate();
+        return api()->success(null,InvoiceResource::collection($invoices)->response()->getData());
+    }
+
+    /**
+     * Get invoice details
+     * @group
+     * Public User > Invoices
+     * @param ShowInvoiceRequest $request
+     * @return JsonResponse
+     */
+    public function show(ShowInvoiceRequest $request)
+    {
+        $invoice = Invoice::query()->where('transaction_id',$request->get('transaction_id'))->where('user_id',$request->header('X-user-id'))->first();
+        return api()->success(null,InvoiceResource::make($invoice));
+    }
+
+    /**
+     * Get invoice transactions
      * @group
      * Public User > Invoices
      * @param ShowOrderTransactionsRequest $request
      * @return JsonResponse
      */
-    public function getTransactionsByOrderId(ShowOrderTransactionsRequest $request)
+    public function transactions(ShowOrderTransactionsRequest $request)
     {
-        $transactions = InvoiceTransaction::query()->whereHas('invoice', function($subQuery) use($request) {
-            $subQuery->where('order_id',$request->get('order_id'));
-        })->get();
-        return api()->success(null,InvoiceTransactionResource::collection($transactions));
+        $invoice = Invoice::query()->where('transaction_id',$request->get('transaction_id'))->where('user_id',$request->header('X-user-id'))->with('transactions')->first();
+        return api()->success(null,InvoiceTransactionResource::collection($invoice->transactions));
     }
 }

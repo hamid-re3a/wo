@@ -59,11 +59,15 @@ class WalletServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->seed();
-
-            $this->publishes([
-                __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
-            ], 'api-response');
         }
+
+        $this->publishes([
+            __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
+        ], 'api-response');
+
+        $this->publishes([
+            __DIR__ . '/resources/lang' => resource_path('lang'),
+        ], 'user-resources');
     }
 
     /**

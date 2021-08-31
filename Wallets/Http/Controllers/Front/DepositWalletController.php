@@ -85,6 +85,7 @@ class DepositWalletController extends Controller
         UrgentEmailJob::dispatch(new RequestFundEmail($user,$request->wallet_user,$request->get('amount')),$user->email);
 
         return api()->success(null,[
+            'amount' => walletPfAmount($request->get('amount')),
             'receiver_full_name' => $user->full_name
         ]);
 
@@ -204,7 +205,7 @@ class DepositWalletController extends Controller
         $invoice = $wallet_service->invoiceWallet($request);
         return api()->success('success', [
             'payment_currency'=>$invoice->getPaymentCurrency(),
-            'amount' => $invoice->getAmount(),
+            'amount' => walletPfAmount($invoice->getAmount()),
             'checkout_link' => $invoice->getCheckoutLink(),
             'transaction_id' => $invoice->getTransactionId(),
             'expiration_time' => $invoice->getExpirationTime(),

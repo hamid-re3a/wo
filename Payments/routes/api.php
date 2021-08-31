@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Payments\Http\Controllers\Front\WebhookController;
 
-Route::name('payments.')->group(function () {
+Route::name('payments.')->middleware('auth_user_payment')->group(function () {
     Route::post('webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');
     Route::name('currency.')->prefix("currency")->group(function () {
         Route::get('',[\Payments\Http\Controllers\Front\PaymentCurrencyController::class,'index'])->name('index');
@@ -25,8 +25,11 @@ Route::name('payments.')->group(function () {
         Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
     });
 
-    Route::name('invoice.')->group(function(){
-        Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'getTransactionsByOrderId'])->name('transactions-by-order-id');
+    Route::name('invoice.')->prefix('invoices')->group(function(){
+        Route::get('/check-pending-order-invoice',[\Payments\Http\Controllers\Front\InvoiceController::class,'pendingOrderInvoice'])->name('check');
+        Route::get('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'index'])->name('get-list');
+        Route::post('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'show'])->name('get-invoice-details');
+        Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'transactions'])->name('transactions');
     });
 
     Route::post('test',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'tt'])->name('tt');

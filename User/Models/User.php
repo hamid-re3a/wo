@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Orders\Models\Order;
+use Payments\Models\Invoice;
 use Spatie\Permission\Traits\HasRoles;
+use User\database\factories\UserFactory;
 use Wallets\Models\Transaction;
 
 /**
@@ -60,6 +62,11 @@ class User extends Model implements WalletFloat
         'block_type',
     ];
 
+    protected static function newFactory()
+    {
+        return UserFactory::new();
+    }
+
     Protected $guard_name ='api';
 
     /**
@@ -93,6 +100,11 @@ class User extends Model implements WalletFloat
     public function paidOrders()
     {
         return $this->hasMany(Order::class,'user_id','id')->whereNotNull('is_paid_at');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class,'user_id','id');
     }
 
     /**

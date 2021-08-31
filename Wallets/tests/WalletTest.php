@@ -1,15 +1,15 @@
 <?php
 
 
-namespace Packages\tests;
+namespace Wallets\tests;
 
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Packages\PackageConfigure;
+use Wallets\WalletConfigure;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 
-class PackageTest extends TestCase
+class WalletTest extends TestCase
 {
     use CreatesApplication;
     use RefreshDatabase;
@@ -19,7 +19,7 @@ class PackageTest extends TestCase
         parent::setUp();
         $this->app->setLocale('en');
         $this->withHeaders($this->getHeaders());
-        PackageConfigure::seed();
+        WalletConfigure::seed();
     }
 
     public function hasMethod($class, $method)

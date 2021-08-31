@@ -11,12 +11,18 @@ class EmailContentSeeder extends Seeder
         if(defined('WALLET_EMAIL_CONTENTS') AND is_array(WALLET_EMAIL_CONTENTS)) {
             $emails = [];
             $now = now()->toDateTimeString();
-            foreach(WALLET_EMAIL_CONTENTS AS $key => $email)
+            foreach(WALLET_EMAIL_CONTENTS AS $key => $email) {
+
+                if(filter_var(env('MAIL_USERNAME', $email['from']), FILTER_VALIDATE_EMAIL))
+                    $from =  env('MAIL_USERNAME', $email['from']);
+                else
+                    $from = $email['from'];
+
                 $emails[] = [
                     'key' => $key,
                     'is_active' => $email['is_active'],
                     'subject' => $email['subject'],
-                    'from' => env('MAIL_USERNAME', $email['from']),
+                    'from' => $from,
                     'from_name' => $email['from_name'],
                     'body' => $email['body'],
                     'variables' => $email['variables'],
@@ -25,6 +31,7 @@ class EmailContentSeeder extends Seeder
                     'created_at' => $now,
                     'updated_at' => $now
                 ];
+            }
             EmailContent::insert($emails);
             cache(['wallet_email_contents' => $emails]);
         }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Payments\Http\Controllers\Front\WebhookController;
 
-Route::name('payments.')->group(function () {
+Route::name('payments.')->middleware('auth_user_payment')->group(function () {
     Route::post('webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');
     Route::name('currency.')->prefix("currency")->group(function () {
         Route::get('',[\Payments\Http\Controllers\Front\PaymentCurrencyController::class,'index'])->name('index');

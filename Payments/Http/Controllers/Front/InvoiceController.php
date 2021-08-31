@@ -39,7 +39,7 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Get Invoice transactions
+     * Get invoice transactions
      * @group
      * Public User > Invoices
      * @param ShowOrderTransactionsRequest $request

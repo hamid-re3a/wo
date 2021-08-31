@@ -23,7 +23,6 @@ class InvoiceResource extends JsonResource
             'is_paid' => $this->is_paid,
             'paid_amount' => $this->paid_amount,
             'due_amount' => $this->due_amount,
-            'deposit_amount' => $this->deposit_amount,
             'expiration_time' => $this->expiration_time->timestamp,
             'created_at' => $this->created_at->timestamp,
             'updated_at' => $this->updated_at->timestamp,

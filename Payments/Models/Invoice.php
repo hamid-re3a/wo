@@ -63,10 +63,6 @@ class Invoice extends Model
         'expiration_time'
     ];
 
-    protected $attributes = [
-        'type'
-    ];
-
     public function getFullStatusAttribute()
     {
         return $this->status .' '. $this->additional_status;

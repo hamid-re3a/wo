@@ -21,7 +21,7 @@ class InvoiceController extends Controller
      */
     public function pendingOrderInvoice()
     {
-        $invoice = request()->user->invoices()->where('payable_type','Order')->whereNull('is_paid')->where('expiration_time','>',now()->toDateTimeString());
+        $invoice = request()->user->invoices()->where('payable_type','Order')->whereNull('is_paid')->where('expiration_time','>',now()->toDateTimeString())->first();
 
         if(!$invoice)
             return api()->error(null,null,406);

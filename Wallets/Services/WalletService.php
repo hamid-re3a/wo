@@ -58,6 +58,7 @@ class WalletService implements WalletServiceInterface
             $transaction = $deposit->getTransaction();
 
             if (
+                $transaction->getConfiremd() > 0 AND
                 $transaction->getAmount() > 0 AND
                 $transaction->getToWalletName() AND
                 $transaction->getToUserId() AND
@@ -124,6 +125,7 @@ class WalletService implements WalletServiceInterface
                 $transaction->getToUserId() AND
                 $transaction->getConfiremd()
             ) {
+
                 $fromUser = $this->walletUser($transfer->getFromUser());
                 $toUser = $this->walletUser($transfer->getToUser());
                 $fromBankService = new BankService($fromUser);
@@ -131,8 +133,7 @@ class WalletService implements WalletServiceInterface
 
                 $fromWallet = Str::contains(Str::lower($transaction->getFromWalletName()), 'deposit') ? $this->depositWallet : $this->earningWallet;
                 $toWallet = Str::contains(Str::lower($transaction->getToWalletName()), 'deposit') ? $this->depositWallet : $this->earningWallet;
-
-                $fromBankService->transfer($fromWallet,$toBankService->getWallet($toWallet), $transaction->getAmount(), $transaction->getDescription() ?: null);
+                $fromBankService->transfer($fromBankService->getWallet($fromWallet),$toBankService->getWallet($toWallet), $transaction->getAmount(), $transaction->getDescription() ?: null);
 
                 DB::commit();
 
@@ -142,7 +143,6 @@ class WalletService implements WalletServiceInterface
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
-
             DB::rollBack();
             return $this->falseResponse();
         }

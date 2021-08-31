@@ -1,6 +1,6 @@
 <?php
 
-namespace Payment\Http\Middlewares;
+namespace Payments\Http\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;

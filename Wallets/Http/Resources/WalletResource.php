@@ -21,7 +21,7 @@ class WalletResource extends JsonResource
         $totalTransfer = walletPfAmount(abs($this->transactions()->where('wallet_id',$this->id)->where('meta->type', 'Transfer')->sum('amount')) / 100 );
         return [
             'name' => $this->name,
-            'balance' => (float) walletPfAmount($this->balanceFloat),
+            'balance' => walletPfAmount($this->balanceFloat),
             'transactions_count' => (int) $this->transactions->count(),
             'transfers_count' => (int) $this->transfers->count(),
             'total_transfer' => (int) $totalTransfer,

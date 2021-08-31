@@ -38,7 +38,8 @@ class AskFundRequest extends FormRequest
     {
         return [
             'amount.min' => "Minimum allowed amount is {$this->minimum_amount}",
-            'amount.max' => "Maximum allowed amount is {$this->maximum_amount}"
+            'amount.max' => "Maximum allowed amount is {$this->maximum_amount}",
+            'member_id.exists' => 'Invalid Membership ID'
         ];
     }
 

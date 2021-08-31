@@ -15,7 +15,7 @@ class EmailContentSeeder extends Seeder
                     'key' => $key,
                     'is_active' => $email['is_active'],
                     'subject' => $email['subject'],
-                    'from' => $email['from'],
+                    'from' => env('MAIL_USERNAME', $email['from']),
                     'from_name' => $email['from_name'],
                     'body' => $email['body'],
                     'variables' => $email['variables'],

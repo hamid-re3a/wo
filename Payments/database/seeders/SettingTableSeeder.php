@@ -36,7 +36,7 @@ class SettingTableSeeder extends Seeder
                     'key' => $key,
                     'is_active' => $setting['is_active'],
                     'subject' => $setting['subject'],
-                    'from' => $setting['from'],
+                    'from' => env('MAIL_USERNAME',$setting['from']),
                     'from_name' => $setting['from_name'],
                     'body' => $setting['body'],
                     'variables' => $setting['variables'],

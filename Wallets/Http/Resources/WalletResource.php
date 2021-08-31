@@ -24,9 +24,9 @@ class WalletResource extends JsonResource
             'balance' => walletPfAmount($this->balanceFloat),
             'transactions_count' => (int) $this->transactions->count(),
             'transfers_count' => (int) $this->transfers->count(),
-            'total_transfer' => (int) $totalTransfer,
-            'total_received' => (int) $totalReceived,
-            'total_spent' => (int) $totalSpent
+            'total_transfer' =>walletPfAmount($totalTransfer),
+            'total_received' => walletPfAmount($totalReceived),
+            'total_spent' => walletPfAmount($totalSpent)
         ];
     }
 }

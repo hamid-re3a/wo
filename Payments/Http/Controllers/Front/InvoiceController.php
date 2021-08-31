@@ -15,6 +15,21 @@ class InvoiceController extends Controller
 {
 
     /**
+     * Get user pending package invoice
+     * @group
+     * Public User > Invoices
+     */
+    public function pendingOrderInvoice()
+    {
+        $invoice = request()->user->invoices()->where('payable_type','Order')->orderByDesc('id')->whereNull('is_paid')->whereDate('expiration_time','<',now()->toDateTimeString())->first();
+
+        if(!$invoice)
+            return api()->error(null,null,406);
+
+        return api()->success('success', InvoiceResource::make($invoice));
+    }
+
+    /**
      * Get invoices list
      * @group
      * Public User > Invoices

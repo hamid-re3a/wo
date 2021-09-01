@@ -4,6 +4,22 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Payments\Http\Controllers\Front\WebhookController;
 
+/**
+ * @todo before lunch project we must migrate all route to this (admin-super subscriptions-payment-admin)
+ * list of all route admin section
+ */
+Route::middleware(['role:super-admin|subscriptions-payment-admin'])->name('admin.')->group(function () {
+
+});
+
+/**
+ * @todo before lunch project we must migrate all route to this (all api public and customer side)
+ * list of all route admin section
+ */
+Route::middleware(['role:client'])->name('customer.')->group(function () {
+
+});
+
 Route::name('payments.')->middleware('auth_user_payment')->group(function () {
     Route::post('webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');
     Route::name('currency.')->prefix("currency")->group(function () {
@@ -31,8 +47,5 @@ Route::name('payments.')->middleware('auth_user_payment')->group(function () {
         Route::post('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'show'])->name('get-invoice-details');
         Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'transactions'])->name('transactions');
     });
-
-    Route::post('test',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'tt'])->name('tt');
-
 });
 

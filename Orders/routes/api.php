@@ -4,6 +4,22 @@ use Illuminate\Support\Facades\Route;
 use Orders\Http\Controllers\Front\OrderController;
 use Orders\Http\Controllers\Front\PackageController;
 
+/**
+ * @todo before lunch project we must migrate all route to this (admin-super subscriptions-order-admin)
+ * list of all route admin section
+ */
+Route::middleware(['role:super-admin|subscriptions-order-admin'])->name('admin.')->group(function () {
+
+});
+
+/**
+ * @todo before lunch project we must migrate all route to this (all api public and customer side)
+ * list of all route admin section
+ */
+Route::middleware(['role:client'])->name('customer.')->group(function () {
+
+});
+
 Route::name('orders.')->middleware('auth_user_order')->group(function () {
     Route::post('', [OrderController::class, 'index'])->name('list');
     Route::post('show', [OrderController::class, 'showOrder'])->name('show');
@@ -14,4 +30,3 @@ Route::name('packages.')->prefix('packages')->middleware('auth_user_order')->gro
     Route::get('available-packages',[PackageController::class, 'paidPackages'])->name('paid-packages');
     Route::get('has-valid-package',[PackageController::class, 'hasValidPackage'])->name('has-valid-package');
 });
-

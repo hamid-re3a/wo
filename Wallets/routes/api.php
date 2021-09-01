@@ -10,6 +10,22 @@ use Wallets\Http\Controllers\Front\WalletController;
 use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
 use Wallets\Services\BankService;
 
+/**
+ * @todo before lunch project we must migrate all route to this (admin-super subscriptions-wallet-admin)
+ * list of all route admin section
+ */
+Route::middleware(['role:super-admin|subscriptions-wallet-admin'])->name('admin.')->group(function () {
+
+});
+
+/**
+ * @todo before lunch project we must migrate all route to this (all api public and customer side)
+ * list of all route admin section
+ */
+Route::middleware(['role:client'])->name('customer.')->group(function () {
+
+});
+
 Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
     Route::get('', [WalletController::class, 'index'])->name('index');
     Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');

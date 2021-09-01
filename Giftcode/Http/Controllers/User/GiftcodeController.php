@@ -67,7 +67,7 @@ class GiftcodeController extends Controller
              */
             //Check User Balance
             if($this->checkUserBalance($request) < $giftcode->total_cost_in_usd)
-                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),422);
+                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),406);
 
             //Withdraw Balance
             $finalTransaction = $this->withdrawUserWallet($giftcode);
@@ -86,7 +86,9 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             DB::rollBack();
-            return api()->error($exception->getMessage(),null,$exception->getCode());
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -100,7 +102,7 @@ class GiftcodeController extends Controller
         $giftcode = request()->user->giftcodes()->where('uuid',request()->uuid)->first();
 
         if(!$giftcode)
-            return api()->error(trans('giftcode.responses.not-valid-giftcode-id'),null,404);
+            return api()->error(null,null,404);
 
         return api()->success(null,GiftcodeResource::make($giftcode));
     }
@@ -116,11 +118,15 @@ class GiftcodeController extends Controller
         $giftcode = request()->user->giftcodes()->where('uuid',$request->get('id'))->first();
 
         if($giftcode->is_canceled === true)
-            return api()->error(trans('giftcode.responses.giftcode-is-used-and-user-cant-cancel'),null,406);
+            return api()->error(null,null,406,[
+                'subject' => trans('giftcode.responses.giftcode-is-used-and-user-cant-cancel')
+            ]);
 
 
         if(!empty($giftcode->expiration_date) AND $giftcode->expiration_date->isPast())
-            return api()->error(trans('giftcode.responses.giftcode-is-expired-and-user-cant-cancel'),null,406);
+            return api()->error(null,null,406,[
+                'subject' => trans('giftcode.responses.giftcode-is-expired-and-user-cant-cancel')
+            ]);
 
         try {
             DB::beginTransaction();
@@ -151,7 +157,9 @@ class GiftcodeController extends Controller
             //Handle exceptions
             DB::rollBack();
             Log::error('Cancel giftcode error,Giftcode uuid => <' . $giftcode->uuid . '>');
-            return api()->error($exception->getMessage(),null,$exception->getCode());
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
 
         }
     }
@@ -169,14 +177,20 @@ class GiftcodeController extends Controller
             $giftcode = Giftcode::where('uuid', $request->get('id'))->first();
 
             if($giftcode->is_canceled === true)
-                return api()->error(trans('giftcode.responses.giftcode-is-canceled-and-user-cant-redeem'),null,406);
+                return api()->error(null,null,406,[
+                    'subject' => trans('giftcode.responses.giftcode-is-canceled-and-user-cant-redeem')
+                ]);
 
             if(!empty($giftcode->redeem_user_id))
-                return api()->error(trans('giftcode.responses.giftcode-is-used-and-user-cant-redeem'),null,406);
+                return api()->error(null,null,406,[
+                    'subject' => trans('giftcode.responses.giftcode-is-used-and-user-cant-redeem')
+                ]);
 
 
             if(!empty($giftcode->expiration_date) AND $giftcode->expiration_date->isPast())
-                return api()->error(trans('giftcode.responses.giftcode-is-expired-and-user-cant-redeem'),null,406);
+                return api()->error(null,null,406,[
+                    'subject' => trans('giftcode.responses.giftcode-is-expired-and-user-cant-redeem')
+                ]);
 
             $giftcode->update([
                 'redeem_user_id' => request()->user->id,
@@ -202,7 +216,9 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Giftcode redeem error > ' . $exception->getMessage());
-            return api()->error(trans('giftcode.responses.something-went-wrong'));
+            return api()->error(null,null,500,[
+                'subject' => trans('giftcode.responses.something-went-wrong')
+            ]);
         }
     }
 

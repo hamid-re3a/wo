@@ -25,7 +25,7 @@ class PackageController extends Controller
     public function paidPackages()
     {
         $packages = collect();
-        $orders = request()->order_user->paidOrders()->whereHas('packages')->with('packages')->get();
+        $orders = request()->user->paidOrders()->whereHas('packages')->with('packages')->get();
         foreach($orders AS $order) {
             foreach($order->packages AS $key => $package) {
                 $packageDetails = $this->getPackage($package->package_id);
@@ -49,7 +49,7 @@ class PackageController extends Controller
      */
     public function hasValidPackage()
     {
-        $orders = request()->order_user->paidOrders()->whereHas('packages')->with('packages')->get();
+        $orders = request()->user->paidOrders()->whereHas('packages')->with('packages')->get();
         foreach($orders AS $order) {
             foreach($order->packages AS $key => $package) {
                 $packageDetails = $this->getPackage($package->package_id);

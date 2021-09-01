@@ -40,7 +40,7 @@ class AskFundRequest extends FormRequest
             'amount.min' => 'Minimum allowed amount is ' . walletPfAmount($this->minimum_amount) . ' PF',
             'amount.max' => 'Maximum allowed amount is ' . walletPfAmount($this->maximum_amount) . ' PF',
             'member_id.exists' => 'Invalid Membership ID',
-            'member_id.not_in' => 'You are not allowed transfer PF to your account .'
+            'member_id.not_in' => 'You are not allowed to ask PF from your own .'
         ];
     }
 

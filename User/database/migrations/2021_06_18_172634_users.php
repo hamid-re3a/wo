@@ -21,8 +21,8 @@ class Users extends Migration
             $table->string('username',100)->nullable();
             $table->string('email',100)->nullable();
             $table->string('block_type')->nullable();
-            $table->boolean('is_freeze')->default(FALSE);
-            $table->boolean('is_deactivate')->default(FALSE);
+            $table->boolean('is_freeze')->default(FALSE)->nullable();
+            $table->boolean('is_deactivate')->default(FALSE)->nullable();
             $table->unsignedBigInteger('sponsor_id')->nullable();
             $table->softDeletes();
             $table->timestamps();

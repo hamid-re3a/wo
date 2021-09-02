@@ -67,7 +67,7 @@ return [
             'block_for' => null,
         ],
 
-        'subscriptions' => [
+        'rabbit' => [
 
             'driver' => 'rabbitmq',
             'queue' => env('RABBITMQ_QUEUE', 'subscriptions'),

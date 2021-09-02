@@ -61,7 +61,6 @@ class BankService
         $transaction->syncMetaData($data);
         return $transaction;
 
-
     }
 
     public function forceWithdraw($wallet_name, $amount, $description = null)
@@ -69,19 +68,20 @@ class BankService
         return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($description));
     }
 
-    private function toAdminDepositWallet($transaction,$amount,$description,$type)
+    public function toAdminDepositWallet($transaction,$amount,$description,$type)
     {
-        $admin_user = User::query()->find(1);
-        $admin_wallet = $admin_user->getWallet(Str::slug('Deposit Wallet'));
+        $this->owner = User::query()->find(1);
+        $admin_wallet = $this->getWallet(Str::slug('Deposit Wallet'));
+
         //Prepare description
         $description = $this->createMeta($description);
         $description['user_transaction_id'] = $transaction->id;
-
         $data = [
             'wallet_before_balance' => $admin_wallet->balanceFloat,
             'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
             'type' => $type
         ];
+
         $transaction = $admin_wallet->depositFloat($amount, $description);
         $transaction->syncMetaData($data);
 

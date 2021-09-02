@@ -15,23 +15,18 @@ use Giftcode\Jobs\UrgentEmailJob;
 use Giftcode\Mail\User\GiftcodeCanceledEmail;
 use Giftcode\Mail\User\RedeemedGiftcodeCreatorEmail;
 use Giftcode\Mail\User\RedeemedGiftcodeRedeemerEmail;
-use Giftcode\Models\Giftcode;
+use Giftcode\Repository\GiftcodeRepository;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Wallets\Services\Deposit;
-use Wallets\Services\Transaction;
-use Wallets\Services\WalletService;
-use Wallets\Services\Withdraw;
 
 class GiftcodeController extends Controller
 {
 
-    private $walletService;
+    private $giftcode_repository;
 
-    public function __construct(WalletService $walletService)
+    public function __construct(GiftcodeRepository $giftcodeRepository)
     {
-        $this->walletService = $walletService;
+        $this->giftcode_repository = $giftcodeRepository;
     }
 
     /**
@@ -54,38 +49,17 @@ class GiftcodeController extends Controller
     {
         UpdatePackages::dispatchSync();
         try {
-            DB::beginTransaction();
 
-            //All stuff fixed in GiftcodeObserver
-            $giftcode = $request->user->giftcodes()->create([
+            $giftcode = $this->giftcode_repository->create($request->merge([
+                'user_id' => $request->user->id,
                 'package_id' => $request->get('package_id')
-            ]);
-
-
-            /**
-             * Start User wallet process
-             */
-            //Check User Balance
-            if($this->checkUserBalance($request) < $giftcode->total_cost_in_usd)
-                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),406);
-
-            //Withdraw Balance
-            $finalTransaction = $this->withdrawUserWallet($giftcode);
-
-            //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfiremd())
-                throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
-            /**
-             * End User wallet process
-             */
+            ]));
 
             //Successful
-            DB::commit();
             return api()->success(null,GiftcodeResource::make($giftcode));
 
         } catch (\Throwable $exception) {
             //Handle exceptions
-            DB::rollBack();
             return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
             ]);
@@ -99,12 +73,13 @@ class GiftcodeController extends Controller
     public function show()
     {
 
-        $giftcode = request()->user->giftcodes()->where('uuid',request()->uuid)->first();
+        $giftcode = $this->giftcode_repository->getByUuid(request()->uuid);
 
-        if(!$giftcode)
+        if(!$giftcode OR $giftcode->user_id != request()->user->id)
             return api()->error(null,null,404);
 
         return api()->success(null,GiftcodeResource::make($giftcode));
+
     }
 
     /**
@@ -115,48 +90,16 @@ class GiftcodeController extends Controller
      */
     public function cancel(CancelGiftcodeRequest $request)
     {
-        $giftcode = request()->user->giftcodes()->where('uuid',$request->get('id'))->first();
-
-        if($giftcode->is_canceled === true)
-            return api()->error(null,null,406,[
-                'subject' => trans('giftcode.responses.giftcode-is-used-and-user-cant-cancel')
-            ]);
-
-
-        if(!empty($giftcode->expiration_date) AND $giftcode->expiration_date->isPast())
-            return api()->error(null,null,406,[
-                'subject' => trans('giftcode.responses.giftcode-is-expired-and-user-cant-cancel')
-            ]);
 
         try {
-            DB::beginTransaction();
-            $giftcode->update([
-                'is_canceled' => true
-            ]);
 
-
-            /**
-             * Refund Giftcode total paid - cancelation fee
-             */
-            //Refund giftcode pay fee
-            $finalTransaction = $this->depositUserWallet($giftcode);
-
-            //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfiremd())
-                throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
-            /**
-             * End refund
-             */
-
+            $giftcode = $this->giftcode_repository->cancel($request);
             UrgentEmailJob::dispatch(new GiftcodeCanceledEmail(request()->user,$giftcode),request()->user->email);
-
-            DB::commit();
-            return api()->success(trans('giftcode.responses.giftcode-canceled-amount-refunded', ['amount' => (float) $giftcode->getRefundAmount()]));
+            return api()->success(trans('giftcode.responses.giftcode-canceled-amount-refunded', ['amount' => (double) $giftcode->getRefundAmount()]));
 
         } catch (\Throwable $exception) {
             //Handle exceptions
-            DB::rollBack();
-            Log::error('Cancel giftcode error,Giftcode uuid => <' . $giftcode->uuid . '>');
+            Log::error('Cancel giftcode error,iftcode uuid => <' . $request->get('uuid') . '>');
             return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
             ]);
@@ -173,29 +116,8 @@ class GiftcodeController extends Controller
     public function redeem(RedeemGiftcodeRequest $request)
     {
         try {
-            DB::beginTransaction();
-            $giftcode = Giftcode::where('uuid', $request->get('id'))->first();
 
-            if($giftcode->is_canceled === true)
-                return api()->error(null,null,406,[
-                    'subject' => trans('giftcode.responses.giftcode-is-canceled-and-user-cant-redeem')
-                ]);
-
-            if(!empty($giftcode->redeem_user_id))
-                return api()->error(null,null,406,[
-                    'subject' => trans('giftcode.responses.giftcode-is-used-and-user-cant-redeem')
-                ]);
-
-
-            if(!empty($giftcode->expiration_date) AND $giftcode->expiration_date->isPast())
-                return api()->error(null,null,406,[
-                    'subject' => trans('giftcode.responses.giftcode-is-expired-and-user-cant-redeem')
-                ]);
-
-            $giftcode->update([
-                'redeem_user_id' => request()->user->id,
-                'redeem_date' => now()->toDateTimeString()
-            ]);
+            $giftcode = $this->giftcode_repository->redeem($request);
 
             /**
              * Start sending emails
@@ -210,65 +132,13 @@ class GiftcodeController extends Controller
              * End sending emails
              */
 
-            DB::commit();
-
             return api()->success(null,GiftcodeResource::make($giftcode));
         } catch (\Throwable $exception) {
-            DB::rollBack();
             Log::error('Giftcode redeem error > ' . $exception->getMessage());
             return api()->error(null,null,500,[
-                'subject' => trans('giftcode.responses.something-went-wrong')
+                'subject' => $exception->getMessage()
             ]);
         }
-    }
-
-    private function withdrawUserWallet($giftcode)
-    {
-        $preparedUser = request()->user->getUserService();
-
-        //Prepare Transaction
-        $transactionService = app(Transaction::class);
-        $transactionService->setConfiremd(true);
-        $transactionService->setAmount($giftcode->total_cost_in_usd);
-        $transactionService->setFromWalletName(request()->get('wallet'));
-        $transactionService->setFromUserId(request()->user->id);
-        $transactionService->setType('Giftcode');
-        $transactionService->setDescription('Create Giftcode #' . $giftcode->uuid);
-
-        //Prepare Withdraw Service
-        $withdrawService = app(Withdraw::class);
-        $withdrawService->setTransaction($transactionService);
-        $withdrawService->setUser($preparedUser);
-
-        //Withdraw transaction
-        return $finalTransaction = $this->walletService->withdraw($withdrawService);
-    }
-
-    private function depositUserWallet($giftcode)
-    {
-        $preparedUser = request()->user->getUserService();
-
-        //Prepare Transaction
-        $transactionService = app(Transaction::class);
-        $transactionService->setConfiremd(true);
-        $transactionService->setAmount($giftcode->getRefundAmount());
-        $transactionService->setToWalletName('Deposit Wallet');
-        $transactionService->setToUserId(request()->user->id);
-        $transactionService->setType('Giftcode');
-        $transactionService->setDescription('Refund Giftcode #' . $giftcode->uuid);
-
-        //Prepare Deposit Service
-        $depositService = app(Deposit::class);
-        $depositService->setTransaction($transactionService);
-        $depositService->setUser($preparedUser);
-        //Deposit transaction
-        return $finalTransaction = $this->walletService->deposit($depositService);
-    }
-
-    private function checkUserBalance($request)
-    {
-        $wallet = prepareGiftcodeWallet(request()->user,$request->get('wallet'));
-        return $this->walletService->getBalance($wallet)->getBalance();
     }
 
 }

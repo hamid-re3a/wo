@@ -23,6 +23,7 @@ use User\Models\User;
  * @property int $packages_cost_in_usd
  * @property int $registration_fee_in_usd
  * @property int $total_cost_in_usd
+ * @property boolean $is_canceled
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

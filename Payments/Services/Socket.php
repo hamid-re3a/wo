@@ -16,7 +16,7 @@ class Socket
         Http::post($this->socket_url, [
             "uid" => $invoice_model->getTransactionId(),
             "content" => [
-                "name" => "partial_paid",
+                "name" => $status,
                 "amount" => $invoice_model->getDueAmount(),
                 "checkout_link" => $invoice_model->getCheckoutLink(),
                 "payment_currency" => $invoice_model->getPaymentCurrency()

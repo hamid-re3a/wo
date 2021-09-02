@@ -21,7 +21,7 @@ Route::middleware(['role:client'])->name('customer.')->group(function () {
 });
 
 
-Route::name('packages.')->middleware('auth_user_package')->group(function () {
+Route::name('packages.')->middleware('auth_user')->group(function () {
     Route::get('/',[PackageController::class,'index'])->name('index');
     Route::post('/edit',[\Packages\Http\Controllers\Admin\PackageController::class,'edit'])->name('edit');
 });

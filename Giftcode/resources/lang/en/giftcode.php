@@ -12,6 +12,7 @@ return [
         'email-key-doesnt-exists' => "giftcode email content doesn't exists",
         'not-valid-giftcode-id' => 'Giftcode ID is not valid',
 
+        'giftcode-is-canceled-and-user-cant-cancel' => 'You can not cancel a giftcode again.',
         'giftcode-is-used-and-user-cant-cancel' => 'You can not cancel a used giftcode.',
         'giftcode-is-expired-and-user-cant-cancel' => 'You can not cancel an expired giftcode.',
 

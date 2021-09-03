@@ -131,4 +131,32 @@ class Giftcode extends Model
 
 
 
+        public function getGiftcodeService()
+    {
+        $giftcode_service = new \Giftcode\Services\Giftcode();
+        $giftcode_service->setId($this->attributes['id']);
+        $giftcode_service->setUuid($this->attributes['uuid']);
+        $giftcode_service->setUserId($this->attributes['user_id']);
+        $giftcode_service->setPackageId($this->attributes['package_id']);
+        $giftcode_service->setPackagesCostInUsd($this->attributes['packages_cost_in_usd']);
+        $giftcode_service->setRegistrationFeeInUsd($this->attributes['registration_fee_in_usd']);
+        $giftcode_service->setTotalCostInUsd($this->attributes['total_cost_in_usd']);
+        $giftcode_service->setCode($this->attributes['code']);
+        if(isset($this->attributes['expiration_date']))
+            $giftcode_service->setExpirationDate($this->attributes['expiration_date']);
+
+        $giftcode_service->setIsCanceled($this->attributes['is_canceled']);
+        $giftcode_service->setCreatedAt($this->attributes['created_at']);
+        $giftcode_service->setUpdatedAt($this->attributes['updated_at']);
+        $giftcode_service->setCreator($this->creator->getUserService());
+        if(!empty($this->attributes['redeem_user_id'])) {
+            $giftcode_service->setRedeemer($this->redeemer->getUserService());
+            $giftcode_service->setRedeemUserId($this->attributes['redeem_user_id']);
+            $giftcode_service->setRedeemDate($this->attributes['redeem_date']);
+        }
+        return $giftcode_service;
+    }
+
+
+
 }

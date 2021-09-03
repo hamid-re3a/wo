@@ -94,7 +94,6 @@ class GiftcodeController extends Controller
         try {
 
             $giftcode = $this->giftcode_repository->cancel($request);
-            UrgentEmailJob::dispatch(new GiftcodeCanceledEmail(request()->user,$giftcode),request()->user->email);
             return api()->success(trans('giftcode.responses.giftcode-canceled-amount-refunded', ['amount' => (double) $giftcode->getRefundAmount()]));
 
         } catch (\Throwable $exception) {

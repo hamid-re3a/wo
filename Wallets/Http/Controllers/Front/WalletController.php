@@ -17,7 +17,7 @@ class WalletController extends Controller
 
     public function readyBankService()
     {
-        $this->bankService = new BankService(request()->wallet_user);
+        $this->bankService = new BankService(request()->user);
         $this->earningWallet = config('earningWallet');
         $this->depositWallet = config('depositWallet');
         if($this->bankService->getAllWallets()->count() == 0) {

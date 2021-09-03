@@ -4,6 +4,7 @@
 namespace Wallets\tests\Feature;
 
 
+use Illuminate\Support\Facades\Mail;
 use User\Models\User;
 use Wallets\Services\BankService;
 use Wallets\tests\WalletTest;
@@ -16,6 +17,7 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function get_deposit_wallet()
     {
+        Mail::fake();
         $response = $this->get(route('wallets.deposit.get-wallet'));
         $response->assertOk();
         $response->assertJsonStructure([
@@ -94,6 +96,7 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function transfer_fund_preview_sufficient_balance()
     {
+        Mail::fake();
         $user_1 = User::query()->where('username','=','admin')->first();
         $bank_service = new BankService($user_1);
         $bank_service->deposit('Deposit Wallet',30000);
@@ -139,6 +142,7 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function transfer_fund_sufficient_balance()
     {
+        Mail::fake();
         $user_1 = User::query()->where('username','=','admin')->first();
         $bank_service = new BankService($user_1);
         $bank_service->deposit('Deposit Wallet',30000);
@@ -162,6 +166,7 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function deposit_fund()
     {
+        Mail::fake();
         $response = $this->postJson(route('wallets.deposit.deposit-funds'),[
             'amount' => 101,
         ]);

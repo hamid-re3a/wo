@@ -18,7 +18,7 @@ class EarningWalletController extends Controller
     private function prepareEarningWallet()
     {
 
-        $this->bankService = new BankService(request()->wallet_user);
+        $this->bankService = new BankService(request()->user);
         $this->wallet = config('earningWallet');
         $this->bankService->getWallet($this->wallet);
 

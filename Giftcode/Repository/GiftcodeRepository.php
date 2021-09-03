@@ -5,6 +5,9 @@ namespace Giftcode\Repository;
 
 
 use Exception;
+use Giftcode\Jobs\UrgentEmailJob;
+use Giftcode\Mail\User\GiftcodeCanceledEmail;
+use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +49,9 @@ class GiftcodeRepository
             /**
              * End User wallet process
              */
+
+            UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
+
             DB::commit();
 
             return $giftcode;
@@ -94,6 +100,7 @@ class GiftcodeRepository
             /**
              * End refund
              */
+            UrgentEmailJob::dispatch(new GiftcodeCanceledEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
 
 
             DB::commit();
@@ -122,7 +129,7 @@ class GiftcodeRepository
                 throw new \Exception(trans('giftcode.responses.giftcode-is-expired-and-user-cant-redeem'),406);
 
             $giftcode->update([
-                'redeem_user_id' => request()->user->id,
+                'redeem_user_id' => $request->user->id,
                 'redeem_date' => now()->toDateTimeString()
             ]);
             DB::commit();
@@ -145,7 +152,7 @@ class GiftcodeRepository
 
     public function getGiftcodeServiceByUuid($uuid)
     {
-        $giftcode = $this->model->query()->where('id',$uuid)->first();
+        $giftcode = $this->model->query()->where('uuid',$uuid)->first();
         if($giftcode)
             return $this->getGiftcodeService($giftcode);
 
@@ -155,24 +162,8 @@ class GiftcodeRepository
     public function getGiftcodeService($giftcode)
     {
         $giftcode_service = new \Giftcode\Services\Giftcode();
-        $giftcode_service->setId($giftcode->id);
-        $giftcode_service->setUuid($giftcode->uuid);
-        $giftcode_service->setUserId($giftcode->user_id);
-        $giftcode_service->setPackageId($giftcode->package_id);
-        $giftcode_service->setPackagesCostInUsd($giftcode->packages_cost_in_usd);
-        $giftcode_service->setRegistrationFeeInUsd($giftcode->registration_fee_in_usd);
-        $giftcode_service->setTotalCostInUsd($giftcode->total_cost_in_usd);
-        $giftcode_service->setCode($giftcode->code);
-        $giftcode_service->setExpirationDate($giftcode->expiration_date);
-        $giftcode_service->setIsCanceled($giftcode->is_canceled);
-        $giftcode_service->setCreatedAt($giftcode->created_at);
-        $giftcode_service->setUpdatedAt($giftcode->updated_at);
-        $giftcode_service->setCreator($giftcode->creator->getUserService());
-        if(!empty($giftcode->redeem_user_id)) {
-            $giftcode_service->setRedeemer($giftcode->redeemer->getUserService());
-            $giftcode_service->setRedeemUserId($giftcode->redeem_user_id);
-            $giftcode_service->setRedeemDate($giftcode->redeem_date);
-        }
+        if($giftcode instanceof Giftcode AND !empty($giftcode->id))
+            return $giftcode->getGiftcodeService();
 
         return $giftcode_service;
     }
@@ -189,12 +180,12 @@ class GiftcodeRepository
 
     public function getUserCanceledGiftcodesCount($user_id)
     {
-        return $this->model->query()->where('user_id', $user_id)->whereNotNull('is_canceled')->count();
+        return $this->model->query()->where('user_id', $user_id)->where('is_canceled','!=',0)->count();
     }
 
     public function getUserRedeemedGiftcodesCount($user_id)
     {
-        return $this->model->query()->where('redeem_user_id',$user_id)->whereNotNull('is_canceled')->count();
+        return $this->model->query()->where('redeem_user_id',$user_id)->where('is_canceled','!=',0)->count();
     }
 
 

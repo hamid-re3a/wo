@@ -46,9 +46,4 @@ class GiftcodeObserver
             $giftcode->package_id = request()->get('package_id');
 
     }
-
-    public function created(Giftcode $giftcode)
-    {
-        UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
-    }
 }

@@ -6,7 +6,6 @@ namespace Giftcode\Services;
 
 use Giftcode\Repository\GiftcodeRepository;
 use Illuminate\Http\Request;
-use Packages\Services\Package;
 use User\Services\User;
 
 class GiftcodeService
@@ -18,20 +17,11 @@ class GiftcodeService
         $this->giftcode_repository = $giftcode_repository;
     }
 
-    public function getGiftcodeById(Id $id)
+    public function getGiftcode(Giftcode $giftcode)
     {
-        $giftcode = $this->giftcode_repository->getById($id->getId());
-        if($giftcode)
-            return $this->giftcode_repository->getGiftcodeService($giftcode);
-
-        return new Giftcode();
-    }
-
-    public function getGiftcodeByUuid(Uuid $uuid)
-    {
-        $giftcode = $this->giftcode_repository->getByUuid($uuid->getUuid());
-        if($giftcode)
-            return $this->giftcode_repository->getGiftcodeService($giftcode);
+        $giftcode_model = $this->giftcode_repository->getByUuid($giftcode->getUuid());
+        if($giftcode_model)
+            return $this->giftcode_repository->getGiftcodeService($giftcode_model);
 
         return new Giftcode();
     }
@@ -42,14 +32,14 @@ class GiftcodeService
             $giftcode_model = $this->giftcode_repository->getById($giftcode->getId());
             if(!$giftcode_model)
                 return new Giftcode();
-
-            if($giftcode_model->package_id != $package->getId()) {
+            if($giftcode_model->package_id == $package->getId()) {
                 $request = new Request();
-                $request->uuid = $giftcode->getUuid();
-                $request->user = \User\Models\User::query()->find($user->getId());
-                $this->giftcode_repository->redeem($request);
+                $request->merge([
+                    'id' => $giftcode->getUuid(),
+                    'user' => \User\Models\User::query()->find($user->getId())
+                ]);
+                $giftcode_model = $this->giftcode_repository->redeem($request);
             }
-
             return $this->giftcode_repository->getGiftcodeServiceByUuid($giftcode->getUuid());
 
         } catch (\Throwable $exception) {
@@ -63,16 +53,22 @@ class GiftcodeService
         return $this->giftcode_repository->getUserCreatedGiftcodesCount($user_id);
     }
 
+    public function getUserExpiredGiftcodesCount(User $user)
+    {
+        $user_id = $user->getId();
+        return $this->giftcode_repository->getUserExpiredGiftcodesCount($user_id);
+    }
+
     public function getUserCanceledGiftcodesCount(User $user)
     {
         $user_id = $user->getId();
-        return $this->giftcode_repository->getUserCreatedGiftcodesCount($user_id);
+        return $this->giftcode_repository->getUserCanceledGiftcodesCount($user_id);
     }
 
     public function getUserRedeemedGiftcodesCount(User $user)
     {
         $user_id = $user->getId();
-        return $this->giftcode_repository->getUserCreatedGiftcodesCount($user_id);
+        return $this->giftcode_repository->getUserRedeemedGiftcodesCount($user_id);
     }
 
 

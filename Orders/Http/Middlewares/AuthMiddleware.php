@@ -26,7 +26,8 @@ class AuthMiddleware
 
         if ($request->hasHeader('X-user-id') && $request->hasHeader('X-user-hash')) {
             $user_hash_request = $request->header('X-user-id');
-            $user = User::whereId($request->header('X-user-hash'))->first();
+            $user = User::query()->find($request->header('X-user-id'));
+
             $hash_user_service = \Illuminate\Support\Facades\Hash::make(serialize($user->getUserService()));
 
             /**

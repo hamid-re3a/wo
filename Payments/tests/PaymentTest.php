@@ -6,11 +6,13 @@ namespace Payments\tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 use Packages\Models\Package;
 use Packages\PackageConfigure;
 use Payments\PaymentConfigure;
 use Tests\CreatesApplication;
 use Tests\TestCase;
+use User\Models\User;
 
 class PaymentTest extends TestCase
 {
@@ -37,17 +39,19 @@ class PaymentTest extends TestCase
 
     public function getHeaders()
     {
+        User::query()->firstOrCreate([
+            'id' => '1',
+            'first_name' => 'Admin',
+            'last_name' => 'Admin',
+            'member_id' => 1000,
+            'email' => 'work@sajidjaved.com',
+            'username' => 'admin',
+        ]);
+        $user = User::query()->first();
+        $hash = Hash::make(serialize($user->getUserService()));
         return [
             'X-user-id' => '1',
-            'X-user-first-name' => 'Admin',
-            'X-user-last-name' => 'Admin',
-            'X-user-email' => 'admin@site.com',
-            'X-user-username' => 'Admin',
-            'X-user-member-id' => '1000',
-            'X-user-sponsor-id' => '',
-            'X-user-block-type' => '',
-            'X-user-is-freeze' => '',
-            'X-user-is-deactivate' => '',
+            'X-user-hash' => $hash,
         ];
     }
 }

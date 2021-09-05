@@ -18,9 +18,9 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        foreach (USER_ROLES as $role) {
-            Role::query()->firstOrCreate(['name' => $role]);
-        }
+        if(defined('USER_ROLES'))
+            foreach (USER_ROLES as $role)
+                Role::query()->firstOrCreate(['name' => $role]);
 
         // Load local seeder
         if (app()->environment() === 'local') {
@@ -33,7 +33,8 @@ class UserTableSeeder extends Seeder
                 'username' => 'admin',
             ]);
 
-            $admin->assignRole(USER_ROLE_SUPER_ADMIN);
+            if(defined('USER_ROLE_SUPER_ADMIN'))
+                $admin->assignRole(USER_ROLE_SUPER_ADMIN);
         }
 
     }

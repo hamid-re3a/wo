@@ -1,6 +1,6 @@
 <?php
 
-namespace Orders\Http\Middlewares;
+namespace User\Http\Middlewares;
 
 use App\Jobs\User\UserGetDataJob;
 use Closure;

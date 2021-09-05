@@ -105,6 +105,7 @@ class User extends Model implements WalletFloat
         return $this->hasMany(Invoice::class,'user_id','id');
     }
 
+
     /**
      * Methods
      */
@@ -127,6 +128,11 @@ class User extends Model implements WalletFloat
 
         if(isset($this->attributes['is_freeze']))
             $user->setIsFreeze($this->attributes['is_freeze']);
+
+        if($this->getRoleNames()->count()) {
+            $role_name = implode(",",$this->getRoleNames()->toArray());
+            $user->setRole($role_name);
+        }
 
         return $user;
     }

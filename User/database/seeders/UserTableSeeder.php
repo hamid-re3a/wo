@@ -3,6 +3,7 @@
 namespace User\database\seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 use User\Models\User;
 
 /**
@@ -17,16 +18,22 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
+        foreach (USER_ROLES as $role) {
+            Role::query()->firstOrCreate(['name' => $role]);
+        }
+
         // Load local seeder
         if (app()->environment() === 'local') {
-            $user = User::query()->firstOrCreate(['id' => 1]);
-            $user->update([
+            $admin = User::query()->firstOrCreate(['id' => 1]);
+            $admin->update([
                 'first_name' => 'Admin',
                 'last_name' => 'Admin',
                 'member_id' => 1000,
                 'email' => 'work@sajidjaved.com',
                 'username' => 'admin',
             ]);
+
+            $admin->assignRole(USER_ROLE_SUPER_ADMIN);
         }
 
     }

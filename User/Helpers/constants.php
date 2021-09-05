@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * user_roles
+ */
+const USER_ROLE_SUPER_ADMIN = 'super-admin';
+const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
+const USER_ROLE_ADMIN_KYC = 'kyc-admin';
+const USER_ROLE_ADMIN_SUBSCRIPTIONS_ORDER = 'subscriptions-order-admin';
+const USER_ROLE_ADMIN_SUBSCRIPTIONS_PACKAGE = 'subscriptions-package-admin';
+const USER_ROLE_ADMIN_SUBSCRIPTIONS_PAYMENT = 'subscriptions-payment-admin';
+const USER_ROLE_ADMIN_SUBSCRIPTIONS_WALLET = 'subscriptions-wallet-admin';
+const USER_ROLE_ADMIN_SUBSCRIPTIONS_GIFTCODE = 'subscriptions-giftcode-admin';
+const USER_ROLE_ADMIN_MLM = 'mlm-admin';
+const USER_ROLE_CLIENT = 'client';
+const USER_ROLE_HELP_DESK = 'help-desk';
+const USER_ROLES = [
+    USER_ROLE_SUPER_ADMIN,
+    USER_ROLE_ADMIN_GATEWAY,
+    USER_ROLE_ADMIN_KYC,
+    USER_ROLE_ADMIN_SUBSCRIPTIONS_ORDER,
+    USER_ROLE_ADMIN_SUBSCRIPTIONS_PACKAGE,
+    USER_ROLE_ADMIN_SUBSCRIPTIONS_PAYMENT,
+    USER_ROLE_ADMIN_SUBSCRIPTIONS_WALLET,
+    USER_ROLE_ADMIN_SUBSCRIPTIONS_GIFTCODE,
+    USER_ROLE_ADMIN_MLM,
+    USER_ROLE_CLIENT,
+    USER_ROLE_HELP_DESK,
+];

@@ -79,7 +79,7 @@ class UserServiceProvider extends ServiceProvider
             require_once $helperFile;
         }
 
-        if (file_exists($helperFile = __DIR__ . '/helpers/constants.php')) {
+        if (file_exists($helperFile = __DIR__ . '/Helpers/constants.php')) {
             require_once $helperFile;
         }
     }

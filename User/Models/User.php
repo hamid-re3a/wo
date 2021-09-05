@@ -2,7 +2,6 @@
 namespace User\Models;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
-use Bavix\Wallet\Models\Wallet as WalletModel;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
@@ -13,7 +12,6 @@ use Orders\Models\Order;
 use Payments\Models\Invoice;
 use Spatie\Permission\Traits\HasRoles;
 use User\database\factories\UserFactory;
-use Wallets\Models\Transaction;
 
 /**
  * User\Models\User

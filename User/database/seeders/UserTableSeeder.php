@@ -33,7 +33,8 @@ class UserTableSeeder extends Seeder
                 'username' => 'admin',
             ]);
 
-            $admin->assignRole(USER_ROLE_SUPER_ADMIN);
+            if(defined('USER_ROLE_SUPER_ADMIN'))
+                $admin->assignRole(USER_ROLE_SUPER_ADMIN);
         }
 
     }

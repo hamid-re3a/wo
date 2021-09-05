@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use User\Services\UserService;
 
 class UserGetDataJob implements ShouldQueue
@@ -28,6 +29,7 @@ class UserGetDataJob implements ShouldQueue
     public function handle()
     {
         $userGetDataSerialize = serialize($this->data);
+        Log::info("produce request get user data",[$this->data]);
         UserDataJob::dispatch($userGetDataSerialize)->onConnection('rabbit')->onQueue('api-gateway');
     }
 }

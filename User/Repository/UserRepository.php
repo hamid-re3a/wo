@@ -19,12 +19,12 @@ class UserRepository
             'first_name' => $user->getFirstName(),
             'last_name' => $user->getLastName(),
             'username' => $user->getUsername(),
-            'email' => $user->getFirstName(),
+            'email' => $user->getEmail(),
             'member_id' => $user->getMemberId(),
-            'block_type' => $user->getBlockType(),
-            'is_deactivate' => $user->getIsDeactivate(),
-            'is_freeze' => $user->getIsFreeze(),
-            'sponsor_id' => $user->getSponsorId(),
+            'block_type' => empty($user->getBlockType()) ? null : $user->getBlockType(),
+            'is_deactivate' => empty($user->getIsDeactivate()) ? null : $user->getIsDeactivate(),
+            'is_freeze' => empty($user->getIsFreeze()) ? null : $user->getIsFreeze(),
+            'sponsor_id' => empty($user->getSponsorId()) ? null : $user->getSponsorId(),
         ]);
         return $user_find;
     }

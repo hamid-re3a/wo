@@ -26,9 +26,6 @@ class UserRepository
             'is_freeze' => $user->getIsFreeze(),
             'sponsor_id' => $user->getSponsorId(),
         ]);
-        if (!empty($user_find->getDirty())) {
-            $user_find->save();
-        }
         return $user_find;
     }
 

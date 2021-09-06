@@ -1,4 +1,5 @@
 <?php
+
 namespace User\Models;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
@@ -45,7 +46,7 @@ use User\database\factories\UserFactory;
  */
 class User extends Model implements WalletFloat
 {
-    use HasWalletFloat,HasWallets, HasFactory, HasRoles;
+    use HasWalletFloat, HasWallets, HasFactory, HasRoles;
     protected $table = "users";
     protected $fillable = [
         "id",
@@ -65,7 +66,7 @@ class User extends Model implements WalletFloat
         return UserFactory::new();
     }
 
-    Protected $guard_name ='api';
+    Protected $guard_name = 'api';
 
     /**
      * Mutators
@@ -80,29 +81,29 @@ class User extends Model implements WalletFloat
      * Relations
      */
 
-    public function transactions() : MorphMany
+    public function transactions(): MorphMany
     {
         return $this->morphMany(config('wallet.transaction.model', \Bavix\Wallet\Models\Transaction::class), 'payable');
     }
 
     public function giftCodes()
     {
-        return $this->hasMany(Giftcode::class,'user_id','id');
+        return $this->hasMany(Giftcode::class, 'user_id', 'id');
     }
 
     public function orders()
     {
-        return $this->hasMany(Order::class,'user_id','id');
+        return $this->hasMany(Order::class, 'user_id', 'id');
     }
 
     public function paidOrders()
     {
-        return $this->hasMany(Order::class,'user_id','id')->whereNotNull('is_paid_at');
+        return $this->hasMany(Order::class, 'user_id', 'id')->whereNotNull('is_paid_at');
     }
 
     public function invoices()
     {
-        return $this->hasMany(Invoice::class,'user_id','id');
+        return $this->hasMany(Invoice::class, 'user_id', 'id');
     }
 
 
@@ -118,20 +119,18 @@ class User extends Model implements WalletFloat
         $user->setUsername($this->attributes['username']);
         $user->setEmail($this->attributes['email']);
         $user->setMemberId($this->attributes['member_id']);
-        if(isset($this->attributes['sponsor_id']))
+        $user->setIsDeactivate($this->attributes['is_deactivate']);
+        $user->setIsFreeze($this->attributes['is_freeze']);
+
+        if (isset($this->attributes['sponsor_id']) AND !empty($this->attributes['sponsor_id']))
             $user->setSponsorId($this->attributes['sponsor_id']);
 
-        if(isset($this->attributes['block_type']))
+        if (isset($this->attributes['block_type']) AND !empty($this->attributes['block_type']))
             $user->setBlockType($this->attributes['block_type']);
 
-        if(isset($this->attributes['is_deactivate']))
-            $user->setIsDeactivate($this->attributes['is_deactivate']);
 
-        if(isset($this->attributes['is_freeze']))
-            $user->setIsFreeze($this->attributes['is_freeze']);
-
-        if($this->getRoleNames()->count()) {
-            $role_name = implode(",",$this->getRoleNames()->toArray());
+        if ($this->getRoleNames()->count()) {
+            $role_name = implode(",", $this->getRoleNames()->toArray());
             $user->setRole($role_name);
         }
 

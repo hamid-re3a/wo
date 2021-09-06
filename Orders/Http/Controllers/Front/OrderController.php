@@ -66,23 +66,15 @@ class OrderController extends Controller
      */
     public function newOrder(OrderRequest $request)
     {
-        $this->validatePackages($request);
-
+        $this->validatePackage($request);
         $order_db = Order::query()->create([
             "user_id" => user($request->header('X-user-id'))->getId(),
             "payment_type" => $request->payment_type,
             "payment_currency" => $request->payment_currency,
             "payment_driver" => $request->payment_driver,
+            "package_id" => $request->package_id
         ]);
-
-        $ids = [];
-        foreach ($request->package_ids as $item) {
-            for ($i = 0; $i < $item['qty']; $i++)
-                $ids[] = ['package_id' => $item['id']];
-        }
-        $order_db->packages()->createMany($ids);
-        $order_db->reCalculateCosts();
-        $order_db->refresh();
+        $order_db->refreshOrder();
 
         $invoice_request = new Invoice();
         $invoice_request->setPayableId((int)$order_db->id);
@@ -91,7 +83,6 @@ class OrderController extends Controller
         $invoice_request->setPaymentDriver($order_db->payment_driver);
         $invoice_request->setPaymentType($order_db->payment_type);
         $invoice_request->setPaymentCurrency($order_db->payment_currency);
-
         $invoice_request->setUser($request->user->getUserService());
 
         $invoice = $this->payment_service->pay($invoice_request);
@@ -105,24 +96,16 @@ class OrderController extends Controller
         ]);
     }
 
-    private function validatePackages(Request $request)
+    private function validatePackage(Request $request)
     {
-        $rules = [
-            'package_ids.*.id' => 'required',
-            'package_ids.*.qty' => 'required|numeric|min:1|max:1',
-        ];
 
-        $this->validate($request, $rules);
-
-        foreach ($request->package_ids as $item) {
-            $id = new Id;
-            $id->setId($item['id']);
-            $package = $this->package_service->packageById( $id);
-            if (!$package->getId()) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'package_ids' => ['Package does not exist'],
-                ]);
-            }
+        $id = new Id;
+        $id->setId($request->package_id);
+        $package = $this->package_service->packageById( $id);
+        if (!$package->getId()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'package_ids' => ['Package does not exist'],
+            ]);
         }
     }
 }

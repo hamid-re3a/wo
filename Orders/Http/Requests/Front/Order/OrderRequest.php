@@ -29,7 +29,7 @@ class OrderRequest extends FormRequest
     {
             return [
 
-            'package_ids' => 'required|array|min:1|max:1',
+            'package_id' => 'required|numeric',
 //            'items.*.id' => 'exists:packages,id',
 //            'items.*.qty' => 'required|numeric|min:1',
 //            'to_user_id' => 'nullable|exists:order_users,id',

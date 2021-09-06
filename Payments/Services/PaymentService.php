@@ -47,13 +47,12 @@ class PaymentService implements PaymentsServiceInterface
         switch ($invoice_request->getPaymentDriver()) {
             case 'btc-pay-server':
                 return $this->payBtcServer($invoice_request);
-            default:
-                return $invoice_request;
                 break;
         }
+        return $invoice_request;
     }
 
-    private function payBtcServer($invoice_request)
+    private function payBtcServer(Invoice $invoice_request)
     {
         $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->post(

@@ -12,6 +12,7 @@ use Packages\PackageConfigure;
 use Payments\PaymentConfigure;
 use Tests\CreatesApplication;
 use Tests\TestCase;
+use User\UserConfigure;
 use User\Models\User;
 
 class PaymentTest extends TestCase
@@ -23,6 +24,7 @@ class PaymentTest extends TestCase
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
+        UserConfigure::seed();
         $this->withHeaders($this->getHeaders());
         PackageConfigure::seed();
         PaymentConfigure::seed();

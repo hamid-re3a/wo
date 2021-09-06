@@ -2,9 +2,11 @@
 
 namespace User\database\seeders;
 
+use App\Jobs\User\RequestGetAllUserDataJob;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use User\Models\User;
+use User\Services\UserUpdate;
 
 /**
  * Class AuthTableSeeder.
@@ -18,6 +20,11 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
+        $user_update = new UserUpdate();
+        $user_update->setQueueName('subscriptions');
+        $data_serialize = serialize($user_update);
+        RequestGetAllUserDataJob::dispatch($data_serialize);
+
         if(defined('USER_ROLES'))
             foreach (USER_ROLES as $role)
                 Role::query()->firstOrCreate(['name' => $role]);

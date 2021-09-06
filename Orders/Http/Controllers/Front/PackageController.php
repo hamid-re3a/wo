@@ -25,21 +25,19 @@ class PackageController extends Controller
     public function paidPackages()
     {
         $packages = collect();
-        $orders = request()->user->paidOrders()->whereHas('packages')->with('packages')->get();
-        foreach($orders AS $order) {
-            foreach($order->packages AS $key => $package) {
-                $packageDetails = $this->getPackage($package->package_id);
-                $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());
-                if( $packageExpireDate > now() )
-                    $packages->push([
-                        'id' => $packageDetails->getId(),
-                        'name' => $packageDetails->getName(),
-                        'short_name' => $packageDetails->getShortName(),
-                        'expire_date' => $packageExpireDate->timestamp
-                    ]);
-            }
+        $orders = request()->user->paidOrders()->get();
+        foreach ($orders AS $order) {
+            $packageDetails = $this->getPackage($order->package_id);
+            $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());
+            if ($packageExpireDate > now())
+                $packages->push([
+                    'id' => $packageDetails->getId(),
+                    'name' => $packageDetails->getName(),
+                    'short_name' => $packageDetails->getShortName(),
+                    'expire_date' => $packageExpireDate->timestamp
+                ]);
         }
-        return api()->success(null,PackageResource::collection($packages));
+        return api()->success(null, PackageResource::collection($packages));
     }
 
     /**
@@ -49,19 +47,16 @@ class PackageController extends Controller
      */
     public function hasValidPackage()
     {
-        $orders = request()->user->paidOrders()->whereHas('packages')->with('packages')->get();
-        foreach($orders AS $order) {
-            foreach($order->packages AS $key => $package) {
-                $packageDetails = $this->getPackage($package->package_id);
-                $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());
-                if( $packageExpireDate > now() )
-                    return api()->success(null,[
-                        'has_valid_package' => true
-                    ]);
-
-            }
+        $orders = request()->user->paidOrders()->get();
+        foreach ($orders AS $order) {
+            $packageDetails = $this->getPackage($order->package_id);
+            $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());
+            if ($packageExpireDate > now())
+                return api()->success(null, [
+                    'has_valid_package' => true
+                ]);
         }
-        return api()->success( null,[
+        return api()->success(null, [
             'has_valid_package' => false
         ]);
     }

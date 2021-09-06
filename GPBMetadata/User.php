@@ -16,9 +16,9 @@ class User
         }
         $pool->internalAddGeneratedFile(
             '
-ù
+∞
 
-user.protouser.services"∫
+user.protouser.services"Õ
 User
 
 id (
@@ -27,14 +27,15 @@ first_name (	
 	last_name (	
 username (	
 email (	
-role (	
+role (	
+	member_id (
 
-sponsor_id (
+sponsor_id (
 
-block_type (	
-	is_freeze	 (
-is_deactivate
- (";
+block_type	 (	
+	is_freeze
+ (
+is_deactivate (";
 
 UserUpdate
 

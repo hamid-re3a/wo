@@ -38,19 +38,23 @@ class User extends \Google\Protobuf\Internal\Message
      */
     protected $role = '';
     /**
-     * Generated from protobuf field <code>int64 sponsor_id = 7;</code>
+     * Generated from protobuf field <code>int64 member_id = 7;</code>
+     */
+    protected $member_id = 0;
+    /**
+     * Generated from protobuf field <code>int64 sponsor_id = 8;</code>
      */
     protected $sponsor_id = 0;
     /**
-     * Generated from protobuf field <code>string block_type = 8;</code>
+     * Generated from protobuf field <code>string block_type = 9;</code>
      */
     protected $block_type = '';
     /**
-     * Generated from protobuf field <code>bool is_freeze = 9;</code>
+     * Generated from protobuf field <code>bool is_freeze = 10;</code>
      */
     protected $is_freeze = false;
     /**
-     * Generated from protobuf field <code>bool is_deactivate = 10;</code>
+     * Generated from protobuf field <code>bool is_deactivate = 11;</code>
      */
     protected $is_deactivate = false;
 
@@ -66,6 +70,7 @@ class User extends \Google\Protobuf\Internal\Message
      *     @type string $username
      *     @type string $email
      *     @type string $role
+     *     @type int|string $member_id
      *     @type int|string $sponsor_id
      *     @type string $block_type
      *     @type bool $is_freeze
@@ -210,7 +215,29 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 sponsor_id = 7;</code>
+     * Generated from protobuf field <code>int64 member_id = 7;</code>
+     * @return int|string
+     */
+    public function getMemberId()
+    {
+        return $this->member_id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 member_id = 7;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setMemberId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->member_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 sponsor_id = 8;</code>
      * @return int|string
      */
     public function getSponsorId()
@@ -219,7 +246,7 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 sponsor_id = 7;</code>
+     * Generated from protobuf field <code>int64 sponsor_id = 8;</code>
      * @param int|string $var
      * @return $this
      */
@@ -232,7 +259,7 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string block_type = 8;</code>
+     * Generated from protobuf field <code>string block_type = 9;</code>
      * @return string
      */
     public function getBlockType()
@@ -241,7 +268,7 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string block_type = 8;</code>
+     * Generated from protobuf field <code>string block_type = 9;</code>
      * @param string $var
      * @return $this
      */
@@ -254,7 +281,7 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool is_freeze = 9;</code>
+     * Generated from protobuf field <code>bool is_freeze = 10;</code>
      * @return bool
      */
     public function getIsFreeze()
@@ -263,7 +290,7 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool is_freeze = 9;</code>
+     * Generated from protobuf field <code>bool is_freeze = 10;</code>
      * @param bool $var
      * @return $this
      */
@@ -276,7 +303,7 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool is_deactivate = 10;</code>
+     * Generated from protobuf field <code>bool is_deactivate = 11;</code>
      * @return bool
      */
     public function getIsDeactivate()
@@ -285,7 +312,7 @@ class User extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>bool is_deactivate = 10;</code>
+     * Generated from protobuf field <code>bool is_deactivate = 11;</code>
      * @param bool $var
      * @return $this
      */

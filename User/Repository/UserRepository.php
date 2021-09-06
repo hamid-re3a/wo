@@ -20,6 +20,7 @@ class UserRepository
             'last_name' => $user->getLastName(),
             'username' => $user->getUsername(),
             'email' => $user->getFirstName(),
+            'member_id' => $user->getMemberId(),
             'block_type' => $user->getBlockType(),
             'is_deactivate' => $user->getIsDeactivate(),
             'is_freeze' => $user->getIsFreeze(),

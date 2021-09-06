@@ -51,8 +51,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaymentDriver($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePaymentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePfAmount($value)
- * @property float $deposit_amount
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDepositAmount($value)
+ * @property int|null $user_id
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Payments\Models\InvoiceTransaction[] $transactions
+ * @property-read int|null $transactions_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereUserId($value)
  */
 class Invoice extends Model
 {

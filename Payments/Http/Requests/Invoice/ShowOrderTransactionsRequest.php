@@ -28,7 +28,7 @@ class ShowOrderTransactionsRequest extends FormRequest
     {
 
         return [
-            'invoice_id' => 'required|string|exists:invoices,transaction_id',
+            'transaction_id' => 'required|string|exists:invoices,transaction_id',
         ];
     }
 }

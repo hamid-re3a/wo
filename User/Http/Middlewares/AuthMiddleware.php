@@ -28,25 +28,25 @@ class AuthMiddleware
             $user_hash_request = $request->header('X-user-hash');
             $user = User::query()->find($request->header('X-user-id'));
 
-//            /**
-//             * if there is not exist user. get data user complete from api gateway
-//             * error code 5000 is for data user not exist log for development
-//             */
-//            if ($user === null) {
-//                UserGetDataJob::dispatch($user_update);
-//                return  api()->error('please try another time!',null,5000);
-//            }
-//
-//            $hash_user_service = md5(serialize($user->getUserService()));
-//
-//            /**
-//             * if there is not update data user. get data user complete from api gateway
-//             * error code 5001 is for data user not update log for development
-//             */
-//            if ($hash_user_service != $user_hash_request){
-//                UserGetDataJob::dispatch($user_update);
-//                return  api()->error('please try another time!',null,5001);
-//            }
+            /**
+             * if there is not exist user. get data user complete from api gateway
+             * error code 5000 is for data user not exist log for development
+             */
+            if ($user === null) {
+                UserGetDataJob::dispatch($user_update);
+                return  api()->error('please try another time!',null,5000);
+            }
+
+            $hash_user_service = md5(serialize($user->getUserService()));
+
+            /**
+             * if there is not update data user. get data user complete from api gateway
+             * error code 5001 is for data user not update log for development
+             */
+            if ($hash_user_service != $user_hash_request){
+                UserGetDataJob::dispatch($user_update);
+                return  api()->error('please try another time!',null,5001);
+            }
 
             $request->merge([
                 'user' => $user

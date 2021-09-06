@@ -64,6 +64,13 @@ class Invoice extends Model
     use HasFactory;
     protected $guarded = [];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'expiration_time' => 'datetime',
+        'is_paid' => 'boolean'
+    ];
+
     public function getFullStatusAttribute()
     {
         return $this->status .' '. $this->additional_status;
@@ -81,5 +88,24 @@ class Invoice extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Mutators
+     */
+
+    public function getTypeAttribute()
+    {
+        switch($this->attributes['payable_type']) {
+            case 'Order':
+                return 'order';
+                break;
+            case 'DepositWallet' :
+                return 'wallet';
+                break;
+            default:
+                return 'Unknown';
+                break;
+        }
     }
 }

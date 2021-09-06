@@ -61,7 +61,7 @@ if(!function_exists('prepareGiftcodeWallet')) {
     function prepareGiftcodeWallet(\User\Models\User $user,$wallet)
     {
         $walletService = app(\Wallets\Services\Wallet::class);
-        $walletService->setUser(prepareGiftcodeUser($user));
+        $walletService->setUser($user->getUserService());
         $walletService->setName($wallet);
         return $walletService;
     }

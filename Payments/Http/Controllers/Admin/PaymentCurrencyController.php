@@ -73,8 +73,4 @@ class PaymentCurrencyController extends Controller
         $payment_currency->setIsActive($request->is_active);
         return$payment_currency;
     }
-
-    public function tt(){
-//        dd($this->payment_service->getPaymentCurrencies( new EmptyObject()));
-    }
 }

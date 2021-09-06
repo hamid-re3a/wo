@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Http\Requests\Front\AskFundRequest;
 use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
-use Wallets\Http\Resources\TransactionHistoryResource;
-use Wallets\Jobs\TrivialEmailJob;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
@@ -30,7 +28,7 @@ class DepositWalletController extends Controller
 
     private function prepareDepositWallet()
     {
-        $this->bankService = new BankService(request()->wallet_user);
+        $this->bankService = new BankService(request()->user);
         $this->wallet = config('depositWallet');
     }
 
@@ -84,9 +82,12 @@ class DepositWalletController extends Controller
     public function paymentRequest(AskFundRequest $request)
     {
         $user = User::query()->where('member_id',$request->get('member_id'))->first();
-        UrgentEmailJob::dispatch(new RequestFundEmail($user,$request->wallet_user,$request->get('amount')),$user->email);
+        UrgentEmailJob::dispatch(new RequestFundEmail($user,$request->user,$request->get('amount')),$user->email);
 
-        return api()->success();
+        return api()->success(null,[
+            'amount' => walletPfAmount($request->get('amount')),
+            'receiver_full_name' => $user->full_name
+        ]);
 
     }
 
@@ -176,7 +177,7 @@ class DepositWalletController extends Controller
                 'transfer_id' => $transfer->id
             ],'Transfer fee');
 
-            UrgentEmailJob::dispatch(new SenderFundEmail(request()->wallet_user, $transfer), request()->wallet_user->email);
+            UrgentEmailJob::dispatch(new SenderFundEmail(request()->user, $transfer), request()->user->email);
             UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user, $transfer), $to_user->email);
 
             DB::commit();
@@ -204,7 +205,7 @@ class DepositWalletController extends Controller
         $invoice = $wallet_service->invoiceWallet($request);
         return api()->success('success', [
             'payment_currency'=>$invoice->getPaymentCurrency(),
-            'amount' => $invoice->getAmount(),
+            'amount' => walletPfAmount($invoice->getAmount()),
             'checkout_link' => $invoice->getCheckoutLink(),
             'transaction_id' => $invoice->getTransactionId(),
             'expiration_time' => $invoice->getExpirationTime(),

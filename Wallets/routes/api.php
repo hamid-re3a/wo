@@ -10,19 +10,33 @@ use Wallets\Http\Controllers\Front\WalletController;
 use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
 use Wallets\Services\BankService;
 
-Route::name('wallets.')->middleware('auth_user_wallet')->group(function () {
+/**
+ * @todo before lunch project we must migrate all route to this (admin-super subscriptions-wallet-admin)
+ * list of all route admin section
+ */
+Route::middleware(['role:super-admin|subscriptions-wallet-admin'])->name('admin.')->group(function () {
+
+});
+
+/**
+ * @todo before lunch project we must migrate all route to this (all api public and customer side)
+ * list of all route admin section
+ */
+Route::middleware(['role:client'])->name('customer.')->group(function () {
+
+});
+
+Route::name('wallets.')->middleware('auth_user')->group(function () {
     Route::get('', [WalletController::class, 'index'])->name('index');
-    Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transactions');
-    Route::get('invoiceWallet', [InvoiceWalletController::class, 'invoiceWallet'])->name('get-transaction');
+    Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');
 
     Route::name('deposit.')->prefix('deposit')->group(function () {
-        Route::get('', [DepositWalletController::class, 'index'])->name('get-wallet');
-        Route::get('transactions', [DepositWalletController::class, 'transactions'])->name('transactions');
-        Route::post('transfer', [DepositWalletController::class, 'transfer'])->name('transfer-fund');
-        Route::get('transfers', [DepositWalletController::class, 'transfers'])->name('transfers');
+        Route::get('',[DepositWalletController::class, 'index'])->name('get-wallet');
+        Route::get('transactions', [DepositWalletController::class, 'transactions'])->name('get-transactions');
+        Route::get('transfers', [DepositWalletController::class, 'transfers'])->name('get-transfers');
         Route::post('transfer-preview', [DepositWalletController::class, 'transferPreview'])->name('transfer-fund-preview');
-        Route::post('transfer-funds', [DepositWalletController::class, 'transferFunds'])->name('transfer-funds');
-        Route::post('deposit', [DepositWalletController::class, 'deposit'])->name('deposit');
+        Route::post('transfer-funds', [DepositWalletController::class, 'transferFunds'])->name('transfer-fund');
+        Route::post('deposit-funds', [DepositWalletController::class, 'deposit'])->name('deposit-funds');
         Route::post('payment-request', [DepositWalletController::class, 'paymentRequest'])->name('payment-request');
     });
 

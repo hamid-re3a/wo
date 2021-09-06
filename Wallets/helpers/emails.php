@@ -4,7 +4,7 @@ CONST WALLET_EMAIL_CONTENTS = [
     'TRANSFER_FUNDS_SENDER' => [
         'is_active' => true,
         'subject'=>'You transferred funds',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -26,7 +26,7 @@ CONST WALLET_EMAIL_CONTENTS = [
     'TRANSFER_FUNDS_RECEIVER' => [
         'is_active' => true,
         'subject'=>'You received funds',
-        'from'=>'support@janex.com',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -46,15 +46,15 @@ CONST WALLET_EMAIL_CONTENTS = [
     ],
     'PAYMENT_REQUEST' => [
         'is_active' => true,
-        'subject'=>'Someone sent you a payment request',
-        'from'=>'support@janex.com',
+        'subject'=>'{{request_first_name}} sent you a payment request',
+        'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
                 <p>Hello <b>{{full_name}}</b>,</p>
-                <p>You have a payment request from {{request_full_name}}</p>
+                <p>{{request_full_name}}, has asked you for {{amount}} PF</p>
                 <p></p>
-                <p>Amount : <b>{{amount}}</b></p>
+                <p>You can transfer this amount by going to the deposit wallet of your {{app_name}} account.</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>

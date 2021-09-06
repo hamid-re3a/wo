@@ -24,7 +24,7 @@ class GetTransactionRequest extends FormRequest
      */
     public function rules()
     {
-        $user_id = request()->wallet_user ? request()->wallet_user->id : null;
+        $user_id = request()->user ? request()->user->id : null;
         return [
             'id' => 'required|uuid|exists:transactions,uuid,payable_id,' . $user_id
         ];

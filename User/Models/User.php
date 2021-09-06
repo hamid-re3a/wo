@@ -112,6 +112,7 @@ class User extends Model implements WalletFloat
      */
     public function getUserService()
     {
+        $this->fresh();
         $user = new \User\Services\User();
         $user->setId($this->attributes['id']);
         $user->setFirstName($this->attributes['first_name']);

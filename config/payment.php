@@ -3,7 +3,7 @@
 return [
     'btc-pay-server-domain' => 'https://staging-btcpayserver.janex.org/',
     'btc-pay-server-store-id' => '5ERagatYmuiBgRXVeHpNknuML8GbQFpD1LjeKMPrXEh7',
-    'btc-pay-server-api-token' => 'token IvOOEiZOinZdCWrivUil1OQpYUlk7iEI0kv0vIllv7E',
+    'btc-pay-server-api-token' => 'token 346864af97312257f5292740876bc8c0fa67e8a4',
 
     'payment_types' => [
         [

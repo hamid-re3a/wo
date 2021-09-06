@@ -107,7 +107,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Processing Paid':
             case 'Processing None':
             case 'Processing PaidOver':
-
+                $processor->processing();
                 break;
 
             case 'Expired PaidPartial':

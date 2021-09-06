@@ -28,8 +28,8 @@ class UserGetDataJob implements ShouldQueue
      */
     public function handle()
     {
-        $userGetDataSerialize = serialize($this->data);
+        $user_getData_serialize = serialize($this->data);
         Log::info("produce request get user data",[$this->data]);
-        UserDataJob::dispatch($userGetDataSerialize)->onConnection('rabbit')->onQueue('api-gateway');
+        UserDataJob::dispatch($user_getData_serialize)->onConnection('rabbit')->onQueue('api-gateway');
     }
 }

@@ -13,6 +13,7 @@ use Tests\TestCase;
 use User\Models\User;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
+use Wallets\Services\Wallet;
 use Wallets\Services\WalletService;
 
 class GiftcodeTest extends TestCase
@@ -79,15 +80,19 @@ class GiftcodeTest extends TestCase
     protected function deposit_user()
     {
         $user = User::query()->first();
-        $user_object = $user->getUserService();
         $wallet_service = app(WalletService::class);
 
         //Deposit Service
-        $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(TRUE));
-        $deposit_service->setUser($user_object);
+        $deposit_object = app(Deposit::class);
+        $deposit_object->setConfirmed(true);
+        $deposit_object->setUserId($user->id);
+        $deposit_object->setAmount(10000000);
+        $deposit_object->setWalletName('Deposit Wallet');
+        $deposit_object->setType('Deposit');
+
         //Deposit transaction
-        $wallet_service->deposit($deposit_service);
+        $deposit = $wallet_service->deposit($deposit_object);
+
         return $user;
 
     }
@@ -113,9 +118,9 @@ class GiftcodeTest extends TestCase
     protected function createGiftCode()
     {
         $this->deposit_user();
-        $package = Package::query()->first();
+
         return $this->postJson(route('giftcodes.create'), [
-            'package_id' => $package->id,
+            'package_id' => 1,
             'include_registration_fee' => true,
             'wallet' => 'Deposit Wallet'
         ]);

@@ -6,6 +6,7 @@ namespace Wallets\Services;
 use Bavix\Wallet\Interfaces\WalletFloat;
 use Illuminate\Support\Str;
 use User\Models\User;
+use Wallets\Models\TransactionType;
 
 class BankService
 {
@@ -34,12 +35,13 @@ class BankService
         return $this->owner->wallets()->get();
     }
 
-    public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit')
+    public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit', $sub_type = null)
     {
         $data = [
             'wallet_before_balance' => $this->getBalance($wallet_name),
             'wallet_after_balance' => $this->getBalance($wallet_name) + $amount,
-            'type' => $type
+            'type' => $type,
+            'sub_type' => $sub_type
         ];
 
         $transaction = $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($description), $confirmed);
@@ -48,13 +50,14 @@ class BankService
         return $transaction;
     }
 
-    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw')
+    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null)
     {
 
         $data = [
             'wallet_before_balance' => $this->getBalance($wallet_name),
             'wallet_after_balance' => $this->getBalance($wallet_name) - $amount,
-            'type' => $type
+            'type' => $type,
+            'sub_type' => $sub_type
         ];
         $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description));
         $this->toAdminDepositWallet($transaction,$amount,$description,$type);
@@ -81,7 +84,6 @@ class BankService
             'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
             'type' => $type
         ];
-
         $transaction = $admin_wallet->depositFloat($amount, $description);
         $transaction->syncMetaData($data);
 

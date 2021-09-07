@@ -5,6 +5,7 @@ namespace Wallets\tests\Feature;
 
 
 use User\Models\User;
+use Wallets\Models\TransactionType;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
 use Wallets\Services\Transfer;
@@ -16,208 +17,187 @@ use Wallets\tests\WalletTest;
 class WalletServiceTest extends WalletTest
 {
 
-    private function getTransaction($confirmed = TRUE)
-    {
-        $transaction_service = app(Transaction::class);
-        $transaction_service->setConfiremd($confirmed);
-        $transaction_service->setAmount(1000);
-        $transaction_service->setToWalletName('Deposit Wallet');
-        $transaction_service->setToUserId(1);
-        $transaction_service->setType('Deposit');
-        $transaction_service->setDescription(serialize([
-            'description' => 'Deposit Test #12'
-        ]));
-
-        return $transaction_service;
-    }
-
     /**
      * @test
      */
-    public function deposit_unconfirmed_transaction()
+    public function deposit_unconfirmed()
     {
-        $user = User::factory()->create();
-        $user_object = $user->getUserService();
-
         $wallet_service = app(WalletService::class);
 
         //Deposit Service
         $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(FALSE));
-        $deposit_service->setUser($user_object);
+        $deposit_service->setConfirmed(false);
+        $deposit_service->setUserId(1);
+        $deposit_service->setAmount(10000000);
+        $deposit_service->setType('Deposit');
+        $deposit_service->setWalletName('Deposit Wallet');
 
         //Deposit transaction
-        $deposit_transaction = $wallet_service->deposit($deposit_service);
-        $this->assertIsObject($deposit_transaction);
-        $this->assertFalse($deposit_transaction->getConfiremd());
+        $deposit = $wallet_service->deposit($deposit_service);
+        $this->assertIsObject($deposit);
+        $this->assertFalse($deposit->getConfirmed());
 
     }
 
     /**
      * @test
      */
-    public function deposit_confirmed_transaction()
+    public function deposit_wrong_wallet_name()
     {
-        $user = User::factory()->create();
-        $user_object = $user->getUserService();
-
         $wallet_service = app(WalletService::class);
 
         //Deposit Service
         $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(TRUE));
-        $deposit_service->setUser($user_object);
+        $deposit_service->setConfirmed(false);
+        $deposit_service->setUserId(1);
+        $deposit_service->setAmount(10000000);
+        $deposit_service->setType('Deposit');
+        $deposit_service->setWalletName('Wrong Wallet Name');
 
         //Deposit transaction
-        $deposit_transaction = $wallet_service->deposit($deposit_service);
-        $this->assertIsObject($deposit_transaction);
-        $this->assertTrue($deposit_transaction->getConfiremd());
+        $deposit = $wallet_service->deposit($deposit_service);
+        $this->assertIsObject($deposit);
+        $this->assertFalse($deposit->getConfirmed());
 
     }
 
     /**
      * @test
      */
-    public function withdraw_unconfirmed_transaction()
+    public function deposit_confirmed($user_id = 1)
     {
-        //User
-        $user = User::factory()->create();
-        $user_object = $user->getUserService();
+        $wallet_service = app(WalletService::class);
 
+        //Deposit Service
+        $deposit_service = app(Deposit::class);
+        $deposit_service->setConfirmed(true);
+        $deposit_service->setUserId($user_id);
+        $deposit_service->setAmount(10000000);
+        $deposit_service->setType('Deposit');
+        $deposit_service->setWalletName('Deposit Wallet');
+
+        //Deposit transaction
+        $deposit = $wallet_service->deposit($deposit_service);
+        $this->assertIsObject($deposit);
+        $this->assertTrue($deposit->getConfirmed());
+
+    }
+
+    /**
+     * @test
+     */
+    public function deposit_with_sub_type_confirmed($user_id = 1)
+    {
+        $wallet_service = app(WalletService::class);
+
+        //Deposit Service
+        $deposit_service = app(Deposit::class);
+        $deposit_service->setConfirmed(true);
+        $deposit_service->setUserId($user_id);
+        $deposit_service->setAmount(10000000);
+        $deposit_service->setType('Commission');
+        $deposit_service->setSubType('Indirect Commission');
+        $deposit_service->setWalletName('Deposit Wallet');
+
+        //Deposit transaction
+        $deposit = $wallet_service->deposit($deposit_service);
+        $this->assertIsObject($deposit);
+        $this->assertTrue($deposit->getConfirmed());
+
+    }
+
+    /**
+     * @test
+     */
+    public function withdraw_unconfirmed()
+    {
         $wallet_service = app(WalletService::class);
 
         //Deposit
-        $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(TRUE));
-        $deposit_service->setUser($user_object);
-        $wallet_service->deposit($deposit_service);
+        $this->deposit_confirmed();
 
         //Withdraw
         $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setTransaction($this->getTransaction(FALSE));
-        $withdraw_service->setUser($user_object);
-        $withdraw_transaction = $wallet_service->withdraw($withdraw_service);
-        $this->assertIsObject($withdraw_transaction);
-        $this->assertFalse($withdraw_transaction->getConfiremd());
-
+        $withdraw_service->setConfirmed(false);
+        $withdraw_service->setUserId(1);
+        $withdraw_service->setWalletName('Deposit Wallet');
+        $withdraw_service->setType('Giftcode');
+        $withdraw_service->setAmount(100);
+        $withdraw = $wallet_service->withdraw($withdraw_service);
+        $this->assertIsObject($withdraw);
+        $this->assertFalse($withdraw->getConfirmed());
     }
 
     /**
      * @test
      */
-    public function withdraw_confirmed_transaction()
+    public function withdraw_wrong_wallet_name()
     {
-        //User
-        $user = User::factory()->create();
-        $user_object = $user->getUserService();
-
         $wallet_service = app(WalletService::class);
 
         //Deposit
-        $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(TRUE));
-        $deposit_service->setUser($user_object);
-        $wallet_service->deposit($deposit_service);
+        $this->deposit_confirmed();
 
         //Withdraw
         $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setTransaction($this->getTransaction(TRUE));
-        $withdraw_service->setUser($user_object);
-        $withdraw_transaction = $wallet_service->withdraw($withdraw_service);
-        $this->assertIsObject($withdraw_transaction);
-        $this->assertFalse($withdraw_transaction->getConfiremd());
+        $withdraw_service->setConfirmed(true);
+        $withdraw_service->setUserId(1);
+        $withdraw_service->setWalletName('Wrong Walelt Name');
+        $withdraw_service->setType('Giftcode');
+        $withdraw_service->setAmount(100);
+        $withdraw = $wallet_service->withdraw($withdraw_service);
+        $this->assertIsObject($withdraw);
+        $this->assertFalse($withdraw->getConfirmed());
     }
 
     /**
      * @test
      */
-    public function transfer_fund_with_unconfirmed_transaction()
+    public function withdraw_confirmed()
     {
-        //User
-        $from_user = User::factory()->create();
-        $from_user_object = $from_user->getUserService();
-
-        $to_user = User::factory()->create();
-        $to_user_object = $to_user->getUserService();
-
         $wallet_service = app(WalletService::class);
 
-        //Deposit from user wallet
-        $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(TRUE));
-        $deposit_service->setUser($from_user_object);
-        $deposit_transaction = $wallet_service->deposit($deposit_service);
-        $this->assertTrue($deposit_transaction->getConfiremd());
+        //Deposit
+        $this->deposit_confirmed();
 
-        //Prepare transfer
-        $transfer_service = app(Transfer::class);
-        $transfer_service->setFromUser($from_user_object);
-        $transfer_service->setToUser($to_user_object);
-
-        $transaction_service = app(Transaction::class);
-        $transaction_service->setConfiremd(FALSE);
-        $transaction_service->setAmount(100);
-
-        //From User
-        $transaction_service->setFromUserId($from_user->id);
-        $transaction_service->setFromWalletName('Deposit Wallet');
-
-        //To User
-        $transaction_service->setToUserId($to_user->id);
-        $transaction_service->setToWalletName('Deposit Wallet');
-
-        //finalize transfer service
-        $transfer_service->setTransaction($transaction_service);
-
-        $transaction_response = $wallet_service->transfer($transfer_service);
-        $this->assertIsObject($transaction_response);
-        $this->assertFalse($transaction_response->getConfiremd());
+        //Withdraw
+        $withdraw_service = app(Withdraw::class);
+        $withdraw_service->setConfirmed(true);
+        $withdraw_service->setUserId(1);
+        $withdraw_service->setWalletName('Deposit Wallet');
+        $withdraw_service->setType('Giftcode');
+        $withdraw_service->setAmount(100);
+        $withdraw = $wallet_service->withdraw($withdraw_service);
+        $this->assertIsObject($withdraw);
+        $this->assertTrue($withdraw->getConfirmed());
     }
 
     /**
      * @test
      */
-    public function transfer_fund_with_confirmed_transaction()
+    public function transfer_fund()
     {
         //User
         $from_user = User::factory()->create();
-        $from_user_object = $from_user->getUserService();
 
         $to_user = User::factory()->create();
-        $to_user_object = $to_user->getUserService();
 
         $wallet_service = app(WalletService::class);
-
         //Deposit from user wallet
-        $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(TRUE));
-        $deposit_service->setUser($from_user_object);
-        $deposit_transaction = $wallet_service->deposit($deposit_service);
-        $this->assertTrue($deposit_transaction->getConfiremd());
+        $this->deposit_confirmed($from_user->id);
 
         //Prepare transfer
         $transfer_service = app(Transfer::class);
-        $transfer_service->setFromUser($from_user_object);
-        $transfer_service->setToUser($to_user_object);
-
-        $transaction_service = app(Transaction::class);
-        $transaction_service->setConfiremd(TRUE);
-        $transaction_service->setAmount(100);
-
-        //From User
-        $transaction_service->setFromUserId($from_user->id);
-        $transaction_service->setFromWalletName('Deposit Wallet');
-
-        //To User
-        $transaction_service->setToUserId($to_user->id);
-        $transaction_service->setToWalletName('Deposit Wallet');
-
-        //finalize transfer service
-        $transfer_service->setTransaction($transaction_service);
+        $transfer_service->setFromUserId($from_user->id);
+        $transfer_service->setFromWalletName('Deposit Wallet');
+        $transfer_service->setToUserId($to_user->id);
+        $transfer_service->setToWalletName('Deposit Wallet');
+        $transfer_service->setAmount(1000);
+        $transfer_service->setConfirmed(true);
 
         $transaction_response = $wallet_service->transfer($transfer_service);
         $this->assertIsObject($transaction_response);
-        $this->assertTrue($transaction_response->getConfiremd());
+        $this->assertTrue($transaction_response->getConfirmed());
     }
 
     /**
@@ -227,25 +207,21 @@ class WalletServiceTest extends WalletTest
     {
         //User
         $user = User::factory()->create();
-        $user_object = $user->getUserService();
 
         $wallet_service = app(WalletService::class);
 
         //Deposit
-        $deposit_service = app(Deposit::class);
-        $deposit_service->setTransaction($this->getTransaction(TRUE));
-        $deposit_service->setUser($user_object);
-        $wallet_service->deposit($deposit_service);
+        $this->deposit_confirmed($user->id);
 
         //Prepare wallet
         $user_wallet_service = app(Wallet::class);
-        $user_wallet_service->setUser($user_object);
+        $user_wallet_service->setUserId($user->id);
         $user_wallet_service->setName('Deposit Wallet');
 
         //Check balance
         $response_wallet = $wallet_service->getBalance($user_wallet_service);
         $this->assertIsObject($response_wallet);
-        if(is_numeric($response_wallet->getBalance()) AND $response_wallet->getBalance() > 0)
+        if (is_numeric($response_wallet->getBalance()) AND $response_wallet->getBalance() > 0)
             $this->assertTrue(TRUE);
         else
             $this->assertTrue(FALSE);

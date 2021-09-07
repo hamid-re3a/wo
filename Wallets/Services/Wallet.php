@@ -18,9 +18,9 @@ class Wallet extends \Google\Protobuf\Internal\Message
      */
     protected $id = 0;
     /**
-     * Generated from protobuf field <code>.user.services.User user = 2;</code>
+     * Generated from protobuf field <code>int64 user_id = 2;</code>
      */
-    protected $user = null;
+    protected $user_id = 0;
     /**
      * Generated from protobuf field <code>double balance = 3;</code>
      */
@@ -37,7 +37,7 @@ class Wallet extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int|string $id
-     *     @type \User\Services\User $user
+     *     @type int|string $user_id
      *     @type float $balance
      *     @type string $name
      * }
@@ -70,33 +70,23 @@ class Wallet extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.user.services.User user = 2;</code>
-     * @return \User\Services\User|null
+     * Generated from protobuf field <code>int64 user_id = 2;</code>
+     * @return int|string
      */
-    public function getUser()
+    public function getUserId()
     {
-        return $this->user;
-    }
-
-    public function hasUser()
-    {
-        return isset($this->user);
-    }
-
-    public function clearUser()
-    {
-        unset($this->user);
+        return $this->user_id;
     }
 
     /**
-     * Generated from protobuf field <code>.user.services.User user = 2;</code>
-     * @param \User\Services\User $var
+     * Generated from protobuf field <code>int64 user_id = 2;</code>
+     * @param int|string $var
      * @return $this
      */
-    public function setUser($var)
+    public function setUserId($var)
     {
-        GPBUtil::checkMessage($var, \User\Services\User::class);
-        $this->user = $var;
+        GPBUtil::checkInt64($var);
+        $this->user_id = $var;
 
         return $this;
     }

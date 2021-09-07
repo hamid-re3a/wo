@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use User\Models\User;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
+use Wallets\Services\Wallet;
 use Wallets\Services\WalletService;
 use Wallets\Services\Withdraw;
 
@@ -23,74 +24,52 @@ class WalletRepository
 
     public function withdrawUserWallet(Giftcode $giftcode)
     {
-        $preparedUser = request()->user->getUserService();
-
-        //Prepare Transaction
-        $transactionService = app(Transaction::class);
-        $transactionService->setConfiremd(true);
-        $transactionService->setAmount($giftcode->total_cost_in_usd);
-        $transactionService->setFromWalletName(request()->get('wallet'));
-        $transactionService->setFromUserId(request()->user->id);
-        $transactionService->setType('Giftcode');
-        $transactionService->setDescription('Create Giftcode #' . $giftcode->uuid);
-
-        //Prepare Withdraw Service
-        $withdrawService = app(Withdraw::class);
-        $withdrawService->setTransaction($transactionService);
-        $withdrawService->setUser($preparedUser);
-        //Withdraw transaction
-        return $finalTransaction = $this->wallet_service->withdraw($withdrawService);
+        $withdraw_object = app(Withdraw::class);
+        $withdraw_object->setConfirmed(true);
+        $withdraw_object->setAmount($giftcode->total_cost_in_usd);
+        $withdraw_object->setWalletName('Deposit Wallet');
+        $withdraw_object->setUserId($giftcode->user_id);
+        $withdraw_object->setType('Create Giftcode');
+        $withdraw_object->setDescription('Giftcode #' . $giftcode->uuid);
+        return $this->wallet_service->withdraw($withdraw_object);
     }
 
-    public function depositUserWallet(Giftcode $giftcode, $description = 'Giftcode')
+    public function depositUserWallet(Giftcode $giftcode, $description = 'Giftcode refund')
     {
-        $preparedUser = request()->user->getUserService();
-
-        //Prepare Transaction
-        $transactionService = app(Transaction::class);
-        $transactionService->setConfiremd(true);
-        $transactionService->setAmount($giftcode->getRefundAmount());
-        $transactionService->setToWalletName('Deposit Wallet');
-        $transactionService->setToUserId(request()->user->id);
-        $transactionService->setType('Giftcode');
-        $transactionService->setDescription($description);
-
-        //Prepare Deposit Service
-        $depositService = app(Deposit::class);
-        $depositService->setTransaction($transactionService);
-        $depositService->setUser($preparedUser);
-        //Deposit transaction
+        $deposit_object = app(Deposit::class);
+        $deposit_object->setConfirmed(true);
+        $deposit_object->setUserId($giftcode->user_id);
+        $deposit_object->setAmount($giftcode->getRefundAmount());
+        $deposit_object->setType('Giftcode refund');
+        $deposit_object->setDescription($description);
+        $deposit_object->setWalletName('Deposit Wallet');
 
         //Deposit fee to admin wallet
         if($giftcode->total_cost_in_usd != $giftcode->getRefundAmount())
             $this->depositToAdminWallet($giftcode,$description);
 
-        return $finalTransaction = $this->wallet_service->deposit($depositService);
+        return $this->wallet_service->deposit($deposit_object);
     }
 
-    public function checkUserBalance(Request $request)
+    public function checkUserBalance()
     {
-        $wallet = prepareGiftcodeWallet(request()->user,$request->get('wallet'));
+        $wallet = app(Wallet::class);
+        $wallet->setUserId(request()->user->id);
+        $wallet->setName('Deposit Wallet');
         return $this->wallet_service->getBalance($wallet)->getBalance();
     }
 
-    private function depositToAdminWallet($giftcode, $description = 'Giftcode')
+    private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode')
     {
-        $admin_user = User::query()->find(1);
-        $transactionService = app(Transaction::class);
-        $transactionService->setConfiremd(true);
-        $transactionService->setAmount( ($giftcode->total_cost_in_usd - $giftcode->getRefundAmount()) );
-        $transactionService->setToWalletName('Deposit Wallet');
-        $transactionService->setToUserId(1);
-        $transactionService->setType('Giftcode');
-        $transactionService->setDescription($description);
-
-        //Prepare Deposit Service
-        $depositService = app(Deposit::class);
-        $depositService->setTransaction($transactionService);
-        $depositService->setUser($admin_user->getUserService());
+        $deposit_object = app(Deposit::class);
+        $deposit_object->setConfirmed(true);
+        $deposit_object->setUserId(1);
+        $deposit_object->setAmount(($giftcode->total_cost_in_usd - $giftcode->getRefundAmount()));
+        $deposit_object->setType('Giftcode refund');
+        $deposit_object->setDescription($description);
+        $deposit_object->setWalletName('Deposit Wallet');
         //Deposit transaction
-        $this->wallet_service->deposit($depositService);
+        $this->wallet_service->deposit($deposit_object);
     }
 
 

@@ -14,13 +14,41 @@ use Google\Protobuf\Internal\GPBUtil;
 class Withdraw extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>.user.services.User user = 1;</code>
+     * Generated from protobuf field <code>int64 user_id = 1;</code>
      */
-    protected $user = null;
+    protected $user_id = 0;
     /**
-     * Generated from protobuf field <code>.wallets.services.Transaction transaction = 2;</code>
+     * Generated from protobuf field <code>string type = 2;</code>
      */
-    protected $transaction = null;
+    protected $type = '';
+    /**
+     * Generated from protobuf field <code>string sub_type = 3;</code>
+     */
+    protected $sub_type = '';
+    /**
+     * Generated from protobuf field <code>double amount = 4;</code>
+     */
+    protected $amount = 0.0;
+    /**
+     * Generated from protobuf field <code>string description = 5;</code>
+     */
+    protected $description = '';
+    /**
+     * Generated from protobuf field <code>string wallet_name = 6;</code>
+     */
+    protected $wallet_name = '';
+    /**
+     * Generated from protobuf field <code>string service_name = 7;</code>
+     */
+    protected $service_name = '';
+    /**
+     * Generated from protobuf field <code>int64 payload_id = 8;</code>
+     */
+    protected $payload_id = 0;
+    /**
+     * Generated from protobuf field <code>bool confirmed = 9;</code>
+     */
+    protected $confirmed = false;
 
     /**
      * Constructor.
@@ -28,8 +56,15 @@ class Withdraw extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type \User\Services\User $user
-     *     @type \Wallets\Services\Transaction $transaction
+     *     @type int|string $user_id
+     *     @type string $type
+     *     @type string $sub_type
+     *     @type float $amount
+     *     @type string $description
+     *     @type string $wallet_name
+     *     @type string $service_name
+     *     @type int|string $payload_id
+     *     @type bool $confirmed
      * }
      */
     public function __construct($data = NULL) {
@@ -38,65 +73,199 @@ class Withdraw extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.user.services.User user = 1;</code>
-     * @return \User\Services\User|null
+     * Generated from protobuf field <code>int64 user_id = 1;</code>
+     * @return int|string
      */
-    public function getUser()
+    public function getUserId()
     {
-        return $this->user;
-    }
-
-    public function hasUser()
-    {
-        return isset($this->user);
-    }
-
-    public function clearUser()
-    {
-        unset($this->user);
+        return $this->user_id;
     }
 
     /**
-     * Generated from protobuf field <code>.user.services.User user = 1;</code>
-     * @param \User\Services\User $var
+     * Generated from protobuf field <code>int64 user_id = 1;</code>
+     * @param int|string $var
      * @return $this
      */
-    public function setUser($var)
+    public function setUserId($var)
     {
-        GPBUtil::checkMessage($var, \User\Services\User::class);
-        $this->user = $var;
+        GPBUtil::checkInt64($var);
+        $this->user_id = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.wallets.services.Transaction transaction = 2;</code>
-     * @return \Wallets\Services\Transaction|null
+     * Generated from protobuf field <code>string type = 2;</code>
+     * @return string
      */
-    public function getTransaction()
+    public function getType()
     {
-        return $this->transaction;
-    }
-
-    public function hasTransaction()
-    {
-        return isset($this->transaction);
-    }
-
-    public function clearTransaction()
-    {
-        unset($this->transaction);
+        return $this->type;
     }
 
     /**
-     * Generated from protobuf field <code>.wallets.services.Transaction transaction = 2;</code>
-     * @param \Wallets\Services\Transaction $var
+     * Generated from protobuf field <code>string type = 2;</code>
+     * @param string $var
      * @return $this
      */
-    public function setTransaction($var)
+    public function setType($var)
     {
-        GPBUtil::checkMessage($var, \Wallets\Services\Transaction::class);
-        $this->transaction = $var;
+        GPBUtil::checkString($var, True);
+        $this->type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string sub_type = 3;</code>
+     * @return string
+     */
+    public function getSubType()
+    {
+        return $this->sub_type;
+    }
+
+    /**
+     * Generated from protobuf field <code>string sub_type = 3;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setSubType($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->sub_type = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>double amount = 4;</code>
+     * @return float
+     */
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    /**
+     * Generated from protobuf field <code>double amount = 4;</code>
+     * @param float $var
+     * @return $this
+     */
+    public function setAmount($var)
+    {
+        GPBUtil::checkDouble($var);
+        $this->amount = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string description = 5;</code>
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Generated from protobuf field <code>string description = 5;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setDescription($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->description = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string wallet_name = 6;</code>
+     * @return string
+     */
+    public function getWalletName()
+    {
+        return $this->wallet_name;
+    }
+
+    /**
+     * Generated from protobuf field <code>string wallet_name = 6;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setWalletName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->wallet_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string service_name = 7;</code>
+     * @return string
+     */
+    public function getServiceName()
+    {
+        return $this->service_name;
+    }
+
+    /**
+     * Generated from protobuf field <code>string service_name = 7;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setServiceName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->service_name = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 payload_id = 8;</code>
+     * @return int|string
+     */
+    public function getPayloadId()
+    {
+        return $this->payload_id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 payload_id = 8;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setPayloadId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->payload_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>bool confirmed = 9;</code>
+     * @return bool
+     */
+    public function getConfirmed()
+    {
+        return $this->confirmed;
+    }
+
+    /**
+     * Generated from protobuf field <code>bool confirmed = 9;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setConfirmed($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->confirmed = $var;
 
         return $this;
     }

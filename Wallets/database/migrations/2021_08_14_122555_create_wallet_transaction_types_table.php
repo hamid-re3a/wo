@@ -14,11 +14,12 @@ class CreateWalletTransactionTypesTable extends Migration
     public function up()
     {
         Schema::create('wallet_transaction_types', function (Blueprint $table) {
-            $table->engine = "InnoDB";
             $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('wallet_transaction_types','id');
             $table->string('name')->unique()->nullable();
             $table->mediumText('description')->nullable();
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 

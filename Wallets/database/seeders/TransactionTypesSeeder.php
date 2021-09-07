@@ -27,9 +27,9 @@ class TransactionTypesSeeder extends Seeder
             [
                 'name' => 'Purchase'
             ],
-            [
-                'name' => 'Upgrade'
-            ],
+//            [
+//                'name' => 'Upgrade'
+//            ],
             [
                 'name' => 'Renewal'
             ],

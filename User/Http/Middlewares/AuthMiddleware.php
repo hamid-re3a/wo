@@ -34,7 +34,7 @@ class AuthMiddleware
              */
             if ($user === null) {
                 UserGetDataJob::dispatch($user_update);
-                return  api()->error('please try another time!',null,5000);
+                return  api()->error('please try another time!',null,470);
             }
 
             $hash_user_service = md5(serialize($user->getUserService()));
@@ -45,7 +45,7 @@ class AuthMiddleware
              */
             if ($hash_user_service != $user_hash_request){
                 UserGetDataJob::dispatch($user_update);
-                return  api()->error('please try another time!',null,5001);
+                return  api()->error('please try another time!',null,471);
             }
 
             $request->merge([

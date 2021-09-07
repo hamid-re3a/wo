@@ -57,6 +57,10 @@ class User extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>bool is_deactivate = 11;</code>
      */
     protected $is_deactivate = false;
+    /**
+     * Generated from protobuf field <code>bool is_fake = 12;</code>
+     */
+    protected $is_fake = false;
 
     /**
      * Constructor.
@@ -75,6 +79,7 @@ class User extends \Google\Protobuf\Internal\Message
      *     @type string $block_type
      *     @type bool $is_freeze
      *     @type bool $is_deactivate
+     *     @type bool $is_fake
      * }
      */
     public function __construct($data = NULL) {
@@ -320,6 +325,28 @@ class User extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->is_deactivate = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>bool is_fake = 12;</code>
+     * @return bool
+     */
+    public function getIsFake()
+    {
+        return $this->is_fake;
+    }
+
+    /**
+     * Generated from protobuf field <code>bool is_fake = 12;</code>
+     * @param bool $var
+     * @return $this
+     */
+    public function setIsFake($var)
+    {
+        GPBUtil::checkBool($var);
+        $this->is_fake = $var;
 
         return $this;
     }

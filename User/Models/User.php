@@ -25,6 +25,7 @@ use User\database\factories\UserFactory;
  * @property string|null $block_type
  * @property boolean|null $is_freeze
  * @property boolean|null $is_deactivate
+ * @property boolean|null $is_fake
  * @property integer|null $member_id
  * @property integer|null $sponsor_id
  * @property string|null $deleted_at
@@ -59,6 +60,7 @@ class User extends Model implements WalletFloat
         'is_deactivate',
         'is_freeze',
         'block_type',
+        'is_fake',
     ];
 
     protected static function newFactory()
@@ -129,6 +131,9 @@ class User extends Model implements WalletFloat
 
         if (isset($this->attributes['is_deactivate']))
             $user->setIsDeactivate($this->attributes['is_deactivate']);
+
+        if (isset($this->attributes['is_fake']))
+            $user->setIsFake($this->attributes['is_fake']);
 
         if (isset($this->attributes['is_freeze']))
             $user->setIsFreeze($this->attributes['is_freeze']);

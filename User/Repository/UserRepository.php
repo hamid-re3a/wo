@@ -22,8 +22,8 @@ class UserRepository
             'email' => $user->getEmail(),
             'member_id' => $user->getMemberId(),
             'block_type' => empty($user->getBlockType()) ? null : $user->getBlockType(),
-            'is_deactivate' => empty($user->getIsDeactivate()) ? 0 : $user->getIsDeactivate(),
-            'is_freeze' => empty($user->getIsFreeze()) ? 0 : $user->getIsFreeze(),
+            'is_deactivate' => empty($user->getIsDeactivate()) ? false : $user->getIsDeactivate(),
+            'is_freeze' => empty($user->getIsFreeze()) ? false : $user->getIsFreeze(),
             'sponsor_id' => empty($user->getSponsorId()) ? null : $user->getSponsorId(),
         ]);
         return $user_find;

@@ -23,7 +23,7 @@ class UserTableSeeder extends Seeder
         $user_update = new UserUpdate();
         $user_update->setQueueName('subscriptions');
         $data_serialize = serialize($user_update);
-        RequestGetAllUserDataJob::dispatch($data_serialize);
+        RequestGetAllUserDataJob::dispatch($data_serialize)->onConnection("rabbit")->onQueue("api-gateway");
 
         if(defined('USER_ROLES'))
             foreach (USER_ROLES as $role)

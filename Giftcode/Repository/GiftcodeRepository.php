@@ -67,6 +67,11 @@ class GiftcodeRepository
         return $this->model->query()->where('uuid',$uuid)->first();
     }
 
+    public function getByCode($code)
+    {
+        return $this->model->query()->where('code',$code)->first();
+    }
+
     public function cancel(Request $request)
     {
         try {

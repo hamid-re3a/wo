@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Wallets\Services\Deposit;
 use Wallets\Services\WalletService;
 
-class WalletGetDepositJob implements ShouldQueue
+class WalletDepositJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -33,9 +33,9 @@ class WalletGetDepositJob implements ShouldQueue
          */
         $deposit_data = unserialize($this->data);
         $wallet_service = app(WalletService::class);
-        $deposit_response = $wallet_service->deposit($deposit_data);
+        $deposit_response = serialize($wallet_service->deposit($deposit_data));
 
-        WalletDepositDataJob::dispatch($deposit_response)->onConnection('rabbit')->onQueue($deposit_data->getServiceName());
+        WalletDepositJob::dispatch($deposit_response)->onConnection('rabbit')->onQueue($deposit_data->getServiceName());
 
     }
 }

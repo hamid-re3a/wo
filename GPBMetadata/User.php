@@ -16,9 +16,9 @@ class User
         }
         $pool->internalAddGeneratedFile(
             '
-Á
+°
 
-user.protouser.services"Þ
+user.protouser.services"Í
 User
 
 id (
@@ -35,8 +35,7 @@ sponsor_id (
 block_type	 (	
 	is_freeze
  (
-is_deactivate (
-is_fake (";
+is_deactivate (";
 
 UserUpdate
 

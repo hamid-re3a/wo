@@ -76,12 +76,6 @@ class OrderProcessor extends ProcessorAbstract
         // send email to user to regenerate new invoice for due amount
         EmailJob::dispatch(new EmailInvoiceExpired($this->order_model->getUser(), $this->invoice_model), $this->order_model->getUser()->getEmail());
 
-        //Mark user as fake
-        $user_object = $this->order_model->getUser();
-        $user_object->setIsFake(true);
-
-        UpdateUserJob::dispatch(serialize($user_object))->onConnection('rabbit')->onQueue('api-gateway');
-
     }
 
     public function invalid()

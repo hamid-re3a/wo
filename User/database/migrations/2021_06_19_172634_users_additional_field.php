@@ -15,7 +15,6 @@ class UsersAdditionalField extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->unsignedBigInteger('member_id')->after('sponsor_id')->unsigned()->nullable();
-            $table->boolean('is_fake')->after('is_deactivate')->default(FALSE)->nullable();
         });
     }
 

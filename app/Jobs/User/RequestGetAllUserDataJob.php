@@ -28,6 +28,7 @@ class RequestGetAllUserDataJob implements ShouldQueue
      */
     public function handle()
     {
+        Log::info("request for all users:");
         echo "request for get all user data" . PHP_EOL;
     }
 }

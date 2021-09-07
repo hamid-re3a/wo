@@ -16,7 +16,7 @@ class GiftcodeServiceTest extends GiftcodeTest
     /**
      * @test
      */
-    public function getGiftcode()
+    public function getGiftcodeByCode()
     {
 
         Mail::fake();
@@ -25,7 +25,23 @@ class GiftcodeServiceTest extends GiftcodeTest
         $giftcode_model = GiftcodeModel::query()->first();
         $giftcode_object = $giftcode_model->getGiftcodeService();
         $giftcode_service = app(GiftcodeService::class);
-        $giftcode_object = $giftcode_service->getGiftcode($giftcode_object);
+        $giftcode_object = $giftcode_service->getGiftcodeByCode($giftcode_object);
+        $this->assertIsInt($giftcode_object->getId());
+
+    }
+    /**
+     * @test
+     */
+    public function getGiftcodeByUuid()
+    {
+
+        Mail::fake();
+        $response = $this->createGiftCode();
+        $response->assertOk();
+        $giftcode_model = GiftcodeModel::query()->first();
+        $giftcode_object = $giftcode_model->getGiftcodeService();
+        $giftcode_service = app(GiftcodeService::class);
+        $giftcode_object = $giftcode_service->getGiftcodeByUuid($giftcode_object);
         $this->assertIsInt($giftcode_object->getId());
 
     }
@@ -40,12 +56,10 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $giftcode_model = GiftcodeModel::query()->first();
         $giftcode_object = $giftcode_model->getGiftcodeService();
-        $package = Package::query()->first();
-        $package_object = $package->getPackageService();
         $user = User::query()->first();
         $user_object = $user->getUserService();
         $giftcode_service = app(GiftcodeService::class);
-        $response = $giftcode_service->redeemGiftcode($giftcode_object,$package_object,$user_object);
+        $response = $giftcode_service->redeemGiftcode($giftcode_object,$user_object);
         $this->assertIsInt($response->getId());
         $this->assertIsInt($response->getRedeemUserId());
         $this->assertEquals($response->getRedeemUserId(),$user_object->getId());

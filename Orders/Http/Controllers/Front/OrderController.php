@@ -3,12 +3,17 @@
 namespace Orders\Http\Controllers\Front;
 
 
+use Carbon\Carbon;
+use Giftcode\Services\Giftcode;
+use Giftcode\Services\GiftcodeService;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Log;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderRequest;
+use Orders\Http\Requests\Front\Order\OrderRequestWithGiftcode;
 use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
 use Orders\Models\Order;
@@ -16,6 +21,9 @@ use Packages\Services\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Invoice;
 use Payments\Services\PaymentService;
+use Wallets\Services\Wallet;
+use Wallets\Services\WalletService;
+use Wallets\Services\Withdraw;
 
 class OrderController extends Controller
 {
@@ -96,6 +104,64 @@ class OrderController extends Controller
         ]);
     }
 
+    public function newOrderWithGiftcode(OrderRequestWithGiftcode $request)
+    {
+        //check giftcode
+        $giftcode_service = app(GiftcodeService::class);
+        $giftcode_object = app(Giftcode::class);
+        $giftcode_object->setCode($request->get('giftcode'));
+        $giftcode_response = $giftcode_service->getGiftcodeByCode($giftcode_object);
+
+        //if any errors occurs, returns exception like validatePackage method
+        $this->checkGiftcode($giftcode_response);
+
+        //Redeem giftcode
+        $redeem_giftcode = $giftcode_service->redeemGiftcode($giftcode_response,$request->user->getUserService());
+
+        if(!$redeem_giftcode->getRedeemUserId())
+            throw new \Exception(trans('order.responses.something-went-wrong'),500);
+
+        /*
+         * Giftcode redeemed, we can do other stuff of order
+         */
+
+    }
+
+    public function newOrderWithWallet(Order $order)
+    {
+        /*
+         * We can use db transaction , first of all create Order and after that handle wallet by calling this method
+         */
+        try {
+            $wallet_service = app(WalletService::class);
+
+            //Check wallet balance
+            $wallet = app(Wallet::class);
+            $wallet->setUserId(request()->user->id);
+            $wallet->setName('Deposit Wallet');
+            $balance = $wallet_service->getBalance($wallet)->getBalance();
+            if($balance < $order->total_cost_in_usd)
+                throw new \Exception(trans('order.responses.wallet.not-enough-balance'),406);
+
+            //Withdraw user wallet
+            $withdraw_object = app(Withdraw::class);
+            $withdraw_object->setConfirmed(true);
+            $withdraw_object->setUserId(request()->user->id);
+            $withdraw_object->setWalletName('Deposit Wallet');
+            $withdraw_object->setType('Purchase');
+            $withdraw_object->setDescription('Purchase order #' . $order->id);
+            $withdraw_object->setAmount($order->total_cost_in_usd);
+            $withdraw_response = $wallet_service->withdraw($withdraw_object);
+            if(!$withdraw_response->getConfirmed())
+                throw new \Exception(trans('order.responses.something-went-wrong'),500);
+
+            //Done.
+
+        } catch (\Throwable $exception) {
+            Log::error('Order Module => OrderController | Purchase order with deposit wallet error');
+            throw new \Exception(trans('order.responses.something-went-wrong'),500);
+        }
+    }
     private function validatePackage(Request $request)
     {
 
@@ -107,5 +173,28 @@ class OrderController extends Controller
                 'package_ids' => ['Package does not exist'],
             ]);
         }
+    }
+
+    private function checkGiftcode(Giftcode $giftcode)
+    {
+        if(!$giftcode->getId()) // code is not valid
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'giftcode' => [trans('order.responses.giftcode.wrong-code')],
+            ]);
+
+        if($giftcode->getPackageId() != request()->get('package_id'))
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'giftcode' => [trans('order.responses.giftcode.wrong-package')],
+            ]);
+
+        if($giftcode->getRedeemUserId()) // code is not valid
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'giftcode' => [trans('order.responses.giftcode.used')],
+            ]);
+
+        if(Carbon::parse($giftcode->getExpirationDate())->isPast())
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'giftcode' => [trans('order.responses.giftcode.expired')],
+            ]);
     }
 }

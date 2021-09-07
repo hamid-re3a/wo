@@ -30,21 +30,17 @@ class GiftcodeRepository
             DB::beginTransaction();
             //All stuff fixed in GiftcodeObserver
             $giftcode = $this->model->query()->create($request->all());
-
-            $request->user = User::query()->find(User::query()->find($request->get('user_id')));
-
             /**
              * Start User wallet process
              */
             //Check User Balance
-            if($this->wallet_repository->checkUserBalance($request) < $giftcode->total_cost_in_usd)
+            if($this->wallet_repository->checkUserBalance() < $giftcode->total_cost_in_usd)
                 throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),406);
-
             //Withdraw Balance
             $finalTransaction = $this->wallet_repository->withdrawUserWallet($giftcode);
 
             //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfiremd())
+            if(!$finalTransaction->getConfirmed())
                 throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
             /**
              * End User wallet process
@@ -95,7 +91,7 @@ class GiftcodeRepository
             $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid);
 
             //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfiremd())
+            if(!$finalTransaction->getConfirmed())
                 throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
             /**
              * End refund

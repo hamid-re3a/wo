@@ -51,7 +51,6 @@ class GiftcodeController extends Controller
         try {
 
             $giftcode = $this->giftcode_repository->create($request->merge([
-                'user_id' => $request->user->id,
                 'package_id' => $request->get('package_id')
             ]));
 

@@ -2,13 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use Orders\Http\Controllers\Front\OrderController;
+use Orders\Http\Controllers\Admin\OrderController as OrderAdminController;
 use Orders\Http\Controllers\Front\PackageController;
 
 /**
  * @todo before lunch project we must migrate all route to this (admin-super subscriptions-order-admin)
  * list of all route admin section
  */
-Route::middleware(['role:super-admin|subscriptions-order-admin'])->name('admin.')->group(function () {
+Route::/*middleware(['role:super-admin|subscriptions-order-admin'])->*/prefix('admin')->name('admin.')->group(function () {
+
+    Route::name('order')->prefix('subscription')->group(function (){
+        Route::get('/counts',[OrderAdminController::class,"getCountSubscriptions"]);
+    });
 
 });
 

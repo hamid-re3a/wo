@@ -29,9 +29,9 @@ class OrderController extends Controller
     }
 
     /**
-     * List orders
+     * get count subscriptions
      * @group
-     * Public User > Orders
+     * Public User > Orders > admin
      * @param ListOrderRequest $request
      * @return JsonResponse
      */

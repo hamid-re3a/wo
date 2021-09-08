@@ -115,13 +115,12 @@ class Giftcode extends Model
 
     public function getStatusAttribute()
     {
-        if($this->attributes['redeem_user_id'])
+        if(isset($this->attributes['redeem_user_id']))
             return 'Used';
 
-        if($this->attributes['is_canceled'] == true)
+        if(isset($this->attributes['is_canceled']) AND $this->attributes['is_canceled'] == true)
             return 'Canceled';
-
-        if(is_null($this->attributes['redeem_user_id']) AND $this->attributes['expiration_date'] AND $this->expiration_date->isPast())
+        if(isset($this->attributes['redeem_user_id']) AND $this->expiration_date->isPast())
             return 'Expired';
 
         return 'Ready to use';

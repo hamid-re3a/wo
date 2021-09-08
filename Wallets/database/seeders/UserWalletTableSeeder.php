@@ -29,6 +29,11 @@ class UserWalletTableSeeder extends Seeder
 
         $bankService = new BankService($user);
         $bankService->getWallet('Deposit Wallet');
+//        $bankService->deposit('Deposit Wallet',10000000);
+
+        $user = User::query()->firstOrCreate(['id' => 2]);
+        $bankService = new BankService($user);
+        $bankService->getWallet('Deposit Wallet');
         $bankService->deposit('Deposit Wallet',10000000);
 
 

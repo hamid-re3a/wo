@@ -29,7 +29,9 @@ class GiftcodeRepository
         try {
             DB::beginTransaction();
             //All stuff fixed in GiftcodeObserver
-            $giftcode = $this->model->query()->create($request->all());
+            $giftcode = $this->model->query()->create($request->only([
+                'package_id'
+            ]));
             /**
              * Start User wallet process
              */

@@ -4,6 +4,7 @@
 namespace Orders\Services;
 
 
+use Orders\Repository\OrderRepository;
 use Packages\Services\PackageService;
 use Payments\Services\EmptyObject;
 use Payments\Services\PaymentService;
@@ -13,10 +14,12 @@ class OrderService implements OrdersServiceInterface
 {
 
     private $payment_service;
+    private $order_repository;
 
-    public function __construct(PaymentService $payment_service)
+    public function __construct(PaymentService $payment_service, OrderRepository $order_repository)
     {
         $this->payment_service = $payment_service;
+        $this->order_repository = $order_repository;
     }
 
     /**
@@ -121,5 +124,10 @@ class OrderService implements OrdersServiceInterface
         $order->setIsExpiredAt($order_db->is_expired_at);
 
         return $order;
+    }
+
+    public function getCountPackageSubscriptions()
+    {
+        return collect(["count" => $this->order_repository->getCountSubscriptions()]);
     }
 }

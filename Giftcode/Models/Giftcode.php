@@ -113,6 +113,20 @@ class Giftcode extends Model
         return null;
     }
 
+    public function getStatusAttribute()
+    {
+        if($this->attributes['redeem_user_id'])
+            return 'Used';
+
+        if($this->attributes['is_canceled'] == true)
+            return 'Canceled';
+
+        if(is_null($this->attributes['redeem_user_id']) AND $this->attributes['expiration_date'] AND $this->expiration_date->isPast())
+            return 'Expired';
+
+        return 'Ready to use';
+    }
+
 
     /**
      * Methods
@@ -156,6 +170,7 @@ class Giftcode extends Model
         }
         return $giftcode_service;
     }
+
 
 
 

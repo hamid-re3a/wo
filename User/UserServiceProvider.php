@@ -2,9 +2,15 @@
 
 namespace User;
 
+use App\Jobs\User\UserGetDataJob;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use User\Models\User;
+use User\Services\UserUpdate;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -41,6 +47,50 @@ class UserServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Auth::viaRequest('r2f-sub-service', function (Request $request) {
+
+            if (
+                $request->hasHeader('X-user-id')
+                && $request->hasHeader('X-user-hash')
+                && is_numeric($request->header('X-user-id'))
+            ) {
+                $user_update = new UserUpdate();
+                $user_update->setId($request->header('X-user-id'));
+                $user_update->setQueueName('subscriptions');
+
+
+
+                $user_hash_request = $request->header('X-user-hash');
+                $user = User::query()->find($request->header('X-user-id'));
+
+                /**
+                 * if there is not exist user. get data user complete from api gateway
+                 * error code 470 is for data user not exist log for development
+                 */
+                if ($user === null) {
+                    UserGetDataJob::dispatch($user_update);
+                    throw new Exception('please try another time!', 470);
+                }
+
+                $hash_user_service = md5(serialize($user->getUserService()));
+
+                /**
+                 * if there is not update data user. get data user complete from api gateway
+                 * error code 471 is for data user not update log for development
+                 */
+                if ($hash_user_service != $user_hash_request) {
+                    UserGetDataJob::dispatch($user_update);
+                    throw new Exception('please try another time!', 471);
+                }
+
+                $request->merge([
+                    'user' => $user
+                ]);
+                return $user;
+            }
+
+        });
+
 
         $this->setupConfig();
 
@@ -55,7 +105,7 @@ class UserServiceProvider extends ServiceProvider
             $this->seed();
 
             $this->publishes([
-                __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
+                __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
     }
@@ -94,6 +144,7 @@ class UserServiceProvider extends ServiceProvider
     {
         return UserConfigure::$runsMigrations;
     }
+
     private function seed()
     {
         if (isset($_SERVER['argv']))

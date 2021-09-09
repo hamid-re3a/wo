@@ -42,7 +42,7 @@ return [
         ],
 
         'api' => [
-            'driver' => 'sanctum',
+            'driver' => 'r2f-sub-service',
             'provider' => 'users',
             'hash' => false,
         ],

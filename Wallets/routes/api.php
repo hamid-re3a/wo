@@ -26,7 +26,7 @@ Route::middleware(['role:client'])->name('customer.')->group(function () {
 
 });
 
-Route::name('wallets.')->middleware('auth_user')->group(function () {
+Route::name('wallets.')->middleware('auth')->group(function () {
     Route::get('', [WalletController::class, 'index'])->name('index');
     Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');
 

@@ -68,10 +68,11 @@ class WalletProcessor extends ProcessorAbstract
 
             //Deposit Service
             $deposit_service = app(Deposit::class);
-            $deposit_service->setConfirmed(false);
+            $deposit_service->setConfirmed(true);
             $deposit_service->setUserId($this->user_db->id);
             $deposit_service->setAmount($this->invoice_db->pf_amount);
             $deposit_service->setType('Deposit');
+            $deposit_service->setDescription('Invoice #' . $this->invoice_db->transaction_id);
             $deposit_service->setWalletName('Deposit Wallet');
 
             //Deposit transaction

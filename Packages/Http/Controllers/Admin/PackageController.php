@@ -4,6 +4,7 @@ namespace Packages\Http\Controllers\Admin;
 
 use Packages\Http\Requests\Admin\Package\PackageEditRequest;
 use Illuminate\Routing\Controller;
+use Packages\Http\Requests\Admin\Package\PackageTypeFilterRequest;
 use Packages\Http\Resources\PackageCountByMonthResource;
 use Packages\Http\Resources\PackageResource;
 use Packages\Services\Id;
@@ -47,16 +48,16 @@ class PackageController extends Controller
 
 
     /**
-     * Count Package Last Week
+     * Count Package Between To date
      * @group
      * Public User > Packages > admin
      * @unauthenticated
      * @param PackageEditRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCountLastThreeMonth()
+    public function getCountPackageByDate(PackageTypeFilterRequest $request)
     {
-        return api()->success('packages.successfully-fetched-all-packages',($this->package_service->getCountTreeLastMonth()));
+        return api()->success('packages.successfully-fetched-all-packages',($this->package_service->getCountPackageByDate($request->type)));
     }
 
 

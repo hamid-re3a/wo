@@ -21,7 +21,7 @@ Route::middleware(['role:client'])->name('customer.')->group(function () {
 });
 
 Route::post('webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');
-Route::name('payments.')->middleware('auth_user')->group(function () {
+Route::name('payments.')->middleware('auth')->group(function () {
     Route::name('currency.')->prefix("currency")->group(function () {
         Route::get('',[\Payments\Http\Controllers\Front\PaymentCurrencyController::class,'index'])->name('index');
         Route::post('create',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'store'])->name('store');

@@ -23,7 +23,7 @@ Route::middleware(['role:client'])->name('customer.')->group(function () {
 
 });
 
-Route::name('giftcodes.')->middleware('auth_user')->group(function () {
+Route::name('giftcodes.')->middleware('auth')->group(function () {
     Route::get('', [GiftcodeController::class,'index'])->name('list');
     Route::post('create',[GiftcodeController::class,'store'])->name('create');
     Route::get('show/{uuid}', [GiftcodeController::class,'show'])->name('show');

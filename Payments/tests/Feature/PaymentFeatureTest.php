@@ -39,10 +39,7 @@ class PaymentFeatureTest extends PaymentTest
             'payment_currency' => 'BTC',
         ], [
             'X-user-id' => 1,
-            'X-user-first-name' => 'admin',
-            'X-user-last-name' => 'ni',
-            'X-user-email' => 'admin@site.com',
-            'X-user-username' => 'admin',
+            'X-user-hash'=>3,
         ]);
         $response->assertOk();
 

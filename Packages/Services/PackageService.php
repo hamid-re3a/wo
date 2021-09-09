@@ -83,8 +83,6 @@ class PackageService implements PackagesServiceInterface
     public function getCountTreeLastMonth()
     {
         $data_count = $this->package_repository->getCountAllPackageByMonth(Carbon::now()->subDay(7),Carbon::now());
-        //dd(Carbon::now()->endOfMonth()->subMonth(2),Carbon::now()->startOfMonth()->subMonth(2));
-        //dd($data_count->where('category_id',3)->where('category_id',3)->whereBetween('created_at',[Carbon::now()->startOfMonth()->subMonth(2),Carbon::now()->endOfMonth()->subMonth(2)]));
         $array_count = [];
         $last_week_days = [1,2,3,4,5,6,7];
 
@@ -94,25 +92,6 @@ class PackageService implements PackagesServiceInterface
             $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"p" => $data_count->where('category_id',4)->whereBetween('created_at',[Carbon::now()->subDay($day),Carbon::now()->endOfDay()->subDay($day)])->count()];
             $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"i" => $data_count->where('category_id',2)->whereBetween('created_at',[Carbon::now()->subDay($day),Carbon::now()->endOfDay()->subDay($day)])->count()];
         }
-       /* $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"a" => $data_count->where('category_id',3)->whereBetween('created_at',[Carbon::now()->subDay(1),Carbon::now()->subDay(1)])];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"a" => $data_count->where('category_id',3)->whereBetween('created_at',[Carbon::now()->subDay(2),Carbon::now()->subDay(2)])];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"a" => $data_count->where('category_id',3)->whereBetween('created_at',[Carbon::now()->subDay(3),Carbon::now()->subDay(3)])];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"a" => $data_count->where('category_id',3)->whereBetween('created_at',[Carbon::now()->subDay(4),Carbon::now()->subDay(4)])];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"a" => $data_count->where('category_id',3)->whereBetween('created_at',[Carbon::now()->subDay(7),Carbon::now()->subDay(1)])];
-
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"b" => $data_count->where('category_id',1)->whereBetween('created_at',[Carbon::now()->startOfMonth(),Carbon::now()->endOfMonth()])->count()];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->subMonth(2)->timestamp ,"b" => $data_count->where('category_id',1)->whereBetween('created_at',[Carbon::now()->startOfMonth()->subMonth(2),Carbon::now()->endOfMonth()->subMonth(1)])->count()];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->subMonth(3)->timestamp ,"b" => $data_count->where('category_id',1)->whereBetween('created_at',[Carbon::now()->startOfMonth()->subMonth(3),Carbon::now()->endOfMonth()->subMonth(2)])->count()];
-        dd($array_count);
-
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"p" => $data_count->where('category_id',4)->whereBetween('created_at',[Carbon::now()->startOfMonth(),Carbon::now()->endOfMonth()])->count()];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->subMonth(2)->timestamp ,"p" => $data_count->where('category_id',4)->whereBetween('created_at',[Carbon::now()->startOfMonth()->subMonth(2),Carbon::now()->endOfMonth()->subMonth(1)])->count()];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->subMonth(3)->timestamp ,"p" => $data_count->where('category_id',4)->whereBetween('created_at',[Carbon::now()->startOfMonth()->subMonth(3),Carbon::now()->endOfMonth()->subMonth(2)])->count()];
-
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"i" => $data_count->where('category_id',2)->whereBetween('created_at',[Carbon::now()->startOfMonth(),Carbon::now()->endOfMonth()])->count()];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->subMonth(2)->timestamp ,"i" => $data_count->where('category_id',2)->whereBetween('created_at',[Carbon::now()->startOfMonth()->subMonth(2),Carbon::now()->endOfMonth()->subMonth(1)])->count()];
-        $array_count[] = ["time" =>Carbon::now()->startOfMonth()->subMonth(3)->timestamp ,"i" => $data_count->where('category_id',2)->whereBetween('created_at',[Carbon::now()->startOfMonth()->subMonth(3),Carbon::now()->endOfMonth()->subMonth(2)])->count()];*/
-
         return $array_count;
     }
 }

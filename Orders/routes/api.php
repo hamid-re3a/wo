@@ -15,6 +15,7 @@ Route::/*middleware(['role:super-admin|subscriptions-order-admin'])->*/prefix('a
         Route::get('/subscription_count',[OrderAdminController::class,"getCountSubscriptions"]);
         Route::get('/active_package_count',[OrderAdminController::class,'activePackageCount']);
         Route::get('/deactivate_package_count',[OrderAdminController::class,'deactivatePackageCount']);
+        Route::post('/package_count_overview',[OrderAdminController::class,'packageOverviewCount']);
     });
 
 });

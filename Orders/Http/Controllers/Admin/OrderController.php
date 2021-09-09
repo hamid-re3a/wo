@@ -7,6 +7,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
+use Orders\Http\Requests\Front\Order\OrderTypeFilterRequest;
 use Orders\Http\Resources\CountDataResource;
 use Orders\Services\OrderService;
 use Packages\Services\PackageService;
@@ -61,5 +62,17 @@ class OrderController extends Controller
     public function deactivatePackageCount()
     {
         return api()->success(null,new CountDataResource($this->order_service->deactivatePackageCount()));
+    }
+
+    /**
+     * get package overview count
+     * @group
+     * Public User > Orders > admin
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageOverviewCount(OrderTypeFilterRequest $request)
+    {
+        return api()->success(null,$this->order_service->packageOverviewCount($request->type));
     }
 }

@@ -11,7 +11,7 @@ use Packages\Http\Controllers\Admin\PackageController as PackageAdminController;
 Route::/*middleware(['role:super-admin|subscriptions-package-admin'])->*/prefix('admin')->name('admin.')->group(function () {
 
     Route::name('package')->group(function (){
-        Route::get('/package_count',[PackageAdminController::class,'getCountLastThreeMonth']);
+        Route::post('/package_count',[PackageAdminController::class,'getCountPackageByDate']);
     });
 
 

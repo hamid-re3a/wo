@@ -4,6 +4,7 @@
 namespace Orders\Services;
 
 
+use Illuminate\Support\Carbon;
 use Orders\Repository\OrderRepository;
 use Packages\Services\PackageService;
 use Payments\Services\EmptyObject;
@@ -143,6 +144,49 @@ class OrderService implements OrdersServiceInterface
     {
         $count = $this->order_repository->getCountDeactivatePackage();
         return collect(["count" => $count]);
+    }
+
+    public function packageOverviewCount($type)
+    {
+        switch ($type) {
+            case "week":
+                $array_active = $this->order_repository->getCountActivePackageByDate(Carbon::now()->endOfDay()->subDay(7), Carbon::now());
+                $array_deactivate = $this->order_repository->getCountDeactivatePackageByDate(Carbon::now()->endOfDay()->subDay(7), Carbon::now());
+                $total = $this->order_repository->getCountTotalPackageByDate(Carbon::now()->endOfDay()->subDay(7), Carbon::now());
+                $array_count = [];
+                foreach (range(1, 7) as $day) {
+                    $array_count[] = ["time" => Carbon::now()->startOfDay()->subDay($day)->timestamp, "active" => $array_active->whereBetween('created_at', [Carbon::now()->startOfDay()->subDay($day), Carbon::now()->endOfDay()->subDay($day)])->count()];
+                    $array_count[] = ["time" => Carbon::now()->startOfDay()->subDay($day)->timestamp, "deactivate" => $array_deactivate->whereBetween('created_at', [Carbon::now()->startOfDay()->subDay($day), Carbon::now()->endOfDay()->subDay($day)])->count()];
+                    $array_count[] = ["time" => Carbon::now()->startOfDay()->subDay($day)->timestamp, "total" => $total->whereBetween('created_at', [Carbon::now()->startOfDay()->subDay($day), Carbon::now()->endOfDay()->subDay($day)])->count()];
+                }
+                return $array_count;
+                break;
+            case "month":
+                $array_active = $this->order_repository->getCountActivePackageByDate(Carbon::now()->endOfMonth()->subMonth(6), Carbon::now());
+                $array_deactivate = $this->order_repository->getCountDeactivatePackageByDate(Carbon::now()->endOfMonth()->subMonth(6), Carbon::now());
+                $total = $this->order_repository->getCountTotalPackageByDate(Carbon::now()->endOfMonth()->subMonth(6), Carbon::now());
+                $array_count = [];
+                foreach (range(6, 12) as $month) {
+                    $array_count[] = ["time" => Carbon::now()->startOfMonth()->subMonth($month)->timestamp, "active" => $array_active->whereBetween('created_at', [Carbon::now()->startOfMonth()->subMonth($month), Carbon::now()->endOfMonth()->subMonth($month)])->count()];
+                    $array_count[] = ["time" => Carbon::now()->startOfMonth()->subMonth($month)->timestamp, "deactivate" => $array_deactivate->whereBetween('created_at', [Carbon::now()->startOfMonth()->subMonth($month), Carbon::now()->endOfMonth()->subMonth($month)])->count()];
+                    $array_count[] = ["time" => Carbon::now()->startOfMonth()->subMonth($month)->timestamp, "total" => $total->whereBetween('created_at', [Carbon::now()->startOfMonth()->subMonth($month), Carbon::now()->endOfMonth()->subMonth($month)])->count()];
+                }
+                return $array_count;
+                break;
+            case "year":
+                $array_active = $this->order_repository->getCountActivePackageByDate(Carbon::now()->endOfYear()->subYear(3), Carbon::now());
+                $array_deactivate = $this->order_repository->getCountDeactivatePackageByDate(Carbon::now()->endOfYear()->subYear(3), Carbon::now());
+                $total = $this->order_repository->getCountTotalPackageByDate(Carbon::now()->endOfDay()->subYear(3), Carbon::now());
+                $array_count = [];
+                foreach (range(1, 3) as $year) {
+                    $array_count[] = ["time" => Carbon::now()->startOfYear()->subYear($year)->timestamp, "active" => $array_active->whereBetween('created_at', [Carbon::now()->startOfYear()->subYear($year), Carbon::now()->endOfYear()->subYear($year)])->count()];
+                    $array_count[] = ["time" => Carbon::now()->startOfYear()->subYear($year)->timestamp, "deactivate" => $array_deactivate->whereBetween('created_at', [Carbon::now()->startOfYear()->subYear($year), Carbon::now()->endOfYear()->subYear($year)])->count()];
+                    $array_count[] = ["time" => Carbon::now()->startOfYear()->subYear($year)->timestamp, "total" => $total->whereBetween('created_at', [Carbon::now()->startOfYear()->subYear($year), Carbon::now()->endOfYear()->subYear($year)])->count()];
+                }
+                return $array_count;
+                break;
+        }
+
     }
 
 }

@@ -29,7 +29,7 @@ class GiftcodeController extends Controller
      */
     public function index()
     {
-        $giftcodes = request()->user->giftcodes()->simplePaginate();
+        $giftcodes = request()->user->giftcodes()->orderBy('created_at','DESC')->simplePaginate();
         return api()->success(null,GiftcodeResource::collection($giftcodes)->response()->getData());
     }
 

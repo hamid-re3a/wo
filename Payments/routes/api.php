@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Payments\Http\Controllers\Front\InvoiceController;
 use Payments\Http\Controllers\Front\WebhookController;
 
 /**
@@ -16,8 +17,10 @@ Route::middleware(['role:super-admin|subscriptions-payment-admin'])->name('admin
  * @todo before lunch project we must migrate all route to this (all api public and customer side)
  * list of all route admin section
  */
-Route::middleware(['role:client'])->name('customer.')->group(function () {
-
+Route::/*middleware(['role:client'])->*/name('customer.')->group(function () {
+    Route::name('.invoice')->prefix("invoice")->group(function (){
+        Route::post('cancel_invoice',[InvoiceController::class,'cancelInvoice'])->name('cancel_invoice');
+    });
 });
 
 Route::post('webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');

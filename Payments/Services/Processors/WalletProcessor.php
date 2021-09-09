@@ -75,10 +75,13 @@ class WalletProcessor extends ProcessorAbstract
             $deposit_service->setWalletName('Deposit Wallet');
 
             //Deposit transaction
+            /**
+             * @var $deposit Deposit
+             */
             $deposit = $this->wallet_service->deposit($deposit_service);
 
             //Deposit check
-            if($deposit->getConfiremd()) {
+            if($deposit->getConfirmed()) {
                 $this->invoice_db->update([
                     'is_paid' => true
                 ]);

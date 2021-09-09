@@ -7,14 +7,8 @@ namespace Giftcode\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Giftcode\Http\Requests\User\CancelGiftcodeRequest;
 use Giftcode\Http\Requests\User\CreateGiftcodeRequest;
-use Giftcode\Http\Requests\User\RedeemGiftcodeRequest;
 use Giftcode\Http\Resources\GiftcodeResource;
-use Giftcode\Jobs\TrivialEmailJob;
 use Giftcode\Jobs\UpdatePackages;
-use Giftcode\Jobs\UrgentEmailJob;
-use Giftcode\Mail\User\GiftcodeCanceledEmail;
-use Giftcode\Mail\User\RedeemedGiftcodeCreatorEmail;
-use Giftcode\Mail\User\RedeemedGiftcodeRedeemerEmail;
 use Giftcode\Repository\GiftcodeRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +29,7 @@ class GiftcodeController extends Controller
      */
     public function index()
     {
-        $giftcodes = request()->user->giftcodes()->simplePaginate();
+        $giftcodes = request()->user->giftcodes()->orderBy('created_at','DESC')->simplePaginate();
         return api()->success(null,GiftcodeResource::collection($giftcodes)->response()->getData());
     }
 
@@ -104,39 +98,39 @@ class GiftcodeController extends Controller
 
         }
     }
-
-    /**
-     * Redeem a giftcode
-     * @group Public User > Giftcode
-     * @param RedeemGiftcodeRequest $request
-     * @return JsonResponse
-     */
-    public function redeem(RedeemGiftcodeRequest $request)
-    {
-        try {
-
-            $giftcode = $this->giftcode_repository->redeem($request);
-
-            /**
-             * Start sending emails
-             */
-            //Redeemer email
-            TrivialEmailJob::dispatch(new RedeemedGiftcodeRedeemerEmail($request->user,$giftcode), $request->user->email);
-
-            //Creator email
-            if($giftcode->user_id != $giftcode->redeem_user_id) //Check if creator used his own giftcode,We wont send any email for creator
-                TrivialEmailJob::dispatch(new RedeemedGiftcodeCreatorEmail($giftcode->creator,$giftcode), $giftcode->creator->email);
-            /**
-             * End sending emails
-             */
-
-            return api()->success(null,GiftcodeResource::make($giftcode));
-        } catch (\Throwable $exception) {
-            Log::error('Giftcode redeem error > ' . $exception->getMessage());
-            return api()->error(null,null,500,[
-                'subject' => $exception->getMessage()
-            ]);
-        }
-    }
+//
+//    /**
+//     * Redeem a giftcode
+//     * @group Public User > Giftcode
+//     * @param RedeemGiftcodeRequest $request
+//     * @return JsonResponse
+//     */
+//    public function redeem(RedeemGiftcodeRequest $request)
+//    {
+//        try {
+//
+//            $giftcode = $this->giftcode_repository->redeem($request);
+//
+//            /**
+//             * Start sending emails
+//             */
+//            //Redeemer email
+//            TrivialEmailJob::dispatch(new RedeemedGiftcodeRedeemerEmail($request->user,$giftcode), $request->user->email);
+//
+//            //Creator email
+//            if($giftcode->user_id != $giftcode->redeem_user_id) //Check if creator used his own giftcode,We wont send any email for creator
+//                TrivialEmailJob::dispatch(new RedeemedGiftcodeCreatorEmail($giftcode->creator,$giftcode), $giftcode->creator->email);
+//            /**
+//             * End sending emails
+//             */
+//
+//            return api()->success(null,GiftcodeResource::make($giftcode));
+//        } catch (\Throwable $exception) {
+//            Log::error('Giftcode redeem error > ' . $exception->getMessage());
+//            return api()->error(null,null,500,[
+//                'subject' => $exception->getMessage()
+//            ]);
+//        }
+//    }
 
 }

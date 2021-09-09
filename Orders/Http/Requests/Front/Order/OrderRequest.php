@@ -30,14 +30,20 @@ class OrderRequest extends FormRequest
             return [
 
             'package_id' => 'required|numeric',
-//            'items.*.id' => 'exists:packages,id',
-//            'items.*.qty' => 'required|numeric|min:1',
-//            'to_user_id' => 'nullable|exists:order_users,id',
-            'plan' => array('in:' . implode(',', ORDER_PLANS)),
-
-            //'payment_type' => array('required', Rule::in($this->getNamePaymentType())),
-//            'payment_driver' => array('required_if:payment_type,=,purchase'),
-            //'payment_currency' => array('required', Rule::in($this->getNamePaymentCurrency())),
+            'plan' => 'required|in:' . implode(',', ORDER_PLANS),
+            'payment_type' => [
+                'required',
+                'in:' . implode(',',$this->getNamePaymentType())
+            ],
+            'payment_currency' => [
+                'required_if:payment_type,purchase',
+                'in:'. implode(',', $this->getNamePaymentCurrency())
+            ],
+            'payment_driver' => [
+                'required_if:payment_type,purchase',
+                'in:btc-pay-server'
+            ],
+            'giftcode' => 'required_if:payment_type,giftcode',
         ];
     }
 
@@ -68,6 +74,7 @@ class OrderRequest extends FormRequest
         }
         return $payment_type_name_array;
     }
+
 
 
 }

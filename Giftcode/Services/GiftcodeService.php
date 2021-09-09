@@ -45,7 +45,8 @@ class GiftcodeService
                 $request = new Request();
                 $request->merge([
                     'id' => $giftcode->getUuid(),
-                    'user' => \User\Models\User::query()->find($user->getId())
+                    'user' => \User\Models\User::query()->find($user->getId()),
+                    'order_id' => $giftcode->getOrderId()
                 ]);
                 $this->giftcode_repository->redeem($request);
             return $this->giftcode_repository->getGiftcodeServiceByUuid($giftcode->getUuid());

@@ -4,7 +4,7 @@ namespace Orders\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SubscriptionsCountResource extends JsonResource
+class CountDataResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

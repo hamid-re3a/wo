@@ -202,13 +202,19 @@ class DepositWalletController extends Controller
     public function deposit(ChargeDepositWalletRequest $request)
     {
         $wallet_service = app(WalletService::class);
-        $invoice = $wallet_service->invoiceWallet($request);
+        list($flag,$response) = $wallet_service->invoiceWallet($request);
+
+        if(!$flag)
+            return api()->error(null,[
+                'subject' => $response
+            ]);
+
         return api()->success('success', [
-            'payment_currency'=>$invoice->getPaymentCurrency(),
-            'amount' => walletPfAmount($invoice->getAmount()),
-            'checkout_link' => $invoice->getCheckoutLink(),
-            'transaction_id' => $invoice->getTransactionId(),
-            'expiration_time' => $invoice->getExpirationTime(),
+            'payment_currency'=> $response['payment_currency'],
+            'amount' => $response['amount'],
+            'checkout_link' => $response['checkout_link'],
+            'transaction_id' => $response['transaction_id'],
+            'expiration_time' => $response['expiration_time'],
         ]);
     }
 

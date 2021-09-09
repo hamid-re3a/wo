@@ -17,6 +17,7 @@ class CreateGiftcodesTable extends Migration
             $table->engine = "InnoDB";
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->unsignedBigInteger('order_id')->nullable();
             $table->foreignId('user_id')->constrained('users','id');
             $table->foreignId('package_id')->constrained('giftcode_packages','id');
 

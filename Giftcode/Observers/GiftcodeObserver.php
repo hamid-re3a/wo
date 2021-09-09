@@ -4,8 +4,6 @@
 namespace Giftcode\Observers;
 
 use Exception;
-use Giftcode\Jobs\UrgentEmailJob;
-use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;

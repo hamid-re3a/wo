@@ -3,6 +3,7 @@
 
 namespace Packages\Repository;
 
+use Illuminate\Support\Facades\DB;
 use Packages\Models\Package;
 use Packages\Services\Id;
 use Packages\Services\Package as PackageData;
@@ -38,7 +39,13 @@ class PackageRepository
     public function getAll()
     {
         $package_entity = new $this->entity_name;
-        return $package_entity->with('category','packageIndirectCommission')->get();
+        return $package_entity->with('category', 'packageIndirectCommission')->get();
+    }
+
+    public function getCountAllPackageByMonth($from_month,$until_month)
+    {
+        $package_entity = new $this->entity_name;
+        return $package_entity->select('short_name','category_id','created_at',DB::raw('count(id) as `count`'))->whereBetween('created_at',[$from_month,$until_month])->groupby('created_at','category_id','short_name')->get();
     }
 
 }

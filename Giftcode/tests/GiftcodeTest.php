@@ -13,7 +13,6 @@ use Tests\TestCase;
 use User\Models\User;
 use Wallets\Services\Deposit;
 use Wallets\Services\Transaction;
-use Wallets\Services\Wallet;
 use Wallets\Services\WalletService;
 
 class GiftcodeTest extends TestCase

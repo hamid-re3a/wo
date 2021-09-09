@@ -81,6 +81,10 @@ class Giftcode extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string updated_at = 17;</code>
      */
     protected $updated_at = '';
+    /**
+     * Generated from protobuf field <code>int64 order_id = 18;</code>
+     */
+    protected $order_id = 0;
 
     /**
      * Constructor.
@@ -105,6 +109,7 @@ class Giftcode extends \Google\Protobuf\Internal\Message
      *     @type string $deleted_at
      *     @type string $created_at
      *     @type string $updated_at
+     *     @type int|string $order_id
      * }
      */
     public function __construct($data = NULL) {
@@ -502,6 +507,28 @@ class Giftcode extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->updated_at = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 order_id = 18;</code>
+     * @return int|string
+     */
+    public function getOrderId()
+    {
+        return $this->order_id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 order_id = 18;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setOrderId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->order_id = $var;
 
         return $this;
     }

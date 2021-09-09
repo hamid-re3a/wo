@@ -28,13 +28,12 @@ class CreateOrdersTable extends Migration
             $table->timestamp('is_paid_at')->nullable();
             $table->timestamp('is_resolved_at')->nullable();
             $table->timestamp('is_refund_at')->nullable();
-            $table->timestamp('is_expired_at')->nullable();
             $table->timestamp('is_commission_resolved_at')->nullable();
 
             $table->string('payment_type');
-            $table->string('payment_currency');
+            $table->string('payment_currency')->nullable();
+            $table->integer('validity_in_days')->nullable();
             $table->string('payment_driver')->nullable()->default(null);
-
             $table->unsignedBigInteger('package_id');
 
             $table->string('plan')->default(ORDER_PLAN_START);

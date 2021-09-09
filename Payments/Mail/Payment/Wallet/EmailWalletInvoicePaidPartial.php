@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Payments\Mail\SettingableMail;
-use Payments\Services\Invoice;
+use Payments\Models\Invoice;
 use User\Models\User;
 
 class EmailWalletInvoicePaidPartial extends Mailable implements SettingableMail
@@ -59,18 +59,18 @@ class EmailWalletInvoicePaidPartial extends Mailable implements SettingableMail
     private function getPartialInPf()
     {
         return number_format(
-            (($this->invoice->getPfAmount() / $this->invoice->getAmount()) * $this->invoice->getDueAmount())
+            (($this->invoice->pf_amount / $this->invoice->amount) * $this->invoice->due_amount)
             , 2, '.', '');
     }
 
     private function getInvoiceDueAmount()
     {
-        return $this->invoice->getDueAmount() ;
+        return $this->invoice->due_amount ;
 //        return $this->invoice->getDueAmount() . ' ' . $this->order->getPaymentCurrency();
     }
 
     private function getInvoiceExpirationTime()
     {
-        return Carbon::createFromTimestamp($this->invoice->getExpirationTime())->diffForHumans();
+        return Carbon::createFromTimestamp($this->invoice->expiration_time)->diffForHumans();
     }
 }

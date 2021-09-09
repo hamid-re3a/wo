@@ -17,7 +17,17 @@ class GiftcodeService
         $this->giftcode_repository = $giftcode_repository;
     }
 
-    public function getGiftcode(Giftcode $giftcode)
+    public function getGiftcodeByCode(Giftcode $giftcode)
+    {
+        $giftcode_model = $this->giftcode_repository->getByCode($giftcode->getCode());
+        if($giftcode_model)
+            return $this->giftcode_repository->getGiftcodeService($giftcode_model);
+
+        return new Giftcode();
+
+    }
+
+    public function getGiftcodeByUuid(Giftcode $giftcode)
     {
         $giftcode_model = $this->giftcode_repository->getByUuid($giftcode->getUuid());
         if($giftcode_model)
@@ -26,20 +36,18 @@ class GiftcodeService
         return new Giftcode();
     }
 
-    public function redeemGiftcode(Giftcode $giftcode,Package $package,User $user)
+    public function redeemGiftcode(Giftcode $giftcode,User $user)
     {
         try {
             $giftcode_model = $this->giftcode_repository->getById($giftcode->getId());
             if(!$giftcode_model)
                 return new Giftcode();
-            if($giftcode_model->package_id == $package->getId()) {
                 $request = new Request();
                 $request->merge([
                     'id' => $giftcode->getUuid(),
                     'user' => \User\Models\User::query()->find($user->getId())
                 ]);
-                $giftcode_model = $this->giftcode_repository->redeem($request);
-            }
+                $this->giftcode_repository->redeem($request);
             return $this->giftcode_repository->getGiftcodeServiceByUuid($giftcode->getUuid());
 
         } catch (\Throwable $exception) {

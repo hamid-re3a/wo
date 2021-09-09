@@ -4,6 +4,8 @@
 namespace Payments\Services\Processors;
 
 
+use App\Jobs\User\UpdateUserJob;
+use App\Jobs\User\UserDataJob;
 use Orders\Services\Id;
 use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;

@@ -29,7 +29,9 @@ class GiftcodeRepository
         try {
             DB::beginTransaction();
             //All stuff fixed in GiftcodeObserver
-            $giftcode = $this->model->query()->create($request->all());
+            $giftcode = $this->model->query()->create($request->only([
+                'package_id'
+            ]));
             /**
              * Start User wallet process
              */
@@ -65,6 +67,11 @@ class GiftcodeRepository
     public function getByUuid($uuid)
     {
         return $this->model->query()->where('uuid',$uuid)->first();
+    }
+
+    public function getByCode($code)
+    {
+        return $this->model->query()->where('code',$code)->first();
     }
 
     public function cancel(Request $request)

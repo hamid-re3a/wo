@@ -21,12 +21,19 @@ class InvoiceController extends Controller
      */
     public function pendingOrderInvoice()
     {
-        $invoice = request()->user->invoices()->where('payable_type','Order')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
+        $pending_invoice = request()->user->invoices()->where('payable_type','Order')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
 
-        if(!$invoice)
-            return api()->error(null,null,406);
+        if(!$pending_invoice) {
+            $paid_invoice = request()->user()->invoices()->where('payable_type','Order')->where('is_paid',1)->count();
+            if($paid_invoice)
+                return api()->success(null,[
+                    'status' => 'confirmed'
+                ]);
 
-        return api()->success('success', InvoiceResource::make($invoice));
+            return api()->error(null,null,404);
+        }
+
+        return api()->success(null, InvoiceResource::make($pending_invoice));
     }
 
     /**

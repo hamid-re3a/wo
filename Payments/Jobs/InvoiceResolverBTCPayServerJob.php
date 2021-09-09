@@ -31,7 +31,6 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     public function __construct(Invoice $invoice_db)
     {
         $this->invoice_db = $invoice_db;
-        $this->invoice_model = new \Payments\Models\Invoice();
     }
 
     public function handle()
@@ -40,7 +39,6 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled'){
                 return;
             }
-
             DB::beginTransaction();
             $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
                 ->get(
@@ -54,6 +52,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 );
 
             if ($response->ok() && $payment_response->ok()) {
+
                 $amount_paid = $payment_response->json()[0]['totalPaid'];
                 $amount_due = $payment_response->json()[0]['due'];
                 $this->recordTransactions($payment_response->json()[0]['payments']);
@@ -101,6 +100,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Paid PaidOver':
             case 'Complete PaidOver':
             case 'Settled PaidOver':
+            case 'Settled Marked':
                 $processor->completed();
                 break;
 

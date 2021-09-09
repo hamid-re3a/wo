@@ -34,7 +34,7 @@ class OrderProcessor extends ProcessorAbstract
 
         $order_service = app(OrderService::class);
         $order_id = new Id();
-        $order_id->setId($this->invoice_model->payable_id);
+        $order_id->setId($this->invoice_db->payable_id);
         $this->order_service = $order_service->OrderById($order_id);
 
     }
@@ -43,10 +43,10 @@ class OrderProcessor extends ProcessorAbstract
     {
 
         //send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_model, 'partial_paid');
+        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'partial_paid');
 
         // send email notification for due amount
-        EmailJob::dispatch(new EmailInvoicePaidPartial($this->order_service->getUser(), $this->invoice_model,$this->order_service), $this->order_service->getUser()->getEmail());
+        EmailJob::dispatch(new EmailInvoicePaidPartial($this->order_service->getUser(), $this->invoice_db,$this->order_service), $this->order_service->getUser()->getEmail());
 
 
     }
@@ -55,22 +55,21 @@ class OrderProcessor extends ProcessorAbstract
     {
 
         // send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_model, 'paid');
+        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
 
     }
 
     public function completed()
     {
-
         $this->invoice_db->update([
             'is_paid' => true
         ]);
 
         // send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_model, 'confirmed');
+        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
 
         // send thank you email notification
-        EmailJob::dispatch(new EmailInvoicePaidComplete($this->order_service->getUser(), $this->invoice_model), $this->order_service->getUser()->getEmail());
+        EmailJob::dispatch(new EmailInvoicePaidComplete($this->order_service->getUser(), $this->invoice_db), $this->order_service->getUser()->getEmail());
 
 
         //Update order
@@ -85,10 +84,10 @@ class OrderProcessor extends ProcessorAbstract
     {
 
         // send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_model, 'expired');
+        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'expired');
 
         // send email to user to regenerate new invoice for due amount
-        EmailJob::dispatch(new EmailInvoiceExpired($this->order_service->getUser(), $this->invoice_model), $this->order_service->getUser()->getEmail());
+        EmailJob::dispatch(new EmailInvoiceExpired($this->order_service->getUser(), $this->invoice_db), $this->order_service->getUser()->getEmail());
 
     }
 

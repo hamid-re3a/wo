@@ -14,12 +14,14 @@ class OrderService implements OrdersServiceInterface
 {
 
     private $payment_service;
+    private $package_service;
     private $order_repository;
 
-    public function __construct(PaymentService $payment_service, OrderRepository $order_repository)
+    public function __construct(PaymentService $payment_service, OrderRepository $order_repository, PackageService $package_service)
     {
         $this->payment_service = $payment_service;
         $this->order_repository = $order_repository;
+        $this->package_service = $package_service;
     }
 
     /**
@@ -130,4 +132,17 @@ class OrderService implements OrdersServiceInterface
     {
         return collect(["count" => $this->order_repository->getCountSubscriptions()]);
     }
+
+    public function activePackageCount()
+    {
+        $count = $this->order_repository->getCountActivePackage();
+        return collect(["count" => $count]);
+    }
+
+    public function deactivatePackageCount()
+    {
+        $count = $this->order_repository->getCountDeactivatePackage();
+        return collect(["count" => $count]);
+    }
+
 }

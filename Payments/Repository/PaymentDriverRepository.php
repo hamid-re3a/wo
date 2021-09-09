@@ -9,6 +9,11 @@ class PaymentDriverRepository
 {
     protected $entity_name = PaymentDriver::class;
 
+    public function getAll()
+    {
+        return $this->entity_name::all();
+    }
+
     public function create(PaymentDriverObject $payment_driver)
     {
         $entity = new $this->entity_name;

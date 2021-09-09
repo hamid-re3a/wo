@@ -50,6 +50,9 @@ class InvoiceController extends Controller
     public function show(ShowInvoiceRequest $request)
     {
         $invoice = Invoice::query()->where('transaction_id',$request->get('transaction_id'))->where('user_id',$request->header('X-user-id'))->first();
+        if(!$invoice)
+            return api()->error(null,null,404);
+
         return api()->success(null,InvoiceResource::make($invoice));
     }
 

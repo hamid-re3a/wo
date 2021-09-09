@@ -5,8 +5,6 @@ namespace Payments\Services\Processors;
 
 
 use Payments\Models\Invoice;
-use Payments\Services\Id;
-use Payments\Services\PaymentService;
 use Payments\Services\Socket;
 
 abstract class ProcessorAbstract
@@ -19,10 +17,6 @@ abstract class ProcessorAbstract
 
         $this->socket_service = new Socket();
         $this->invoice_db = $invoice_db;
-
-        $payment_Id = new Id();
-        $payment_Id->setId((int)$this->invoice_db->id);
-        $this->invoice_model = app(PaymentService::class)->getInvoiceById($payment_Id);
     }
 
     public function mlmStuff()

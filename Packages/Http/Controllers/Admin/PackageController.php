@@ -48,7 +48,7 @@ class PackageController extends Controller
 
 
     /**
-     * Count Package Between To date
+     * Count Package Between two date
      * @group
      * Public User > Packages > admin
      * @unauthenticated

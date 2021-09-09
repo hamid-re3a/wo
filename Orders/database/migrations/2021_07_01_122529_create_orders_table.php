@@ -31,7 +31,7 @@ class CreateOrdersTable extends Migration
             $table->timestamp('is_commission_resolved_at')->nullable();
 
             $table->string('payment_type');
-            $table->string('payment_currency');
+            $table->string('payment_currency')->nullable();
             $table->integer('validity_in_days')->nullable();
             $table->string('payment_driver')->nullable()->default(null);
             $table->unsignedBigInteger('package_id');

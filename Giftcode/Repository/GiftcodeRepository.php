@@ -11,7 +11,6 @@ use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use User\Models\User;
 
 class GiftcodeRepository
 {
@@ -133,7 +132,8 @@ class GiftcodeRepository
 
             $giftcode->update([
                 'redeem_user_id' => $request->user->id,
-                'redeem_date' => now()->toDateTimeString()
+                'redeem_date' => now()->toDateTimeString(),
+                'order_id' => $request->get('order_id')
             ]);
             DB::commit();
             return $giftcode->fresh();

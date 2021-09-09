@@ -114,24 +114,16 @@ class User extends Model implements WalletFloat
     {
         $this->fresh();
         $user = new \User\Services\User();
-        $user->setId($this->attributes['id']);
-        $user->setFirstName($this->attributes['first_name']);
-        $user->setLastName($this->attributes['last_name']);
-        $user->setUsername($this->attributes['username']);
-        $user->setEmail($this->attributes['email']);
-        $user->setMemberId($this->attributes['member_id']);
-
-        if (isset($this->attributes['sponsor_id']) AND !empty($this->attributes['sponsor_id']))
-            $user->setSponsorId($this->attributes['sponsor_id']);
-
-        if (isset($this->attributes['block_type']) AND !empty($this->attributes['block_type']))
-            $user->setBlockType($this->attributes['block_type']);
-
-        if (isset($this->attributes['is_deactivate']))
-            $user->setIsDeactivate($this->attributes['is_deactivate']);
-
-        if (isset($this->attributes['is_freeze']))
-            $user->setIsFreeze($this->attributes['is_freeze']);
+        $user->setId((int)$this->attributes['id']);
+        $user->setFirstName((string)$this->attributes['first_name']);
+        $user->setLastName((string)$this->attributes['last_name']);
+        $user->setUsername((string)$this->attributes['username']);
+        $user->setEmail((string)$this->attributes['email']);
+        $user->setMemberId((int)$this->attributes['member_id']);
+        $user->setSponsorId((int)$this->attributes['sponsor_id']);
+        $user->setBlockType((string)$this->attributes['block_type']);
+        $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
+        $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());

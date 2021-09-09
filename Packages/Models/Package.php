@@ -4,6 +4,7 @@ namespace Packages\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Orders\Models\Order;
 
 /**
  * Packages\Models\Package
@@ -61,6 +62,15 @@ class Package extends Model
     public function packageIndirectCommission()
     {
         return $this->hasMany(PackagesIndirectCommission::class);
+    }
+
+    /**
+     * relation with Order
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Orders\Services;
 
 
-use Illuminate\Support\Facades\DB;
+use App\Jobs\Order\MLMOrderJob;
 
 class OrderResolver
 {
@@ -45,7 +45,6 @@ class OrderResolver
      */
     public function resolve(): array
     {
-        DB::beginTransaction();
         $problem_level = 0;
 
 
@@ -53,16 +52,15 @@ class OrderResolver
         if ($bool) {
             list($bool, $msg) = $this->addUserToNetwork();
             if ($bool) {
-                DB::commit();
                 return [true, 'resolve', $problem_level];
             } else {
                 $problem_level = 2;
             }
         } else {
+
             $problem_level = 1;
         }
 
-        DB::rollBack(0);
         return [false, $msg ?? 'resolve', $problem_level];
     }
 
@@ -73,20 +71,12 @@ class OrderResolver
      */
     public function simulateValidation(): array
     {
-        DB::beginTransaction();
-
         list($bool, $msg) = $this->isValid();
         if ($bool) {
-            list($bool, $msg) = $this->addUserToNetwork(true);
-            if ($bool) {
-                DB::rollBack(0);
-                return [true, 'resolve'];
-            }
-
+            return [true, 'resolve'];
         }
 
-        DB::rollBack(0);
-        return [false, $msg ?? 'resolve'];
+        return [false, $msg];
 
     }
 
@@ -96,8 +86,14 @@ class OrderResolver
      */
     public function isValid(): array
     {
-        // check user if he is in tree
-        return [true, trans('responses.isValid')];
+        if ($this->order->getPlan() != ORDER_PLAN_START) {
+            $check_start_plan = request()->user->paidOrders()->where('plan', '=', ORDER_PLAN_START)->count();
+            if (!$check_start_plan)
+                return [false, trans('order.responses.you-should-order-starter-plan-first')];
+        }
+
+        return [true, trans('order.responses.isValid')];
+
     }
 
 
@@ -108,8 +104,8 @@ class OrderResolver
 
     private function addUserToNetwork($simulate = false): array
     {
-        // Add user to network with rabbitmq job (MLM Tree stuff)
-        // Check if it is possible to add user to network for simulation
+        MLMOrderJob::dispatch(serialize($this->order))->onConnection('rabbit')->onQueue('mlm');
+        return [true, ''];
     }
 
 

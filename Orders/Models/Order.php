@@ -17,10 +17,10 @@ use User\Models\User;
  * @property int $total_cost_in_usd
  * @property int $packages_cost_in_usd
  * @property int $registration_fee_in_usd
+ * @property int $validity_in_days
  * @property string|null $is_paid_at
  * @property string|null $is_resolved_at
  * @property string|null $is_refund_at
- * @property string|null $is_expired_at
  * @property string|null $is_commission_resolved_at
  * @property string $payment_type
  * @property string $payment_currency
@@ -85,7 +85,8 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function refreshOrder(){
+    public function refreshOrder()
+    {
         $this->reCalculateCosts();
     }
 
@@ -103,7 +104,7 @@ class Order extends Model
     {
         $id = new Id;
         $id->setId($this->package_id);
-        $package_service_object = app(PackageService::class )->packageById($id);
+        $package_service_object = app(PackageService::class)->packageById($id);
         return $package_service_object->getPrice();
     }
 
@@ -113,27 +114,70 @@ class Order extends Model
      */
     public function scopeFilter($query)
     {
-        if(request()->has('is_paid_at_from'))
-            $query->whereDate('is_paid_at', ' >' , request()->get('is_paid_at_from'));
+        if (request()->has('is_paid_at_from'))
+            $query->whereDate('is_paid_at', ' >', request()->get('is_paid_at_from'));
 
-        if(request()->has('is_paid_at_to'))
-            $query->whereDate('is_paid_at', ' <' , request()->get('is_paid_at_to'));
+        if (request()->has('is_paid_at_to'))
+            $query->whereDate('is_paid_at', ' <', request()->get('is_paid_at_to'));
 
-        if(request()->has('created_at_from'))
-            $query->whereDate('created_at', ' >' , request()->get('created_at_from'));
+        if (request()->has('created_at_from'))
+            $query->whereDate('created_at', ' >', request()->get('created_at_from'));
 
-        if(request()->has('created_at_to'))
-            $query->whereDate('created_at', ' <' , request()->get('created_at_to'));
+        if (request()->has('created_at_to'))
+            $query->whereDate('created_at', ' <', request()->get('created_at_to'));
 
-        if(request()->has('is_paid') AND request()->get('is_paid'))
+        if (request()->has('is_paid') AND request()->get('is_paid'))
             $query->whereNotNull('is_paid_at');
 
-        if(request()->has('is_refunded') AND request()->get('is_refunded'))
+        if (request()->has('is_refunded') AND request()->get('is_refunded'))
             $query->whereNotNull('is_refunded');
 
-        if(request()->has('is_expired') AND request()->get('is_expired'))
+        if (request()->has('is_expired') AND request()->get('is_expired'))
             $query->whereNotNull('is_expired');
 
         return $query;
+    }
+
+    /**
+     * Methods
+     */
+    public function getOrderService()
+    {
+        $order_service = new \Orders\Services\Order();
+        $order_service->setId((int)$this->attributes['id']);
+        $order_service->setUser($this->user->getUserService());
+        $order_service->setUserId((int)$this->attributes['user_id']);
+
+        $order_service->setToUserId((int)$this->attributes['to_user_id']);
+
+        $order_service->setTotalCostInUsd((float)$this->attributes['total_cost_in_usd']);
+        $order_service->setPackagesCostInUsd((float)$this->attributes['packages_cost_in_usd']);
+        $order_service->setRegistrationFeeInUsd((float)$this->attributes['registration_fee_in_usd']);
+        $order_service->setIsPaidAt((string)$this->attributes['is_paid_at']);
+
+        $order_service->setIsResolvedAt((string)$this->attributes['is_resolved_at']);
+
+        $order_service->setIsRefundAt((string)$this->attributes['is_refund_at']);
+
+        $order_service->setIsCommissionResolvedAt((string)$this->attributes['is_commission_resolved_at']);
+
+        $order_service->setPaymentType((string)$this->attributes['payment_type']);
+
+        $order_service->setPaymentCurrency((string)$this->attributes['payment_currency']);
+
+        $order_service->setPaymentDriver((string)$this->attributes['payment_driver']);
+
+        $order_service->setPackageId((int)$this->attributes['package_id']);
+        $order_service->setPlan((string)$this->attributes['plan']);
+
+        $order_service->setValidityInDays((string)$this->attributes['validity_in_days']);
+
+        $order_service->setDeletedAt((string)$this->attributes['deleted_at']);
+
+        $order_service->setCreatedAt((string)$this->attributes['created_at']);
+
+        $order_service->setUpdatedAt((string)$this->attributes['updated_at']);
+
+        return $order_service;
     }
 }

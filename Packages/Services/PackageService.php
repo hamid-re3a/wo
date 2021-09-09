@@ -3,6 +3,7 @@
 
 namespace Packages\Services;
 
+use Illuminate\Support\Carbon;
 use Packages\Repository\PackageRepository;
 
 class PackageService implements PackagesServiceInterface
@@ -79,4 +80,18 @@ class PackageService implements PackagesServiceInterface
         return $this->package_repository->getAll();
     }
 
+    public function getCountTreeLastMonth()
+    {
+        $data_count = $this->package_repository->getCountAllPackageByMonth(Carbon::now()->subDay(7),Carbon::now());
+        $array_count = [];
+        $last_week_days = [1,2,3,4,5,6,7];
+
+        foreach ($last_week_days as $day){
+            $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"a" => $data_count->where('category_id',3)->whereBetween('created_at',[Carbon::now()->subDay($day),Carbon::now()->endOfDay()->subDay($day)])->count()];
+            $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"b" => $data_count->where('category_id',1)->whereBetween('created_at',[Carbon::now()->subDay($day),Carbon::now()->endOfDay()->subDay($day)])->count()];
+            $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"p" => $data_count->where('category_id',4)->whereBetween('created_at',[Carbon::now()->subDay($day),Carbon::now()->endOfDay()->subDay($day)])->count()];
+            $array_count[] = ["time" =>Carbon::now()->startOfMonth()->timestamp ,"i" => $data_count->where('category_id',2)->whereBetween('created_at',[Carbon::now()->subDay($day),Carbon::now()->endOfDay()->subDay($day)])->count()];
+        }
+        return $array_count;
+    }
 }

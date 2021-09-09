@@ -28,7 +28,6 @@ class CreateOrdersTable extends Migration
             $table->timestamp('is_paid_at')->nullable();
             $table->timestamp('is_resolved_at')->nullable();
             $table->timestamp('is_refund_at')->nullable();
-            $table->timestamp('is_expired_at')->nullable();
             $table->timestamp('is_commission_resolved_at')->nullable();
 
             $table->string('payment_type');

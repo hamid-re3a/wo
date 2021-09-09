@@ -56,20 +56,20 @@ class GiftcodeControllerTest extends GiftcodeTest
         Mail::assertSent(GiftcodeCanceledEmail::class);
     }
 
-    /**
-     * @test
-     */
-    public function redeem_gift_code()
-    {
-        Mail::fake();
-        $response = $this->createGiftCode();
-        $response->assertOk();
-        $giftcode = Giftcode::query()->first();
-        $response = $this->postJson(route('giftcodes.redeem'), [
-            'id' => $giftcode->uuid
-        ]);
-        $response->assertOk();
-
-    }
+//    /**
+//     * @test
+//     */
+//    public function redeem_gift_code()
+//    {
+//        Mail::fake();
+//        $response = $this->createGiftCode();
+//        $response->assertOk();
+//        $giftcode = Giftcode::query()->first();
+//        $response = $this->postJson(route('giftcodes.redeem'), [
+//            'id' => $giftcode->uuid
+//        ]);
+//        $response->assertOk();
+//
+//    }
 
 }

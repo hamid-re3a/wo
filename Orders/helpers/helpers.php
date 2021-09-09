@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Http\Request;
-const ORDER_PLAN_UPGRADE = 'ORDER_PLAN_UPGRADE';
+const ORDER_PLAN_PURCHASE = 'ORDER_PLAN_PURCHASE';
 const ORDER_PLAN_START = 'ORDER_PLAN_START';
 const ORDER_PLANS = [
     ORDER_PLAN_START,
-    ORDER_PLAN_UPGRADE
+    ORDER_PLAN_PURCHASE
 ];
 
 if (!function_exists('user')) {

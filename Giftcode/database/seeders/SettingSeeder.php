@@ -36,7 +36,7 @@ class SettingSeeder extends Seeder
             ],
             [
                 'name' => 'use_prefix',
-                'value' => true,
+                'value' => false,
                 'title' => 'Include prefix',
                 'description' => 'Use prefix for giftcode or not'
             ],
@@ -48,7 +48,7 @@ class SettingSeeder extends Seeder
             ],
             [
                 'name' => 'use_postfix',
-                'value' => true,
+                'value' => false,
                 'title' => 'Include postfix',
                 'description' => 'Use postfix for giftcode or not'
             ],

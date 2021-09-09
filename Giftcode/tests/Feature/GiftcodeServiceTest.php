@@ -5,7 +5,6 @@ namespace Wallets\tests\Feature;
 
 use Giftcode\Models\Giftcode;
 use Giftcode\Models\Giftcode as GiftcodeModel;
-use Giftcode\Models\Package;
 use Giftcode\Services\GiftcodeService;
 use Giftcode\tests\GiftcodeTest;
 use Illuminate\Support\Facades\Mail;
@@ -56,6 +55,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $giftcode_model = GiftcodeModel::query()->first();
         $giftcode_object = $giftcode_model->getGiftcodeService();
+        $giftcode_object->setOrderId(1);
         $user = User::query()->first();
         $user_object = $user->getUserService();
         $giftcode_service = app(GiftcodeService::class);

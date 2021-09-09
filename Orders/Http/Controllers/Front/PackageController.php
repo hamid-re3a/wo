@@ -34,6 +34,7 @@ class PackageController extends Controller
                     'id' => $packageDetails->getId(),
                     'name' => $packageDetails->getName(),
                     'short_name' => $packageDetails->getShortName(),
+                    'is_paid_at' => $order->is_paid_at->timestamp,
                     'expire_date' => $packageExpireDate->timestamp
                 ]);
         }

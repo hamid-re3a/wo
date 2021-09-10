@@ -53,6 +53,9 @@ class BankService
     public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null)
     {
 
+        if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
+            throw new \Exception();
+
         $data = [
             'wallet_before_balance' => $this->getBalance($wallet_name),
             'wallet_after_balance' => $this->getBalance($wallet_name) - $amount,
@@ -71,23 +74,6 @@ class BankService
         return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($description));
     }
 
-    public function toAdminDepositWallet($transaction,$amount,$description,$type)
-    {
-        $this->owner = User::query()->find(1);
-        $admin_wallet = $this->getWallet(Str::slug('Deposit Wallet'));
-
-        //Prepare description
-        $description = $this->createMeta($description);
-        $description['user_transaction_id'] = $transaction->id;
-        $data = [
-            'wallet_before_balance' => $admin_wallet->balanceFloat,
-            'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
-            'type' => $type
-        ];
-        $transaction = $admin_wallet->depositFloat($amount, $description);
-        $transaction->syncMetaData($data);
-
-    }
 
     public function transfer($from_wallet, $to_wallet, $amount, $description = null)
     {
@@ -165,6 +151,24 @@ class BankService
     public function getTransfers($wallet_name)
     {
         return $this->getWallet($wallet_name)->transfers()->where('to_id','!=',1);
+    }
+
+    public function toAdminDepositWallet($transaction,$amount,$description,$type)
+    {
+        $this->owner = User::query()->find(1);
+        $admin_wallet = $this->getWallet(Str::slug('Deposit Wallet'));
+
+        //Prepare description
+        $description = $this->createMeta($description);
+        $description['user_transaction_id'] = $transaction->id;
+        $data = [
+            'wallet_before_balance' => $admin_wallet->balanceFloat,
+            'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
+            'type' => $type
+        ];
+        $transaction = $admin_wallet->depositFloat($amount, $description);
+        $transaction->syncMetaData($data);
+
     }
 
     private function createMeta($meta)

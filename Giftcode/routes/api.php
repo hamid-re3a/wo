@@ -24,7 +24,8 @@ Route::middleware(['role:client'])->name('customer.')->group(function () {
 });
 
 Route::name('giftcodes.')->middleware('auth')->group(function () {
-    Route::get('', [GiftcodeController::class,'index'])->name('list');
+    Route::get('', [GiftcodeController::class,'index'])->name('data');
+    Route::get('counts', [GiftcodeController::class,'counts'])->name('counts');
     Route::post('create',[GiftcodeController::class,'store'])->name('create');
     Route::get('show/{uuid}', [GiftcodeController::class,'show'])->name('show');
     Route::post('cancel',[GiftcodeController::class,'cancel'])->name('cancel');

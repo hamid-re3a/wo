@@ -10,8 +10,10 @@ use Giftcode\Http\Requests\User\CreateGiftcodeRequest;
 use Giftcode\Http\Resources\GiftcodeResource;
 use Giftcode\Jobs\UpdatePackages;
 use Giftcode\Repository\GiftcodeRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use User\Models\User;
 
 class GiftcodeController extends Controller
 {
@@ -24,13 +26,40 @@ class GiftcodeController extends Controller
     }
 
     /**
+     * Giftcode counts
+     * @group Public User > Giftcode
+     */
+    public function counts()
+    {
+        $total_giftcodes = request()->user->where('id',request()->user->id)->withCount([
+            'giftcodes as total_created',
+            'giftcodes as total_used' => function(Builder $query) {
+                $query->whereNotNull('redeem_user_id');
+            },
+            'giftcodes as total_expired' => function(Builder $query) {
+                $query->where('expiration_date' , '<' , now()->toDateTimeString());
+            },
+            'giftcodes as total_canceled' => function(Builder $query) {
+                $query->where('is_canceled',true);
+            }
+        ])->first()->toArray();
+        return api()->success(null,[
+            'total_created' => $total_giftcodes['total_created'],
+            'total_available' => $total_giftcodes['total_created'] - ($total_giftcodes['total_used'] + $total_giftcodes['total_canceled'] + $total_giftcodes['total_expired']),
+            'total_used' => $total_giftcodes['total_used'],
+            'total_canceled' => $total_giftcodes['total_canceled'],
+            'total_expired' => $total_giftcodes['total_expired'],
+        ]);
+    }
+
+    /**
      * Giftcodes list
      * @group Public User > Giftcode
      */
     public function index()
     {
-        $giftcodes = request()->user->giftcodes()->orderBy('created_at','DESC')->simplePaginate();
-        return api()->success(null,GiftcodeResource::collection($giftcodes)->response()->getData());
+        $giftcodes = request()->user->giftcodes()->orderBy('created_at', 'DESC')->simplePaginate();
+        return api()->success(null, GiftcodeResource::collection($giftcodes)->response()->getData());
     }
 
     /**
@@ -49,11 +78,11 @@ class GiftcodeController extends Controller
             ]));
 
             //Successful
-            return api()->success(null,GiftcodeResource::make($giftcode));
+            return api()->success(null, GiftcodeResource::make($giftcode));
 
         } catch (\Throwable $exception) {
             //Handle exceptions
-            return api()->error(null,null,$exception->getCode(),[
+            return api()->error(null, null, $exception->getCode(), [
                 'subject' => $exception->getMessage()
             ]);
         }
@@ -68,10 +97,10 @@ class GiftcodeController extends Controller
 
         $giftcode = $this->giftcode_repository->getByUuid(request()->uuid);
 
-        if(!$giftcode OR $giftcode->user_id != request()->user->id)
-            return api()->error(null,null,404);
+        if (!$giftcode OR $giftcode->user_id != request()->user->id)
+            return api()->error(null, null, 404);
 
-        return api()->success(null,GiftcodeResource::make($giftcode));
+        return api()->success(null, GiftcodeResource::make($giftcode));
 
     }
 
@@ -87,12 +116,12 @@ class GiftcodeController extends Controller
         try {
 
             $giftcode = $this->giftcode_repository->cancel($request);
-            return api()->success(trans('giftcode.responses.giftcode-canceled-amount-refunded', ['amount' => (double) $giftcode->getRefundAmount()]));
+            return api()->success(trans('giftcode.responses.giftcode-canceled-amount-refunded', ['amount' => (double)$giftcode->getRefundAmount()]));
 
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('Cancel giftcode error,iftcode uuid => <' . $request->get('uuid') . '>');
-            return api()->error(null,null,$exception->getCode(),[
+            return api()->error(null, null, $exception->getCode(), [
                 'subject' => $exception->getMessage()
             ]);
 

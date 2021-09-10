@@ -26,7 +26,7 @@ class GiftcodeController extends Controller
     }
 
     /**
-     * Giftcode counts
+     * Giftcodes counts
      * @group Public User > Giftcode
      */
     public function counts()

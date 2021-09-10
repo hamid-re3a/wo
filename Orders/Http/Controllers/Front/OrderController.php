@@ -35,7 +35,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Counts
+     * Orders Counts
      * @group
      * Public User > Orders
      */

@@ -30,6 +30,7 @@ Route::middleware(['role:client'])->name('customer.')->group(function () {
 
 Route::name('orders.')->middleware('auth')->group(function () {
     Route::post('', [OrderController::class, 'index'])->name('list');
+    Route::get('counts', [OrderController::class, 'counts'])->name('counts');
     Route::post('show', [OrderController::class, 'showOrder'])->name('show');
     Route::post('store',[OrderController::class,'newOrder'])->name('store');
 });

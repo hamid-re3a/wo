@@ -3,6 +3,7 @@
 namespace User\Models;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
+use Bavix\Wallet\Traits\CanPay;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
@@ -47,6 +48,7 @@ use User\database\factories\UserFactory;
 class User extends Model implements WalletFloat
 {
     use HasWalletFloat, HasWallets, HasFactory, HasRoles;
+
     protected $table = "users";
     protected $fillable = [
         "id",
@@ -86,7 +88,7 @@ class User extends Model implements WalletFloat
         return $this->morphMany(config('wallet.transaction.model', \Bavix\Wallet\Models\Transaction::class), 'payable');
     }
 
-    public function giftCodes()
+    public function giftcodes()
     {
         return $this->hasMany(Giftcode::class, 'user_id', 'id');
     }
@@ -131,6 +133,12 @@ class User extends Model implements WalletFloat
         }
 
         return $user;
+    }
+
+    public function canWithdraw($amount, bool $allowZero = null): bool
+    {
+        return true;
+//        return !$this->isUserBlocked();
     }
 
 }

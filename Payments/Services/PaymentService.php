@@ -148,7 +148,7 @@ class PaymentService implements PaymentsServiceInterface
             ];
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('PaymentService@payBtcServer error ' . $exception->getMessage());
+            Log::error('PaymentService@payFromGiftcode error ' . $exception->getMessage());
             return [false,$exception->getMessage()];
         }
     }
@@ -204,7 +204,7 @@ class PaymentService implements PaymentsServiceInterface
             ];
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('PaymentService@payBtcServer error ' . $exception->getMessage());
+            Log::error('PaymentService@payFromDepositWallet error ' . $exception->getMessage());
             return [false,$exception->getMessage()];
         }
     }

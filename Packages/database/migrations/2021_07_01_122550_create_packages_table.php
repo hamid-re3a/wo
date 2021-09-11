@@ -17,7 +17,7 @@ class CreatePackagesTable extends Migration
             $table->id();
 
             $table->string('name');
-            $table->string('short_name',20);
+            $table->string('short_name',20)->unique();
             $table->integer('validity_in_days')->nullable();
             $table->double('price');
 

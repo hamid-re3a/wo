@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use User\Models\User;
+use User\Services\UserService;
 use User\Services\UserUpdate;
 
 class UserServiceProvider extends ServiceProvider
@@ -54,10 +55,11 @@ class UserServiceProvider extends ServiceProvider
                 && $request->hasHeader('X-user-hash')
                 && is_numeric($request->header('X-user-id'))
             ) {
+
+
                 $user_update = new UserUpdate();
                 $user_update->setId($request->header('X-user-id'));
                 $user_update->setQueueName('subscriptions');
-
 
 
                 $user_hash_request = $request->header('X-user-hash');
@@ -68,8 +70,10 @@ class UserServiceProvider extends ServiceProvider
                  * error code 470 is for data user not exist log for development
                  */
                 if ($user === null) {
-                    UserGetDataJob::dispatch($user_update);
-                    throw new Exception('please try another time!', 470);
+                    $service_user = updateUserFromGrpcServer($request);
+                    if ($service_user === null)
+                        throw new Exception('please try another time!', 470);
+                    $user->refresh();
                 }
 
                 $hash_user_service = md5(serialize($user->getUserService()));
@@ -79,9 +83,14 @@ class UserServiceProvider extends ServiceProvider
                  * error code 471 is for data user not update log for development
                  */
                 if ($hash_user_service != $user_hash_request) {
-                    UserGetDataJob::dispatch($user_update);
-                    throw new Exception('please try another time!', 471);
+                    $service_user = updateUserFromGrpcServer($request);
+                    $hash_user_service = md5(serialize($service_user));
+                    if ($hash_user_service != $user_hash_request) {
+                        UserGetDataJob::dispatch($user_update);
+                        throw new Exception('please try another time!', 471);
+                    }
                 }
+
 
                 $request->merge([
                     'user' => $user
@@ -90,6 +99,7 @@ class UserServiceProvider extends ServiceProvider
             }
 
         });
+
 
 
         $this->setupConfig();

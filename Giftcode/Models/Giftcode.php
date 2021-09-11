@@ -73,6 +73,11 @@ class Giftcode extends Model
     /**
      * Relation
      */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
@@ -123,7 +128,7 @@ class Giftcode extends Model
 
         if (isset($this->attributes['is_canceled']) AND $this->attributes['is_canceled'] == true)
             return 'Canceled';
-        if (isset($this->attributes['redeem_user_id']) AND $this->expiration_date->isPast())
+        if (isset($this->attributes['expiration_date']) AND $this->expiration_date->isPast())
             return 'Expired';
 
         return 'Ready to use';

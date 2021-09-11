@@ -31,7 +31,7 @@ class GiftcodeController extends Controller
      */
     public function counts()
     {
-        $total_giftcodes = request()->user->withCount([
+        $total_giftcodes = request()->user->where('id',request()->user->id)->withCount([
             'giftcodes as total_created',
             'giftcodes as total_used' => function(Builder $query) {
                 $query->whereNotNull('redeem_user_id');

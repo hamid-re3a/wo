@@ -50,27 +50,29 @@ class UserServiceProvider extends ServiceProvider
     {
         Auth::viaRequest('r2f-sub-service', function (Request $request) {
 
-            /**
-             * @param Request $request
-             * @return array
-             */
-            function updateUser(Request $request): ?\User\Services\User
-            {
-                $client = new \User\Services\UserServiceClient('staging-api-gateway.janex.org:9595', [
-                    'credentials' => \Grpc\ChannelCredentials::createInsecure()
-                ]);
-                $request = new \User\Services\Id();
-                $request->setId((int)1);
-                try {
-                    /** @var $user \User\Services\User */
-                    list($user, $status) = $client->getUserById($request)->wait();
-                    if ($status->code == 0) {
-                        app(UserService::class)->userUpdate($user);
-                        return $user;
+            if (!function_exists('updateUserFromGrpcServer')) {
+                /**
+                 * @param Request $request
+                 * @return array
+                 */
+                function updateUserFromGrpcServer(Request $request): ?\User\Services\User
+                {
+                    $client = new \User\Services\UserServiceClient('staging-api-gateway.janex.org:9595', [
+                        'credentials' => \Grpc\ChannelCredentials::createInsecure()
+                    ]);
+                    $id = new \User\Services\Id();
+                    $id->setId((int)$request->header('X-user-id'));
+                    try {
+                        /** @var $user \User\Services\User */
+                        list($user, $status) = $client->getUserById($id)->wait();
+                        if ($status->code == 0) {
+                            app(UserService::class)->userUpdate($user);
+                            return $user;
+                        }
+                        return null;
+                    } catch (\Exception $exception) {
+                        return null;
                     }
-                    return null;
-                } catch (\Exception $exception) {
-                    return null;
                 }
             }
 
@@ -94,7 +96,7 @@ class UserServiceProvider extends ServiceProvider
                  * error code 470 is for data user not exist log for development
                  */
                 if ($user === null) {
-                    $service_user = updateUser($request);
+                    $service_user = updateUserFromGrpcServer($request);
                     if ($service_user === null)
                         throw new Exception('please try another time!', 470);
                     $user->refresh();
@@ -107,7 +109,7 @@ class UserServiceProvider extends ServiceProvider
                  * error code 471 is for data user not update log for development
                  */
                 if ($hash_user_service != $user_hash_request) {
-                    $service_user = updateUser($request);
+                    $service_user = updateUserFromGrpcServer($request);
                     $hash_user_service = md5(serialize($service_user));
                     if ($hash_user_service != $user_hash_request) {
                         UserGetDataJob::dispatch($user_update);
@@ -123,6 +125,7 @@ class UserServiceProvider extends ServiceProvider
             }
 
         });
+
 
 
         $this->setupConfig();

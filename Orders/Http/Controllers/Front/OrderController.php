@@ -140,7 +140,7 @@ class OrderController extends Controller
             $order_resolver = new OrderResolver($order_db->getOrderService());
             list($flag, $response) = $order_resolver->simulateValidation();
 
-            if ($flag === false)
+            if (!$flag)
                 throw new \Exception($response, 406);
 
             //Invoice service

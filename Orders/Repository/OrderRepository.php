@@ -19,14 +19,14 @@ class OrderRepository
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP < DATE_ADD(created_at, INTERVAL validity_in_days DAY)")->count();
+        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP < DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->count();
     }
 
     public function getCountDeactivatePackage()
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP >= DATE_ADD(created_at, INTERVAL validity_in_days DAY)")->count();
+        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP >= DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->count();
     }
 
 
@@ -34,14 +34,14 @@ class OrderRepository
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP < DATE_ADD(created_at, INTERVAL validity_in_days DAY)")->whereBetween('created_at',[$from,$until])->get();
+        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP < DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->whereBetween('created_at',[$from,$until])->get();
     }
 
     public function getCountDeactivatePackageByDate($from,$until)
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP >= DATE_ADD(created_at, INTERVAL validity_in_days DAY)")->whereBetween('created_at',[$from,$until])->get();
+        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP >= DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->whereBetween('created_at',[$from,$until])->get();
     }
 
     public function getCountTotalPackageByDate($from,$until)

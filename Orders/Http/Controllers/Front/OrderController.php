@@ -3,6 +3,7 @@
 namespace Orders\Http\Controllers\Front;
 
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,57 @@ class OrderController extends Controller
     {
         $this->payment_service = $payment_service;
         $this->package_service = $package_service;
+    }
+
+    /**
+     * Orders Counts
+     * @group
+     * Public User > Orders
+     */
+    public function counts()
+    {
+        $total_counts = request()->user->withCount([
+            'orders AS total_orders',
+            'orders AS total_paid' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
+            },
+            'orders AS total_resolved' => function(Builder $query) {
+                $query->whereNotNull('is_resolved_at');
+            },
+            'orders AS total_refund' => function (Builder $query) {
+                $query->whereNotNull('is_refund_at');
+            },
+            'orders AS total_commission_paid' => function(Builder $query) {
+                $query->whereNotNull('is_commission_resolved_at');
+            },
+            'orders AS total_paid_with_wallet' => function(Builder $query) {
+                $query->where('payment_driver','deposit');
+            },
+            'orders AS total_paid_with_giftcode' => function(Builder $query) {
+                $query->where('payment_driver', 'giftcode');
+            },
+            'orders AS total_paid_with_purchase' => function(Builder $query) {
+                $query->where('payment_driver', 'purchase');
+            },
+            'orders AS total_plan_start' => function(Builder $query) {
+                $query->where('plan',ORDER_PLAN_START);
+            },
+            'orders AS total_plan_purchase' => function(Builder $query) {
+                $query->where('plan',ORDER_PLAN_PURCHASE);
+            }
+        ])->first()->toArray();
+
+        return api()->success(null,[
+            'total_orders' => $total_counts['total_orders'],
+            'total_paid' => $total_counts['total_paid'],
+            'total_resolved' => $total_counts['total_resolved'],
+            'total_commission_paid' => $total_counts['total_commission_paid'],
+            'total_paid_with_wallet' => $total_counts['total_paid_with_wallet'],
+            'total_paid_with_giftcode' => $total_counts['total_paid_with_giftcode'],
+            'total_paid_with_purchase' => $total_counts['total_paid_with_purchase'],
+            'total_plan_start' => $total_counts['total_plan_start'],
+            'total_plan_purchase' => $total_counts['total_plan_purchase']
+        ]);
     }
 
     /**
@@ -86,10 +138,10 @@ class OrderController extends Controller
 
             //Order Resolver
             $order_resolver = new OrderResolver($order_db->getOrderService());
-            list($flag,$response) = $order_resolver->simulateValidation();
+            list($flag, $response) = $order_resolver->simulateValidation();
 
-            if($flag === false)
-                throw new \Exception($response,406);
+            if ($flag === false)
+                throw new \Exception($response, 406);
 
             //Invoice service
             $invoice_request = new Invoice();
@@ -104,16 +156,16 @@ class OrderController extends Controller
             $invoice_request->setPayableId($order_db->id);
             $invoice_request->setPayableType('Order');
 
-            list($flag,$payment_response) = $this->payment_service->pay($invoice_request);
+            list($flag, $payment_response) = $this->payment_service->pay($invoice_request);
 
 
-            if(!$flag)
-                throw new \Exception($response,406);
+            if (!$flag)
+                throw new \Exception($response, 406);
 
-            if($request->get('payment_type') != 'purchase') {
-                list($flag,$response) = $order_resolver->resolve();
-                if(!$flag)
-                    throw new \Exception($response,406);
+            if ($request->get('payment_type') != 'purchase') {
+                list($flag, $response) = $order_resolver->resolve();
+                if (!$flag)
+                    throw new \Exception($response, 406);
 
                 $order_db->update([
                     'is_resolved_at' => now()->toDateTimeString()
@@ -121,14 +173,14 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return api()->success(null,$payment_response);
+            return api()->success(null, $payment_response);
 
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('OrderController@newOrder => ' . $exception->getMessage());
-            return api()->error(null,[
+            return api()->error(null, [
                 'subject' => $exception->getMessage()
-            ], $exception->getCode(),null);
+            ], $exception->getCode(), null);
         }
     }
 

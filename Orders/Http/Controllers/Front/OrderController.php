@@ -156,11 +156,11 @@ class OrderController extends Controller
             $invoice_request->setPayableId($order_db->id);
             $invoice_request->setPayableType('Order');
 
-            list($flag, $payment_response) = $this->payment_service->pay($invoice_request);
+            list($payment_flag, $payment_response) = $this->payment_service->pay($invoice_request);
 
 
-            if (!$flag)
-                throw new \Exception($response, 406);
+            if (!$payment_flag)
+                throw new \Exception($payment_response, 406);
 
             if ($request->get('payment_type') != 'purchase') {
                 list($flag, $response) = $order_resolver->resolve();

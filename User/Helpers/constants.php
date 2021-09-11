@@ -3,6 +3,9 @@
 /**
  * user_roles
  */
+
+use Illuminate\Http\Request;
+use User\Services\UserService;
 const USER_ROLE_SUPER_ADMIN = 'super-admin';
 const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
 const USER_ROLE_ADMIN_KYC = 'kyc-admin';
@@ -27,3 +30,31 @@ const USER_ROLES = [
     USER_ROLE_CLIENT,
     USER_ROLE_HELP_DESK,
 ];
+
+
+
+if (!function_exists('updateUserFromGrpcServer')) {
+    /**
+     * @param Request $request
+     * @return array
+     */
+    function updateUserFromGrpcServer(Request $request): ?\User\Services\User
+    {
+        $client = new \User\Services\UserServiceClient('staging-api-gateway.janex.org:9595', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+        $id = new \User\Services\Id();
+        $id->setId((int)$request->header('X-user-id'));
+        try {
+            /** @var $user \User\Services\User */
+            list($user, $status) = $client->getUserById($id)->wait();
+            if ($status->code == 0) {
+                app(UserService::class)->userUpdate($user);
+                return $user;
+            }
+            return null;
+        } catch (\Exception $exception) {
+            return null;
+        }
+    }
+}

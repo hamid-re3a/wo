@@ -50,32 +50,6 @@ class UserServiceProvider extends ServiceProvider
     {
         Auth::viaRequest('r2f-sub-service', function (Request $request) {
 
-            if (!function_exists('updateUserFromGrpcServer')) {
-                /**
-                 * @param Request $request
-                 * @return array
-                 */
-                function updateUserFromGrpcServer(Request $request): ?\User\Services\User
-                {
-                    $client = new \User\Services\UserServiceClient('staging-api-gateway.janex.org:9595', [
-                        'credentials' => \Grpc\ChannelCredentials::createInsecure()
-                    ]);
-                    $id = new \User\Services\Id();
-                    $id->setId((int)$request->header('X-user-id'));
-                    try {
-                        /** @var $user \User\Services\User */
-                        list($user, $status) = $client->getUserById($id)->wait();
-                        if ($status->code == 0) {
-                            app(UserService::class)->userUpdate($user);
-                            return $user;
-                        }
-                        return null;
-                    } catch (\Exception $exception) {
-                        return null;
-                    }
-                }
-            }
-
             if (
                 $request->hasHeader('X-user-id')
                 && $request->hasHeader('X-user-hash')

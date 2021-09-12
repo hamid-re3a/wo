@@ -40,10 +40,11 @@ class Handler extends ExceptionHandler
         });
     }
 
+
     public function render($request, Throwable $e)
     {
         if ($e instanceof ValidationException)
-            return api()->validation(trans('responses.validation-error'),$e->errors());
+            return api()->validation(trans('responses.validation-error'), $e->errors());
         if ($this->isHttpException($e)) {
             switch ($e->getStatusCode()) {
                 case '401':
@@ -63,7 +64,7 @@ class Handler extends ExceptionHandler
             }
         }
         $code = (int)$e->getCode();
-        return api()->error($e->getMessage(), [], ($code > 599) ? 400 : $code);
+        return api()->error($e->getMessage(), [], ($code > 599 || $code < 100) ? 400 : $code);
 
     }
 }

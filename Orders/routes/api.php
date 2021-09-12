@@ -12,10 +12,10 @@ use Orders\Http\Controllers\Front\PackageController;
 Route::/*middleware(['role:super-admin|subscriptions-order-admin'])->*/prefix('admin')->name('admin.')->group(function () {
 
     Route::name('order')->group(function (){
-        Route::get('/subscription_count',[OrderAdminController::class,"getCountSubscriptions"]);
-        Route::get('/active_package_count',[OrderAdminController::class,'activePackageCount']);
-        Route::get('/deactivate_package_count',[OrderAdminController::class,'deactivatePackageCount']);
-        Route::post('/package_count_overview',[OrderAdminController::class,'packageOverviewCount']);
+        Route::get('/subscription_count',[OrderAdminController::class,"getCountSubscriptions"])->name('getCountSubscriptions');
+        Route::get('/active_package_count',[OrderAdminController::class,'activePackageCount'])->name('activePackageCount');
+        Route::get('/deactivate_package_count',[OrderAdminController::class,'deactivatePackageCount'])->name('deactivatePackageCount');
+        Route::post('/package_count_overview',[OrderAdminController::class,'packageOverviewCount'])->name('packageOverviewCount');
     });
 
 });

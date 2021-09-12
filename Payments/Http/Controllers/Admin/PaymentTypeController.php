@@ -34,7 +34,7 @@ class PaymentTypeController extends Controller
     }
 
     /**
-     * Store payment types
+     * Create payment types
      * @group
      * Admin > Payments types
      * @param StorePaymentTypeRequest $request
@@ -47,7 +47,7 @@ class PaymentTypeController extends Controller
     }
 
     /**
-     * Store payment types
+     * Delete payment types
      * @group
      * Admin > Payments types
      * @param RemovePaymentTypeRequest $request

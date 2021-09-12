@@ -9,8 +9,14 @@ use Payments\Http\Controllers\Front\WebhookController;
  * @todo before lunch project we must migrate all route to this (admin-super subscriptions-payment-admin)
  * list of all route admin section
  */
-Route::middleware(['role:super-admin|subscriptions-payment-admin'])->name('admin.')->group(function () {
+Route::middleware(['auth','role:super-admin|subscriptions-payment-admin'])->name('admin-payment.')->group(function () {
 
+    Route::name('type.')->prefix("type")->group(function () {
+        Route::get('',[\Payments\Http\Controllers\Front\PaymentTypeController::class,'index'])->name('index');
+        Route::post('create',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'store'])->name('store');
+        Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'update'])->name('update');
+        Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
+    });
 });
 
 /**
@@ -24,7 +30,7 @@ Route::/*middleware(['role:client'])->*/name('customer.')->group(function () {
 });
 
 Route::post('webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');
-Route::name('payments.')->middleware('auth')->group(function () {
+Route::name('payments.')->middleware('auth_user')->group(function () {
     Route::name('currency.')->prefix("currency")->group(function () {
         Route::get('',[\Payments\Http\Controllers\Front\PaymentCurrencyController::class,'index'])->name('index');
         Route::post('create',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'store'])->name('store');
@@ -37,12 +43,7 @@ Route::name('payments.')->middleware('auth')->group(function () {
         Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentDriverController::class,'update'])->name('update');
         Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentDriverController::class,'delete'])->name('delete');
     });
-    Route::name('type.')->prefix("type")->group(function () {
-        Route::get('',[\Payments\Http\Controllers\Front\PaymentTypeController::class,'index'])->name('index');
-        Route::post('create',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'store'])->name('store');
-        Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'update'])->name('update');
-        Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
-    });
+
 
     Route::name('invoice.')->prefix('invoices')->group(function(){
         Route::get('/check-pending-order-invoice',[\Payments\Http\Controllers\Front\InvoiceController::class,'pendingOrderInvoice'])->name('check');

@@ -41,14 +41,6 @@ class PaymentTest extends TestCase
 
     public function getHeaders()
     {
-        User::query()->firstOrCreate([
-            'id' => '1',
-            'first_name' => 'Admin',
-            'last_name' => 'Admin',
-            'member_id' => 1000,
-            'email' => 'work@sajidjaved.com',
-            'username' => 'admin',
-        ]);
         $user = User::query()->first();
         $hash = Hash::make(serialize($user->getUserService()));
         return [

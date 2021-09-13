@@ -29,11 +29,11 @@ class UpdateEmailContentRequest extends FormRequest
             'key' => 'required|string|exists:wallet_email_contents,key',
             'is_active' => 'required|boolean',
             'subject' => 'required|string',
-            'from' => 'required|email',
-            'from_name' => 'required|string',
+//            'from' => 'required|email',
+//            'from_name' => 'required|string',
             'body' => 'required|string',
-            'variables' => 'required|string',
-            'variable_description' => 'required|string'
+//            'variables' => 'required|string',
+//            'variable_description' => 'required|string'
         ];
     }
 

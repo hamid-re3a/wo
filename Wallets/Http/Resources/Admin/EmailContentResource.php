@@ -19,12 +19,12 @@ class EmailContentResource extends JsonResource
             'key' => $this->key,
             'is_active' => $this->is_active,
             'subject' => $this->subject,
-            'from' => $this->from,
-            'from_name' => $this->from_name,
+//            'from' => $this->from,
+//            'from_name' => $this->from_name,
             'body' => $this->body,
-            'variables' => $this->variables,
-            'variables_description' => $this->variables_description,
-            'type' => $this->type,
+//            'variables' => $this->variables,
+//            'variables_description' => $this->variables_description,
+//            'type' => $this->type,
             'created_at' => $this->created_at->timestamp,
             'updated_at' => $this->updated_at->timestamp
         ];

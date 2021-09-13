@@ -26,6 +26,7 @@ class SettingController extends Controller
      * @group Admin > Giftcode
      * @param UpdateSettingRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function update(UpdateSettingRequest $request)
     {

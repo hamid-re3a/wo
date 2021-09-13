@@ -12,7 +12,6 @@ use Payments\Http\Controllers\Front\WebhookController;
 Route::middleware(['auth','role:super-admin|subscriptions-payment-admin'])->name('admin-payment.')->group(function () {
 
     Route::name('type.')->prefix("type")->group(function () {
-        Route::get('',[\Payments\Http\Controllers\Front\PaymentTypeController::class,'index'])->name('index');
         Route::post('create',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'store'])->name('store');
         Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'update'])->name('update');
         Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
@@ -30,7 +29,7 @@ Route::/*middleware(['role:client'])->*/name('customer.')->group(function () {
 });
 
 Route::post('webhook', [WebhookController::class, 'index'])->name('btc-pay-server-webhook');
-Route::name('payments.')->middleware('auth_user')->group(function () {
+Route::name('payments.')->middleware(['auth'])->group(function () {
     Route::name('currency.')->prefix("currency")->group(function () {
         Route::get('',[\Payments\Http\Controllers\Front\PaymentCurrencyController::class,'index'])->name('index');
         Route::post('create',[\Payments\Http\Controllers\Admin\PaymentCurrencyController::class,'store'])->name('store');
@@ -50,6 +49,10 @@ Route::name('payments.')->middleware('auth_user')->group(function () {
         Route::get('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'index'])->name('get-list');
         Route::post('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'show'])->name('get-invoice-details');
         Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'transactions'])->name('transactions');
+    });
+
+    Route::name('type.')->prefix("type")->group(function () {
+        Route::get('',[\Payments\Http\Controllers\Front\PaymentTypeController::class,'index'])->name('index');
     });
 });
 

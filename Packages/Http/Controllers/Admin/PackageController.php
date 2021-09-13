@@ -22,10 +22,9 @@ class PackageController extends Controller
     }
 
     /**
-     * All packages
+     * Edit package
      * @group
-     * Public User > Packages
-     * @unauthenticated
+     * Admin User > Packages
      * @param PackageEditRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -50,8 +49,7 @@ class PackageController extends Controller
     /**
      * Count Package Between two date
      * @group
-     * Public User > Packages > admin
-     * @unauthenticated
+     * Admin User > Packages
      * @param PackageEditRequest $request
      * @return \Illuminate\Http\JsonResponse
      */

@@ -13,8 +13,8 @@ Route::middleware(['auth','role:super-admin|subscriptions-payment-admin'])->name
 
     Route::name('type.')->prefix("type")->group(function () {
         Route::post('create',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'store'])->name('store');
-        Route::post('edit',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'update'])->name('update');
-        Route::post('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
+        Route::patch('edit',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'update'])->name('update');
+        Route::delete('delete',[\Payments\Http\Controllers\Admin\PaymentTypeController::class,'delete'])->name('delete');
     });
 });
 

@@ -37,7 +37,7 @@ class PaymentDriverController extends Controller
     /**
      * Store payment driver
      * @group
-     * Admin > Payments Drivers
+     * Admin User > Payments Drivers
      * @param StorePaymentDriverRequest $request
      * @return JsonResponse
      */
@@ -50,7 +50,7 @@ class PaymentDriverController extends Controller
     /**
      * Delete payment driver
      * @group
-     * Admin > Payments Drivers
+     * Admin User > Payments Drivers
      * @param RemovePaymentDriverRequest $request
      * @return JsonResponse
      */

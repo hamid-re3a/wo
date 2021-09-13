@@ -14,7 +14,7 @@ class EmailContentController extends Controller
 
     /**
      * Get emails list
-     * @group Admin > Wallets
+     * @group Admin User > Wallets > EmailContents
      */
     public function index()
     {
@@ -24,7 +24,7 @@ class EmailContentController extends Controller
 
     /**
      * Update emails
-     * @group Admin > Wallets
+     * @group Admin User > Wallets > EmailContents
      * @param UpdateEmailContentRequest $request
      * @return JsonResponse
      * @throws \Exception

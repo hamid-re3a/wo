@@ -21,7 +21,7 @@ class PaymentAdminFeatureTest extends PaymentTest
     public function get_payment_type_admin()
     {
         $header = $this->getHeaders();
-        $response = $this->get(route('admin-payment.type.index',$header));
+        $response = $this->get(route('payments.type.index',$header));
         $response->assertOk();
         $response->json()['data'];
     }

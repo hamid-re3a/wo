@@ -21,11 +21,16 @@ class ChargeDepositWalletRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws \Exception
      */
     public function rules()
     {
+
+        $minimum_amount = walletGetSetting('minimum_deposit_fund_amount');
+        $maximum_amount = walletGetSetting('maximum_deposit_fund_amount');
+
         return [
-            'amount' => 'required|numeric'
+            'amount' => "required|numeric|between{$minimum_amount},{$maximum_amount}"
         ];
 
     }

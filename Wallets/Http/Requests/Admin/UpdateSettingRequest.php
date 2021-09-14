@@ -4,6 +4,7 @@ namespace Wallets\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Wallets\Models\Setting;
 
 class UpdateSettingRequest extends FormRequest
 {
@@ -27,7 +28,7 @@ class UpdateSettingRequest extends FormRequest
     {
         return [
             'name' => 'required|string|exists:wallet_settings,name',
-            'value' => 'required|' . $this->valueValidation(),
+            'value' => $this->valueValidation(),
             'title' => 'nullable|string',
             'description' => 'nullable|string'
         ];
@@ -42,14 +43,40 @@ class UpdateSettingRequest extends FormRequest
 
     private function valueValidation()
     {
-        switch ($this->name) {
-            case 'percentage_transfer_fee':
-            case 'fix_transfer_fee':
-                return 'integer|min:1';
-                break;
-            case 'transaction_fee_calculation' :
-                return 'in:fix,percentage';
+        if ($this->has('name')) {
+            $settings = Setting::all();
+            switch ($this->get('name')) {
+                case 'percentage_transfer_fee':
+                case 'fix_transfer_fee':
+                    return 'required|integer|min:1';
+                    break;
+                case 'transaction_fee_calculation' :
+                    return 'required|in:fix,percentage';
+                    break;
+                case 'minimum_deposit_fund_amount':
+                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_deposit_fund_amount')->pluck('value');
+                    break;
+                case 'maximum_deposit_fund_amount':
+                    return 'required|gte:' . $settings->where('name', '=', 'minimum_deposit_fund_amount')->pluck('value');
+                    break;
+                case 'minimum_transfer_fund_amount':
+                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_transfer_fund_amount')->pluck('value');
+                    break;
+                case 'maximum_transfer_fund_amount':
+                    return 'required|gte:' . $settings->where('name', '=', 'minimum_transfer_fund_amount')->pluck('value');
+                    break;
+                case 'minimum_payment_request_amount':
+                    return 'required|lte:' . $settings->where('name', '=', 'maximum_payment_request_amount')->pluck('value');
+                    break;
+                case 'maximum_payment_request_amount':
+                    return 'required|gte:' . $settings->where('name', '=', 'minimum_payment_request_amount')->pluck('value');
+                    break;
+                default:
+                    return 'required';
+            }
         }
+
+        return 'required';
     }
 
 }

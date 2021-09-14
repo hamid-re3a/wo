@@ -16,6 +16,16 @@ const WALLET_SETTINGS = [
         'title' => 'How calculate transaction fee',
         'description' => 'Select Fix or Percentage transaction fee'
     ],
+    'minimum_deposit_fund_amount' => [
+        'value' => 100,
+        'title' => 'Minimum deposit amount',
+        'description' => 'Minimum deposit amount'
+    ],
+    'maximum_deposit_fund_amount' => [
+        'value' => 10000,
+        'title' => 'Minimum deposit amount',
+        'description' => 'Minimum deposit amount'
+    ],
     'minimum_transfer_fund_amount' => [
         'value' => 100,
         'title' => 'Minimum transfer amount',

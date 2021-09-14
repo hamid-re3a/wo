@@ -28,7 +28,7 @@ class AskFundRequest extends FormRequest
         $this->minimum_amount = walletGetSetting('minimum_payment_request_amount');
         $this->maximum_amount = walletGetSetting('maximum_payment_request_amount');
         return [
-            'member_id' => 'required|integer|exists:users,member_id|not_in:' . $this->header('X-user-member-id'),
+            'member_id' => 'required|integer|exists:users,member_id|not_in:' . $this->user->member_id,
             'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}"
         ];
 

@@ -27,7 +27,7 @@ class EarningWalletController extends Controller
     }
 
     /**
-     * Get sum commissions
+     * Get earned commissions
      * @group Public User > Earning Wallet
      */
     public function earned_commissions()

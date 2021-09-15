@@ -35,7 +35,7 @@ class WalletDepositJob implements ShouldQueue
         $wallet_service = app(WalletService::class);
         $deposit_response = serialize($wallet_service->deposit($deposit_data));
 
-        WalletDepositJob::dispatch($deposit_response)->onConnection('rabbit')->onQueue($deposit_data->getServiceName());
+//        WalletDepositJob::dispatch($deposit_response)->onConnection('rabbit')->onQueue($deposit_data->getServiceName());
 
     }
 }

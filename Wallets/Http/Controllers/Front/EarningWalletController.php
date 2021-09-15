@@ -27,10 +27,10 @@ class EarningWalletController extends Controller
     }
 
     /**
-     * Get counts
+     * Get sum commissions
      * @group Public User > Earning Wallet
      */
-    public function counts()
+    public function earned_commissions()
     {
         $this->prepareEarningWallet();
         $counts = User::query()->where('id', '=', request()->user->id)

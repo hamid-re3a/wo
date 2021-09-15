@@ -42,6 +42,7 @@ Route::name('wallets.')->middleware('auth')->group(function () {
 
     Route::name('earning.')->prefix('earning')->group(function () {
         Route::get('', [EarningWalletController::class, 'index'])->name('get-wallet');
+        Route::get('counts', [EarningWalletController::class, 'counts'])->name('counts');
         Route::get('transactions', [EarningWalletController::class, 'transactions'])->name('transactions');
         Route::get('transfers', [EarningWalletController::class, 'transfers'])->name('transfers');
         Route::get('transfers/income', [EarningWalletController::class, 'incomeTransfers'])->name('income-transfers');

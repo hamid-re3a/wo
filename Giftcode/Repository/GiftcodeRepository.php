@@ -28,9 +28,11 @@ class GiftcodeRepository
         try {
             DB::beginTransaction();
             //All stuff fixed in GiftcodeObserver
-            $giftcode = $this->model->query()->create($request->only([
-                'package_id'
-            ]));
+
+            $giftcode = $this->model->query()->create([
+                'package_id' => $request->get('package_id'),
+                'user_id' => $request->get('user_id')
+            ]);
             /**
              * Start User wallet process
              */
@@ -164,7 +166,7 @@ class GiftcodeRepository
 
     public function getGiftcodeService($giftcode)
     {
-        $giftcode_service = new \Giftcode\Services\Giftcode();
+        $giftcode_service = new \Giftcode\Services\Grpc\Giftcode();
         if($giftcode instanceof Giftcode AND !empty($giftcode->id))
             return $giftcode->getGiftcodeService();
 

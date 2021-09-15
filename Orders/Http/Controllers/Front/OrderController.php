@@ -16,9 +16,9 @@ use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
 use Orders\Models\Order;
 use Orders\Services\OrderResolver;
-use Packages\Services\Id;
+use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
-use Payments\Services\Invoice;
+use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentService;
 
 class OrderController extends Controller
@@ -135,7 +135,6 @@ class OrderController extends Controller
             ]);
 
             $order_db->refreshOrder();
-
             //Order Resolver
             $order_resolver = new OrderResolver($order_db->getOrderService());
             list($flag, $response) = $order_resolver->simulateValidation();

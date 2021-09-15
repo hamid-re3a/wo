@@ -30,7 +30,7 @@ class ChargeDepositWalletRequest extends FormRequest
         $maximum_amount = walletGetSetting('maximum_deposit_fund_amount');
 
         return [
-            'amount' => "required|numeric|between{$minimum_amount},{$maximum_amount}"
+            'amount' => "required|numeric|between:{$minimum_amount},{$maximum_amount}"
         ];
 
     }

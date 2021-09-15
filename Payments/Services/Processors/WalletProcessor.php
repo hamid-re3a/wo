@@ -11,7 +11,7 @@ use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidComplete;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidPartial;
 use Payments\Models\Invoice;
 use User\Models\User;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\WalletService;
 
 class WalletProcessor extends ProcessorAbstract

@@ -6,10 +6,14 @@ namespace Wallets\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Payments\Services\Invoice;
+use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentService;
 use User\Models\User;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\Transfer;
+use Wallets\Services\Grpc\Wallet;
+use Wallets\Services\Grpc\WalletNames;
+use Wallets\Services\Grpc\Withdraw;
 
 class WalletService implements WalletServiceInterface
 {
@@ -44,12 +48,17 @@ class WalletService implements WalletServiceInterface
                 $deposit->getAmount() > 0 AND
                 $deposit->getWalletName() AND
                 $deposit->getUserId() AND
-                in_array($deposit->getWalletName(), [$this->earningWallet, $this->depositWallet])
+                in_array($deposit->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($deposit->getUserId());
                 $bankService = new BankService($walletUser);
 
-                $bankService->deposit($deposit->getWalletName(), $deposit->getAmount(), $deposit->getDescription() ?: null, $deposit->getConfirmed(), $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
+                $wallet_name = $this->earningWallet;
+                if($deposit->getWalletName() == WalletNames::DEPOSIT)
+                    $wallet_name = $this->depositWallet;
+
+                $transaction = $bankService->deposit($wallet_name, $deposit->getAmount(), $deposit->getDescription() ?: null, $deposit->getConfirmed(), $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
+                $deposit->setTransactionId($transaction->uuid);
 
                 DB::commit();
                 return $deposit;
@@ -75,12 +84,18 @@ class WalletService implements WalletServiceInterface
                 $withdraw->getWalletName() AND
                 $withdraw->getUserId() AND
                 $withdraw->getType() AND
-                in_array($withdraw->getWalletName(), [$this->depositWallet, $this->earningWallet])
+                in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($withdraw->getUserId());
                 $bankService = new BankService($walletUser);
 
-                $bankService->withdraw($withdraw->getWalletName(), $withdraw->getAmount(), $withdraw->getDescription() ?: null, $withdraw->getType(),empty($withdraw->getSubType()) ? null : $withdraw->getSubType());
+                $wallet_name = $this->earningWallet;
+                if($withdraw->getWalletName() == WalletNames::DEPOSIT)
+                    $wallet_name = $this->depositWallet;
+
+                $transaction = $bankService->withdraw($wallet_name, $withdraw->getAmount(), $withdraw->getDescription() ?: null, $withdraw->getType(),empty($withdraw->getSubType()) ? null : $withdraw->getSubType());
+                $withdraw->setTransactionId($transaction->uuid);
+
                 DB::commit();
                 return $withdraw;
 
@@ -100,20 +115,28 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
             if (
                 $transfer->getFromUserId() AND
-                $transfer->getFromWalletName() AND
                 $transfer->getToUserId() AND
-                $transfer->getToWalletName() AND
                 $transfer->getAmount() > 0 AND
-                $transfer->getConfirmed()
+                $transfer->getConfirmed() AND
+                in_array($transfer->getToWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT]) AND
+                in_array($transfer->getFromWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $fromUser = $this->walletUser($transfer->getFromUserId());
                 $toUser = $this->walletUser($transfer->getToUserId());
                 $fromBankService = new BankService($fromUser);
                 $toBankService = new BankService($toUser);
 
-                $fromWallet = Str::contains(Str::lower($transfer->getFromWalletName()), 'deposit') ? $this->depositWallet : $this->earningWallet;
-                $toWallet = Str::contains(Str::lower($transfer->getToWalletName()), 'deposit') ? $this->depositWallet : $this->earningWallet;
-                $fromBankService->transfer($fromBankService->getWallet($fromWallet), $toBankService->getWallet($toWallet), $transfer->getAmount(), $transfer->getDescription() ?: null);
+                $fromWallet = $toWallet = $this->earningWallet;
+                if($transfer->getToWalletName() == WalletNames::DEPOSIT)
+                    $toWallet = $this->depositWallet;
+
+                if($transfer->getFromWalletName() == WalletNames::DEPOSIT)
+                    $fromWallet = $this->depositWallet;
+
+                $bank_transfer = $fromBankService->transfer($fromBankService->getWallet($fromWallet), $toBankService->getWallet($toWallet), $transfer->getAmount(), $transfer->getDescription() ?: null);
+                $transfer->setDepositTransactionId($bank_transfer->withdraw->uuid);
+                $transfer->setWithdrawTransactionId($bank_transfer->deposit->uuid);
+
 
                 DB::commit();
                 return $transfer;
@@ -134,7 +157,12 @@ class WalletService implements WalletServiceInterface
         try {
             $walletUser = $this->walletUser($wallet->getUserId());
             $bankService = new BankService($walletUser);
-            $balance = $bankService->getBalance(Str::contains(Str::lower($wallet->getName()), 'deposit') ? $this->depositWallet : $this->earningWallet);
+
+            $walletName = $this->earningWallet;
+            if($wallet->getName() == WalletNames::DEPOSIT)
+                $walletName = $this->depositWallet;
+
+            $balance = $bankService->getBalance($walletName);
 
             $response = new Wallet();
             $response->setBalance($balance);
@@ -147,7 +175,6 @@ class WalletService implements WalletServiceInterface
 
     /**
      * @param $request
-     * @return Invoice
      */
     public function invoiceWallet(Request $request)
     {

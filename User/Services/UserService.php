@@ -3,9 +3,9 @@
 
 namespace User\Services;
 
-
 use Spatie\Permission\Models\Role;
 use User\Repository\UserRepository;
+use User\Services\Grpc\User;
 
 class UserService
 {

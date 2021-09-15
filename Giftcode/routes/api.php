@@ -14,28 +14,23 @@ Route::middleware(['role:super-admin|subscriptions-giftcode-admin'])->name('admi
 
 });
 
+Route::middleware(['auth', 'role:client'])->name('customer.')->group(function () {
+    Route::name('giftcodes.')->middleware('auth')->group(function () {
+        Route::get('', [GiftcodeController::class, 'index'])->name('data');
+        Route::get('counts', [GiftcodeController::class, 'counts'])->name('counts');
+        Route::post('create', [GiftcodeController::class, 'store'])->name('create');
+        Route::get('show/{uuid}', [GiftcodeController::class, 'show'])->name('show');
+        Route::post('cancel', [GiftcodeController::class, 'cancel'])->name('cancel');
+        Route::post('redeem', [GiftcodeController::class, 'redeem'])->name('redeem');
 
-/**
- * @todo before lunch project we must migrate all route to this (all api public and customer side)
- * list of all route admin section
- */
-Route::middleware(['role:client'])->name('customer.')->group(function () {
-
-});
-
-Route::name('giftcodes.')->middleware('auth')->group(function () {
-    Route::get('', [GiftcodeController::class,'index'])->name('data');
-    Route::get('counts', [GiftcodeController::class,'counts'])->name('counts');
-    Route::post('create',[GiftcodeController::class,'store'])->name('create');
-    Route::get('show/{uuid}', [GiftcodeController::class,'show'])->name('show');
-    Route::post('cancel',[GiftcodeController::class,'cancel'])->name('cancel');
-    Route::post('redeem',[GiftcodeController::class,'redeem'])->name('redeem');
-
-    //Admin Routes
-    Route::middleware(['role:super-admin|subscriptions-admin'])->prefix('admin')->name('admin.')->group(function(){ //TODO admin role
-        Route::prefix('settings')->name('settings.')->group(function(){
-            Route::get('', [SettingController::class, 'index'])->name('list');
-            Route::post('update', [SettingController::class, 'update']);
+        //Admin Routes
+        Route::middleware(['role:super-admin|subscriptions-admin'])->prefix('admin')->name('admin.')->group(function () { //TODO admin role
+            Route::prefix('settings')->name('settings.')->group(function () {
+                Route::get('', [SettingController::class, 'index'])->name('list');
+                Route::post('update', [SettingController::class, 'update']);
+            });
         });
     });
 });
+
+

@@ -7,11 +7,12 @@ namespace Giftcode\Repository;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
 use User\Models\User;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\Transaction;
-use Wallets\Services\Wallet;
+use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\WalletService;
-use Wallets\Services\Withdraw;
+use Wallets\Services\Grpc\Withdraw;
 
 class WalletRepository
 {
@@ -27,7 +28,7 @@ class WalletRepository
         $withdraw_object = app(Withdraw::class);
         $withdraw_object->setConfirmed(true);
         $withdraw_object->setAmount($giftcode->total_cost_in_usd);
-        $withdraw_object->setWalletName('Deposit Wallet');
+        $withdraw_object->setWalletName(WalletNames::DEPOSIT);
         $withdraw_object->setUserId($giftcode->user_id);
         $withdraw_object->setType('Create Giftcode');
         $withdraw_object->setDescription('Giftcode #' . $giftcode->uuid);
@@ -42,7 +43,7 @@ class WalletRepository
         $deposit_object->setAmount($giftcode->getRefundAmount());
         $deposit_object->setType('Giftcode refund');
         $deposit_object->setDescription($description);
-        $deposit_object->setWalletName('Deposit Wallet');
+        $deposit_object->setWalletName(WalletNames::DEPOSIT);
 
         //Deposit fee to admin wallet
         if($giftcode->total_cost_in_usd != $giftcode->getRefundAmount())
@@ -55,7 +56,7 @@ class WalletRepository
     {
         $wallet = app(Wallet::class);
         $wallet->setUserId(request()->user->id);
-        $wallet->setName('Deposit Wallet');
+        $wallet->setName(WalletNames::DEPOSIT);
         return $this->wallet_service->getBalance($wallet)->getBalance();
     }
 
@@ -67,7 +68,7 @@ class WalletRepository
         $deposit_object->setAmount(($giftcode->total_cost_in_usd - $giftcode->getRefundAmount()));
         $deposit_object->setType('Giftcode refund');
         $deposit_object->setDescription($description);
-        $deposit_object->setWalletName('Deposit Wallet');
+        $deposit_object->setWalletName(WalletNames::DEPOSIT);
         //Deposit transaction
         $this->wallet_service->deposit($deposit_object);
     }

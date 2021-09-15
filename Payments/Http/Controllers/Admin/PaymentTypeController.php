@@ -8,7 +8,7 @@ use Payments\Http\Requests\PaymentType\StorePaymentTypeRequest;
 use Payments\Http\Requests\PaymentType\UpdatePaymentTypeRequest;
 use Payments\Http\Resources\PaymentTypeResource;
 use Payments\Services\PaymentService;
-use Payments\Services\PaymentType;
+use Payments\Services\Grpc\PaymentType;
 
 class PaymentTypeController extends Controller
 {

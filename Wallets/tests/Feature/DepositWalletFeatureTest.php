@@ -168,7 +168,7 @@ class DepositWalletFeatureTest extends WalletTest
     {
         Mail::fake();
         $response = $this->postJson(route('wallets.deposit.deposit-funds'),[
-            'amount' => 101,
+            'amount' => 102,
         ]);
         $response->assertStatus(200);
         $response->assertJsonStructure([

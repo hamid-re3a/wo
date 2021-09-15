@@ -7,8 +7,8 @@ use Illuminate\Routing\Controller;
 use Packages\Http\Requests\Admin\Package\PackageTypeFilterRequest;
 use Packages\Http\Resources\PackageCountByMonthResource;
 use Packages\Http\Resources\PackageResource;
-use Packages\Services\Id;
-use Packages\Services\Package;
+use Packages\Services\Grpc\Id;
+use Packages\Services\Grpc\Package;
 use Packages\Services\PackageService;
 use Packages\Http\Resources\CountDataResource;
 

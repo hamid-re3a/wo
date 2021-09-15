@@ -3,12 +3,11 @@
 namespace Payments\Services;
 
 use Carbon\Carbon;
-use Giftcode\Services\Giftcode;
+use Giftcode\Services\Grpc\Giftcode;
 use Giftcode\Services\GiftcodeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Orders\Services\Order;
 use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
@@ -16,9 +15,17 @@ use Payments\Mail\Payment\Wallet\EmailWalletInvoiceCreated;
 use Payments\Repository\PaymentCurrencyRepository;
 use Payments\Repository\PaymentDriverRepository;
 use Payments\Repository\PaymentTypesRepository;
-use Wallets\Services\Wallet;
+use Payments\Services\Grpc\EmptyObject;
+use Payments\Services\Grpc\Id;
+use Payments\Services\Grpc\Invoice;
+use Payments\Services\Grpc\PaymentCurrencies;
+use Payments\Services\Grpc\PaymentCurrency;
+use Payments\Services\Grpc\PaymentDriver;
+use Payments\Services\Grpc\PaymentType;
+use Payments\Services\Grpc\PaymentTypes;
+use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\WalletService;
-use Wallets\Services\Withdraw;
+use Wallets\Services\Grpc\Withdraw;
 
 class PaymentService implements PaymentsServiceInterface
 {
@@ -96,7 +103,7 @@ class PaymentService implements PaymentsServiceInterface
 
             //Load order
             $order_service = app(OrderService::class);
-            $id_object = app(\Orders\Services\Id::class);
+            $id_object = app(\Orders\Services\Grpc\Id::class);
             $id_object->setId($invoice_request->getPayableId());
             $order_object = $order_service->OrderById($id_object);
             if(empty($order_object->getId()))
@@ -160,7 +167,7 @@ class PaymentService implements PaymentsServiceInterface
 
             //Load order
             $order_service = app(OrderService::class);
-            $id_object = app(\Orders\Services\Id::class);
+            $id_object = app(\Orders\Services\Grpc\Id::class);
             $id_object->setId($invoice_request->getPayableId());
             $order_object = $order_service->OrderById($id_object);
 

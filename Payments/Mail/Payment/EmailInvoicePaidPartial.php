@@ -6,10 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 use Payments\Mail\SettingableMail;
 use Payments\Models\Invoice;
-use User\Services\User;
+use User\Services\Grpc\User;
 
 class EmailInvoicePaidPartial extends Mailable implements SettingableMail
 {

@@ -8,7 +8,7 @@ use Payments\Http\Requests\PaymentDriver\RemovePaymentDriverRequest;
 use Payments\Http\Requests\PaymentDriver\StorePaymentDriverRequest;
 use Payments\Http\Requests\PaymentDriver\UpdatePaymentDriverRequest;
 use Payments\Http\Resources\PaymentDriverResource;
-use Payments\Services\PaymentDriver;
+use Payments\Services\Grpc\PaymentDriver;
 use Payments\Services\PaymentService;
 
 class PaymentDriverController extends Controller

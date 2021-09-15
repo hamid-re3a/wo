@@ -6,7 +6,7 @@ use App\Jobs\User\RequestGetAllUserDataJob;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use User\Models\User;
-use User\Services\UserUpdate;
+use User\Services\Grpc\UserUpdate;
 
 /**
  * Class AuthTableSeeder.

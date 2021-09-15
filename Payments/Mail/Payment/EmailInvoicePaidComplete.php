@@ -2,7 +2,7 @@
 
 namespace Payments\Mail\Payment;
 
-use User\Services\User;
+use User\Services\Grpc\User;
 use Payments\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;

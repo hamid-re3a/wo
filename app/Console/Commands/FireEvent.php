@@ -6,7 +6,7 @@ use App\Jobs\User\RequestGetAllUserDataJob;
 use App\Jobs\User\UserDataJob;
 use Illuminate\Console\Command;
 use Payments\Models\PaymentType;
-use User\Services\UserUpdate;
+use User\Services\Grpc\UserUpdate;
 
 class FireEvent extends Command
 {

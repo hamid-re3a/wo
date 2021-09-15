@@ -5,6 +5,8 @@ namespace Packages\Services;
 
 use Illuminate\Support\Carbon;
 use Packages\Repository\PackageRepository;
+use Packages\Services\Grpc\Id;
+use Packages\Services\Grpc\Package;
 
 class PackageService implements PackagesServiceInterface
 {

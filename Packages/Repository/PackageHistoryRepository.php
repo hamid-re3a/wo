@@ -5,8 +5,8 @@ namespace Packages\Repository;
 
 use Packages\Models\Package;
 use Packages\Models\PackageHistory;
-use Packages\Services\Id;
-use Packages\Services\Package as PackageData;
+use Packages\Services\Grpc\Id;
+use Packages\Services\Grpc\Package as PackageData;
 
 class PackageHistoryRepository
 {

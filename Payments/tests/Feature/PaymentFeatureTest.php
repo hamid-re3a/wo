@@ -4,11 +4,7 @@ namespace Payments\tests\Feature;
 
 use Illuminate\Support\Facades\Mail;
 use Payments\Mail\Payment\EmailInvoiceCreated;
-use Payments\Mail\Payment\EmailInvoicePaidComplete;
-use Payments\Services\Invoice;
 use Payments\tests\PaymentTest;
-use User\Mail\User\TooManyLoginAttemptTemporaryBlockedEmail;
-use User\Services\User;
 
 class PaymentFeatureTest extends PaymentTest
 {
@@ -37,9 +33,6 @@ class PaymentFeatureTest extends PaymentTest
             'payment_type' => 'purchase',
             'payment_driver' => 'btc-pay-server',
             'payment_currency' => 'BTC',
-        ], [
-            'X-user-id' => 1,
-            'X-user-hash'=>3,
         ]);
         $response->assertOk();
 

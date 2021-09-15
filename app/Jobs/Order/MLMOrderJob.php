@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
 
 class MLMOrderJob implements ShouldQueue

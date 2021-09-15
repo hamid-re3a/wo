@@ -7,8 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Payments\Mail\SettingableMail;
-use Payments\Services\Invoice;
-use User\Services\User;
+use Payments\Services\Grpc\Invoice;
+use User\Services\Grpc\User;
 
 class EmailWalletInvoiceCreated extends Mailable implements SettingableMail
 {

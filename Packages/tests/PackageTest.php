@@ -43,7 +43,7 @@ class PackageTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $hash = Hash::make(serialize($user->getUserService()));
+        $hash = md5(serialize($user->getUserService()));
         return [
             'X-user-id' => '1',
             'X-user-hash' => $hash,

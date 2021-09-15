@@ -1,6 +1,6 @@
 <?php
-require '/home/subscription/public_html/Subscriptions/vendor/autoload.php';
-require '/home/subscription/public_html/Subscriptions/public/index.php';
+require getcwd() . '/vendor/autoload.php';
+require getcwd() .' /public/index.php';
 
 $grpc = new \Mix\Grpc\Server();
 $grpc->register(\Wallets\Services\WalletGrpcService::class);

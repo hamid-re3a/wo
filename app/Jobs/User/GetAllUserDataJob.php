@@ -9,7 +9,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use User\Services\UserService;
 
-
 class GetAllUserDataJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -49,6 +48,7 @@ class GetAllUserDataJob implements ShouldQueue
             }
 
             $user_object_service->setRole(implode(',',$roles_array));
+
             app(UserService::class)->userUpdate($user_object_service);
         }
 //        echo "all user created".$this->data. PHP_EOL;

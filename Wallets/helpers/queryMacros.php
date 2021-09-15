@@ -36,7 +36,6 @@ Builder::macro('withSumQuery', function ($columns) {
             [$name, $alias] = [$segments[0], $segments[2]];
         }
 
-// Here we'll extract the relation name and the actual column name that's need to sum.
         $segments = explode('.', $name);
 
         $relationName = $segments[0];
@@ -58,9 +57,6 @@ Builder::macro('withSumQuery', function ($columns) {
             $query->columns = [$query->columns[0]];
         }
 
-// Finally we will add the proper result column alias to the query and run the subselect
-// statement against the query builder. Then we will return the builder instance back
-// to the developer for further constraint chaining that needs to take place on it.
         $column = $alias ?? Str::snake(Str::replaceFirst('.', ' ', $name . '_sum'));
 
         $this->selectSub($query, $column);

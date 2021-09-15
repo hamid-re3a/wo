@@ -46,6 +46,16 @@ const WALLET_SETTINGS = [
         'title' => 'Minimum payment request amount',
         'description' => 'Minimum payment request amount'
     ],
+    'minimum_transfer_from_earning_to_deposit_wallet_fund_amount' => [
+        'value' => 100,
+        'title' => 'Minimum allowed amount',
+        'description' => 'Minimum allowed amount'
+    ],
+    'maximum_transfer_from_earning_to_deposit_wallet_fund_amount' => [
+        'value' => 10000,
+        'title' => 'Minimum allowed amount',
+        'description' => 'Minimum allowed amount'
+    ],
 
 ];
 

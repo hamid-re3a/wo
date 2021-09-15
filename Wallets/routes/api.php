@@ -45,7 +45,8 @@ Route::name('wallets.')->middleware('auth')->group(function () {
         Route::get('earned-commissions', [EarningWalletController::class, 'earned_commissions'])->name('earned-commissions');
         Route::get('transactions', [EarningWalletController::class, 'transactions'])->name('transactions');
         Route::get('transfers', [EarningWalletController::class, 'transfers'])->name('transfers');
-        Route::get('transfers/income', [EarningWalletController::class, 'incomeTransfers'])->name('income-transfers');
+        Route::post('transfer-funds-preview', [EarningWalletController::class, 'transfer_to_deposit_wallet_preview'])->name('transfer-funds-preview');
+        Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
     });
 
 

@@ -1,8 +1,6 @@
 <?php
-//require '/home/stagingapigateway/public_html/API-Gateway/vendor/autoload.php';
-//require '/home/stagingapigateway/public_html/API-Gateway/public/index.php';
-require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/public/index.php';
+require '/home/subscription/public_html/Subscriptions/vendor/autoload.php';
+require '/home/subscription/public_html/Subscriptions/public/index.php';
 
 $grpc = new \Mix\Grpc\Server();
 $grpc->register(\Wallets\Services\WalletGrpcService::class);

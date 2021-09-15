@@ -5,8 +5,9 @@ namespace Giftcode\Services;
 
 
 use Giftcode\Repository\GiftcodeRepository;
+use Giftcode\Services\Grpc\Giftcode;
 use Illuminate\Http\Request;
-use User\Services\User;
+use User\Services\Grpc\User;
 
 class GiftcodeService
 {

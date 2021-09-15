@@ -78,7 +78,7 @@ class Package extends Model
      */
     public function getPackageService()
     {
-        $package_service = new \Packages\Services\Package();
+        $package_service = new \Packages\Services\Grpc\Package();
         $package_service->setId($this->attributes['id']);
         $package_service->setName($this->attributes['name']);
         $package_service->setShortName($this->attributes['short_name']);

@@ -5,8 +5,8 @@ namespace Payments\Services\Processors;
 
 
 use App\Jobs\Order\MLMOrderJob;
-use Orders\Services\Id;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Id;
+use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceExpired;

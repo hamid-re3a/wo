@@ -4,6 +4,7 @@
 namespace Packages\Services;
 
 use Packages\Repository\PackageHistoryRepository;
+use Packages\Services\Grpc\Package;
 
 class PackageHistoryService
 {

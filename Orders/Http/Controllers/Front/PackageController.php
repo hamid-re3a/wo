@@ -64,7 +64,7 @@ class PackageController extends Controller
 
     private function getPackage($id)
     {
-        $request = new \Packages\Services\Id();
+        $request = new \Packages\Services\Grpc\Id();
         $request->setId($id);
         return $this->packageService->packageFullById($request);
     }

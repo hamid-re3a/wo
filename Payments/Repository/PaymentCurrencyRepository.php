@@ -3,7 +3,7 @@ namespace Payments\Repository;
 
 
 use Payments\Models\PaymentCurrency;
-use \Payments\Services\PaymentCurrency as PaymentCurrencyObject;
+use \Payments\Services\Grpc\PaymentCurrency as PaymentCurrencyObject;
 
 class PaymentCurrencyRepository
 {

@@ -7,8 +7,8 @@ use Payments\Http\Requests\PaymentCurrency\RemovePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\StorePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\UpdatePaymentCurrencyRequest;
 use Payments\Http\Resources\PaymentCurrencyResource;
-use Payments\Services\EmptyObject;
-use Payments\Services\PaymentCurrency;
+use Payments\Services\Grpc\EmptyObject;
+use Payments\Services\Grpc\PaymentCurrency;
 use Payments\Services\PaymentService;
 
 class PaymentCurrencyController extends Controller

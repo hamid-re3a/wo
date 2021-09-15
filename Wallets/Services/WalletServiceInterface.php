@@ -3,7 +3,10 @@
 # source: wallets.proto
 
 namespace Wallets\Services;
-use User\Services;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\Transfer;
+use Wallets\Services\Grpc\Wallet;
+use Wallets\Services\Grpc\Withdraw;
 
 interface WalletServiceInterface
 {

@@ -6,12 +6,13 @@ namespace Wallets\tests\Feature;
 
 use User\Models\User;
 use Wallets\Models\TransactionType;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\Transaction;
-use Wallets\Services\Transfer;
-use Wallets\Services\Wallet;
+use Wallets\Services\Grpc\Transfer;
+use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\WalletService;
-use Wallets\Services\Withdraw;
+use Wallets\Services\Grpc\Withdraw;
 use Wallets\tests\WalletTest;
 
 class WalletServiceTest extends WalletTest
@@ -30,7 +31,7 @@ class WalletServiceTest extends WalletTest
         $deposit_service->setUserId(1);
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Deposit');
-        $deposit_service->setWalletName('Deposit Wallet');
+        $deposit_service->setWalletName(WalletNames::DEPOSIT);
 
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
@@ -52,7 +53,7 @@ class WalletServiceTest extends WalletTest
         $deposit_service->setUserId(1);
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Deposit');
-        $deposit_service->setWalletName('Wrong Wallet Name');
+        $deposit_service->setWalletName(3);
 
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
@@ -74,7 +75,7 @@ class WalletServiceTest extends WalletTest
         $deposit_service->setUserId($user_id);
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Deposit');
-        $deposit_service->setWalletName('Deposit Wallet');
+        $deposit_service->setWalletName(WalletNames::DEPOSIT);
 
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
@@ -97,7 +98,7 @@ class WalletServiceTest extends WalletTest
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Commission');
         $deposit_service->setSubType('Indirect Commission');
-        $deposit_service->setWalletName('Deposit Wallet');
+        $deposit_service->setWalletName(WalletNames::DEPOSIT);
 
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
@@ -120,7 +121,7 @@ class WalletServiceTest extends WalletTest
         $withdraw_service = app(Withdraw::class);
         $withdraw_service->setConfirmed(false);
         $withdraw_service->setUserId(1);
-        $withdraw_service->setWalletName('Deposit Wallet');
+        $withdraw_service->setWalletName(WalletNames::DEPOSIT);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(100);
         $withdraw = $wallet_service->withdraw($withdraw_service);
@@ -142,7 +143,7 @@ class WalletServiceTest extends WalletTest
         $withdraw_service = app(Withdraw::class);
         $withdraw_service->setConfirmed(true);
         $withdraw_service->setUserId(1);
-        $withdraw_service->setWalletName('Wrong Walelt Name');
+        $withdraw_service->setWalletName(3);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(100);
         $withdraw = $wallet_service->withdraw($withdraw_service);
@@ -164,7 +165,7 @@ class WalletServiceTest extends WalletTest
         $withdraw_service = app(Withdraw::class);
         $withdraw_service->setConfirmed(true);
         $withdraw_service->setUserId(1);
-        $withdraw_service->setWalletName('Deposit Wallet');
+        $withdraw_service->setWalletName(WalletNames::DEPOSIT);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(100);
         $withdraw = $wallet_service->withdraw($withdraw_service);
@@ -189,9 +190,9 @@ class WalletServiceTest extends WalletTest
         //Prepare transfer
         $transfer_service = app(Transfer::class);
         $transfer_service->setFromUserId($from_user->id);
-        $transfer_service->setFromWalletName('Deposit Wallet');
+        $transfer_service->setFromWalletName(WalletNames::DEPOSIT);
         $transfer_service->setToUserId($to_user->id);
-        $transfer_service->setToWalletName('Deposit Wallet');
+        $transfer_service->setToWalletName(WalletNames::DEPOSIT);
         $transfer_service->setAmount(1000);
         $transfer_service->setConfirmed(true);
 
@@ -216,7 +217,7 @@ class WalletServiceTest extends WalletTest
         //Prepare wallet
         $user_wallet_service = app(Wallet::class);
         $user_wallet_service->setUserId($user->id);
-        $user_wallet_service->setName('Deposit Wallet');
+        $user_wallet_service->setName(WalletNames::DEPOSIT);
 
         //Check balance
         $response_wallet = $wallet_service->getBalance($user_wallet_service);

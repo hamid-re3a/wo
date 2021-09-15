@@ -28,7 +28,7 @@ class GetAllUserDataJob implements ShouldQueue
      */
     public function handle()
     {
-        $user_object_service = new \User\Services\User();
+        $user_object_service = new \User\Services\Grpc\User();
         $user_get_data_serialize = unserialize($this->data);
         foreach ($user_get_data_serialize as $item) {
             $block_type = isset($item['block_type']) && !empty($item['block_type'])? $item['block_type'] : null;

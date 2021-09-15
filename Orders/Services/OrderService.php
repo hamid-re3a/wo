@@ -6,8 +6,10 @@ namespace Orders\Services;
 
 use Illuminate\Support\Carbon;
 use Orders\Repository\OrderRepository;
+use Orders\Services\Grpc\Id;
+use Orders\Services\Grpc\Order;
 use Packages\Services\PackageService;
-use Payments\Services\EmptyObject;
+use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
 
 class OrderService implements OrdersServiceInterface
@@ -32,31 +34,8 @@ class OrderService implements OrdersServiceInterface
         $response = new Order();
         $order = \Orders\Models\Order::query()->find($request->getId());
 
-        if ($order) {
-            $response->setId($order->id);
-            $response->setUserId((int)$order->user_id);
-            $response->setToUserId((int)$order->to_user_id);
-            $response->setPackageId((int)$order->package_id);
-            $response->setTotalCostInUsd((double)$order->total_cost_in_usd);
-            $response->setPackagesCostInUsd((double)$order->packages_cost_in_usd);
-            $response->setRegistrationFeeInUsd((double)$order->registration_fee_in_usd);
-            $response->setIsPaidAt((string)$order->is_paid_at);
-            $response->setIsResolvedAt((string)$order->is_resolved_at);
-            $response->setIsRefundAt((string)$order->is_refund_at);
-            $response->setValidityInDays((string)$order->validity_in_days);
-            $response->setIsCommissionResolvedAt((string)$order->is_commission_resolved_at);
-            $response->setPaymentType((string)$order->payment_type);
-            $response->setPaymentCurrency((string)$order->payment_currency);
-            $response->setPaymentDriver((string)$order->payment_driver);
-            $response->setPlan((string)$order->plan);
-            $response->setUser($order->user->getUserService());
-            $response->setToUser($order->toUser->getUserService());
-
-            $id = new \Packages\Services\Id();
-            $id->setId($order->package_id);
-            $response->setPackage($this->package_service->packageFullById($id));
-
-        }
+        if ($order)
+            return $order->getOrderService();
 
         return $response;
 

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Payments\Models\Invoice;
 use Payments\Services\PaymentService;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\WalletService;
 use Payments\Services\Processors\OrderProcessor;
 use Payments\Services\Processors\ProcessorAbstract;

@@ -85,7 +85,7 @@ class Giftcode extends Model
 
     public function package()
     {
-        return $this->belongsTo(Package::class);
+        return $this->belongsTo(Package::class,'package_id','id');
     }
 
     public function redeemer()
@@ -153,7 +153,7 @@ class Giftcode extends Model
 
     public function getGiftcodeService()
     {
-        $giftcode_service = new \Giftcode\Services\Giftcode();
+        $giftcode_service = new \Giftcode\Services\Grpc\Giftcode();
         $giftcode_service->setId((int)$this->attributes['id']);
         $giftcode_service->setUuid((string)$this->attributes['uuid']);
         $giftcode_service->setUserId((int)$this->attributes['user_id']);

@@ -5,7 +5,7 @@ namespace Giftcode\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Giftcode\Models\Giftcode
+ * Giftcode\Models\Package
  *
  * @property int $id
  * @property string $name

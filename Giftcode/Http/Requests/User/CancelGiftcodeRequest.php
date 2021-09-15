@@ -24,7 +24,7 @@ class CancelGiftcodeRequest extends FormRequest
      */
     public function rules()
     {
-        $user_id = !empty(request()->user) ?  request()->user->id : null;
+        $user_id = !empty(request()->header('X-user-id')) ?  request()->header('X-user-id') : null;
         return [
             'id' => 'required|uuid|exists:giftcodes,uuid,user_id,' . $user_id
         ];

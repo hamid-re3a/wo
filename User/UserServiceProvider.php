@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use User\Models\User;
-use User\Services\UserUpdate;
+use User\Services\Grpc\UserUpdate;
 
 class UserServiceProvider extends ServiceProvider
 {

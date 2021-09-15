@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Wallets\tests\Feature;
+namespace Giftcode\tests\Feature;
 
 
 use Giftcode\Mail\User\GiftcodeCanceledEmail;
@@ -32,7 +32,7 @@ class GiftcodeControllerTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
         $giftcode = Giftcode::query()->first();
-        $response = $this->getJson(route('giftcodes.show', [
+        $response = $this->getJson(route('customer.giftcodes.show', [
             'uuid' => $giftcode->uuid
         ]));
         $response->assertOk();
@@ -49,27 +49,13 @@ class GiftcodeControllerTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
         $giftcode = Giftcode::query()->first();
-        $response = $this->postJson(route('giftcodes.cancel'), [
+        $response = $this->postJson(route('customer.giftcodes.cancel'), [
             'id' => $giftcode->uuid
         ]);
+
         $response->assertOk();
         Mail::assertSent(GiftcodeCanceledEmail::class);
     }
 
-//    /**
-//     * @test
-//     */
-//    public function redeem_gift_code()
-//    {
-//        Mail::fake();
-//        $response = $this->createGiftCode();
-//        $response->assertOk();
-//        $giftcode = Giftcode::query()->first();
-//        $response = $this->postJson(route('giftcodes.redeem'), [
-//            'id' => $giftcode->uuid
-//        ]);
-//        $response->assertOk();
-//
-//    }
 
 }

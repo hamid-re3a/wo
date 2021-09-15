@@ -2,8 +2,9 @@
 
 namespace Orders\Services;
 
-
 use App\Jobs\Order\MLMOrderJob;
+use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
 
 class OrderResolver
 {
@@ -20,7 +21,6 @@ class OrderResolver
      */
     public function handle(): array
     {
-
         $processed = [true, 'handle'];
         if ($this->order->getIsResolvedAt())
             return $processed;
@@ -86,7 +86,7 @@ class OrderResolver
      */
     public function isValid(): array
     {
-        if ($this->order->getPlan() != ORDER_PLAN_START) {
+        if ($this->order->getPlan() != OrderPlans::ORDER_PLAN_START) {
             $check_start_plan = request()->user->paidOrders()->where('plan', '=', ORDER_PLAN_START)->count();
             if (!$check_start_plan)
                 return [false, trans('order.responses.you-should-order-starter-plan-first')];

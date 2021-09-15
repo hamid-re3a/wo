@@ -16,15 +16,17 @@ class WalletResource extends JsonResource
     public function toArray($request)
     {
 
-        $totalReceived = number_format($this->transactions()->where('wallet_id',$this->id)->where('type', 'deposit')->sum('amount') / 100,2);
-        $totalSpent = number_format($this->transactions()->where('wallet_id',$this->id)->where('type', 'withdraw')->sum('amount') / 100 ,2);
+        $totalReceived = walletPfAmount(abs($this->transactions()->where('wallet_id',$this->id)->where('type', 'deposit')->sum('amount')) / 100);
+        $totalSpent = walletPfAmount(abs($this->transactions()->where('wallet_id',$this->id)->where('type', 'withdraw')->sum('amount')) / 100 );
+        $totalTransfer = walletPfAmount(abs($this->transactions()->where('wallet_id',$this->id)->where('meta->type', 'Transfer')->sum('amount')) / 100 );
         return [
             'name' => $this->name,
-            'balance' => number_format($this->balanceFloat,2),
-            'transactions_count' => $this->transactions->count(),
-            'transfers_count' => $this->transfers->count(),
-            'total_received' => $totalReceived,
-            'total_spent' => $totalSpent
+            'balance' => walletPfAmount($this->balanceFloat),
+            'transactions_count' => (int) $this->transactions->count(),
+            'transfers_count' => (int) $this->transfers->count(),
+            'total_transfer' =>walletPfAmount($totalTransfer),
+            'total_received' => walletPfAmount($totalReceived),
+            'total_spent' => walletPfAmount($totalSpent)
         ];
     }
 }

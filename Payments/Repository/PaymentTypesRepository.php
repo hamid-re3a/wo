@@ -3,7 +3,7 @@ namespace Payments\Repository;
 
 
 use Payments\Models\PaymentType;
-use Payments\Services\PaymentType as PaymentTypeObject;
+use Payments\Services\Grpc\PaymentType as PaymentTypeObject;
 
 class PaymentTypesRepository
 {

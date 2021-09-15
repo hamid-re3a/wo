@@ -184,7 +184,7 @@ return [
          * Set this to true if your API should be authenticated by default. If so, you must also set `enabled` (above) to true.
          * You can then use @unauthenticated or @authenticated on individual endpoints to change their status from the default.
          */
-        'default' => false,
+        'default' => true,
 
         /*
          * Where is the auth value meant to be sent in a request?
@@ -307,7 +307,7 @@ INTRO
     /*
      * The base URL to be used in examples. If this is empty, Scribe will use the value of config('app.url').
      */
-    'base_url' => 'https://staging-subscription.janex.org',
+    'base_url' => 'https://staging-api-gateway.janex.org/api/gateway/subscription',
 
     /*
      * Generate a Postman collection (v2.1.0) in addition to HTML docs.

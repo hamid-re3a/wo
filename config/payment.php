@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'btc-pay-server-domain' => 'https://btcpay214900.lndyn.com/',
-    'btc-pay-server-store-id' => '7LeJqgcLrNHrC3ia8ABPev3oWviBAFwNggnDngkf9mYa',
-    'btc-pay-server-api-token' => 'token 6aaa703fbe5b2575131a2d9afa259d1760a6b683',
+    'btc-pay-server-domain' => 'https://testnet.demo.btcpayserver.org/',
+    'btc-pay-server-store-id' => 'BbPfXmDoY2jhaCAkz2fxxYfnNgkRLCv2Agp1W1BNHUhE',
+    'btc-pay-server-api-token' => 'token 2ce510aee96c5fa134622dd8adf95acb9f87c171',
 
     'payment_types' => [
         [

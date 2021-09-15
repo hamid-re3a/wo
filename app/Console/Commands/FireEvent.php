@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\UserDataJob;
+use App\Jobs\User\RequestGetAllUserDataJob;
+use App\Jobs\User\UserDataJob;
 use Illuminate\Console\Command;
 use Payments\Models\PaymentType;
+use User\Services\Grpc\UserUpdate;
 
 class FireEvent extends Command
 {
@@ -39,11 +41,18 @@ class FireEvent extends Command
      */
     public function handle()
     {
-        $entity = new PaymentType();
-        $entity->name = "Dariush";
-        $entity->is_active = false;
-        $entity->save();
-        $data = $entity->toArray();
-        UserDataJob::dispatch($data)->onConnection('subscriptions');
+
+
+        $user_update = new UserUpdate();
+        $user_update->setQueueName('testseceound');
+        $data_serialize = serialize($user_update);
+        RequestGetAllUserDataJob::dispatch($data_serialize)->onConnection("rabbit")->onQueue("test");
+        echo "request get all user data". PHP_EOL;
+        /*        $entity = new PaymentType();
+                $entity->name = "Dariush";
+                $entity->is_active = false;
+                $entity->save();
+                $data = $entity->toArray();
+                UserDataJob::dispatch($data)->onConnection('subscriptions');*/
     }
 }

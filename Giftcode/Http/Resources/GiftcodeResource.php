@@ -24,7 +24,10 @@ class GiftcodeResource extends JsonResource
             'packages_cost_in_usd' => $this->packages_cost_in_usd,
             'registration_fee_in_usd' => $this->registration_fee_in_usd,
             'total_cost_in_usd' => $this->total_cost_in_usd,
+            'redeem_date' => $this->redeem_date ? $this->redeem_date->timestamp : null,
+            'redeem_user_full_name' => $this->redeemer_full_name,
             'created_at' => $this->created_at->timestamp,
+            'status' => $this->status,
         ];
     }
 }

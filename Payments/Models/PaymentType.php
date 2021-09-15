@@ -2,6 +2,7 @@
 
 namespace Payments\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,10 +26,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentType whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentType whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Query\Builder|PaymentType onlyTrashed()
+ * @method static \Illuminate\Database\Query\Builder|PaymentType withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|PaymentType withoutTrashed()
  */
 class PaymentType extends Model
 {
     use HasFactory,SoftDeletes;
     protected $fillable = ["name","is_active"];
     protected $guarded = [];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('actives', function (Builder $builder) {
+            $builder->where('is_active', '=', true);
+        });
+    }
 }

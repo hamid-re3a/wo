@@ -18,16 +18,24 @@ class UserWalletTableSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::query()->firstOrCreate(['id'=>1]);
+        $user = User::query()->firstOrCreate(['id' => 1]);
         $user->update([
-            'first_name'=>'hamid',
-            'last_name'=>'noruzi',
-            'email'=>'hamidrezanoruzinejad@gmail.com',
-            'username'=>'hamid_re3a',
+            'first_name' => 'Admin',
+            'last_name' => 'Admin',
+            'member_id' => 1000,
+            'email' => 'work@sajidjaved.com',
+            'username' => 'admin',
         ]);
+
         $bankService = new BankService($user);
-        $bankService->deposit('Deposit Wallet',10000);
-        $bankService->deposit('Earning Wallet',1000);
+        $bankService->getWallet('Deposit Wallet');
+//        $bankService->deposit('Deposit Wallet',10000000);
+
+        $user = User::query()->firstOrCreate(['id' => 2]);
+        $bankService = new BankService($user);
+        $bankService->getWallet('Deposit Wallet');
+        $bankService->deposit('Deposit Wallet',10000000);
+
 
 
     }

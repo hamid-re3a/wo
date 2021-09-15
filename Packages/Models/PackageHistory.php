@@ -38,6 +38,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|PackageHistory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PackageHistory whereValidityInDays($value)
  * @mixin \Eloquent
+ * @property int|null $user_id
+ * @method static \Illuminate\Database\Eloquent\Builder|PackageHistory whereUserId($value)
  */
 class PackageHistory extends Model
 {

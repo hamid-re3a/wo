@@ -3,18 +3,21 @@
 # source: wallets.proto
 
 namespace Wallets\Services;
-use User\Services;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\Transfer;
+use Wallets\Services\Grpc\Wallet;
+use Wallets\Services\Grpc\Withdraw;
 
 interface WalletServiceInterface
 {
     // GRPC specific service name.
     public const NAME = "wallets.services.WalletService";
 
-    public function deposit( Deposit $request): Transaction;
+    public function deposit( Deposit $request): Deposit;
 
-    public function withdraw( Withdraw $request): Transaction;
+    public function withdraw( Withdraw $request): Withdraw;
 
-    public function transfer( Transfer $request): Transaction;
+    public function transfer( Transfer $request): Transfer;
 
     public function getBalance( Wallet $request): Wallet;
 }

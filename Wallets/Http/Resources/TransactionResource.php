@@ -15,24 +15,19 @@ class TransactionResource extends JsonResource
      */
     public function toArray($request)
     {
-        $type = $this->type;
-        $description = null;
 
-        if(!empty($this->meta)){
-            if(array_key_exists('type', $this->meta))
-                $type = $this->meta['type'];
-            if(array_key_exists('description', $this->meta))
-                $description = $this->meta['description'];
-        }
+        $metaData = $this->metaData->first();
 
         return [
             'id' => $this->uuid,
             'wallet' => $this->wallet->name,
-            'type' => Str::ucfirst($type),
-            'amount' => number_format($this->amountFloat,2),
-            'description' => $description,
+            'type' => $metaData ? $metaData->name : null,
+            'amount' => walletPfAmount($this->amountFloat),
+            'before_balance' => $metaData ? walletPfAmount($metaData->pivot->wallet_before_balance) : walletPfAmount(0),
+            'after_balance' => $metaData ? walletPfAmount($metaData->pivot->wallet_after_balance) : walletPfAmount(0),
+            'description' => $this->meta AND array_key_exists('description',$this->meta) ? $this->meta['description'] : null,
             'confirmed' => $this->confirmed,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->timestamp,
         ];
     }
 }

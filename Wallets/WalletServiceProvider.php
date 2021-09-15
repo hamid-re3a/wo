@@ -2,10 +2,12 @@
 
 namespace Wallets;
 
-use Illuminate\Contracts\Http\Kernel;
+use Wallets\Models\EmailContent;
+use Wallets\Models\Setting;
+use Wallets\Observers\EmailContentObserver;
+use Wallets\Observers\SettingObserver;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Wallets\Http\Middlewares\WalletAuthMiddleware;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -42,6 +44,8 @@ class WalletServiceProvider extends ServiceProvider
     public function boot()
     {
 
+        $this->registerObservers();
+
         $this->setupConfig();
 
         $this->registerHelpers();
@@ -55,11 +59,24 @@ class WalletServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->seed();
-
-            $this->publishes([
-                __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
-            ], 'api-response');
         }
+
+        $this->publishes([
+            __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
+        ], 'api-response');
+
+        $this->publishes([
+            __DIR__ . '/resources/lang' => resource_path('lang'),
+        ], 'user-resources');
+    }
+
+    /**
+     * Register Observers
+     */
+    protected function registerObservers()
+    {
+        Setting::observe(SettingObserver::class);
+        EmailContent::observe(EmailContentObserver::class);
     }
 
 
@@ -78,6 +95,14 @@ class WalletServiceProvider extends ServiceProvider
      */
     protected function registerHelpers()
     {
+        if (file_exists($helperFile = __DIR__ . '/helpers/constant.php')) {
+            require_once($helperFile);
+        }
+
+        if (file_exists($helperFile = __DIR__ . '/helpers/emails.php')) {
+            require_once($helperFile);
+        }
+
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
         }

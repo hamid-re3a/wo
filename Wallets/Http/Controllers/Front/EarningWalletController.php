@@ -15,11 +15,13 @@ class EarningWalletController extends Controller
     private $bankService;
     private $wallet;
 
-    public function __construct()
+    private function prepareEarningWallet()
     {
-        $this->bankService = new BankService(request()->wallet_user);
+
+        $this->bankService = new BankService(request()->user);
         $this->wallet = config('earningWallet');
         $this->bankService->getWallet($this->wallet);
+
     }
 
     /**
@@ -28,7 +30,10 @@ class EarningWalletController extends Controller
      */
     public function index()
     {
+
+        $this->prepareEarningWallet();
         return api()->success(null,WalletResource::make($this->bankService->getWallet($this->wallet)));
+
     }
 
     /**
@@ -40,8 +45,12 @@ class EarningWalletController extends Controller
     public function transactions(TransactionRequest $request)
     {
 
-        $data = $this->bankService->getTransactions($this->wallet)->simplePaginate();
+        $this->prepareEarningWallet();
+        $data = $this->bankService->getTransactions($this->wallet)->select('*')
+            ->selectRaw('( SELECT IFNULL(SUM(amount), 0) FROM transactions t2 WHERE t2.confirmed=1 AND t2.wallet_id=transactions.wallet_id AND t2.id <= transactions.id ) new_balance')
+            ->simplePaginate();
         return api()->success(null,TransactionResource::collection($data)->response()->getData());
+
     }
 
     /**
@@ -52,6 +61,7 @@ class EarningWalletController extends Controller
     public function transfers()
     {
 
+        $this->prepareEarningWallet();
         $data = $this->bankService->transfers($this->wallet)->simplePaginate();
         return api()->success(null,TransferResource::collection($data)->response()->getData());
 

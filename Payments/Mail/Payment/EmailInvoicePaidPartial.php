@@ -3,13 +3,13 @@
 namespace Payments\Mail\Payment;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
-use User\Services\User;
-use Payments\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Payments\Services\Invoice;
+use Orders\Services\Grpc\Order;
+use Payments\Mail\SettingableMail;
+use Payments\Models\Invoice;
+use User\Services\Grpc\User;
 
 class EmailInvoicePaidPartial extends Mailable implements SettingableMail
 {
@@ -17,19 +17,21 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
 
     public $user;
     public $invoice;
+    public $order;
 
     /**
      * Create a new message instance.
      *
      * @param User $user
      * @param Invoice $invoice
+     * @param Order $order
      */
-    public function __construct(User $user,Invoice $invoice)
+    public function __construct(User $user, Invoice $invoice, Order $order)
     {
         $this->user = $user;
         $this->invoice = $invoice;
+        $this->order = $order;
     }
-
 
     /**
      * Build the message.
@@ -41,24 +43,22 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
     {
         $setting = $this->getSetting();
 
-        $setting['body'] = str_replace('{{full_name}}',(is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown': $this->getUserFullName(),$setting['body']);
-        $setting['body'] = str_replace('{{due_amount}}',(is_null($this->getInvoiceDueAmount()) || empty($this->getInvoiceDueAmount())) ? 'Unknown': $this->getInvoiceDueAmount(),$setting['body']);
-        $setting['body'] = str_replace('{{invoice_expire_duration}}',(is_null($this->getInvoiceExpirationTime()) || empty($this->getInvoiceExpirationTime())) ? 'Unknown': $this->getInvoiceExpirationTime(),$setting['body']);
-        $setting['body'] = str_replace('{{amount_in_usd}}',(is_null($this->getPartialInPf()) || empty($this->getPartialInPf())) ? 'Unknown': $this->getPartialInPf(),$setting['body']);
-        $setting['body'] = str_replace('{{expiry_date}}',(is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown': Carbon::createFromTime($this->invoice->getExpirationTime()),$setting['body']);
-
+        $setting['body'] = str_replace('{{full_name}}', (is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown' : $this->getUserFullName(), $setting['body']);
+        $setting['body'] = str_replace('{{due_amount}}', (is_null($this->getInvoiceDueAmount()) || empty($this->getInvoiceDueAmount())) ? 'Unknown' : $this->getInvoiceDueAmount(), $setting['body']);
+        //$setting['body'] = str_replace('{{invoice_expire_duration}}',(is_null($this->getInvoiceExpirationTime()) || empty($this->getInvoiceExpirationTime())) ? 'Unknown': $this->getInvoiceExpirationTime(),$setting['body']);
+        $setting['body'] = str_replace('{{amount_in_usd}}', (is_null($this->getPartialInPf()) || empty($this->getPartialInPf())) ? 'Unknown' : $this->getPartialInPf(), $setting['body']);
+        //$setting['body'] = str_replace('{{expiry_date}}',(is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown': Carbon::createFromTimestamp($this->invoice->getExpirationTime())->toString(),$setting['body']);
 
         return $this
             ->from($setting['from'], $setting['from_name'])
             ->subject($setting['subject'])
-            ->html( $setting['body']);
+            ->html($setting['body']);
     }
 
-    public function getSetting() : array
+    public function getSetting(): array
     {
         return getPaymentEmailSetting('INVOICE_PARTIAL_PAID_EMAIL');
     }
-
 
     private function getUserFullName()
     {
@@ -68,17 +68,17 @@ class EmailInvoicePaidPartial extends Mailable implements SettingableMail
     private function getPartialInPf()
     {
         return number_format(
-            ($this->invoice->getPfAmount()/$this->invoice->getAmount()) * $this->invoice->getDueAmount()
-            ,2, '.', '');
+            (($this->invoice->pf_amount / $this->invoice->amount) * $this->invoice->due_amount)
+            , 2, '.', '');
     }
 
     private function getInvoiceDueAmount()
     {
-        return $this->invoice->getDueAmount() .' '. $this->invoice->getOrder()->getPaymentCurrency();
+        return $this->invoice->due_amount . ' ' . $this->order->getPaymentCurrency();
     }
 
     private function getInvoiceExpirationTime()
     {
-        return Carbon::createFromTimestamp($this->invoice->getExpirationTime())->diffForHumans();
+        return Carbon::createFromTimestamp($this->invoice->expiration_time)->diffForHumans();
     }
 }

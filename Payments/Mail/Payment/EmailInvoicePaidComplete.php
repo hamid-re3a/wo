@@ -2,12 +2,12 @@
 
 namespace Payments\Mail\Payment;
 
-use User\Services\User;
+use User\Services\Grpc\User;
 use Payments\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Payments\Services\Invoice;
+use Payments\Models\Invoice;
 
 class EmailInvoicePaidComplete extends Mailable implements SettingableMail
 {
@@ -40,6 +40,8 @@ class EmailInvoicePaidComplete extends Mailable implements SettingableMail
         $setting = $this->getSetting();
 
         $setting['body'] = str_replace('{{full_name}}',(is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown': $this->getUserFullName(),$setting['body']);
+        $setting['body'] = str_replace('{{invoice_no}}',(is_null($this->invoice->transaction_id) || empty($this->invoice->transaction_id)) ? 'Unknown': $this->invoice->transaction_id,$setting['body']);
+        $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->pf_amount) || empty($this->invoice->pf_amount)) ? 'Unknown' : $this->invoice->pf_amount, $setting['body']);
 
         return $this
             ->from($setting['from'], $setting['from_name'])

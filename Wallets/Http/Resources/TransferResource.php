@@ -14,8 +14,13 @@ class TransferResource extends JsonResource
      */
     public function toArray($request)
     {
+        $fee = null;
+        if(!empty($this->withdraw->meta) AND array_key_exists('fee', $this->withdraw->meta))
+            $fee = $this->withdraw->meta['fee'];
+
         return [
-            'id' => $this->uuid,
+            'id' => $this->member_id,
+            'to_member_id' => $this->deposit->payable->member_id,
             'from' => [
                 'transaction_id' => $this->deposit->uuid,
                 'wallet' => $this->from->name,
@@ -26,7 +31,9 @@ class TransferResource extends JsonResource
                 'wallet' => $this->to->name,
                 'confirmed' => $this->withdraw->confirmed
             ],
-            'amount' => number_format($this->deposit->amountFloat,2)
+            'amount' => walletPfAmount($this->deposit->amountFloat),
+            'fee' =>  walletPfAmount($fee),
+            'created_at' => $this->created_at->timestamp
         ];
     }
 }

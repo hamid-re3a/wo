@@ -2,10 +2,7 @@
 
 namespace App\Http;
 
-use Giftcode\Http\Middlewares\GiftcodeAuthMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Orders\Http\Middlewares\AuthMiddleware;
-use Wallets\Http\Middlewares\WalletAuthMiddleware;
 
 class Kernel extends HttpKernel
 {
@@ -65,10 +62,6 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'auth_user_order' => AuthMiddleware::class,
-        'auth_user_wallet' => WalletAuthMiddleware::class,
-        'auth_user_gift_code' => GiftCodeAuthMiddleware::class,
-        'auth_user_package' => \Packages\Http\Middlewares\AuthMiddleware::class,
-
+        'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
     ];
 }

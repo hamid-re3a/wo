@@ -5,6 +5,12 @@
 namespace Payments\Services;
 
 
+use Payments\Services\Grpc\EmptyObject;
+use Payments\Services\Grpc\Id;
+use Payments\Services\Grpc\Invoice;
+use Payments\Services\Grpc\PaymentTypes;
+use Payments\Services\Grpc\PaymentCurrencies;
+
 interface PaymentsServiceInterface
 {
     // GRPC specific service name.
@@ -13,7 +19,7 @@ interface PaymentsServiceInterface
 
     public function getInvoiceById( Id $request): Invoice;
 
-    public function pay( Invoice $request): Invoice;
+    public function pay( Invoice $request): array;
 
     public function getPaymentCurrencies( EmptyObject $request): PaymentCurrencies;
 

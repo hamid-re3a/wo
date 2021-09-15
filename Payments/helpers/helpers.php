@@ -18,7 +18,6 @@ const INVOICE_STATUSES = [
     INVOICE_STATUS_INVALID,
 ];
 
-
 const INVOICE_ADDITIONAL_STATUS_PARTIAL_PAID = 'paidPartial';
 const INVOICE_ADDITIONAL_STATUS_NOT_PAID = 'Not paid';
 const INVOICE_ADDITIONAL_STATUS_PAID = 'paid';
@@ -66,7 +65,6 @@ const SETTINGS = [
     ],
 ];
 
-
 /**
  * payment email content settings
  */
@@ -75,7 +73,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'INVOICE_PARTIAL_PAID_EMAIL' => [
         'is_active' => true,
         'subject' => 'Invoice partial paid',
-        'from' => 'support@janex.com',
+        'from' => 'it@ridetothefuture.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -87,74 +85,205 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name,due_amount,amount_in_usd,expiry_date',
-        'variables_description' => 'full_name user full name',
-        'type' => 'email',
+        'variables'=>'full_name,due_amount,amount_in_usd,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
     ],
-    'INVOICE_COMPLETE_PAID_EMAIL' => [
-        'is_active' => true,
-        'subject' => 'Invoice paid',
-        'from' => 'support@janex.com',
-        'from_name' => 'Janex Support Team',
-        'body' => <<<EOT
+    'INVOICE_COMPLETE_PAID_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Payment Received',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
                 <div>
-                <p>Hello {{full_name}},</p>
-                <p>We find out that you have paid of the invoice .</p>
-                <p>Thank your for completing your payment.</p>
+                <p>Hi {{full_name}}</p>
+                <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
+                <p>Your package ({{package_name}}) will automatically activate.</p>
                 <p></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name',
-        'variables_description' => 'full_name user full name',
-        'type' => 'email',
+        'variables'=>'full_name',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
     ],
-    'INVOICE_EXPIRED_EMAIL' => [
-        'is_active' => true,
-        'subject' => 'Invoice expired',
-        'from' => 'support@janex.com',
-        'from_name' => 'Janex Support Team',
-        'body' => <<<EOT
+    'INVOICE_EXPIRED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Invoice expired',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>The invoice {{invoice_number}} has expired in {{expiry_date}}.</p>
-                <p>Please login to the system to place a new order.</p>
+                <p>The invoice #{{invoice_no}} for {{usd_amount}} was due at {{expiry_date}}. But we don't have any record of payment</p>
+                <p>We appreciate if you can create a new invoice and set on time</p>
                 <p></p>
                 <p>Cheers!</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name,invoice_number,expiry_date',
-        'variables_description' => 'full_name user full name',
-        'type' => 'email',
+        'variables'=>'full_name,invoice_no,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
     ],
-    'INVOICE_CRATED_EMAIL' => [
-        'is_active' => true,
-        'subject' => 'Invoice created',
-        'from' => 'support@janex.com',
-        'from_name' => 'Janex Support Team',
-        'body' => <<<EOT
+    'INVOICE_CRATED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'New Invoice',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>We have received your order for the package {{package_name}}.</p>
-                <p>Please pay the amount by logging in to the system or clicking the button below.
-                </p>
-                <p><a href="{{invoice_link}}">Pay Now</a></p>
-                <p>Your package will be activated after the payment is received in the system.</br>
-                    Note:</br>
-                    A) This invoice will expire after {{expiry_date}}</br>
-                    B) The invoice updates every two hours</br>
-                    C) Package price doesn't include the Transaction Charges.</br>
-                    D) In case of partial payment, the customer should pay the due amount on the same link.
-                    </p>
+                <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
+                <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <h2><strong>Note:</strong></h2>
+                <ol>
+                    <li>
+                    <p>Pay this invoice in {{crypto}}</p>
+                    </li>
+                    <li>
+                    <p>This invoice will expire after {{expiry_date}}</p>
+                    </li>
+                    <li>
+                    <p>This invoice updates every {{update_hours}} hours and the due amount may change</p>
+                    </li>
+                    <li>
+                    <p>The package price doesn&#39;t include the Transaction Fee.</p>
+                    </li>
+                    <li>
+                    <p>In case of partial payment, the customer will receive a new email with the due amount and payment instructions. </p>
+                    </li>
+                    <li>
+                    <p>If in case you received multiple invoices emails, please consider the latest one.</p>
+                    </li>
+                    <li>
+                    <p>Here is the confirmation of the conversion rate of the due amount ({{usd_amount}} USD) to {{crypto}} at the moment of creating the invoice: <a href="https://blockchain.info/tobtc?value={{usd_amount}}&currency=USD&time={{current_time}}&textual=true&nosavecurrency=true" target="_blank">Click Here</a></p>
+                    </li>
+                    <li>
+                    <p>If the due amount is more than the package price, then it includes the registration fee.</p>
+                    </li>
+                    <li>
+                    <p>If you have any query regarding this invoice, please reach the support team and provide the invoice number</p>
+                    </li>
+                    <li>
+                    <p>Your package will be activated after the full payment is received in the system.</p>
+                    </li>
+                </ol>
+                <p>&nbsp;</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name,package_name,invoice_link,expiry_date',
-        'variables_description' => 'full_name user full name',
-        'type' => 'email',
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+
+
+    'WALLET_INVOICE_PARTIAL_PAID_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Deposit fund partial paid',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>We noticed that you paid the invoice partially. Please pay the due amount {{amount_in_usd}} ≈ {{due_amount}} on time.</p>
+                <p>This invoice will be expire at {{expiry_date}}</p>
+                <p></p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,due_amount,amount_in_usd,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+    'WALLET_INVOICE_COMPLETE_PAID_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit fund payment received',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hi {{full_name}}</p>
+                <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
+                <p>Your deposit wallet will automatically charge.</p>
+                <p></p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+
+
+    'WALLET_INVOICE_EXPIRED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit fund invoice expired',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>The invoice #{{invoice_no}} for {{usd_amount}} was due at {{expiry_date}}. But we don't have any record of payment</p>
+                <p>We appreciate if you can create a new invoice and set on time</p>
+                <p></p>
+                <p>Cheers!</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,invoice_no,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+
+
+    'WALLET_INVOICE_CRATED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit fund new invoice',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
+                <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <p>&nbsp;</p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
+
+
+    'WALLET_INVOICE_CREATED_EMAIL'=>[
+        'is_active'=>true,
+        'subject'=>'Deposit funds new invoice',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
+                <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <p>&nbsp;</p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
     ],
 ];
 if (!function_exists('getSetting')) {
@@ -162,29 +291,34 @@ if (!function_exists('getSetting')) {
     {
         if (DB::table('settings')->exists()) {
             $key_db = Setting::query()->where('key', $key)->first();
-            if ($key_db && !empty($key_db->value))
+            if ($key_db && !empty($key_db->value)) {
                 return $key_db->value;
+            }
+
         }
 
-        if (isset(SETTINGS[$key]) && isset(SETTINGS[$key]['value']))
+        if (isset(SETTINGS[$key]) && isset(SETTINGS[$key]['value'])) {
             return SETTINGS[$key]['value'];
+        }
 
         throw new Exception(trans('payment.responses.main-key-settings-is-missing'));
     }
 }
 if (!function_exists('getPaymentEmailSetting')) {
 
-
     function getPaymentEmailSetting($key)
     {
         if (DB::table('email_content_settings')->exists()) {
             $setting = EmailContentSetting::query()->where('key', $key)->first();
-            if ($setting && !empty($setting->value))
+            if ($setting && !empty($setting->value)) {
                 return $setting->toArray();
+            }
+
         }
 
-        if (isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key]))
+        if (isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key])) {
             return PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
+        }
 
         throw new Exception(trans('payment.responses.main-key-settings-is-missing'));
     }

@@ -15,9 +15,9 @@ class WalletController extends Controller
     private $depositWallet;
     private $earningWallet;
 
-    public function __construct()
+    public function readyBankService()
     {
-        $this->bankService = new BankService(request()->wallet_user);
+        $this->bankService = new BankService(request()->user);
         $this->earningWallet = config('earningWallet');
         $this->depositWallet = config('depositWallet');
         if($this->bankService->getAllWallets()->count() == 0) {
@@ -31,6 +31,7 @@ class WalletController extends Controller
      */
     public function index()
     {
+        $this->readyBankService();
         return api()->success(null,WalletResource::collection($this->bankService->getAllWallets()));
     }
 
@@ -43,6 +44,7 @@ class WalletController extends Controller
      */
     public function getTransaction(GetTransactionRequest $request)
     {
+        $this->readyBankService();
         return api()->success(null,TransactionResource::make($this->bankService->getTransaction($request->get('id'))));
     }
 }

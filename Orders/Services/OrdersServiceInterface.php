@@ -5,6 +5,9 @@
 namespace Orders\Services;
 
 
+use Orders\Services\Grpc\Id;
+use Orders\Services\Grpc\Order;
+
 interface OrdersServiceInterface
 {
     public function OrderById(Id $request): Order;

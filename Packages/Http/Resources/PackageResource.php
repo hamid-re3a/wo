@@ -3,9 +3,6 @@
 namespace Packages\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Packages\Models\CategoriesIndirectCommission;
-use Packages\Models\Category;
-use Packages\Models\PackagesIndirectCommission;
 
 class PackageResource extends JsonResource
 {

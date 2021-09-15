@@ -5,7 +5,7 @@ namespace Orders\Http\Requests\Front\Order;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Orders\Services\OrderService;
-use Payments\Services\PaymentCurrency;
+use Payments\Services\Grpc\PaymentCurrency;
 
 class OrderRequest extends FormRequest
 {
@@ -29,15 +29,21 @@ class OrderRequest extends FormRequest
     {
             return [
 
-            'package_ids' => 'required|array|min:1|max:1',
-//            'items.*.id' => 'exists:packages,id',
-//            'items.*.qty' => 'required|numeric|min:1',
-//            'to_user_id' => 'nullable|exists:order_users,id',
-            'plan' => array('in:' . implode(',', ORDER_PLANS)),
-
-            //'payment_type' => array('required', Rule::in($this->getNamePaymentType())),
-//            'payment_driver' => array('required_if:payment_type,=,purchase'),
-            //'payment_currency' => array('required', Rule::in($this->getNamePaymentCurrency())),
+            'package_id' => 'required|numeric',
+            'plan' => 'required|in:' . implode(',', ORDER_PLANS),
+            'payment_type' => [
+                'required',
+                'in:' . implode(',',$this->getNamePaymentType())
+            ],
+            'payment_currency' => [
+                'required_if:payment_type,purchase',
+                'in:'. implode(',', $this->getNamePaymentCurrency())
+            ],
+            'payment_driver' => [
+                'required_if:payment_type,purchase',
+                'in:btc-pay-server'
+            ],
+            'giftcode' => 'required_if:payment_type,giftcode',
         ];
     }
 
@@ -68,6 +74,7 @@ class OrderRequest extends FormRequest
         }
         return $payment_type_name_array;
     }
+
 
 
 }

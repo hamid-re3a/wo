@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Payments\Models\Invoice;
 
 class WebhookJob implements ShouldQueue
@@ -29,14 +30,15 @@ class WebhookJob implements ShouldQueue
         if (isset($event['type']) && isset($event['invoiceId']) &&
             isset($event['timestamp']) && !empty($event['invoiceId'])) {
 
-            $invoice_db = Invoice::query()->firstOrCreate([
-                'transaction_id'=> $event['invoiceId']
-            ]);
+
+            $invoice_db = Invoice::query()->where('transaction_id', $event['invoiceId'])->first();
 
 
-            InvoiceResolverBTCPayServerJob::dispatch($invoice_db);
-
-
+            if($invoice_db)
+                InvoiceResolverBTCPayServerJob::dispatch($invoice_db);
+            else{
+                Log::error('Webhook called | Invalid TransactionID => ' . $event['invoiceId']);
+            }
         } else {
             throw new \Exception('btc pay server issues');
         }

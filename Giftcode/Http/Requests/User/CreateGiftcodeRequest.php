@@ -3,7 +3,6 @@
 namespace Giftcode\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class CreateGiftcodeRequest extends FormRequest
 {
@@ -28,7 +27,7 @@ class CreateGiftcodeRequest extends FormRequest
         return [
             'package_id' => 'required|exists:giftcode_packages,id',
             'include_registration_fee' => 'required|boolean',
-            'wallet' => 'required|in:Deposit Wallet,Earning Wallet'
+            'wallet' => 'required|in:Deposit Wallet'
         ];
     }
 

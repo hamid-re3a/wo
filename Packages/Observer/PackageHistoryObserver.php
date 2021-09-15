@@ -4,7 +4,7 @@ namespace Packages\Observer;
 
 use Packages\Models\Package;
 use Packages\Services\PackageHistoryService;
-use Packages\Services\Package as PackageService;
+use Packages\Services\Grpc\Package as PackageService;
 
 class PackageHistoryObserver
 {
@@ -41,14 +41,14 @@ class PackageHistoryObserver
     {
 
         $package = new PackageService();
-        $package->setId($model->id);
+        $package->setId((int)$model->id);
         $package->setName($model->name);
         $package->setShortName($model->short_name);
-        $package->setValidityInDays($model->validity_in_days);
-        $package->setPrice($model->price);
-        $package->setRoiPercentage($model->roi_percentage);
-        $package->setDirectPercentage($model->direct_percentage);
-        $package->setBinaryPercentage($model->binary_percentage);
+        $package->setValidityInDays((int)$model->validity_in_days);
+        $package->setPrice((double)$model->price);
+        $package->setRoiPercentage( (int) $model->roi_percentage);
+        $package->setDirectPercentage((int)$model->direct_percentage);
+        $package->setBinaryPercentage((int)$model->binary_percentage);
         $package->setCategoryId($model->category_id);
         if (!empty($model->getDirty())) {
             $this->packageHistoryService->createPackageHistory($package);

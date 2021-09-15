@@ -17,6 +17,7 @@ class CreateGiftcodesTable extends Migration
             $table->engine = "InnoDB";
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->unsignedBigInteger('order_id')->nullable();
             $table->foreignId('user_id')->constrained('users','id');
             $table->foreignId('package_id')->constrained('giftcode_packages','id');
 
@@ -28,6 +29,8 @@ class CreateGiftcodesTable extends Migration
             $table->timestamp('expiration_date')->nullable();
             $table->foreignId('redeem_user_id')->nullable()->constrained('users','id');
             $table->timestamp('redeem_date')->nullable();
+
+            $table->boolean('is_canceled')->default(FALSE);
 
             $table->softDeletes();
             $table->timestamps();

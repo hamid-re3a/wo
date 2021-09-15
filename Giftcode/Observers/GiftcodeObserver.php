@@ -4,8 +4,6 @@
 namespace Giftcode\Observers;
 
 use Exception;
-use Giftcode\Jobs\UrgentEmailJob;
-use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
@@ -45,10 +43,5 @@ class GiftcodeObserver
         if(empty($giftcode->package_id) AND request()->has('package_id'))
             $giftcode->package_id = request()->get('package_id');
 
-    }
-
-    public function created(Giftcode $giftcode)
-    {
-        UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
     }
 }

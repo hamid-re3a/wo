@@ -8,7 +8,7 @@ use Payments\Http\Requests\PaymentType\StorePaymentTypeRequest;
 use Payments\Http\Requests\PaymentType\UpdatePaymentTypeRequest;
 use Payments\Http\Resources\PaymentTypeResource;
 use Payments\Services\PaymentService;
-use Payments\Services\PaymentType;
+use Payments\Services\Grpc\PaymentType;
 
 class PaymentTypeController extends Controller
 {
@@ -22,7 +22,7 @@ class PaymentTypeController extends Controller
     /**
      * Update payment types
      * @group
-     * Admin > Payments types
+     * Admin User > Payments types
      * @param UpdatePaymentTypeRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -34,9 +34,9 @@ class PaymentTypeController extends Controller
     }
 
     /**
-     * Store payment types
+     * Create payment types
      * @group
-     * Admin > Payments types
+     * Admin User > Payments types
      * @param StorePaymentTypeRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -47,9 +47,9 @@ class PaymentTypeController extends Controller
     }
 
     /**
-     * Store payment types
+     * Delete payment types
      * @group
-     * Admin > Payments types
+     * Admin User > Payments types
      * @param RemovePaymentTypeRequest $request
      * @return \Illuminate\Http\JsonResponse
      */

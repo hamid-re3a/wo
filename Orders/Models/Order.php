@@ -4,7 +4,8 @@ namespace Orders\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Packages\Services\Id;
+use Orders\Services\Grpc\OrderPlans;
+use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use User\Models\User;
 
@@ -143,7 +144,7 @@ class Order extends Model
      */
     public function getOrderService()
     {
-        $order_service = new \Orders\Services\Order();
+        $order_service = new \Orders\Services\Grpc\Order();
         $order_service->setId((int)$this->attributes['id']);
         $order_service->setUser($this->user->getUserService());
         $order_service->setUserId((int)$this->attributes['user_id']);
@@ -166,18 +167,18 @@ class Order extends Model
         $order_service->setPaymentCurrency((string)$this->attributes['payment_currency']);
 
         $order_service->setPaymentDriver((string)$this->attributes['payment_driver']);
-
         $order_service->setPackageId((int)$this->attributes['package_id']);
-        $order_service->setPlan((string)$this->attributes['plan']);
 
+        $order_service->setPlan((int)OrderPlans::value($this->attributes['plan']));
         $order_service->setValidityInDays((string)$this->attributes['validity_in_days']);
 
         $order_service->setDeletedAt((string)$this->attributes['deleted_at']);
-
         $order_service->setCreatedAt((string)$this->attributes['created_at']);
-
         $order_service->setUpdatedAt((string)$this->attributes['updated_at']);
 
         return $order_service;
     }
+
+
+
 }

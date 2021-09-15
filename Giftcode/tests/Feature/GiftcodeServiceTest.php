@@ -4,7 +4,6 @@
 namespace Wallets\tests\Feature;
 
 use Giftcode\Models\Giftcode;
-use Giftcode\Models\Giftcode as GiftcodeModel;
 use Giftcode\Services\GiftcodeService;
 use Giftcode\tests\GiftcodeTest;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +20,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
-        $giftcode_model = GiftcodeModel::query()->first();
+        $giftcode_model = Giftcode::query()->first();
         $giftcode_object = $giftcode_model->getGiftcodeService();
         $giftcode_service = app(GiftcodeService::class);
         $giftcode_object = $giftcode_service->getGiftcodeByCode($giftcode_object);
@@ -37,7 +36,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
-        $giftcode_model = GiftcodeModel::query()->first();
+        $giftcode_model = Giftcode::query()->first();
         $giftcode_object = $giftcode_model->getGiftcodeService();
         $giftcode_service = app(GiftcodeService::class);
         $giftcode_object = $giftcode_service->getGiftcodeByUuid($giftcode_object);
@@ -53,7 +52,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
-        $giftcode_model = GiftcodeModel::query()->first();
+        $giftcode_model = Giftcode::query()->first();
         $giftcode_object = $giftcode_model->getGiftcodeService();
         $giftcode_object->setOrderId(1);
         $user = User::query()->first();

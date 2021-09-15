@@ -3,13 +3,10 @@
 
 namespace Payments\tests;
 
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Hash;
-use Packages\Models\Package;
 use Packages\PackageConfigure;
 use Payments\PaymentConfigure;
+use Spatie\Permission\Models\Role;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 use User\UserConfigure;
@@ -50,7 +47,11 @@ class PaymentTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $hash = Hash::make(serialize($user->getUserService()));
+        if(defined('USER_ROLES'))
+            foreach (USER_ROLES as $role)
+                Role::query()->firstOrCreate(['name' => $role]);
+        $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_SUPER_ADMIN]);
+        $hash = md5(serialize($user->getUserService()));
         return [
             'X-user-id' => '1',
             'X-user-hash' => $hash,

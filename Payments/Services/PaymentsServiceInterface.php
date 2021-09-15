@@ -5,6 +5,12 @@
 namespace Payments\Services;
 
 
+use Payments\Services\Grpc\EmptyObject;
+use Payments\Services\Grpc\Id;
+use Payments\Services\Grpc\Invoice;
+use Payments\Services\Grpc\PaymentTypes;
+use Payments\Services\Grpc\PaymentCurrencies;
+
 interface PaymentsServiceInterface
 {
     // GRPC specific service name.

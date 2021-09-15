@@ -8,10 +8,12 @@ use Giftcode\GiftCodeConfigure;
 use Giftcode\Models\Package;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 use User\Models\User;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\Transaction;
 use Wallets\Services\WalletService;
 
@@ -45,6 +47,7 @@ class GiftcodeTest extends TestCase
 
     public function getHeaders()
     {
+
         User::query()->firstOrCreate([
             'id' => '1',
             'first_name' => 'Admin',
@@ -54,26 +57,16 @@ class GiftcodeTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $hash = Hash::make(serialize($user->getUserService()));
+        if(defined('USER_ROLES'))
+            foreach (USER_ROLES as $role)
+                Role::query()->firstOrCreate(['name' => $role]);
+        $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_SUPER_ADMIN]);
+        $hash = md5(serialize($user->getUserService()));
         return [
             'X-user-id' => '1',
             'X-user-hash' => $hash,
         ];
-    }
 
-    protected function getTransaction($confirmed = TRUE)
-    {
-        $transaction_service = app(Transaction::class);
-        $transaction_service->setConfiremd($confirmed);
-        $transaction_service->setAmount(10000);
-        $transaction_service->setToWalletName('Deposit Wallet');
-        $transaction_service->setToUserId(1);
-        $transaction_service->setType('Deposit');
-        $transaction_service->setDescription(serialize([
-            'description' => 'Deposit Test #12'
-        ]));
-
-        return $transaction_service;
     }
 
     protected function deposit_user()
@@ -86,7 +79,7 @@ class GiftcodeTest extends TestCase
         $deposit_object->setConfirmed(true);
         $deposit_object->setUserId($user->id);
         $deposit_object->setAmount(10000000);
-        $deposit_object->setWalletName('Deposit Wallet');
+        $deposit_object->setWalletName(WalletNames::DEPOSIT);
         $deposit_object->setType('Deposit');
 
         //Deposit transaction
@@ -116,10 +109,11 @@ class GiftcodeTest extends TestCase
 
     protected function createGiftCode()
     {
-        $this->deposit_user();
 
-        return $this->postJson(route('giftcodes.create'), [
+        $this->deposit_user();
+        return $this->postJson(route('customer.giftcodes.create'), [
             'package_id' => 1,
+            'user_id' => 1,
             'include_registration_fee' => true,
             'wallet' => 'Deposit Wallet'
         ]);

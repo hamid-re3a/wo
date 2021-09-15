@@ -13,7 +13,7 @@ class SettingController extends Controller
 
     /**
      * Get settings list
-     * @group Admin > Giftcode
+     * @group Admin User > Giftcodes
      */
     public function index()
     {
@@ -23,9 +23,10 @@ class SettingController extends Controller
 
     /**
      * Update setting
-     * @group Admin > Giftcode
+     * @group Admin User > Giftcodes
      * @param UpdateSettingRequest $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function update(UpdateSettingRequest $request)
     {

@@ -5,7 +5,7 @@ namespace Payments\Http\Controllers\Front;
 use Illuminate\Routing\Controller;
 use Payments\Http\Resources\PaymentCurrencyResource;
 use Payments\Models\PaymentCurrency;
-use Payments\Services\EmptyObject;
+use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
 
 class PaymentCurrencyController extends Controller

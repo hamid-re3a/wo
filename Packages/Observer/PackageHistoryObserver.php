@@ -4,7 +4,7 @@ namespace Packages\Observer;
 
 use Packages\Models\Package;
 use Packages\Services\PackageHistoryService;
-use Packages\Services\Package as PackageService;
+use Packages\Services\Grpc\Package as PackageService;
 
 class PackageHistoryObserver
 {

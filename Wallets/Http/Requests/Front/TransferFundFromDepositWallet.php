@@ -23,13 +23,14 @@ class TransferFundFromDepositWallet extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws \Exception
      */
     public function rules()
     {
         $this->minimum_amount = walletGetSetting('minimum_transfer_fund_amount');
         $this->maximum_amount = walletGetSetting('maximum_transfer_fund_amount');
         return [
-            'member_id' => 'required|integer|exists:users,member_id|not_in:' . $this->header('X-user-member-id'),
+            'member_id' => 'required|integer|exists:users,member_id|not_in:' . $this->user->member_id,
             'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}"
         ];
 

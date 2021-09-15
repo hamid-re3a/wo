@@ -4,7 +4,7 @@
 namespace User\Repository;
 
 use User\Models\User as UserModel;
-use User\Services\User;
+use User\Services\Grpc\User;
 
 class UserRepository
 {

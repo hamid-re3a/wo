@@ -12,6 +12,7 @@ use Giftcode\Jobs\UpdatePackages;
 use Giftcode\Repository\GiftcodeRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
 
@@ -72,9 +73,9 @@ class GiftcodeController extends Controller
     {
         UpdatePackages::dispatchSync();
         try {
-
             $giftcode = $this->giftcode_repository->create($request->merge([
-                'package_id' => $request->get('package_id')
+                'package_id' => $request->get('package_id'),
+                'user_id' => $request->user->id
             ]));
 
             //Successful
@@ -97,7 +98,7 @@ class GiftcodeController extends Controller
 
         $giftcode = $this->giftcode_repository->getByUuid(request()->uuid);
 
-        if (!$giftcode OR $giftcode->user_id != request()->user->id)
+        if (!$giftcode OR $giftcode->user_id != request()->header('X-user-id'))
             return api()->error(null, null, 404);
 
         return api()->success(null, GiftcodeResource::make($giftcode));

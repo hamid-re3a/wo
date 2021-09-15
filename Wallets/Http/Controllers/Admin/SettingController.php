@@ -14,7 +14,7 @@ class SettingController extends Controller
 
     /**
      * Get settings list
-     * @group Admin > Wallets
+     * @group Admin User > Wallets > Settings
      */
     public function index()
     {
@@ -24,7 +24,7 @@ class SettingController extends Controller
 
     /**
      * Update setting
-     * @group Admin > Wallets
+     * @group Admin User > Wallets > Settings
      * @param UpdateSettingRequest $request
      * @return JsonResponse
      * @throws \Exception

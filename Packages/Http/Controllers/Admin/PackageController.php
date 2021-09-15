@@ -7,8 +7,8 @@ use Illuminate\Routing\Controller;
 use Packages\Http\Requests\Admin\Package\PackageTypeFilterRequest;
 use Packages\Http\Resources\PackageCountByMonthResource;
 use Packages\Http\Resources\PackageResource;
-use Packages\Services\Id;
-use Packages\Services\Package;
+use Packages\Services\Grpc\Id;
+use Packages\Services\Grpc\Package;
 use Packages\Services\PackageService;
 use Packages\Http\Resources\CountDataResource;
 
@@ -22,10 +22,9 @@ class PackageController extends Controller
     }
 
     /**
-     * All packages
+     * Edit package
      * @group
-     * Public User > Packages
-     * @unauthenticated
+     * Admin User > Packages
      * @param PackageEditRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -50,8 +49,7 @@ class PackageController extends Controller
     /**
      * Count Package Between two date
      * @group
-     * Public User > Packages > admin
-     * @unauthenticated
+     * Admin User > Packages
      * @param PackageEditRequest $request
      * @return \Illuminate\Http\JsonResponse
      */

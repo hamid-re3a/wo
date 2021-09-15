@@ -7,8 +7,8 @@ use Payments\Http\Requests\PaymentCurrency\RemovePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\StorePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\UpdatePaymentCurrencyRequest;
 use Payments\Http\Resources\PaymentCurrencyResource;
-use Payments\Services\EmptyObject;
-use Payments\Services\PaymentCurrency;
+use Payments\Services\Grpc\EmptyObject;
+use Payments\Services\Grpc\PaymentCurrency;
 use Payments\Services\PaymentService;
 
 class PaymentCurrencyController extends Controller
@@ -21,9 +21,9 @@ class PaymentCurrencyController extends Controller
     }
 
     /**
-     * Update payment currencies
+     * Update payment currency
      * @group
-     * Admin > Payments Currency
+     * Admin User > Payments Currencies
      * @param UpdatePaymentCurrencyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -35,9 +35,9 @@ class PaymentCurrencyController extends Controller
     }
 
     /**
-     * Store payment currencies
+     * Store payment currency
      * @group
-     * Admin > Payments Currency
+     * Admin User > Payments Currencies
      * @param StorePaymentCurrencyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -48,9 +48,9 @@ class PaymentCurrencyController extends Controller
     }
 
     /**
-     * Store payment currencies
+     * Delete payment currency
      * @group
-     * Admin > Payments Currency
+     * Admin User > Payments Currencies
      * @param StorePaymentCurrencyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */

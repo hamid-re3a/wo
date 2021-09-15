@@ -4,6 +4,9 @@
 
 namespace Packages\Services;
 
+use Packages\Services\Grpc\Id;
+use Packages\Services\Grpc\Package;
+
 interface PackagesServiceInterface
 {
     public function packageById(Id $request): Package;

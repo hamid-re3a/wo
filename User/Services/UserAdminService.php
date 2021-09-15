@@ -5,7 +5,6 @@ namespace User\Services;
 
 
 use App\Jobs\User\UserDataJob;
-use Illuminate\Http\Request;
 use User\Repository\RoleRepository;
 use User\Repository\UserRepository;
 
@@ -31,7 +30,7 @@ class UserAdminService
         $role = $this->role_repository->getRole($request->role_id);
         $admin->assignRole($role->id);
 
-        $userObject = new \User\Services\User();
+        $userObject = new \User\Services\Grpc\User();
         $userObject->setId($admin->id);
         $userObject->setEmail($admin->email);
         $userObject->setFirstName($admin->first_name);

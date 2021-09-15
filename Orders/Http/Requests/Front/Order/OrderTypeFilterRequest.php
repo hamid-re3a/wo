@@ -5,7 +5,7 @@ namespace Orders\Http\Requests\Front\Order;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Orders\Services\OrderService;
-use Payments\Services\PaymentCurrency;
+use Payments\Services\Grpc\PaymentCurrency;
 
 class OrderTypeFilterRequest extends FormRequest
 {

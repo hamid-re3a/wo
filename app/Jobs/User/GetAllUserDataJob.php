@@ -2,7 +2,6 @@
 
 namespace App\Jobs\User;
 
-use GPBMetadata\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -29,7 +28,7 @@ class GetAllUserDataJob implements ShouldQueue
      */
     public function handle()
     {
-        $user_object_service = new \User\Services\User();
+        $user_object_service = new \User\Services\Grpc\User();
         $user_get_data_serialize = unserialize($this->data);
         foreach ($user_get_data_serialize as $item) {
             $block_type = isset($item['block_type']) && !empty($item['block_type'])? $item['block_type'] : null;
@@ -43,9 +42,16 @@ class GetAllUserDataJob implements ShouldQueue
             $user_object_service->setIsDeactivate($item['is_deactivate']);
             $user_object_service->setIsFreeze($item['is_freeze']);
             $user_object_service->setSponsorId((int)$item['sponsor_id']);
+
+            $roles_array = [];
+            foreach($item['roles'] AS $role) {
+                $roles_array[] = $role['name'];
+            }
+
+            $user_object_service->setRole(implode(',',$roles_array));
             app(UserService::class)->userUpdate($user_object_service);
         }
-        echo "all user created".$this->data. PHP_EOL;
+//        echo "all user created".$this->data. PHP_EOL;
 
     }
 }

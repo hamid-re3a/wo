@@ -2,6 +2,7 @@
 
 namespace Wallets\Http\Controllers\Front;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,7 @@ class DepositWalletController extends Controller
     }
 
     /**
-     * Get Deposit wallet
+     * Get wallet
      * @group Public User > Deposit Wallet
      */
     public function index()

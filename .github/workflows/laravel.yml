@@ -45,3 +45,6 @@ jobs:
     - name: Run server_deploy.sh
       run: | 
         sudo su - subscription -c '/home/subscription/public_html/Subscriptions/server_deploy.sh'
+    - name: Restart supervisord subscription workers
+      run: |
+        sudo supervisorctl restart subscription-grpcServer:subscription-grpcServer_00

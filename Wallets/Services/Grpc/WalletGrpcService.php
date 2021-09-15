@@ -1,21 +1,18 @@
 <?php
 
 
-namespace Wallets\Services;
+namespace Wallets\Services\Grpc;
 
-use Wallets\Services\Grpc\Deposit;
-use Wallets\Services\Grpc\Transfer;
-use Wallets\Services\Grpc\Wallet;
-use Wallets\Services\Grpc\Withdraw;
 use Mix\Grpc\Context;
+use Wallets\Services\WalletService;
 
 class WalletGrpcService implements \Wallets\Services\Grpc\WalletServiceInterface
 {
     private $wallet_service;
 
-    public function __construct(WalletService $walletService)
+    public function __construct()
     {
-        $this->wallet_service = $walletService;
+        $this->wallet_service = app(WalletService::class);
     }
 
 

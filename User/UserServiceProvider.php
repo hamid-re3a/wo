@@ -63,31 +63,32 @@ class UserServiceProvider extends ServiceProvider
                 $user_hash_request = $request->header('X-user-hash');
                 $user = User::query()->find($request->header('X-user-id'));
 
-//                /**
-//                 * if there is not exist user. get data user complete from api gateway
-//                 * error code 470 is for data user not exist log for development
-//                 */
-//                if ($user === null) {
-//                    $service_user = updateUserFromGrpcServer($request);
-//                    if ($service_user === null)
-//                        throw new Exception('please try another time!', 470);
-//                    $user->refresh();
-//                }
-//
-//                $hash_user_service = md5(serialize($user->getUserService()));
-//
-//                /**
-//                 * if there is not update data user. get data user complete from api gateway
-//                 * error code 471 is for data user not update log for development
-//                 */
-//                if ($hash_user_service != $user_hash_request) {
-//                    $service_user = updateUserFromGrpcServer($request);
-//                    $hash_user_service = md5(serialize($service_user));
-//                    if ($hash_user_service != $user_hash_request) {
-//                        UserGetDataJob::dispatch($user_update);
-//                        throw new Exception('please try another time!', 471);
-//                    }
-//                }
+              /**
+                 * if there is not exist user. get data user complete from api gateway
+                 * error code 470 is for data user not exist log for development
+                 */
+                if ($user === null) {
+                    $service_user = updateUserFromGrpcServer($request->header('X-user-id'));
+                    if ($service_user === null)
+                        throw new Exception('please try another time!', 470);
+                    $user->refresh();
+                }
+
+                $hash_user_service = md5(serialize($user->getUserService()));
+
+                /**
+                 * if there is not update data user. get data user complete from api gateway
+                 * error code 471 is for data user not update log for development
+                 */
+                if ($hash_user_service != $user_hash_request) {
+                    $service_user = updateUserFromGrpcServer($request->header('X-user-id'));
+                    $hash_user_service = md5(serialize($service_user));
+                    if ($hash_user_service != $user_hash_request) {
+                        UserGetDataJob::dispatch($user_update);
+                        throw new Exception('please try another time!', 471);
+                    }
+                }
+
 
 
                 $request->merge([

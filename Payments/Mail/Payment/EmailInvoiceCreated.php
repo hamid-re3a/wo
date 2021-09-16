@@ -53,7 +53,7 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->getPfAmount()) || empty($this->invoice->getPfAmount())) ? 'Unknown' : $this->invoice->getPfAmount(), $setting['body']);
         $setting['body'] = str_replace('{{payment_address}}', (is_null($this->invoice->getCheckoutLink()) || empty($this->invoice->getCheckoutLink())) ? 'Unknown' : $this->invoice->getCheckoutLink(), $setting['body']);
         $setting['body'] = str_replace('{{package_name}}', (is_null($this->package->getName()) || empty($this->package->getName())) ? 'Unknown' : $this->package->getName(), $setting['body']);
-        $setting['body'] = str_replace('{{package_short_name}}', (is_null($this->package->getShortName()) || empty($this->package->getShortName())) ? 'Unknown' : $this->package->getName(), $setting['body']);
+        $setting['body'] = str_replace('{{package_short_name}}', (is_null($this->package->getShortName()) || empty($this->package->getShortName())) ? 'Unknown' : $this->package->getShortName(), $setting['body']);
         $setting['body'] = str_replace('{{crypto}}', (is_null($this->invoice->getPaymentCurrency()) || empty($this->invoice->getPaymentCurrency())) ? 'Unknown' : $this->invoice->getPaymentCurrency(), $setting['body']);
         $setting['body'] = str_replace('{{current_time}}', round(microtime(true) * 1000), $setting['body']);
         $setting['body'] = str_replace('{{expiry_date}}', (is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown' : Carbon::createFromTimestamp($this->invoice->getExpirationTime())->toString(), $setting['body']);

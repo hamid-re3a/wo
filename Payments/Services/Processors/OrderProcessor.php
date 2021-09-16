@@ -13,6 +13,7 @@ use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
+use User\Models\User;
 
 class OrderProcessor extends ProcessorAbstract
 {
@@ -46,7 +47,8 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'partial_paid');
 
         // send email notification for due amount
-        EmailJob::dispatch(new EmailInvoicePaidPartial($this->order_service->getUser(), $this->invoice_db,$this->order_service), $this->order_service->getUser()->getEmail());
+        $user = User::query()->whereId($this->order_service->getUserId())->first();
+        EmailJob::dispatch(new EmailInvoicePaidPartial($user->getUserService(), $this->invoice_db,$this->order_service), $user->email);
 
 
     }
@@ -69,7 +71,8 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
 
         // send thank you email notification
-        EmailJob::dispatch(new EmailInvoicePaidComplete($this->order_service->getUser(), $this->invoice_db), $this->order_service->getUser()->getEmail());
+        $user = User::query()->whereId($this->order_service->getUserId())->first();
+        EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db),$user->email);
 
 
         //Update order
@@ -87,7 +90,8 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'expired');
 
         // send email to user to regenerate new invoice for due amount
-        EmailJob::dispatch(new EmailInvoiceExpired($this->order_service->getUser(), $this->invoice_db), $this->order_service->getUser()->getEmail());
+        $user = User::query()->whereId($this->order_service->getUserId())->first();
+        EmailJob::dispatch(new EmailInvoiceExpired($user->getUserService(), $this->invoice_db), $user->email);
 
     }
 

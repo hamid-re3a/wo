@@ -38,7 +38,7 @@ class GiftcodeObserver
         $giftcode->total_cost_in_usd = $giftcode->packages_cost_in_usd + $giftcode->registration_fee_in_usd;
 
         if(empty($giftcode->user_id))
-            $giftcode->user_id = auth()->user()->id;
+            $giftcode->user_id = request()->user('api')->id;
 
         if(empty($giftcode->package_id) AND request()->has('package_id'))
             $giftcode->package_id = request()->get('package_id');

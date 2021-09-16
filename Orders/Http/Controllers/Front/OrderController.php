@@ -20,6 +20,7 @@ use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentService;
+use User\Models\User;
 
 class OrderController extends Controller
 {
@@ -41,7 +42,7 @@ class OrderController extends Controller
      */
     public function counts()
     {
-        $total_counts = auth()->user()->withCount([
+        $total_counts = User::query()->whereId(auth()->user()->id)->withCount([
             'orders AS total_orders',
             'orders AS total_paid' => function (Builder $query) {
                 $query->whereNotNull('is_paid_at');

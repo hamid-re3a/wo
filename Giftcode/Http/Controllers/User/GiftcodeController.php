@@ -32,7 +32,7 @@ class GiftcodeController extends Controller
      */
     public function counts()
     {
-        $total_giftcodes = auth()->user()->withCount([
+        $total_giftcodes = User::query()->whereId(auth()->user()->id)->withCount([
             'giftcodes as total_created',
             'giftcodes as total_used' => function(Builder $query) {
                 $query->whereNotNull('redeem_user_id');
@@ -75,17 +75,15 @@ class GiftcodeController extends Controller
         try {
             $giftcode = $this->giftcode_repository->create($request->merge([
                 'package_id' => $request->get('package_id'),
-                'user_id' => auth()->user()->id
+                'user_id' => auth()->check() ? auth()->user()->id : null
             ]));
-
             //Successful
             return api()->success(null, GiftcodeResource::make($giftcode));
 
         } catch (\Throwable $exception) {
             //Handle exceptions
-            return api()->error(null, null, $exception->getCode(), [
-                'subject' => $exception->getMessage()
-            ]);
+            Log::error('GiftcodeController@store  => ' . $exception->getMessage() . ' Line => ' . $exception->getLine());
+            throw $exception;
         }
     }
 
@@ -95,8 +93,7 @@ class GiftcodeController extends Controller
      */
     public function show()
     {
-
-        $giftcode = $this->giftcode_repository->getByUuid(request()->uuid);
+        $giftcode = $this->giftcode_repository->getByUuid(request()->route()->parameters['uuid']);
 
         if (!$giftcode OR $giftcode->user_id != request()->header('X-user-id'))
             return api()->error(null, null, 404);
@@ -122,7 +119,7 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('Cancel giftcode error,iftcode uuid => <' . $request->get('uuid') . '>');
-            return api()->error(null, null, $exception->getCode(), [
+            return api()->error(null, null, 400, [
                 'subject' => $exception->getMessage()
             ]);
 

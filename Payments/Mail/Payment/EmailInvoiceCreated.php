@@ -6,6 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Orders\Services\OrderService;
+use Packages\Services\Grpc\Id;
+use Packages\Services\Grpc\Package;
+use Packages\Services\PackageService;
 use Payments\Mail\SettingableMail;
 use Payments\Services\Grpc\Invoice;
 use User\Services\Grpc\User;
@@ -38,12 +42,16 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
     public function build()
     {
         $setting = $this->getSetting();
-
+        /** @var $package Package */
+        $package = $this->getPackage();
         $setting['body'] = str_replace('{{full_name}}', (is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown' : $this->getUserFullName(), $setting['body']);
         $setting['body'] = str_replace('{{invoice_no}}',(is_null($this->invoice->getTransactionId()) || empty($this->invoice->getTransactionId())) ? 'Unknown': $this->invoice->getTransactionId(),$setting['body']);
         $setting['body'] = str_replace('{{due_amount}}', (is_null($this->invoice->getAmount()) || empty($this->invoice->getAmount())) ? 'Unknown' : $this->invoice->getAmount(), $setting['body']);
         $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->getPfAmount()) || empty($this->invoice->getPfAmount())) ? 'Unknown' : $this->invoice->getPfAmount(), $setting['body']);
+        $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->getPfAmount()) || empty($this->invoice->getPfAmount())) ? 'Unknown' : $this->invoice->getPfAmount(), $setting['body']);
         $setting['body'] = str_replace('{{payment_address}}', (is_null($this->invoice->getCheckoutLink()) || empty($this->invoice->getCheckoutLink())) ? 'Unknown' : $this->invoice->getCheckoutLink(), $setting['body']);
+        $setting['body'] = str_replace('{{package_name}}', (is_null($package->getName()) || empty($package->getName())) ? 'Unknown' : $package->getName(), $setting['body']);
+        $setting['body'] = str_replace('{{package_short_name}}', (is_null($package->getShortName()) || empty($package->getShortName())) ? 'Unknown' : $package->getName(), $setting['body']);
         $setting['body'] = str_replace('{{crypto}}', (is_null($this->invoice->getPaymentCurrency()) || empty($this->invoice->getPaymentCurrency())) ? 'Unknown' : $this->invoice->getPaymentCurrency(), $setting['body']);
         $setting['body'] = str_replace('{{current_time}}', round(microtime(true) * 1000), $setting['body']);
         $setting['body'] = str_replace('{{expiry_date}}', (is_null($this->invoice->getExpirationTime()) || empty($this->invoice->getExpirationTime())) ? 'Unknown' : Carbon::createFromTimestamp($this->invoice->getExpirationTime())->toString(), $setting['body']);
@@ -61,6 +69,23 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
     private function getUserFullName()
     {
         return ucwords(strtolower($this->user->getFirstName() . ' ' . $this->user->getLastName()));
+    }
+
+    private function getOrder()
+    {
+        $order_service = app(OrderService::class);
+        $id_object = app(\Orders\Services\Grpc\Id::class);
+        $id_object->setId($this->invoice->getPayableId());
+        return $order_service->OrderById($id_object);
+
+    }
+
+    private function getPackage()
+    {
+        $package_service = app(PackageService::class);
+        $id_object = app(Id::class);
+        $id_object->setId($this->invoice->getP);
+        return $package_service->packageById($this->getOrder()->getPackageId());
     }
 
 }

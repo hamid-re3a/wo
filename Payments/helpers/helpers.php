@@ -138,6 +138,8 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
                 <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
                 <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <p><strong>Package name:</strong> {{package_name}}</p>
+                <p><strong>Package short name:</strong> {{package_short_name}}</p>
                 <h2><strong>Note:</strong></h2>
                 <ol>
                     <li>
@@ -145,9 +147,6 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                     </li>
                     <li>
                     <p>This invoice will expire after {{expiry_date}}</p>
-                    </li>
-                    <li>
-                    <p>This invoice updates every {{update_hours}} hours and the due amount may change</p>
                     </li>
                     <li>
                     <p>The package price doesn&#39;t include the Transaction Fee.</p>
@@ -176,7 +175,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,expiry_date',
         'variables_description'=>'full_name user full name',
         'type'=>'email',
     ],
@@ -259,7 +258,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,expiry_date',
         'variables_description'=>'full_name user full name',
         'type'=>'email',
     ],
@@ -276,12 +275,13 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
                 <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
                 <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <p>As we receive payment in the system, we will deposit to your wallet .</p>
                 <p>&nbsp;</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,update_hours,expiry_date',
+        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,expiry_date',
         'variables_description'=>'full_name user full name',
         'type'=>'email',
     ],

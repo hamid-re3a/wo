@@ -50,7 +50,7 @@ class WalletRepository
     public function checkUserBalance()
     {
         $wallet = app(Wallet::class);
-        $wallet->setUserId(auth()->user()->id);
+        $wallet->setUserId(auth()->check() ? auth()->user()->id : 2);
         $wallet->setName(WalletNames::DEPOSIT);
         return $this->wallet_service->getBalance($wallet)->getBalance();
     }

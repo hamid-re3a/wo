@@ -13,13 +13,6 @@ class TestGiftcodesForTestUserSeeder extends Seeder
     public function run()
     {
         $giftcode_repository = app(GiftcodeRepository::class);
-        Package::query()->firstOrCreate([
-            "id" => 1,
-            "name" => 'Beginner',
-            "short_name" => 'B',
-            "validity_in_days" => 200,
-            "price" => 99,
-        ]);
         $user = User::query()->firstOrCreate([
             'id' => 2,
             'member_id' => '2000',

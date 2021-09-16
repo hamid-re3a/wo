@@ -87,7 +87,7 @@ class OrderResolver
     public function isValid(): array
     {
         if ($this->order->getPlan() != OrderPlans::ORDER_PLAN_START) {
-            $check_start_plan = request()->user->paidOrders()->where('plan', '=', ORDER_PLAN_START)->count();
+            $check_start_plan = auth()->user()->paidOrders()->where('plan', '=', ORDER_PLAN_START)->count();
             if (!$check_start_plan)
                 return [false, trans('order.responses.you-should-order-starter-plan-first')];
         }

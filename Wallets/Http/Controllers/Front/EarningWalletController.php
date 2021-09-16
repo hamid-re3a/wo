@@ -23,7 +23,7 @@ class EarningWalletController extends Controller
 
     private function prepareEarningWallet()
     {
-        $this->bankService = new BankService(request()->user);
+        $this->bankService = new BankService(auth()->user());
         $this->wallet = config('earningWallet');
         $this->bankService->getWallet($this->wallet);
 
@@ -36,7 +36,7 @@ class EarningWalletController extends Controller
     public function earned_commissions()
     {
         $this->prepareEarningWallet();
-        $counts = User::query()->where('id', '=', request()->user->id)
+        $counts = auth()->user()
             ->withSumQuery(['transactions.amount AS binary_commissions_sum' => function (Builder $query) {
                     $query->where('type', '=', 'deposit');
                     $query->whereHas('metaData', function (Builder $subQuery) {
@@ -168,7 +168,6 @@ class EarningWalletController extends Controller
 //     */
     public function transfer_to_deposit_wallet(TransferFundFromEarningWalletRequest $request)
     {
-
         $this->prepareEarningWallet();
 
         try {

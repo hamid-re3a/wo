@@ -25,7 +25,7 @@ class PackageController extends Controller
     public function paidPackages()
     {
         $packages = collect();
-        $orders = request()->user->paidOrders()->get();
+        $orders = auth()->user()->paidOrders()->get();
         foreach ($orders AS $order) {
             $packageDetails = $this->getPackage($order->package_id);
             $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());
@@ -48,7 +48,7 @@ class PackageController extends Controller
      */
     public function hasValidPackage()
     {
-        $orders = request()->user->paidOrders()->get();
+        $orders = auth()->user()->paidOrders()->get();
         foreach ($orders AS $order) {
             $packageDetails = $this->getPackage($order->package_id);
             $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());

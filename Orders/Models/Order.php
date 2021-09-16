@@ -14,7 +14,7 @@ use User\Models\User;
  *
  * @property int $id
  * @property int $user_id
- * @property int|null $to_user_id
+ * @property int|null $from_user_id
  * @property int $total_cost_in_usd
  * @property int $packages_cost_in_usd
  * @property int $registration_fee_in_usd
@@ -47,13 +47,13 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order wherePlan($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereRegistrationFeeInUsd($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereToUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereFromUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTotalCostInUsd($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
  * @mixin \Eloquent
  * @property-read \Orders\Models\User $user
- * @property-read \Orders\Models\User $toUser
+ * @property-read \Orders\Models\User $fromUser
  * @property-read \Illuminate\Database\Eloquent\Collection|\Orders\Models\OrderPackage[] $packages
  * @property-read int|null $packages_count
  * @method static \Illuminate\Database\Eloquent\Builder|Order filter()
@@ -81,9 +81,9 @@ class Order extends Model
     }
 
 
-    public function toUser()
+    public function fromUser()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'from_user_id', 'id');
     }
 
     public function refreshOrder()
@@ -146,10 +146,9 @@ class Order extends Model
     {
         $order_service = new \Orders\Services\Grpc\Order();
         $order_service->setId((int)$this->attributes['id']);
-        $order_service->setUser($this->user->getUserService());
         $order_service->setUserId((int)$this->attributes['user_id']);
 
-        $order_service->setToUserId((int)$this->attributes['to_user_id']);
+        $order_service->setFromUserId((int)$this->attributes['from_user_id']);
 
         $order_service->setTotalCostInUsd((float)$this->attributes['total_cost_in_usd']);
         $order_service->setPackagesCostInUsd((float)$this->attributes['packages_cost_in_usd']);

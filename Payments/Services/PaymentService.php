@@ -24,6 +24,7 @@ use Payments\Services\Grpc\PaymentDriver;
 use Payments\Services\Grpc\PaymentType;
 use Payments\Services\Grpc\PaymentTypes;
 use Wallets\Services\Grpc\Wallet;
+use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\WalletService;
 use Wallets\Services\Grpc\Withdraw;
 
@@ -188,15 +189,14 @@ class PaymentService implements PaymentsServiceInterface
 
             //Prepare withdraw message
             $withdraw_object = app(Withdraw::class);
-            $withdraw_object->setConfirmed(true);
             $withdraw_object->setUserId(request()->user->id);
-            $withdraw_object->setWalletName('Deposit Wallet');
+            $withdraw_object->setWalletName(WalletNames::DEPOSIT);
             $withdraw_object->setType('Purchase');
             $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
             $withdraw_object->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_object);
             //Do withdraw
-            if (!$withdraw_response->getConfirmed())
+            if (!is_string($withdraw_response->getTransactionId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'));
 
             //used same time as Giftcode redeem date for future usage

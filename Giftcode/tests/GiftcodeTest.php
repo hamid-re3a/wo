@@ -7,14 +7,12 @@ namespace Giftcode\tests;
 use Giftcode\GiftCodeConfigure;
 use Giftcode\Models\Package;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\WalletNames;
-use Wallets\Services\Transaction;
 use Wallets\Services\WalletService;
 
 class GiftcodeTest extends TestCase
@@ -76,7 +74,6 @@ class GiftcodeTest extends TestCase
 
         //Deposit Service
         $deposit_object = app(Deposit::class);
-        $deposit_object->setConfirmed(true);
         $deposit_object->setUserId($user->id);
         $deposit_object->setAmount(10000000);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);

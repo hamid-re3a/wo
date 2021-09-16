@@ -5,11 +5,8 @@ namespace Giftcode\Repository;
 
 
 use Giftcode\Models\Giftcode;
-use Illuminate\Http\Request;
-use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\WalletNames;
-use Wallets\Services\Transaction;
 use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\WalletService;
 use Wallets\Services\Grpc\Withdraw;
@@ -26,7 +23,6 @@ class WalletRepository
     public function withdrawUserWallet(Giftcode $giftcode)
     {
         $withdraw_object = app(Withdraw::class);
-        $withdraw_object->setConfirmed(true);
         $withdraw_object->setAmount($giftcode->total_cost_in_usd);
         $withdraw_object->setWalletName(WalletNames::DEPOSIT);
         $withdraw_object->setUserId($giftcode->user_id);
@@ -38,7 +34,6 @@ class WalletRepository
     public function depositUserWallet(Giftcode $giftcode, $description = 'Giftcode refund')
     {
         $deposit_object = app(Deposit::class);
-        $deposit_object->setConfirmed(true);
         $deposit_object->setUserId($giftcode->user_id);
         $deposit_object->setAmount($giftcode->getRefundAmount());
         $deposit_object->setType('Giftcode refund');
@@ -63,7 +58,6 @@ class WalletRepository
     private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode')
     {
         $deposit_object = app(Deposit::class);
-        $deposit_object->setConfirmed(true);
         $deposit_object->setUserId(1);
         $deposit_object->setAmount(($giftcode->total_cost_in_usd - $giftcode->getRefundAmount()));
         $deposit_object->setType('Giftcode refund');

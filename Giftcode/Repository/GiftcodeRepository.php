@@ -43,7 +43,7 @@ class GiftcodeRepository
             $finalTransaction = $this->wallet_repository->withdrawUserWallet($giftcode);
 
             //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfirmed())
+            if(!is_string($finalTransaction->getTransactionId()))
                 throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
             /**
              * End User wallet process
@@ -99,7 +99,7 @@ class GiftcodeRepository
             $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid);
 
             //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfirmed())
+            if(!is_string($finalTransaction->getTransactionId()))
                 throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
             /**
              * End refund

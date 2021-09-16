@@ -22,9 +22,9 @@ class Order extends \Google\Protobuf\Internal\Message
      */
     protected $user_id = 0;
     /**
-     * Generated from protobuf field <code>int64 to_user_id = 3;</code>
+     * Generated from protobuf field <code>int64 from_user_id = 3;</code>
      */
-    protected $to_user_id = 0;
+    protected $from_user_id = 0;
     /**
      * Generated from protobuf field <code>double total_cost_in_usd = 4;</code>
      */
@@ -86,21 +86,9 @@ class Order extends \Google\Protobuf\Internal\Message
      */
     protected $updated_at = '';
     /**
-     * Generated from protobuf field <code>.user.services.grpc.User user = 19;</code>
-     */
-    protected $user = null;
-    /**
-     * Generated from protobuf field <code>.user.services.grpc.User to_user = 20;</code>
-     */
-    protected $to_user = null;
-    /**
-     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     * Generated from protobuf field <code>int64 package_id = 19;</code>
      */
     protected $package_id = 0;
-    /**
-     * Generated from protobuf field <code>.packages.services.grpc.Package package = 22;</code>
-     */
-    protected $package = null;
 
     /**
      * Constructor.
@@ -110,7 +98,7 @@ class Order extends \Google\Protobuf\Internal\Message
      *
      *     @type int|string $id
      *     @type int|string $user_id
-     *     @type int|string $to_user_id
+     *     @type int|string $from_user_id
      *     @type float $total_cost_in_usd
      *     @type float $packages_cost_in_usd
      *     @type float $registration_fee_in_usd
@@ -126,10 +114,7 @@ class Order extends \Google\Protobuf\Internal\Message
      *     @type string $deleted_at
      *     @type string $created_at
      *     @type string $updated_at
-     *     @type \User\Services\Grpc\User $user
-     *     @type \User\Services\Grpc\User $to_user
      *     @type int|string $package_id
-     *     @type \Packages\Services\Grpc\Package $package
      * }
      */
     public function __construct($data = NULL) {
@@ -182,23 +167,23 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 to_user_id = 3;</code>
+     * Generated from protobuf field <code>int64 from_user_id = 3;</code>
      * @return int|string
      */
-    public function getToUserId()
+    public function getFromUserId()
     {
-        return $this->to_user_id;
+        return $this->from_user_id;
     }
 
     /**
-     * Generated from protobuf field <code>int64 to_user_id = 3;</code>
+     * Generated from protobuf field <code>int64 from_user_id = 3;</code>
      * @param int|string $var
      * @return $this
      */
-    public function setToUserId($var)
+    public function setFromUserId($var)
     {
         GPBUtil::checkInt64($var);
-        $this->to_user_id = $var;
+        $this->from_user_id = $var;
 
         return $this;
     }
@@ -534,71 +519,7 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.user.services.grpc.User user = 19;</code>
-     * @return \User\Services\Grpc\User|null
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    public function hasUser()
-    {
-        return isset($this->user);
-    }
-
-    public function clearUser()
-    {
-        unset($this->user);
-    }
-
-    /**
-     * Generated from protobuf field <code>.user.services.grpc.User user = 19;</code>
-     * @param \User\Services\Grpc\User $var
-     * @return $this
-     */
-    public function setUser($var)
-    {
-        GPBUtil::checkMessage($var, \User\Services\Grpc\User::class);
-        $this->user = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>.user.services.grpc.User to_user = 20;</code>
-     * @return \User\Services\Grpc\User|null
-     */
-    public function getToUser()
-    {
-        return $this->to_user;
-    }
-
-    public function hasToUser()
-    {
-        return isset($this->to_user);
-    }
-
-    public function clearToUser()
-    {
-        unset($this->to_user);
-    }
-
-    /**
-     * Generated from protobuf field <code>.user.services.grpc.User to_user = 20;</code>
-     * @param \User\Services\Grpc\User $var
-     * @return $this
-     */
-    public function setToUser($var)
-    {
-        GPBUtil::checkMessage($var, \User\Services\Grpc\User::class);
-        $this->to_user = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     * Generated from protobuf field <code>int64 package_id = 19;</code>
      * @return int|string
      */
     public function getPackageId()
@@ -607,7 +528,7 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     * Generated from protobuf field <code>int64 package_id = 19;</code>
      * @param int|string $var
      * @return $this
      */
@@ -615,38 +536,6 @@ class Order extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkInt64($var);
         $this->package_id = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>.packages.services.grpc.Package package = 22;</code>
-     * @return \Packages\Services\Grpc\Package|null
-     */
-    public function getPackage()
-    {
-        return $this->package;
-    }
-
-    public function hasPackage()
-    {
-        return isset($this->package);
-    }
-
-    public function clearPackage()
-    {
-        unset($this->package);
-    }
-
-    /**
-     * Generated from protobuf field <code>.packages.services.grpc.Package package = 22;</code>
-     * @param \Packages\Services\Grpc\Package $var
-     * @return $this
-     */
-    public function setPackage($var)
-    {
-        GPBUtil::checkMessage($var, \Packages\Services\Grpc\Package::class);
-        $this->package = $var;
 
         return $this;
     }

@@ -84,7 +84,7 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
     {
         $package_service = app(PackageService::class);
         $id_object = app(Id::class);
-        $id_object->setId($this->invoice->getP);
+        $id_object->setId($this->invoice->getPayableId());
         return $package_service->packageById($this->getOrder()->getPackageId());
     }
 

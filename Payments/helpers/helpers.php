@@ -276,6 +276,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
                 <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
                 <p><strong>Payment address:</strong> {{payment_address}}</p>
+                <p>As we receive payment in the system, we will deposit to your wallet .</p>
                 <p>&nbsp;</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>

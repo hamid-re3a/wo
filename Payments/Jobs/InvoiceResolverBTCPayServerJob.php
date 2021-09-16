@@ -53,6 +53,9 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 $amount_paid = $payment_response->json()[0]['totalPaid'];
                 $amount_due = $payment_response->json()[0]['due'];
                 $this->recordTransactions($payment_response->json()[0]['payments']);
+
+                $old_invoice_db = $this->invoice_db;
+
                 $this->invoice_db->update([
                     'expiration_time' => Carbon::createFromTimestamp($response->json()['expirationTime']),
                     'status' => $response->json()['status'],
@@ -60,7 +63,8 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     'paid_amount' => $amount_paid,
                     'due_amount' => $amount_due
                 ]);
-                if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled'){
+
+                if ($old_invoice_db->is_paid AND $old_invoice_db->status == 'Settled'){
                     return;
                 }
 

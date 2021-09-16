@@ -6,6 +6,7 @@ namespace Wallets\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentService;
 use User\Models\User;
@@ -63,6 +64,7 @@ class WalletService implements WalletServiceInterface
                 return $deposit;
 
             } else {
+                Log::error('Deposit error => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
@@ -97,6 +99,7 @@ class WalletService implements WalletServiceInterface
                 return $withdraw;
 
             } else {
+                Log::error('withdraw error => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
@@ -137,6 +140,7 @@ class WalletService implements WalletServiceInterface
                 return $transfer;
 
             } else {
+                Log::error('transfer error :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {

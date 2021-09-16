@@ -133,7 +133,7 @@ class GiftcodeRepository
                 throw new \Exception(trans('giftcode.responses.giftcode-is-expired-and-user-cant-redeem'),406);
 
             $giftcode->update([
-                'redeem_user_id' => $request->user->id,
+                'redeem_user_id' => auth()->user()->id,
                 'redeem_date' => now()->toDateTimeString(),
                 'order_id' => $request->get('order_id')
             ]);

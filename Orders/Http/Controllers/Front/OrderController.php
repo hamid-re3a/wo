@@ -41,7 +41,7 @@ class OrderController extends Controller
      */
     public function counts()
     {
-        $total_counts = request()->user->withCount([
+        $total_counts = auth()->user()->withCount([
             'orders AS total_orders',
             'orders AS total_paid' => function (Builder $query) {
                 $query->whereNotNull('is_paid_at');
@@ -94,7 +94,7 @@ class OrderController extends Controller
      */
     public function index(ListOrderRequest $request)
     {
-        $orders = $request->user->orders()->filter()->simplePaginate();
+        $orders = auth()->user()->orders()->filter()->simplePaginate();
         return api()->success(null, OrderResource::collection($orders)->response()->getData());
     }
 
@@ -107,7 +107,7 @@ class OrderController extends Controller
      */
     public function showOrder(ShowRequest $request)
     {
-        $order = $request->user->orders()->find($request->get('id'))->first();
+        $order = auth()->user()->orders()->find($request->get('id'))->first();
         return api()->success(null, OrderResource::make($order));
     }
 
@@ -133,7 +133,6 @@ class OrderController extends Controller
                 'validity_in_days' => $package->getValidityInDays(),
                 'plan' => $request->get('plan')
             ]);
-
             $order_db->refreshOrder();
             //Order Resolver
             $order_resolver = new OrderResolver($order_db->getOrderService());
@@ -150,8 +149,8 @@ class OrderController extends Controller
             $invoice_request->setPaymentDriver($order_db->payment_driver);
             $invoice_request->setPaymentType($order_db->payment_type);
             $invoice_request->setPaymentCurrency($order_db->payment_currency);
-            $invoice_request->setUser($request->user->getUserService());
-            $invoice_request->setUserId($request->user->id);
+            $invoice_request->setUser(auth()->user()->getUserService());
+            $invoice_request->setUserId(auth()->user()->id);
             $invoice_request->setPayableId($order_db->id);
             $invoice_request->setPayableType('Order');
 

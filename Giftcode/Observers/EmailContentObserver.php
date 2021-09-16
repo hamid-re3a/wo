@@ -10,7 +10,7 @@ class EmailContentObserver
     public function updating(EmailContent $email)
     {
         $data = array_merge($email->getOriginal(),[
-            'actor_id' => request()->user->id,
+            'actor_id' => auth()->user()->id,
             'email_id' => $email->id,
         ]);
         unset($data['id']);

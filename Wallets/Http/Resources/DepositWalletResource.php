@@ -17,7 +17,6 @@ class DepositWalletResource extends JsonResource
      */
     public function toArray($request)
     {
-
         $total_sum = User::query()->where('id','=',auth()->user()->id)
             ->withSumQuery([
                 'transactions.amount AS total_received' => function (Builder $query) {
@@ -27,6 +26,7 @@ class DepositWalletResource extends JsonResource
             ->withSumQuery([
                 'transactions.amount AS total_spent' => function (Builder $query) {
                     $query->where('type', 'withdraw');
+
                 }
             ])
             ->withSumQuery([
@@ -38,15 +38,14 @@ class DepositWalletResource extends JsonResource
                 }
             ])
             ->first();
-
         return [
             'name' => $this->name,
             'balance' => walletPfAmount($this->balanceFloat),
             'transactions_count' => (int) $this->transactions->where('wallet_id','=',$this->id)->count(),
             'transfers_count' => (int) $this->transfers->count(),
-            'total_transfer' => $total_sum->total_transfer ? walletPfAmount($total_sum->total_transfer) : 0,
-            'total_received' => $total_sum->total_received ? walletPfAmount($total_sum->total_received) : 0,
-            'total_spent' => $total_sum->total_spent ? walletPfAmount($total_sum->total_spent) : 0
+            'total_transfer' => $total_sum->total_transfer ? walletPfAmount($total_sum->total_transfer / 100) : 0,
+            'total_received' => $total_sum->total_received ? walletPfAmount($total_sum->total_received / 100) : 0,
+            'total_spent' => $total_sum->total_spent ? walletPfAmount($total_sum->total_spent / 100) : 0
         ];
     }
 }

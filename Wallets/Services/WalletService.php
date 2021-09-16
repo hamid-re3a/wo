@@ -64,11 +64,12 @@ class WalletService implements WalletServiceInterface
                 return $deposit;
 
             } else {
-                Log::error('Deposit error => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
+                Log::error('Deposit error 1 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
+            Log::error('Deposit error 2 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
             return $deposit;
         }
     }
@@ -99,11 +100,12 @@ class WalletService implements WalletServiceInterface
                 return $withdraw;
 
             } else {
-                Log::error('withdraw error => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
+                Log::error('withdraw error 1 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
+            Log::error('withdraw error 2 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
             return $withdraw;
         }
     }
@@ -140,11 +142,12 @@ class WalletService implements WalletServiceInterface
                 return $transfer;
 
             } else {
-                Log::error('transfer error :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
+                Log::error('transfer error 1 :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
+            Log::error('transfer error 2 :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
             return $transfer;
         }
     }

@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Orders\Repository\OrderRepository;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
@@ -70,7 +71,7 @@ class OrderService implements OrdersServiceInterface
             'payment_type' => !empty($order->getPaymentType()) ? $order->getPaymentType() : $order_db->payment_type,
             'payment_currency' => !empty($order->getPaymentCurrency()) ? $order->getPaymentCurrency() : $order_db->payment_currency,
             'payment_driver' => !empty($order->getPaymentDriver()) ? $order->getPaymentDriver() : $order_db->payment_driver,
-            'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
+            'plan' => !empty($order->getPlan()) ? OrderPlans::name($order->getPlan()) : $order_db->plan,
         ]);
         return $order;
     }

@@ -82,7 +82,7 @@ class WalletProcessor extends ProcessorAbstract
             $deposit = $this->wallet_service->deposit($deposit_service);
 
             //Deposit check
-            if(!empty($deposit->getTransactionId())) {
+            if(is_string($deposit->getTransactionId())) {
                 $this->invoice_db->update([
                     'is_paid' => true
                 ]);

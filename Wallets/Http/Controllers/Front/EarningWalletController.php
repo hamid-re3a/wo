@@ -29,10 +29,10 @@ class EarningWalletController extends Controller
 
     }
 
-    /**
-     * Get earned commissions
-     * @group Public User > Earning Wallet
-     */
+//    /**
+//     * Get earned commissions
+//     * @group Public User > Earning Wallet
+//     */
     public function earned_commissions()
     {
         $this->prepareEarningWallet();
@@ -120,12 +120,12 @@ class EarningWalletController extends Controller
     }
 
 
-    /**
-     * Transfer funds to member wallet preview
-     * @group Public User > Earning Wallet
-     * @param TransferFundFromEarningWalletRequest $request
-     * @return JsonResponse
-     */
+//    /**
+//     * Transfer funds to member wallet preview
+//     * @group Public User > Earning Wallet
+//     * @param TransferFundFromEarningWalletRequest $request
+//     * @return JsonResponse
+//     */
     public function transfer_to_deposit_wallet_preview(TransferFundFromEarningWalletRequest $request)
     {
 
@@ -160,12 +160,12 @@ class EarningWalletController extends Controller
         }
     }
 
-    /**
-     * Transfer funds to deposit wallet
-     * @group Public User > Earning Wallet
-     * @param TransferFundFromEarningWalletRequest $request
-     * @return JsonResponse
-     */
+//    /**
+//     * Transfer funds to deposit wallet
+//     * @group Public User > Earning Wallet
+//     * @param TransferFundFromEarningWalletRequest $request
+//     * @return JsonResponse
+//     */
     public function transfer_to_deposit_wallet(TransferFundFromEarningWalletRequest $request)
     {
 

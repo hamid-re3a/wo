@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $legacy_id
  * @property int $user_id
- * @property int|null $to_user_id
+ * @property int|null $from_user_id
  * @property int $total_cost_in_usd
  * @property int $packages_cost_in_usd
  * @property int $registration_fee_in_usd
@@ -43,7 +43,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory wherePaymentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory wherePlan($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory whereRegistrationFeeInUsd($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory whereToUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory whereFromUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory whereTotalCostInUsd($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderHistory whereUserId($value)

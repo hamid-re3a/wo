@@ -44,7 +44,6 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
 
             if (
-                $deposit->getConfirmed() > 0 AND
                 $deposit->getAmount() > 0 AND
                 $deposit->getWalletName() AND
                 $deposit->getUserId() AND
@@ -57,7 +56,7 @@ class WalletService implements WalletServiceInterface
                 if($deposit->getWalletName() == WalletNames::DEPOSIT)
                     $wallet_name = $this->depositWallet;
 
-                $transaction = $bankService->deposit($wallet_name, $deposit->getAmount(), $deposit->getDescription() ?: null, $deposit->getConfirmed(), $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
+                $transaction = $bankService->deposit($wallet_name, $deposit->getAmount(), $deposit->getDescription() ?: null, true, $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
                 $deposit->setTransactionId($transaction->uuid);
 
                 DB::commit();
@@ -68,7 +67,6 @@ class WalletService implements WalletServiceInterface
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
-            $deposit->setConfirmed(false);
             return $deposit;
         }
     }
@@ -79,7 +77,6 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
 
             if (
-                $withdraw->getConfirmed() AND
                 $withdraw->getAmount() > 0 AND
                 $withdraw->getWalletName() AND
                 $withdraw->getUserId() AND
@@ -104,7 +101,6 @@ class WalletService implements WalletServiceInterface
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
-            $withdraw->setConfirmed(false);
             return $withdraw;
         }
     }
@@ -117,7 +113,6 @@ class WalletService implements WalletServiceInterface
                 $transfer->getFromUserId() AND
                 $transfer->getToUserId() AND
                 $transfer->getAmount() > 0 AND
-                $transfer->getConfirmed() AND
                 in_array($transfer->getToWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT]) AND
                 in_array($transfer->getFromWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
@@ -146,7 +141,6 @@ class WalletService implements WalletServiceInterface
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
-            $transfer->setConfirmed(false);
             return $transfer;
         }
     }

@@ -53,6 +53,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
         $giftcode_model = Giftcode::query()->first();
+        /** @var $giftcode_object \Giftcode\Services\Grpc\Giftcode */
         $giftcode_object = $giftcode_model->getGiftcodeService();
         $giftcode_object->setOrderId(1);
         $user = User::query()->first();

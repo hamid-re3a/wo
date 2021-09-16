@@ -58,7 +58,7 @@ class OrderService implements OrdersServiceInterface
         $order_db = \Orders\Models\Order::query()->find($order->getId());
         $order_db->update([
             'user_id' => !empty($order->getUserId()) ? $order->getUserId() : $order_db->user_id,
-            'to_user_id' => !empty($order->getToUserId()) ? $order->getToUserId() : $order_db->to_user_id,
+            'from_user_id' => !empty($order->getFromUserId()) ? $order->getFromUserId() : $order_db->from_user_id,
             'package_id' => !empty($order->getPackageId()) ? $order->getPackageId() : $order_db->package_id,
             'total_cost_in_usd' => !empty($order->getTotalCostInUsd()) ? $order->getTotalCostInUsd() : $order_db->total_cost_in_usd,
             'packages_cost_in_usd' => !empty($order->getPackagesCostInUsd()) ? $order->getPackagesCostInUsd() : $order_db->packages_cost_in_usd,

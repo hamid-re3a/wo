@@ -12,6 +12,7 @@ use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidPartial;
 use Payments\Models\Invoice;
 use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\WalletService;
 
 class WalletProcessor extends ProcessorAbstract
@@ -68,12 +69,11 @@ class WalletProcessor extends ProcessorAbstract
 
             //Deposit Service
             $deposit_service = app(Deposit::class);
-            $deposit_service->setConfirmed(true);
             $deposit_service->setUserId($this->user_db->id);
             $deposit_service->setAmount($this->invoice_db->pf_amount);
             $deposit_service->setType('Deposit');
             $deposit_service->setDescription('Invoice #' . $this->invoice_db->transaction_id);
-            $deposit_service->setWalletName('Deposit Wallet');
+            $deposit_service->setWalletName(WalletNames::DEPOSIT);
 
             //Deposit transaction
             /**
@@ -82,7 +82,7 @@ class WalletProcessor extends ProcessorAbstract
             $deposit = $this->wallet_service->deposit($deposit_service);
 
             //Deposit check
-            if($deposit->getConfirmed()) {
+            if(!is_string($deposit->getTransactionId())) {
                 $this->invoice_db->update([
                     'is_paid' => true
                 ]);

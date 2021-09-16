@@ -8,7 +8,6 @@ use User\Models\User;
 use Wallets\Models\TransactionType;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\WalletNames;
-use Wallets\Services\Transaction;
 use Wallets\Services\Grpc\Transfer;
 use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\WalletService;
@@ -21,35 +20,12 @@ class WalletServiceTest extends WalletTest
     /**
      * @test
      */
-    public function deposit_unconfirmed()
-    {
-        $wallet_service = app(WalletService::class);
-
-        //Deposit Service
-        $deposit_service = app(Deposit::class);
-        $deposit_service->setConfirmed(false);
-        $deposit_service->setUserId(1);
-        $deposit_service->setAmount(10000000);
-        $deposit_service->setType('Deposit');
-        $deposit_service->setWalletName(WalletNames::DEPOSIT);
-
-        //Deposit transaction
-        $deposit = $wallet_service->deposit($deposit_service);
-        $this->assertIsObject($deposit);
-        $this->assertFalse($deposit->getConfirmed());
-
-    }
-
-    /**
-     * @test
-     */
     public function deposit_wrong_wallet_name()
     {
         $wallet_service = app(WalletService::class);
 
         //Deposit Service
         $deposit_service = app(Deposit::class);
-        $deposit_service->setConfirmed(false);
         $deposit_service->setUserId(1);
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Deposit');
@@ -58,7 +34,7 @@ class WalletServiceTest extends WalletTest
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
         $this->assertIsObject($deposit);
-        $this->assertFalse($deposit->getConfirmed());
+        $this->assertEmpty($deposit->getTransactionId());
 
     }
 
@@ -71,7 +47,6 @@ class WalletServiceTest extends WalletTest
 
         //Deposit Service
         $deposit_service = app(Deposit::class);
-        $deposit_service->setConfirmed(true);
         $deposit_service->setUserId($user_id);
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Deposit');
@@ -80,7 +55,7 @@ class WalletServiceTest extends WalletTest
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
         $this->assertIsObject($deposit);
-        $this->assertTrue($deposit->getConfirmed());
+        $this->assertIsString($deposit->getTransactionId());
 
     }
 
@@ -93,7 +68,6 @@ class WalletServiceTest extends WalletTest
 
         //Deposit Service
         $deposit_service = app(Deposit::class);
-        $deposit_service->setConfirmed(true);
         $deposit_service->setUserId($user_id);
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Commission');
@@ -103,30 +77,8 @@ class WalletServiceTest extends WalletTest
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
         $this->assertIsObject($deposit);
-        $this->assertTrue($deposit->getConfirmed());
+        $this->assertIsString($deposit->getTransactionId());
 
-    }
-
-    /**
-     * @test
-     */
-    public function withdraw_unconfirmed()
-    {
-        $wallet_service = app(WalletService::class);
-
-        //Deposit
-        $this->deposit_confirmed();
-
-        //Withdraw
-        $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setConfirmed(false);
-        $withdraw_service->setUserId(1);
-        $withdraw_service->setWalletName(WalletNames::DEPOSIT);
-        $withdraw_service->setType('Giftcode');
-        $withdraw_service->setAmount(100);
-        $withdraw = $wallet_service->withdraw($withdraw_service);
-        $this->assertIsObject($withdraw);
-        $this->assertFalse($withdraw->getConfirmed());
     }
 
     /**
@@ -141,14 +93,13 @@ class WalletServiceTest extends WalletTest
 
         //Withdraw
         $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setConfirmed(true);
         $withdraw_service->setUserId(1);
         $withdraw_service->setWalletName(3);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(100);
         $withdraw = $wallet_service->withdraw($withdraw_service);
         $this->assertIsObject($withdraw);
-        $this->assertFalse($withdraw->getConfirmed());
+        $this->assertEmpty($withdraw->getTransactionId());
     }
 
     /**
@@ -163,14 +114,13 @@ class WalletServiceTest extends WalletTest
 
         //Withdraw
         $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setConfirmed(true);
         $withdraw_service->setUserId(1);
         $withdraw_service->setWalletName(WalletNames::DEPOSIT);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(100);
         $withdraw = $wallet_service->withdraw($withdraw_service);
         $this->assertIsObject($withdraw);
-        $this->assertTrue($withdraw->getConfirmed());
+        $this->assertIsString($withdraw->getTransactionId());
     }
 
     /**
@@ -194,11 +144,11 @@ class WalletServiceTest extends WalletTest
         $transfer_service->setToUserId($to_user->id);
         $transfer_service->setToWalletName(WalletNames::DEPOSIT);
         $transfer_service->setAmount(1000);
-        $transfer_service->setConfirmed(true);
 
         $transaction_response = $wallet_service->transfer($transfer_service);
         $this->assertIsObject($transaction_response);
-        $this->assertTrue($transaction_response->getConfirmed());
+        $this->assertIsString($transaction_response->getDepositTransactionId());
+        $this->assertIsString($transaction_response->getWithdrawTransactionId());
     }
 
     /**

@@ -12,7 +12,7 @@ use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\WalletResource;
+use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Services\BankService;
 
 class EarningWalletController extends Controller
@@ -67,9 +67,9 @@ class EarningWalletController extends Controller
             ->first();
 
         return api()->success(null, [
-            'binary_commissions_sum' => $counts->binary_commissions_sum ? $counts->binary_commissions_sum : 0,
-            'direct_commissions_sum' => $counts->direct_commissions_sum ? $counts->direct_commissions_sum : 0,
-            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? $counts->indirect_commissions_sum : 0,
+            'binary_commissions_sum' => $counts->binary_commissions_sum ? walletPfAmount($counts->binary_commissions_sum) : 0,
+            'direct_commissions_sum' => $counts->direct_commissions_sum ? walletPfAmount($counts->direct_commissions_sum) : 0,
+            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? walletPfAmount($counts->indirect_commissions_sum) : 0,
             'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
         ]);
 
@@ -83,7 +83,7 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        return api()->success(null, WalletResource::make($this->bankService->getWallet($this->wallet)));
+        return api()->success(null, EarningWalletResource::make($this->bankService->getWallet($this->wallet)));
 
     }
 

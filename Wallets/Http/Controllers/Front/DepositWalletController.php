@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Http\Requests\Front\AskFundRequest;
 use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
+use Wallets\Http\Resources\DepositWalletResource;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\WalletResource;
+use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Mail\DepositWallet\ReceiverFundEmail;
 use Wallets\Mail\DepositWallet\RequestFundEmail;
 use Wallets\Mail\DepositWallet\SenderFundEmail;
@@ -40,7 +41,7 @@ class DepositWalletController extends Controller
     public function index()
     {
         $this->prepareDepositWallet();
-        return api()->success(null, WalletResource::make($this->bankService->getWallet($this->wallet)));
+        return api()->success(null, DepositWalletResource::make($this->bankService->getWallet($this->wallet)));
 
     }
 

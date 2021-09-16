@@ -11,7 +11,7 @@ use Wallets\Http\Requests\Admin\GetUserTransactionsRequest;
 use Wallets\Http\Requests\Admin\UserIdRequest;
 use Wallets\Http\Resources\Admin\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\WalletResource;
+use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Models\Transaction;
 use Wallets\Services\BankService;
 
@@ -56,7 +56,7 @@ class UserWalletController extends Controller
     public function getWalletsList(UserIdRequest $request) //UserIdRequest needed for Scribe documentation
     {
         $this->middleware($request);
-        return api()->success(null,WalletResource::collection($this->bankService->getAllWallets()));
+        return api()->success(null,EarningWalletResource::collection($this->bankService->getAllWallets()));
 
     }
 

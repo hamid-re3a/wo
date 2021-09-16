@@ -71,7 +71,7 @@ class EmailInvoicePaidComplete extends Mailable implements SettingableMail
     {
         $order_service = app(OrderService::class);
         $id_object = app(\Orders\Services\Grpc\Id::class);
-        $id_object->setId($this->invoice->getPayableId());
+        $id_object->setId($this->invoice->payable_id);
         return $order_service->OrderById($id_object);
 
     }

@@ -48,11 +48,9 @@ class GiftcodeRepository
             /**
              * End User wallet process
              */
-
             UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
 
             DB::commit();
-
             return $giftcode;
         } catch (\Throwable $exception) {
             DB::rollBack();

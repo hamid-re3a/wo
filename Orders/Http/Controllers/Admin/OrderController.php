@@ -31,7 +31,7 @@ class OrderController extends Controller
     /**
      * get count subscriptions
      * @group
-     * Public User > Orders > admin
+     * Admin User > Orders
      * @param ListOrderRequest $request
      * @return JsonResponse
      */
@@ -43,7 +43,7 @@ class OrderController extends Controller
     /**
      * get count active package
      * @group
-     * Public User > Orders > admin
+     * Admin User > Orders
      * @param ListOrderRequest $request
      * @return JsonResponse
      */
@@ -55,7 +55,7 @@ class OrderController extends Controller
     /**
      * get count deactivate package
      * @group
-     * Public User > Orders > admin
+     * Admin User > Orders
      * @param ListOrderRequest $request
      * @return JsonResponse
      */
@@ -67,7 +67,7 @@ class OrderController extends Controller
     /**
      * get package overview count
      * @group
-     * Public User > Orders > admin
+     * Admin User > Orders
      * @param OrderTypeFilterRequest $request
      * @return JsonResponse
      */

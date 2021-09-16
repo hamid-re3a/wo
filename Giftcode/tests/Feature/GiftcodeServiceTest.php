@@ -75,13 +75,12 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(2)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
         $response = $giftcode_service->getUserCreatedGiftcodesCount($user_object);
         $this->assertIsInt($response);
-        $this->assertEquals($response,1);
     }
 
     /**
@@ -92,8 +91,9 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
+        $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(2)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
@@ -110,8 +110,9 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
+        $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(2)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
@@ -128,8 +129,9 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
+        $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(2)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);

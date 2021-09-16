@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
-use Wallets\Http\Requests\Front\TransferFundFromEarningWalletToFriendWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\WalletResource;
@@ -36,7 +35,7 @@ class EarningWalletController extends Controller
     public function earned_commissions()
     {
         $this->prepareEarningWallet();
-        $counts = auth()->user()
+        $counts = User::query()->whereId(auth()->user()->id)
             ->withSumQuery(['transactions.amount AS binary_commissions_sum' => function (Builder $query) {
                     $query->where('type', '=', 'deposit');
                     $query->whereHas('metaData', function (Builder $subQuery) {
@@ -68,10 +67,10 @@ class EarningWalletController extends Controller
             ->first();
 
         return api()->success(null, [
-            'binary_commissions_sum' => $counts->binary_commissions_sum,
-            'direct_commissions_sum' => $counts->direct_commissions_sum,
-            'indirect_commissions_sum' => $counts->indirect_commissions_sum,
-            'roi_sum' => $counts->roi_sum,
+            'binary_commissions_sum' => $counts->binary_commissions_sum ? $counts->binary_commissions_sum : 0,
+            'direct_commissions_sum' => $counts->direct_commissions_sum ? $counts->direct_commissions_sum : 0,
+            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? $counts->indirect_commissions_sum : 0,
+            'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
         ]);
 
     }

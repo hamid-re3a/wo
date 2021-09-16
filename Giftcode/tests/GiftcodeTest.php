@@ -7,6 +7,7 @@ namespace Giftcode\tests;
 use Giftcode\GiftCodeConfigure;
 use Giftcode\Models\Package;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Tests\CreatesApplication;
 use Tests\TestCase;
@@ -46,22 +47,22 @@ class GiftcodeTest extends TestCase
     public function getHeaders()
     {
 
-        User::query()->firstOrCreate([
-            'id' => '1',
-            'first_name' => 'Admin',
-            'last_name' => 'Admin',
-            'member_id' => 1000,
-            'email' => 'work@sajidjaved.com',
-            'username' => 'admin',
+        $user = User::query()->firstOrCreate([
+            'id' => 2,
+            'member_id' => '2000',
+            'email' => 'janexstaging@gmail.com',
+            'first_name' => 'John',
+            'last_name' => 'Due',
+            'username' => 'johny',
         ]);
-        $user = User::query()->first();
+        $user = $user->fresh();
         if(defined('USER_ROLES'))
             foreach (USER_ROLES as $role)
                 Role::query()->firstOrCreate(['name' => $role]);
         $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_SUPER_ADMIN]);
         $hash = md5(serialize($user->getUserService()));
         return [
-            'X-user-id' => '1',
+            'X-user-id' => '2',
             'X-user-hash' => $hash,
         ];
 
@@ -110,7 +111,7 @@ class GiftcodeTest extends TestCase
         $this->deposit_user();
         return $this->postJson(route('customer.giftcodes.create'), [
             'package_id' => 1,
-            'user_id' => 1,
+            'user_id' => 2,
             'include_registration_fee' => true,
             'wallet' => 'Deposit Wallet'
         ]);

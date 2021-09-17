@@ -72,7 +72,7 @@ class UserServiceProvider extends ServiceProvider
                     $service_user = updateUserFromGrpcServer($request);
                     if ($service_user === null)
                         throw new Exception('please try another time!', 470);
-                    $user->refresh();
+                    $user = $service_user;
                 }
 
                 $hash_user_service = md5(serialize($user->getUserService()));

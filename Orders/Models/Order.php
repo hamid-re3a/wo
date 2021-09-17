@@ -23,6 +23,7 @@ use User\Models\User;
  * @property string|null $is_resolved_at
  * @property string|null $is_refund_at
  * @property string|null $is_commission_resolved_at
+ * @property string|null $expires_at
  * @property string $payment_type
  * @property string $payment_currency
  * @property string|null $payment_driver
@@ -69,7 +70,7 @@ class Order extends Model
         'is_paid_at' => 'datetime',
         'is_resolved_at' => 'datetime',
         'is_refund_at' => 'datetime',
-        'is_expired_at' => 'datetime',
+        'expires_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
 
@@ -110,7 +111,7 @@ class Order extends Model
     }
 
 
-    /**
+    /*
      * Scopes
      */
     public function scopeFilter($query)
@@ -139,7 +140,7 @@ class Order extends Model
         return $query;
     }
 
-    /**
+    /*
      * Methods
      */
     public function getOrderService()
@@ -153,12 +154,10 @@ class Order extends Model
         $order_service->setTotalCostInUsd((float)$this->attributes['total_cost_in_usd']);
         $order_service->setPackagesCostInUsd((float)$this->attributes['packages_cost_in_usd']);
         $order_service->setRegistrationFeeInUsd((float)$this->attributes['registration_fee_in_usd']);
+
         $order_service->setIsPaidAt((string)$this->attributes['is_paid_at']);
-
         $order_service->setIsResolvedAt((string)$this->attributes['is_resolved_at']);
-
         $order_service->setIsRefundAt((string)$this->attributes['is_refund_at']);
-
         $order_service->setIsCommissionResolvedAt((string)$this->attributes['is_commission_resolved_at']);
 
         $order_service->setPaymentType((string)$this->attributes['payment_type']);
@@ -171,12 +170,24 @@ class Order extends Model
         $order_service->setPlan((int)OrderPlans::value($this->attributes['plan']));
         $order_service->setValidityInDays((string)$this->attributes['validity_in_days']);
 
+
         $order_service->setDeletedAt((string)$this->attributes['deleted_at']);
         $order_service->setCreatedAt((string)$this->attributes['created_at']);
         $order_service->setUpdatedAt((string)$this->attributes['updated_at']);
 
         return $order_service;
     }
+
+    /*
+     * Mutators
+     */
+    public function setIsPaidAtAttribute($value)
+    {
+        $this->attributes['is_paid_at'] = $value;
+        if(isset($this->attributes['validity_in_days']))
+            $this->attributes['expires_at'] = now()->addDays($this->attributes['validity_in_days'])->toDateTimeString();
+    }
+
 
 
 

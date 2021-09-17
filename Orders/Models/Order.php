@@ -184,11 +184,12 @@ class Order extends Model
     public function setIsPaidAtAttribute($value)
     {
         $this->attributes['is_paid_at'] = $value;
-        if(isset($this->attributes['validity_in_days']))
+        if (
+            isset($this->attributes['validity_in_days']) AND isset($this->attributes['is_paid_at'])
+            AND !empty($this->attributes['is_paid_at']) AND !empty($this->attributes['validity_in_days'])
+        )
             $this->attributes['expires_at'] = now()->addDays($this->attributes['validity_in_days'])->toDateTimeString();
     }
-
-
 
 
 }

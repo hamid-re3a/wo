@@ -33,6 +33,7 @@ class CreateOrdersTable extends Migration
             $table->string('payment_type');
             $table->string('payment_currency')->nullable();
             $table->integer('validity_in_days')->nullable();
+            $table->timestamp('expires_at')->nullable();
             $table->string('payment_driver')->nullable()->default(null);
             $table->unsignedBigInteger('package_id');
 

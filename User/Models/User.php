@@ -3,6 +3,7 @@
 namespace User\Models;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
+use Bavix\Wallet\Traits\CanConfirm;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
@@ -14,6 +15,7 @@ use Orders\Models\Order;
 use Payments\Models\Invoice;
 use Spatie\Permission\Traits\HasRoles;
 use User\database\factories\UserFactory;
+use Wallets\Models\WithdrawProfit;
 
 /**
  * User\Models\User
@@ -31,6 +33,8 @@ use User\database\factories\UserFactory;
  * @property string|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read WithdrawProfit $withdrawRequests
+ * @property-read WithdrawProfit $withdrawRequestsActor
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
@@ -47,7 +51,7 @@ use User\database\factories\UserFactory;
  */
 class User extends Model implements WalletFloat
 {
-    use HasWalletFloat, HasWallets, HasFactory, HasRoles;
+    use HasWalletFloat, HasWallets, HasFactory, HasRoles,CanConfirm;
 
     protected $table = "users";
     protected $fillable = [
@@ -106,6 +110,16 @@ class User extends Model implements WalletFloat
     public function invoices()
     {
         return $this->hasMany(Invoice::class, 'user_id', 'id');
+    }
+
+    public function withdrawRequests()
+    {
+        return $this->hasMany(WithdrawProfit::class,'user_id','id');
+    }
+
+    public function withdrawRequestsActor()
+    {
+        return $this->hasMany(WithdrawProfit::class,'actor_id','id');
     }
 
 

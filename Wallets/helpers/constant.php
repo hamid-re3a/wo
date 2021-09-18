@@ -56,6 +56,16 @@ const WALLET_SETTINGS = [
         'title' => 'Minimum allowed amount',
         'description' => 'Minimum allowed amount'
     ],
+    'minimum_withdraw_request_from_earning_wallet_amount' => [
+        'value' => 100,
+        'title' => 'Minimum allowed amount',
+        'description' => 'Minimum allowed amount'
+    ],
+    'maximum_withdraw_request_from_earning_wallet_amount' => [
+        'value' => 10000,
+        'title' => 'Minimum allowed amount',
+        'description' => 'Minimum allowed amount'
+    ],
 
 ];
 

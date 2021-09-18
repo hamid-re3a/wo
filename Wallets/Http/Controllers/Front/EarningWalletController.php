@@ -8,11 +8,14 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Http\Requests\Front\CreateWithdrawRequest;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Http\Resources\WithdrawProfitResource;
+use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
 
 class EarningWalletController extends Controller
@@ -28,10 +31,10 @@ class EarningWalletController extends Controller
 
     }
 
-//    /**
-//     * Get earned commissions
-//     * @group Public User > Earning Wallet
-//     */
+    /**
+     * Get earned commissions
+     * @group Public User > Earning Wallet
+     */
     public function earned_commissions()
     {
         $this->prepareEarningWallet();
@@ -45,7 +48,7 @@ class EarningWalletController extends Controller
             )
             ->withSumQuery(['transactions.amount AS direct_commissions_sum' => function (Builder $query) {
                     $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function ($subQuery) {
+                    $query->whereHas('metaData', function (Builder $subQuery) {
                         $subQuery->where('name', '=', 'Direct Commissions');
                     });
                 }]
@@ -97,9 +100,7 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        $data = $this->bankService->getTransactions($this->wallet)->select('*')
-            ->selectRaw('( SELECT IFNULL(SUM(amount), 0) FROM transactions t2 WHERE t2.confirmed=1 AND t2.wallet_id=transactions.wallet_id AND t2.id <= transactions.id ) new_balance')
-            ->simplePaginate();
+        $data = $this->bankService->getTransactions($this->wallet)->simplePaginate();
         return api()->success(null, TransactionResource::collection($data)->response()->getData());
 
     }
@@ -119,12 +120,12 @@ class EarningWalletController extends Controller
     }
 
 
-//    /**
-//     * Transfer funds to member wallet preview
-//     * @group Public User > Earning Wallet
-//     * @param TransferFundFromEarningWalletRequest $request
-//     * @return JsonResponse
-//     */
+    /**
+     * Transfer funds preview
+     * @group Public User > Earning Wallet
+     * @param TransferFundFromEarningWalletRequest $request
+     * @return JsonResponse
+     */
     public function transfer_to_deposit_wallet_preview(TransferFundFromEarningWalletRequest $request)
     {
 
@@ -159,12 +160,12 @@ class EarningWalletController extends Controller
         }
     }
 
-//    /**
-//     * Transfer funds to deposit wallet
-//     * @group Public User > Earning Wallet
-//     * @param TransferFundFromEarningWalletRequest $request
-//     * @return JsonResponse
-//     */
+    /**
+     * Transfer funds
+     * @group Public User > Earning Wallet
+     * @param TransferFundFromEarningWalletRequest $request
+     * @return JsonResponse
+     */
     public function transfer_to_deposit_wallet(TransferFundFromEarningWalletRequest $request)
     {
         $this->prepareEarningWallet();
@@ -175,7 +176,7 @@ class EarningWalletController extends Controller
             $deposit_wallet = $this->bankService->getWallet(config('depositWallet'));
             $amount = request()->get('amount');
             $description = [];
-
+            $fee = 0;
             if ($request->has('member_id')) {
                 $another_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 $bank_service = new BankService($another_member);
@@ -192,11 +193,11 @@ class EarningWalletController extends Controller
             $transfer = $this->bankService->transfer(
                 $this->bankService->getWallet($this->wallet),
                 $deposit_wallet,
-                $request->get('amount'),
+                $amount,
                 $description
             );
 
-            if ($request->has('member_id'))
+            if ($request->has('member_id') AND $fee > 0)
                 $this->bankService->withdraw($this->wallet, $fee, [
                     'transfer_id' => $transfer->id
                 ], 'Transfer fee');
@@ -214,6 +215,56 @@ class EarningWalletController extends Controller
         }
     }
 
+    /**
+     * Withdraw requests
+     * @group Public User > Earning Wallet
+     */
+    public function withdraw_requests()
+    {
+        try {
+            return api()->success(null,WithdrawProfitResource::collection(auth()->user()->withdrawRequests()->simplePaginate())->response()->getData());
+        } catch (\Throwable $exception) {
+            Log::error('EarningWalletController@withdraw_requests => ' . serialize(request()->all()));
+            return api()->error(null,[
+                'subject' => $exception->getMessage()
+            ]);
+        }
+    }
+
+
+    /**
+     * Create withdraw request
+     * @group Public User > Earning Wallet
+     * @param CreateWithdrawRequest $request
+     * @return JsonResponse
+     */
+    public function create_withdraw_request(CreateWithdrawRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+            $this->prepareEarningWallet();
+
+            $withdraw_transaction = $this->bankService->withdraw($this->wallet,$request->get('amount'),[
+                'Withdraw request'
+            ]);
+
+            $withdraw_request = WithdrawProfit::query()->create([
+                'user_id' => auth()->user()->id,
+                'withdraw_transaction_id' => $withdraw_transaction->id
+            ]);
+
+
+
+            DB::commit();
+            return api()->success(null,WithdrawProfitResource::make($withdraw_request->fresh()));
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            Log::error('EarningWalletController@create_withdraw_request => ' . serialize($request->all()));
+            return api()->error(null,[
+                'subject' => $exception->getMessage()
+            ]);
+        }
+    }
 
     private function calculateTransferAmount($amount)
     {

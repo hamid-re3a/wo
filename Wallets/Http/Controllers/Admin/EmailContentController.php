@@ -36,6 +36,6 @@ class EmailContentController extends Controller
         $emails = EmailContent::all()->toArray();
         cache(['wallet_email_contents' =>  $emails]);
 
-        return api()->success(null, EmailContentResource::make($email->fresh()));
+        return api()->success(null, EmailContentResource::make($email->refresh()));
     }
 }

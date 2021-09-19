@@ -40,6 +40,6 @@ class SettingController extends Controller
         $settings = Setting::all()->toArray();
         cache(['wallet_settings' =>  $settings]);
 
-        return api()->success(null, SettingResource::make($setting->fresh()));
+        return api()->success(null, SettingResource::make($setting->refresh()));
     }
 }

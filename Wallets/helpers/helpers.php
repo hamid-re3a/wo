@@ -65,3 +65,11 @@ if (!function_exists('walletConvertAmountToDecimal')) {
         return $value * 100;
     }
 }
+
+if (!function_exists('walletConvertPFToBTC')) {
+
+    function walletConvertPFToBTC($value)
+    {
+        return $value;
+    }
+}

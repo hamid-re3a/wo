@@ -31,6 +31,7 @@ class WithdrawProfit extends Model
     protected $table = 'wallet_withdraw_profit_requests';
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'withdraw_transaction_id',
         'refund_transaction_id',

@@ -41,7 +41,7 @@ class UserWalletTableSeeder extends Seeder
         ]);
         $bankService = new BankService($user);
         $bankService->getWallet('Deposit Wallet');
-        $bankService->deposit('Deposit Wallet',10000);
+//        $bankService->deposit('Deposit Wallet',10000);
         $user->assignRole([USER_ROLE_SUPER_ADMIN,USER_ROLE_CLIENT]);
 
 

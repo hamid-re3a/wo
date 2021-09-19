@@ -27,7 +27,7 @@ Route::middleware(['auth', 'role:client'])->name('customer.')->group(function ()
         Route::middleware(['role:super-admin|subscriptions-admin'])->prefix('admin')->name('admin.')->group(function () { //TODO admin role
             Route::prefix('settings')->name('settings.')->group(function () {
                 Route::get('', [SettingController::class, 'index'])->name('list');
-                Route::post('update', [SettingController::class, 'update']);
+                Route::patch('update', [SettingController::class, 'update']);
             });
         });
     });

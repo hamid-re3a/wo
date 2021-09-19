@@ -8,6 +8,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Payments\Models\Invoice;
 use User\Models\User;
+use Wallets\Services\Grpc\Wallet;
+use Wallets\Services\Grpc\WalletNames;
+use Wallets\Services\WalletService;
 
 class EmailWalletInvoicePaidComplete extends Mailable implements SettingableMail
 {
@@ -22,7 +25,7 @@ class EmailWalletInvoicePaidComplete extends Mailable implements SettingableMail
      * @param User $user
      * @param Invoice $invoice
      */
-    public function __construct(User $user,Invoice $invoice)
+    public function __construct(User $user, Invoice $invoice)
     {
         $this->user = $user;
         $this->invoice = $invoice;
@@ -38,20 +41,35 @@ class EmailWalletInvoicePaidComplete extends Mailable implements SettingableMail
     public function build()
     {
         $setting = $this->getSetting();
-
-        $setting['body'] = str_replace('{{full_name}}',(is_null($this->user->full_name) || empty($this->user->full_name)) ? 'Unknown': $this->user->full_name,$setting['body']);
-        $setting['body'] = str_replace('{{invoice_no}}',(is_null($this->invoice->transaction_id) || empty($this->invoice->transaction_id)) ? 'Unknown': $this->invoice->transaction_id,$setting['body']);
+        $wallet_balance = $this->getDepositWalletBalance();
+        $setting['body'] = str_replace('{{full_name}}', (is_null($this->user->full_name) || empty($this->user->full_name)) ? 'Unknown' : $this->user->full_name, $setting['body']);
+        $setting['body'] = str_replace('{{invoice_no}}', (is_null($this->invoice->transaction_id) || empty($this->invoice->transaction_id)) ? 'Unknown' : $this->invoice->transaction_id, $setting['body']);
         $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->pf_amount) || empty($this->invoice->pf_amount)) ? 'Unknown' : $this->invoice->pf_amount, $setting['body']);
+        $setting['body'] = str_replace('{{wallet_balance}}', is_null($wallet_balance) ? 'Unknown' : $wallet_balance, $setting['body']);
 
         return $this
             ->from($setting['from'], $setting['from_name'])
             ->subject($setting['subject'])
-            ->html( $setting['body']);
+            ->html($setting['body']);
     }
 
-    public function getSetting() : array
+    public function getSetting(): array
     {
         return getPaymentEmailSetting('WALLET_INVOICE_COMPLETE_PAID_EMAIL');
+    }
+
+    public function getDepositWalletBalance()
+    {
+        try {
+            $wallet_service = app(WalletService::class);
+            $user_wallet_service = app(Wallet::class);
+            $user_wallet_service->setUserId($this->user->id);
+            $user_wallet_service->setName(WalletNames::DEPOSIT);
+            $response_wallet = $wallet_service->getBalance($user_wallet_service);
+            return $response_wallet->getBalance();
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 
 }

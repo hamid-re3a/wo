@@ -31,6 +31,7 @@ class CreateGiftcodesTable extends Migration
             $table->timestamp('redeem_date')->nullable();
 
             $table->boolean('is_canceled')->default(FALSE);
+            $table->boolean('is_expired')->default(FALSE);
 
             $table->softDeletes();
             $table->timestamps();

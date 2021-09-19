@@ -25,6 +25,7 @@ use User\Models\User;
  * @property int $registration_fee_in_usd
  * @property int $total_cost_in_usd
  * @property boolean $is_canceled
+ * @property boolean $is_expired
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -50,7 +51,8 @@ class Giftcode extends Model
         'packages_cost_in_usd',
         'registration_fee_in_usd',
         'total_cost_in_usd',
-        'is_canceled'
+        'is_canceled',
+        'is_expired',
     ];
 
     protected $casts = [
@@ -61,7 +63,8 @@ class Giftcode extends Model
         'expiration_date' => 'datetime',
         'redeem_date' => 'datetime',
         'redeem_user_id' => 'integer',
-        'is_canceled' => 'boolean'
+        'is_canceled' => 'boolean',
+        'is_expired' => 'boolean',
     ];
 
     protected $hidden = [
@@ -145,14 +148,20 @@ class Giftcode extends Model
      */
     public function getRefundAmount()
     {
+
+        $fee = null;
+        if($this->is_canceled AND giftcodeGetSetting('include_cancellation_fee') == TRUE)
+            $fee = giftcodeGetSetting('cancellation_fee');
+        else if($this->is_expired)
+            $fee = giftcodeGetSetting('expiration_fee');
+
         //Check we should calculate cancelation fee or not
-        if (!giftcodeGetSetting('include_cancellation_fee'))
+        if (!$fee)
             return $this->total_cost_in_usd;
 
-        //Calculate cancelation fee in fiat (USD)
-        $cancelation_fee_in_percent = giftcodeGetSetting('cancellation_fee');
-        $cancelation_fee_in_fiat = ($this->total_cost_in_usd * $cancelation_fee_in_percent) / 100;
-        return $this->total_cost_in_usd - $cancelation_fee_in_fiat;
+        //Calculate refundable amount
+        $refund_fee_in_fiat = ($this->total_cost_in_usd * $fee) / 100;
+        return $this->total_cost_in_usd - $refund_fee_in_fiat;
     }
 
 

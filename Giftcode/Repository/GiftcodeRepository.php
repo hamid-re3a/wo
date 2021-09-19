@@ -8,6 +8,7 @@ use Exception;
 use Giftcode\Jobs\UrgentEmailJob;
 use Giftcode\Mail\User\GiftcodeCanceledEmail;
 use Giftcode\Mail\User\GiftcodeCreatedEmail;
+use Giftcode\Mail\User\GiftcodeExpiredEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -71,6 +72,38 @@ class GiftcodeRepository
     public function getByCode($code)
     {
         return $this->model->query()->where('code',$code)->first();
+    }
+
+    public function expire(Giftcode $giftcode)
+    {
+        try {
+            DB::beginTransaction();
+
+            $giftcode->update([
+                'is_expired' => true
+            ]);
+
+            /**
+             * Refund Giftcode total paid - expiration fee
+             */
+            //Refund giftcode pay fee
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Expire Giftcode #' . $giftcode->uuid);
+
+            //Wallet transaction failed [Server error]
+            if(!is_string($finalTransaction->getTransactionId()))
+                throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
+            /**
+             * End refund
+             */
+            UrgentEmailJob::dispatch(new GiftcodeExpiredEmail($giftcode),$giftcode->creator->email);
+
+
+            DB::commit();
+            return $giftcode->fresh();
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
     }
 
     public function cancel(Request $request)

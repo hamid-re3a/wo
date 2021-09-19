@@ -54,22 +54,22 @@ class UpdateSettingRequest extends FormRequest
                     return 'required|in:fix,percentage';
                     break;
                 case 'minimum_deposit_fund_amount':
-                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_deposit_fund_amount')->pluck('value');
+                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_deposit_fund_amount')->pluck('value')['0'];
                     break;
                 case 'maximum_deposit_fund_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_deposit_fund_amount')->pluck('value');
+                    return 'required|gte:' . $settings->where('name', '=', 'minimum_deposit_fund_amount')->pluck('value')['0'];
                     break;
                 case 'minimum_transfer_fund_amount':
-                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_transfer_fund_amount')->pluck('value');
+                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_transfer_fund_amount')->pluck('value')['0'];
                     break;
                 case 'maximum_transfer_fund_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_transfer_fund_amount')->pluck('value');
+                    return 'required|gte:' . $settings->where('name', '=', 'minimum_transfer_fund_amount')->pluck('value')['0'];
                     break;
                 case 'minimum_payment_request_amount':
-                    return 'required|lte:' . $settings->where('name', '=', 'maximum_payment_request_amount')->pluck('value');
+                    return 'required|lte:' . $settings->where('name', '=', 'maximum_payment_request_amount')->pluck('value')['0'];
                     break;
                 case 'maximum_payment_request_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_payment_request_amount')->pluck('value');
+                    return 'required|gte:' . $settings->where('name', '=', 'minimum_payment_request_amount')->pluck('value')['0'];
                     break;
                 default:
                     return 'required';

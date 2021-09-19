@@ -83,5 +83,39 @@ CONST EMAIL_CONTENTS = [
         'variables_description'=>'full_name user full name, code giftcode code,package_name package name,creator_full_name creator name, redeem_date redeemed time',
         'type'=>'email',
     ],
+    'GIFTCODE_WILL_EXPIRING_SOON_EMAIL' => [
+        'is_active' => true,
+        'subject'=>'Gift code is expiring soon',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello <b>{{full_name}}</b>,</p>
+                <p>Your gift code ({{code}}) will expire on {{expiration_date}}. please use it as soon as possible </p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,code,expiration_date',
+        'variables_description'=>'full_name user full name, code gift code code,expiration_date gift code expiration date',
+        'type'=>'email',
+    ],
+    'GIFTCODE_EXPIRED_EMAIL' => [
+        'is_active' => true,
+        'subject'=>'Gift code is expired',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello <b>{{full_name}}</b>,</p>
+                <p>Your gift code ({{code}}) is expired. we credited your deposit wallet and charged you for expiry fee .</p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,code,expiration_date',
+        'variables_description'=>'full_name user full name, code gift code code,expiration_date gift code expiration date',
+        'type'=>'email',
+    ],
 
 ];

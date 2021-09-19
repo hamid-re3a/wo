@@ -68,6 +68,7 @@ class GiftcodeController extends Controller
      * @group Public User > Giftcode
      * @param CreateGiftcodeRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function store(CreateGiftcodeRequest $request)
     {
@@ -83,7 +84,9 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('GiftcodeController@store  => ' . $exception->getMessage() . ' Line => ' . $exception->getLine());
-            throw $exception;
+            return api()->error(null,[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 

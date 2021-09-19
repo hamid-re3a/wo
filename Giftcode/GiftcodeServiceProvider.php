@@ -2,6 +2,7 @@
 
 namespace Giftcode;
 
+use Giftcode\Commands\CheckGiftcodesCommand;
 use Giftcode\Models\EmailContent;
 use Giftcode\Models\Giftcode;
 use Giftcode\Models\Setting;
@@ -50,6 +51,8 @@ class GiftcodeServiceProvider extends ServiceProvider
 
         $this->registerObservers();
 
+        $this->registerCommands();
+
         Route::prefix('v1/giftcode')
             ->middleware('api')
             ->namespace($this->routes_namespace)
@@ -71,17 +74,27 @@ class GiftcodeServiceProvider extends ServiceProvider
     /**
      * Set Config files.
      */
-    protected function setupConfig()
+    private function setupConfig()
     {
         $path = realpath($raw = __DIR__ . '/config/' . $this->config_file_name . '.php') ?: $raw;
         $this->mergeConfigFrom($path, 'api');
+    }
+
+    /**
+     * Register Commands
+     */
+    private function registerCommands()
+    {
+        $this->commands([
+            CheckGiftcodesCommand::class
+        ]);
     }
 
 
     /**
      * Register helpers.
      */
-    protected function registerHelpers()
+    private function registerHelpers()
     {
         if (file_exists($helperFile = __DIR__ . '/helpers/emails.php')) {
             require_once($helperFile);
@@ -95,7 +108,7 @@ class GiftcodeServiceProvider extends ServiceProvider
     /**
      * Register Observers
      */
-    protected function registerObservers()
+    private function registerObservers()
     {
         Setting::observe(SettingObserver::class);
         Giftcode::observe(GiftcodeObserver::class);
@@ -107,7 +120,7 @@ class GiftcodeServiceProvider extends ServiceProvider
      *
      * @return bool
      */
-    protected function shouldMigrate()
+    private function shouldMigrate()
     {
         return GiftCodeConfigure::$runsMigrations;
     }

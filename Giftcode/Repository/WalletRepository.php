@@ -31,12 +31,12 @@ class WalletRepository
         return $this->wallet_service->withdraw($withdraw_object);
     }
 
-    public function depositUserWallet(Giftcode $giftcode, $description = 'Giftcode refund')
+    public function depositUserWallet(Giftcode $giftcode, $description = 'Giftcode refund', $type = 'Giftcode refund')
     {
         $deposit_object = app(Deposit::class);
         $deposit_object->setUserId($giftcode->user_id);
         $deposit_object->setAmount($giftcode->getRefundAmount());
-        $deposit_object->setType('Giftcode refund');
+        $deposit_object->setType($type);
         $deposit_object->setDescription($description);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);
 
@@ -55,12 +55,12 @@ class WalletRepository
         return $this->wallet_service->getBalance($wallet)->getBalance();
     }
 
-    private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode')
+    private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode', $type = 'Giftcode Refund fee')
     {
         $deposit_object = app(Deposit::class);
         $deposit_object->setUserId(1);
         $deposit_object->setAmount(($giftcode->total_cost_in_usd - $giftcode->getRefundAmount()));
-        $deposit_object->setType('Giftcode refund');
+        $deposit_object->setType($type);
         $deposit_object->setDescription($description);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);
         //Deposit transaction

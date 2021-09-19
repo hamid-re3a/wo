@@ -209,7 +209,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <div>
                 <p>Hi {{full_name}}</p>
                 <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
-                <p>Your deposit wallet will automatically charge.</p>
+                <p>Your deposit wallet is credited. Your current balance is {{wallet_balance}} PF.</p>
                 <p></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
@@ -266,13 +266,13 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
 
     'WALLET_INVOICE_CREATED_EMAIL'=>[
         'is_active'=>true,
-        'subject'=>'Deposit funds new invoice',
+        'subject'=>'Pay invoice on time',
         'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
-                <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
+                <p>Thank you for creating the invoice for the sum of {{usd_amount}} USD. Please pay the invoice on time. As we receive your payment, we will directly credit your deposit wallet.</p>
                 <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
                 <p><strong>Payment address:</strong> {{payment_address}}</p>
                 <p>As we receive payment in the system, we will deposit to your wallet .</p>

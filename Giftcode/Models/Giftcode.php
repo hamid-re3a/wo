@@ -99,10 +99,15 @@ class Giftcode extends Model
 
     public function getPackageNameAttribute()
     {
-        if ($this->package()->exists() AND !is_null($this->package->name))
-            return $this->package->name;
+        $name = null;
+        if ($this->package()->exists() AND !is_null($this->package->name)) {
+            $name = $this->package->name;
+            if($this->package->short_name)
+                $name = $name . ' (' . $this->package->short_name .')' ;
 
-        return null;
+        }
+
+        return $name;
     }
 
     public function getRedeemerFullNameAttribute()
@@ -131,7 +136,7 @@ class Giftcode extends Model
         if (isset($this->attributes['expiration_date']) AND $this->expiration_date->isPast())
             return 'Expired';
 
-        return 'Ready to use';
+        return 'Unused';
     }
 
 

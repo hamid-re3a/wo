@@ -63,7 +63,8 @@ class BankService
             'sub_type' => $sub_type
         ];
         $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description));
-        $this->toAdminDepositWallet($transaction,$amount,$description,$type);
+        if($this->owner->id != 1)
+            $this->toAdminDepositWallet($transaction,$amount,$description,$type);
         $transaction->syncMetaData($data);
         return $transaction;
 
@@ -166,7 +167,7 @@ class BankService
             'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
             'type' => $type
         ];
-        $transaction = $admin_wallet->depositFloat($amount, $description);
+        $transaction = $admin_wallet->depositFloat($amount, $this->createMeta($description));
         $transaction->syncMetaData($data);
 
     }

@@ -222,15 +222,14 @@ class EarningWalletController extends Controller
     public function withdraw_requests()
     {
         try {
-            return api()->success(null,WithdrawProfitResource::collection(auth()->user()->withdrawRequests()->simplePaginate())->response()->getData());
+            return api()->success(null, WithdrawProfitResource::collection(auth()->user()->withdrawRequests()->simplePaginate())->response()->getData());
         } catch (\Throwable $exception) {
             Log::error('EarningWalletController@withdraw_requests => ' . serialize(request()->all()));
-            return api()->error(null,[
+            return api()->error(null, [
                 'subject' => $exception->getMessage()
             ]);
         }
     }
-
 
     /**
      * Create withdraw request
@@ -244,9 +243,7 @@ class EarningWalletController extends Controller
             DB::beginTransaction();
             $this->prepareEarningWallet();
 
-            $withdraw_transaction = $this->bankService->withdraw($this->wallet,$request->get('amount'),[
-                'Withdraw request'
-            ]);
+            $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'),'Withdraw request');
 
             $withdraw_request = WithdrawProfit::query()->create([
                 'user_id' => auth()->user()->id,
@@ -254,13 +251,12 @@ class EarningWalletController extends Controller
             ]);
 
 
-
             DB::commit();
-            return api()->success(null,WithdrawProfitResource::make($withdraw_request->fresh()));
+            return api()->success(null, WithdrawProfitResource::make($withdraw_request->refresh()));
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('EarningWalletController@create_withdraw_request => ' . serialize($request->all()));
-            return api()->error(null,[
+            return api()->error(null, [
                 'subject' => $exception->getMessage()
             ]);
         }

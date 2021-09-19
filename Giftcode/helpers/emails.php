@@ -3,18 +3,20 @@
 CONST EMAIL_CONTENTS = [
     'GIFT_CODE_CREATED' => [
         'is_active' => true,
-        'subject'=>'Gift code created',
+        'subject'=>'Gift code created successfully',
         'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
                 <p>Hello <b>{{full_name}}</b>,</p>
-                <p>Your new giftcode has been created</p>
+                <p>A new gift code is created. Below are the details of the code.</p>
                 <p></p>
                 <p>Code : <b>{{code}}</b></p>
-                <p>Package : <b>{{package_name}}</b></p>
+                <p>Package name : <b>{{package_name}}</b></p>
+                <p>Registration fee included : <b>{{registration_fee_included_or_not}}</b></p>
                 <p>Total cost : <b>{{total_cost}}</b></p>
                 <p>Expiration date : <b>{{expiration_date}}</b></p>
+                <p>Please share the code with your friend for whom you created it.</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
@@ -25,16 +27,14 @@ CONST EMAIL_CONTENTS = [
     ],
     'GIFT_CODE_CANCELED' => [
         'is_active' => true,
-        'subject'=>'Gift code canceled',
+        'subject'=>'Gift code is canceled',
         'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
                 <p>Hello <b>{{full_name}}</b>,</p>
-                <p>Your giftcode has been canceled</p>
+                <p>Your request for gift code ({{code}}) cancellation is processed successfully. We credited your deposit wallet and charged you for cancellation fee.</p>
                 <p></p>
-                <p>Code : <b>{{code}}</b></p>
-                <p>Total refunded amount : <b>{{refund_amount}}</b></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
@@ -45,18 +45,14 @@ CONST EMAIL_CONTENTS = [
     ],
     'GIFTCODE_REDEEMED_CREATOR_EMAIL' => [
         'is_active' => true,
-        'subject'=>'Your Giftcode redeemed',
+        'subject'=>'Giftcode is used',
         'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
                 <p>Hello <b>{{full_name}}</b>,</p>
-                <p>Your giftcode has been redeemed</p>
+                <p>Your gift code ( {{code}} ) is used by your friend {{redeem_user_full_name}}. We have activated the {{package_name}} for him/her .</p>
                 <p></p>
-                <p>Code : <b>{{code}}</b></p>
-                <p>Package name : <b>{{package_name}}</b></p>
-                <p>Redeem User : <b>{{redeem_user_full_name}}</b></p>
-                <p>Redeem date : <b>{{redeem_date}}</b></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>

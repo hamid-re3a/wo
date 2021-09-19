@@ -43,6 +43,7 @@ class GiftcodeCreatedEmail extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{full_name}}',(is_null($this->user->full_name) || empty($this->user->full_name)) ? 'Unknown': $this->user->full_name,$setting['body']);
         $setting['body'] = str_replace('{{code}}',(is_null($this->giftcode->code) ) ? 'Unknown': $this->giftcode->code,$setting['body']);
         $setting['body'] = str_replace('{{package_name}}',(is_null($this->giftcode->package_name)) ? 'Unknown': $this->giftcode->package_name,$setting['body']);
+        $setting['body'] = str_replace('{{registration_fee_included_or_not}}',(empty($this->giftcode->registration_fee_in_usd) OR is_null($this->giftcode->package_name)) ? 'No': 'Yes',$setting['body']);
         $setting['body'] = str_replace('{{total_cost}}',(is_null($this->giftcode->total_cost_in_usd)) ? 'Unknown': (float) $this->giftcode->package_name,$setting['body']);
         $setting['body'] = str_replace('{{expiration_date}}',(is_null($this->giftcode->expiration_date)) ? trans('giftcode.phrases.no_expiration_date') : $this->giftcode->expiration_date,$setting['body']);
 

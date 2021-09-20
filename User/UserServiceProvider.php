@@ -54,12 +54,6 @@ class UserServiceProvider extends ServiceProvider
                 && is_numeric($request->header('X-user-id'))
             ) {
 
-
-                $user_update = new UserUpdate();
-                $user_update->setId($request->header('X-user-id'));
-                $user_update->setQueueName('subscriptions');
-
-
                 $user_hash_request = $request->header('X-user-hash');
                 $user = User::query()->whereId($request->header('X-user-id'))->first();
 
@@ -85,7 +79,6 @@ class UserServiceProvider extends ServiceProvider
                     $service_user = updateUserFromGrpcServer($request);
                     $hash_user_service = md5(serialize($service_user));
                     if ($hash_user_service != $user_hash_request) {
-                        UserGetDataJob::dispatch($user_update);
                         throw new Exception('please try another time!', 471);
                     }
                 }

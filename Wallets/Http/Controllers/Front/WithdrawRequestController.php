@@ -112,7 +112,7 @@ class WithdrawRequestController extends Controller
         $req->setUserId(auth()->user()->id);
         $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
         list($reply, $status) = $client->getUserWalletInfo($req)->wait();
-        if(!$status OR !$reply->getAddress())
+        if(!$status->code != 0 OR !$reply->getAddress())
             throw new \Exception(trans('wallet.withdraw-profit-request.cant-find-wallet-address',[
                 'name' => WalletType::name(0)
             ]));

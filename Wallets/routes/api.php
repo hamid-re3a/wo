@@ -57,11 +57,11 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
         });
 
-        Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){
-            Route::get('withdraw-requests', [UserWithdrawRequestController::class, 'withdraw_requests'])->name('withdraw-requests');
-            Route::post('preview', [UserWithdrawRequestController::class, 'create_withdraw_request_preview'])->name('create-withdraw-request-preview');
-            Route::post('', [UserWithdrawRequestController::class, 'create_withdraw_request'])->name('create-withdraw-request');
-        });
+//        Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){
+//            Route::get('withdraw-requests', [UserWithdrawRequestController::class, 'withdraw_requests'])->name('withdraw-requests');
+//            Route::post('preview', [UserWithdrawRequestController::class, 'create_withdraw_request_preview'])->name('create-withdraw-request-preview');
+//            Route::post('', [UserWithdrawRequestController::class, 'create_withdraw_request'])->name('create-withdraw-request');
+//        });
     });
 });
 

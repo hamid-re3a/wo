@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use User\Services\Grpc\WalletType;
 use Wallets\Http\Requests\Front\CreateWithdrawRequest;
 use Wallets\Http\Resources\WithdrawProfitResource;
 use Wallets\Models\WithdrawProfit;
@@ -102,7 +103,6 @@ class WithdrawRequestController extends Controller
         }
     }
 
-
     private function getUserWalletHash()
     {
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
@@ -112,8 +112,10 @@ class WithdrawRequestController extends Controller
         $req->setUserId(auth()->user()->id);
         $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
         list($reply, $status) = $client->getUserWalletInfo($req)->wait();
-        if(!$status OR !$reply->getAddress())
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+        if(!$status->code != 0 OR !$reply->getAddress())
+            throw new \Exception(trans('wallet.withdraw-profit-request.cant-find-wallet-address',[
+                'name' => WalletType::name(0)
+            ]));
 
         return $reply->getAddress();
     }

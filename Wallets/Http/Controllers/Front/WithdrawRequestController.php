@@ -53,21 +53,11 @@ class WithdrawRequestController extends Controller
         try {
 
             //Grpc get wallet hash
-            $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
-                'credentials' => \Grpc\ChannelCredentials::createInsecure()
-            ]);
-            $req = app(\User\Services\Grpc\WalletRequest::class);
-            $req->setUserId(auth()->user()->id);
-            $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
-            list($reply, $status) = $client->getUserWalletInfo($req)->wait();
-            if(!$status OR !$reply->getAddress())
-                throw new \Exception(trans('wallet.responses.something-went-wrong'));
-
-            cache([auth()->user()->member_id . '_user_wallet_hash' , $reply->getAddress()]);
+            $wallet_hash = $this->getUserWalletHash();
 
             return api()->success(null,[
                 'amount' => $request->get('amount'),
-                'wallet_hash' => $reply->getAddress()
+                'wallet_hash' => $wallet_hash
             ]);
         } catch (\Throwable $exception) {
             Log::error('EarningWalletController@create_withdraw_request => ' . serialize($request->all()));
@@ -92,16 +82,14 @@ class WithdrawRequestController extends Controller
 
             $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'),'Withdraw request');
 
-            if(!cache()->has(auth()->user()->member_id . '_user_wallet_hash'))
-                throw new \Exception(trans('wallet.responses.something-went-wrong'));
+
+            $wallet_hash = $this->getUserWalletHash();
 
             $withdraw_request = WithdrawProfit::query()->create([
                 'user_id' => auth()->user()->id,
                 'withdraw_transaction_id' => $withdraw_transaction->id,
-                'wallet_hash' => cache(auth()->user()->member_id . '_user_wallet_hash')
+                'wallet_hash' => $wallet_hash
             ]);
-            cache()->delete(auth()->user()->member_id . '_user_wallet_hash');
-
 
             DB::commit();
             return api()->success(null, WithdrawProfitResource::make($withdraw_request->refresh()));
@@ -112,5 +100,21 @@ class WithdrawRequestController extends Controller
                 'subject' => $exception->getMessage()
             ]);
         }
+    }
+
+
+    private function getUserWalletHash()
+    {
+        $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+        $req = app(\User\Services\Grpc\WalletRequest::class);
+        $req->setUserId(auth()->user()->id);
+        $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
+        list($reply, $status) = $client->getUserWalletInfo($req)->wait();
+        if(!$status OR !$reply->getAddress())
+            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+
+        return $reply->getAddress();
     }
 }

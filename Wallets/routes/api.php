@@ -11,7 +11,7 @@ use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController
 use Wallets\Http\Controllers\Front\WithdrawRequestController as UserWithdrawRequestController;
 
 Route::middleware('auth')->name('wallets.')->group(function(){
-    Route::middleware(['role:super-admin|subscriptions-wallet-admin'])->name('wallets.')->prefix('admin')->group(function () {
+    Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_SUBSCRIPTIONS_WALLET])->name('wallets.')->prefix('admin')->group(function () {
             Route::name('users.')->prefix('users')->group(function () {
                 Route::post('all-transactions', [AdminWalletController::class, 'getAllTransactions'])->name('get-all-transactions');
                 Route::post('wallets-list', [AdminWalletController::class, 'getWalletsList'])->name('wallets-list');
@@ -53,14 +53,14 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::get('earned-commissions', [EarningWalletController::class, 'earned_commissions'])->name('earned-commissions');
             Route::get('transactions', [EarningWalletController::class, 'transactions'])->name('transactions');
             Route::get('transfers', [EarningWalletController::class, 'transfers'])->name('transfers');
-//            Route::post('transfer-funds-preview', [EarningWalletController::class, 'transfer_to_deposit_wallet_preview'])->name('transfer-funds-preview');
-//            Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
+            Route::post('transfer-funds-preview', [EarningWalletController::class, 'transfer_to_deposit_wallet_preview'])->name('transfer-funds-preview');
+            Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
         });
 
         Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){
             Route::get('withdraw-requests', [UserWithdrawRequestController::class, 'withdraw_requests'])->name('withdraw-requests');
-            Route::post('withdraw-requests-preview', [UserWithdrawRequestController::class, 'create_withdraw_request_preview'])->name('create-withdraw-request-preview');
-            Route::post('withdraw-requests', [UserWithdrawRequestController::class, 'create_withdraw_request'])->name('create-withdraw-request');
+            Route::post('preview', [UserWithdrawRequestController::class, 'create_withdraw_request_preview'])->name('create-withdraw-request-preview');
+            Route::post('', [UserWithdrawRequestController::class, 'create_withdraw_request'])->name('create-withdraw-request');
         });
     });
 });

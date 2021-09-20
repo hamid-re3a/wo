@@ -47,7 +47,7 @@ class WithdrawProfit extends Model
     protected $with = [
         'withdrawTransaction',
         'refundTransaction',
-        'network_transaction',
+        'networkTransaction',
         'user',
         'actor'
     ];

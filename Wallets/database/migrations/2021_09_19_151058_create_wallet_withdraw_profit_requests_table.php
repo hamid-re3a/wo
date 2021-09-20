@@ -20,7 +20,7 @@ class CreateWalletWithdrawProfitRequestsTable extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('withdraw_transaction_id')->constrained('transactions');
             $table->foreignId('refund_transaction_id')->nullable()->constrained('transactions');
-            $table->foreignId('network_transaction_id')->constrained('wallet_network_transactions');
+            $table->foreignId('network_transaction_id')->nullable()->constrained('wallet_network_transactions');
             $table->tinyInteger('status')->default('1')->comment('Possible values(integer) : 1 = Under review, 2 = Rejected, 3 = Processed');
 
             $table->foreignId('actor_id')->nullable()->constrained('users');

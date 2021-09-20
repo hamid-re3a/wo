@@ -68,7 +68,6 @@ class UserServiceProvider extends ServiceProvider
                         throw new Exception('please try another time!', 470);
 
                     $user = User::query()->whereId($request->header('X-user-id'))->first();
-
                 }
 
                 $hash_user_service = md5(serialize($user->getUserService()));

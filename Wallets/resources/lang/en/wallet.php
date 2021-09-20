@@ -6,5 +6,8 @@ return [
         'not-enough-balance' => 'Insufficient balance',
         'email-key-doesnt-exists' => "Wallet email content doesn't exists",
     ],
+    'withdraw-profit-request' => [
+        'cant-find-wallet-address' => 'Please register your :name wallet address.'
+    ]
 ];
 

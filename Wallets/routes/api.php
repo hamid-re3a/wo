@@ -2,18 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use Wallets\Http\Controllers\Admin\EmailContentController;
-use Wallets\Http\Controllers\Admin\InvoiceWalletController;
 use Wallets\Http\Controllers\Admin\SettingController;
-use Wallets\Http\Controllers\Admin\WithdrawRequestController;
+use Wallets\Http\Controllers\Admin\WithdrawRequestController as AdminWithdrawRequestController;
 use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
 use Wallets\Http\Controllers\Front\WalletController;
 use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
-use Wallets\Services\BankService;
-
+use Wallets\Http\Controllers\Front\WithdrawRequestController as UserWithdrawRequestController;
 
 Route::middleware('auth')->name('wallets.')->group(function(){
-    Route::middleware(['role:super-admin|subscriptions-wallet-admin'])->name('wallets.')->prefix('admin')->group(function () {
+    Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_SUBSCRIPTIONS_WALLET])->name('wallets.')->prefix('admin')->group(function () {
             Route::name('users.')->prefix('users')->group(function () {
                 Route::post('all-transactions', [AdminWalletController::class, 'getAllTransactions'])->name('get-all-transactions');
                 Route::post('wallets-list', [AdminWalletController::class, 'getWalletsList'])->name('wallets-list');
@@ -31,8 +29,8 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             });
 
 //            Route::name('withdraw-requests.')->prefix('withdraw-requests')->group(function(){
-//                Route::get('',[WithdrawRequestController::class,'index'])->name('index');
-//                Route::patch('',[WithdrawRequestController::class,'update'])->name('update');
+//                Route::get('',[AdminWithdrawRequestController::class,'index'])->name('index');
+//                Route::patch('',[AdminWithdrawRequestController::class,'update'])->name('update');
 //            });
     });
 
@@ -55,11 +53,15 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::get('earned-commissions', [EarningWalletController::class, 'earned_commissions'])->name('earned-commissions');
             Route::get('transactions', [EarningWalletController::class, 'transactions'])->name('transactions');
             Route::get('transfers', [EarningWalletController::class, 'transfers'])->name('transfers');
-//            Route::post('transfer-funds-preview', [EarningWalletController::class, 'transfer_to_deposit_wallet_preview'])->name('transfer-funds-preview');
-//            Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
-//            Route::get('withdraw-requests', [EarningWalletController::class, 'withdraw_requests'])->name('withdraw-requests');
-//            Route::post('withdraw-requests', [EarningWalletController::class, 'create_withdraw_request'])->name('create-withdraw-request');
+            Route::post('transfer-funds-preview', [EarningWalletController::class, 'transfer_to_deposit_wallet_preview'])->name('transfer-funds-preview');
+            Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
         });
+
+//        Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){
+//            Route::get('withdraw-requests', [UserWithdrawRequestController::class, 'withdraw_requests'])->name('withdraw-requests');
+//            Route::post('preview', [UserWithdrawRequestController::class, 'create_withdraw_request_preview'])->name('create-withdraw-request-preview');
+//            Route::post('', [UserWithdrawRequestController::class, 'create_withdraw_request'])->name('create-withdraw-request');
+//        });
     });
 });
 

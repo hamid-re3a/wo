@@ -24,6 +24,7 @@ class CreateWithdrawRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws \Exception
      */
     public function rules()
     {

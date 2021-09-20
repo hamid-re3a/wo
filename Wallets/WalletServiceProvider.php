@@ -2,6 +2,7 @@
 
 namespace Wallets;
 
+use Wallets\Commands\ProcessWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;
 use Wallets\Models\WithdrawProfit;
@@ -52,6 +53,8 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
+        $this->registerCommands();
+
         $this->registerWalletsName();
 
         Route::prefix('v1/wallets')
@@ -73,9 +76,19 @@ class WalletServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register Commands
+     */
+    private function registerCommands()
+    {
+        $this->commands([
+            ProcessWithdrawalRequestsCommand::class
+        ]);
+    }
+
+    /**
      * Register Observers
      */
-    protected function registerObservers()
+    private function registerObservers()
     {
         Setting::observe(SettingObserver::class);
         EmailContent::observe(EmailContentObserver::class);
@@ -86,7 +99,7 @@ class WalletServiceProvider extends ServiceProvider
     /**
      * Set Config files.
      */
-    protected function setupConfig()
+    private function setupConfig()
     {
         $path = realpath($raw = __DIR__ . '/config/' . $this->config_file_name . '.php') ?: $raw;
         $this->mergeConfigFrom($path, 'api');
@@ -96,7 +109,7 @@ class WalletServiceProvider extends ServiceProvider
     /**
      * Register helpers.
      */
-    protected function registerHelpers()
+    private function registerHelpers()
     {
         if (file_exists($helperFile = __DIR__ . '/helpers/constant.php')) {
             require_once($helperFile);
@@ -118,7 +131,7 @@ class WalletServiceProvider extends ServiceProvider
     /**
      * Register wallets name
      */
-    protected function registerWalletsName()
+    private function registerWalletsName()
     {
         config([
             'depositWallet' => 'Deposit Wallet',
@@ -132,7 +145,7 @@ class WalletServiceProvider extends ServiceProvider
      *
      * @return bool
      */
-    protected function shouldMigrate()
+    private function shouldMigrate()
     {
         return WalletConfigure::$runsMigrations;
     }

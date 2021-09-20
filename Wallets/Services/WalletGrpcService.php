@@ -1,10 +1,13 @@
 <?php
 
 
-namespace Wallets\Services\Grpc;
+namespace Wallets\Services;
 
 use Mix\Grpc\Context;
-use Wallets\Services\WalletService;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\Transfer;
+use Wallets\Services\Grpc\Wallet;
+use Wallets\Services\Grpc\Withdraw;
 
 class WalletGrpcService implements \Wallets\Services\Grpc\WalletServiceInterface
 {

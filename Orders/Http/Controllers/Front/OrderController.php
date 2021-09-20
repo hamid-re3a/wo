@@ -141,7 +141,7 @@ class OrderController extends Controller
             list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getOrderService())->wait();
 
             if ($flag->code != 0)
-                throw new \Exception($response->getMessage(), 406);
+                throw new \Exception('MLM not responding', 406);
 
             //Invoice service
             $invoice_request = new Invoice();
@@ -168,7 +168,7 @@ class OrderController extends Controller
                 /** @var $submit_response Acknowledge */
                 list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_db->getOrderService())->wait();
                 if ($flag->code != 0 )
-                    throw new \Exception($submit_response->getMessage(), 406);
+                    throw new \Exception('MLM not responding', 406);
 
                 $order_db->update([
                     'is_resolved_at' => $submit_response->getCreatedAt()

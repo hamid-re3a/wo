@@ -66,6 +66,11 @@ const WALLET_SETTINGS = [
         'title' => 'Minimum allowed amount',
         'description' => 'Minimum allowed amount'
     ],
+    'maximum_auto_handle_withdrawals' => [
+        'value' => 10000,
+        'title' => 'Maximum USD amount',
+        'description' => 'Maximum withdrawal amount to process automatically'
+    ],
 
 ];
 

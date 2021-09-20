@@ -5,7 +5,7 @@ require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/public/index.php';
 
 $grpc = new \Mix\Grpc\Server();
-$grpc->register(\Wallets\Services\Grpc\WalletGrpcService::class);
+$grpc->register(\Wallets\Services\WalletGrpcService::class);
 $grpc->register(\Packages\Services\PackageGrpcService::class);
 
 Swoole\Coroutine\run(function () use ($grpc) {

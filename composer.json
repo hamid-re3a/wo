@@ -59,6 +59,7 @@
             "Database\\Seeders\\": "database/seeders/",
             "Packages\\": "Packages/",
             "Orders\\": "Orders/",
+            "MLM\\": "MLM/",
             "Wallets\\": "Wallets/",
             "Giftcode\\": "Giftcode/",
             "Payments\\": "Payments/",

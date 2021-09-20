@@ -16,13 +16,15 @@ class Mlm
         }
         $pool->internalAddGeneratedFile(
             '
-Å
-	mlm.protoMLM.services.grpc"@
-ResidualBonus
-rank (
-level (
+Ñ
+	mlm.protoMLM.services.grpc"L
+ResidualBonus
 
-percentage ("[
+id (
+rank (
+level (
+
+percentage ("[
 
 PackageRoi
 

@@ -17,7 +17,6 @@ use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
 use Orders\Models\Order;
-use Orders\Services\OrderResolver;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\Invoice;

@@ -18,9 +18,3 @@ use Illuminate\Support\Facades\Route;
 //
 //});
 
-
-Route::get('test',function(){
-    $user = updateUserFromGrpcServer(2);
-
-    return $user->getFirstName();
-});

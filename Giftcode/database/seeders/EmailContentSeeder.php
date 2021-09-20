@@ -9,6 +9,7 @@ class EmailContentSeeder extends Seeder
     public function run()
     {
         if(defined('EMAIL_CONTENTS') AND is_array(EMAIL_CONTENTS)) {
+            $now = now()->toDateTimeString();
             $emails = [];
             foreach(EMAIL_CONTENTS AS $key => $email){
                 if(filter_var(env('MAIL_USERNAME', $email['from']), FILTER_VALIDATE_EMAIL))
@@ -24,7 +25,9 @@ class EmailContentSeeder extends Seeder
                     'body' => $email['body'],
                     'variables' => $email['variables'],
                     'variables_description' => $email['variables_description'],
-                    'type' => $email['type']
+                    'type' => $email['type'],
+                    'created_at' => $now,
+                    'updated_at' => $now
                 ];
             }
             EmailContent::insert($emails);

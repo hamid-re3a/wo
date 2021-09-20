@@ -5,6 +5,7 @@ namespace Payments\Services\Processors;
 
 
 use App\Jobs\Order\MLMOrderJob;
+use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
@@ -48,7 +49,7 @@ class OrderProcessor extends ProcessorAbstract
 
         // send email notification for due amount
         $user = User::query()->whereId($this->order_service->getUserId())->first();
-        EmailJob::dispatch(new EmailInvoicePaidPartial($user->getUserService(), $this->invoice_db,$this->order_service), $user->email);
+        EmailJob::dispatch(new EmailInvoicePaidPartial($user->getUserService(), $this->invoice_db, $this->order_service), $user->email);
 
 
     }
@@ -63,24 +64,32 @@ class OrderProcessor extends ProcessorAbstract
 
     public function completed()
     {
+        // TODO handle if mlm grpc is down condition
+
+        //Send order to MLM
+        /** @var $submit_response Acknowledge */
+        list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($this->order_service)->wait();
+        if ($flag->code != 0)
+            throw new \Exception($submit_response->getMessage(), 406);
+
+
         $this->invoice_db->update([
             'is_paid' => true
         ]);
-
         // send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
 
         // send thank you email notification
         $user = User::query()->whereId($this->order_service->getUserId())->first();
-        EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db),$user->email);
+        EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db), $user->email);
 
 
-        //Update order
-        $this->order_service->setIsPaidAt(now()->toDateTimeString());
-        app(OrderService::class)->updateOrder($this->order_service);
+        if ($submit_response->getStatus()) {
+            //Update order
+            $this->order_service->setIsPaidAt(now()->toDateTimeString());
+            app(OrderService::class)->updateOrder($this->order_service);
+        }
 
-        //Send order to MLM
-        MLMOrderJob::dispatch(serialize($this->order_service))->onConnection('rabbit')->onQueue('mlm');
     }
 
     public function expired()

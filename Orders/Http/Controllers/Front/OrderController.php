@@ -3,6 +3,7 @@
 namespace Orders\Http\Controllers\Front;
 
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use MLM\Services\Grpc\Acknowledge;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Http\Requests\Front\Order\ShowRequest;
@@ -47,33 +49,33 @@ class OrderController extends Controller
             'orders AS total_paid' => function (Builder $query) {
                 $query->whereNotNull('is_paid_at');
             },
-            'orders AS total_resolved' => function(Builder $query) {
+            'orders AS total_resolved' => function (Builder $query) {
                 $query->whereNotNull('is_resolved_at');
             },
             'orders AS total_refund' => function (Builder $query) {
                 $query->whereNotNull('is_refund_at');
             },
-            'orders AS total_commission_paid' => function(Builder $query) {
+            'orders AS total_commission_paid' => function (Builder $query) {
                 $query->whereNotNull('is_commission_resolved_at');
             },
-            'orders AS total_paid_with_wallet' => function(Builder $query) {
-                $query->where('payment_driver','deposit');
+            'orders AS total_paid_with_wallet' => function (Builder $query) {
+                $query->where('payment_driver', 'deposit');
             },
-            'orders AS total_paid_with_giftcode' => function(Builder $query) {
+            'orders AS total_paid_with_giftcode' => function (Builder $query) {
                 $query->where('payment_driver', 'giftcode');
             },
-            'orders AS total_paid_with_purchase' => function(Builder $query) {
+            'orders AS total_paid_with_purchase' => function (Builder $query) {
                 $query->where('payment_driver', 'purchase');
             },
-            'orders AS total_plan_start' => function(Builder $query) {
-                $query->where('plan',ORDER_PLAN_START);
+            'orders AS total_plan_start' => function (Builder $query) {
+                $query->where('plan', ORDER_PLAN_START);
             },
-            'orders AS total_plan_purchase' => function(Builder $query) {
-                $query->where('plan',ORDER_PLAN_PURCHASE);
+            'orders AS total_plan_purchase' => function (Builder $query) {
+                $query->where('plan', ORDER_PLAN_PURCHASE);
             }
         ])->first()->toArray();
 
-        return api()->success(null,[
+        return api()->success(null, [
             'total_orders' => $total_counts['total_orders'],
             'total_paid' => $total_counts['total_paid'],
             'total_resolved' => $total_counts['total_resolved'],
@@ -136,11 +138,11 @@ class OrderController extends Controller
             ]);
             $order_db->refreshOrder();
             //Order Resolver
-            $order_resolver = new OrderResolver($order_db->getOrderService());
-            list($flag, $response) = $order_resolver->simulateValidation();
+            /** @var $response Acknowledge */
+            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getOrderService())->wait();
 
-            if (!$flag)
-                throw new \Exception($response, 406);
+            if ($flag->code != 0)
+                throw new \Exception($response->getMessage(), 406);
 
             //Invoice service
             $invoice_request = new Invoice();
@@ -162,12 +164,15 @@ class OrderController extends Controller
                 throw new \Exception($payment_response, 406);
 
             if ($request->get('payment_type') != 'purchase') {
-                list($flag, $response) = $order_resolver->resolve();
-                if (!$flag)
-                    throw new \Exception($response, 406);
+
+
+                /** @var $submit_response Acknowledge */
+                list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_db->getOrderService())->wait();
+                if ($flag->code != 0 )
+                    throw new \Exception($submit_response->getMessage(), 406);
 
                 $order_db->update([
-                    'is_resolved_at' => now()->toDateTimeString()
+                    'is_resolved_at' => $submit_response->getCreatedAt()
                 ]);
             }
 

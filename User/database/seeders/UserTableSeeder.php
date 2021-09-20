@@ -2,12 +2,9 @@
 
 namespace User\database\seeders;
 
-use App\Jobs\User\RequestGetAllUserDataJob;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 use User\Models\User;
-use User\Services\Grpc\UserUpdate;
 
 /**
  * Class AuthTableSeeder.
@@ -21,14 +18,6 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        $user_update = new UserUpdate();
-        $user_update->setQueueName('subscriptions');
-        $data_serialize = serialize($user_update);
-        try {
-            RequestGetAllUserDataJob::dispatch($data_serialize)->onConnection("rabbit")->onQueue("api-gateway");
-        } catch (\Exception $e) {
-            Log::info("Rabbit connection failed");
-        }
 
         if (defined('USER_ROLES'))
             foreach (USER_ROLES as $role)

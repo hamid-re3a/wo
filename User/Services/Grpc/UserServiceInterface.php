@@ -20,4 +20,13 @@ interface UserServiceInterface extends Grpc\ServiceInterface
     * @throws Grpc\Exception\InvokeException
     */
     public function getUserById(Context $context, Id $request): User;
+
+    /**
+    * @param Context $context
+    * @param WalletRequest $request
+    * @return WalletInfo
+    *
+    * @throws Grpc\Exception\InvokeException
+    */
+    public function getUserWalletInfo(Context $context, WalletRequest $request): WalletInfo;
 }

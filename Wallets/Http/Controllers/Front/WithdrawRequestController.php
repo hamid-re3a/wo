@@ -44,7 +44,7 @@ class WithdrawRequestController extends Controller
     }
 
     /**
-     * Create withdraw request preview
+     * Withdraw request preview
      * @group Public User > Withdraw Requests
      * @param CreateWithdrawRequest $request
      * @return JsonResponse
@@ -69,7 +69,7 @@ class WithdrawRequestController extends Controller
     }
 
     /**
-     * Create withdraw request
+     * Submit withdraw request
      * @group Public User > Withdraw Requests
      * @param CreateWithdrawRequest $request
      * @return JsonResponse

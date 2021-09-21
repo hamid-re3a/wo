@@ -48,6 +48,7 @@ class ProcessWithdrawalRequestsCommand extends Command
     public function handle()
     {
         $maximum_amount = walletGetSetting('maximum_auto_handle_withdrawals');
+        $count_withdraw_requests = walletGetSetting('count_withdraw_requests_to_automatic_payout_process') ? walletGetSetting('count_withdraw_requests_to_automatic_payout_process') : 50;
         //Query withdrawal requests
         $withdrawal_requests = WithdrawProfit::query()->whereHas('withdrawTransaction', function (Builder $query) use ($maximum_amount) {
             $query->where(DB::raw("(SIGN(amount))"), '<=', $maximum_amount);
@@ -59,12 +60,12 @@ class ProcessWithdrawalRequestsCommand extends Command
         })->where('status','=',1);
         $btc_price = Http::get('https://blockchain.info/ticker');
 
-        if ($btc_price->ok() AND $withdrawal_requests->count() >= 50 AND is_array($btc_price) AND isset($btc_price->json()['USD']['15m'])) {
+        if ($btc_price->ok() AND $withdrawal_requests->count() >= $count_withdraw_requests AND is_array($btc_price) AND isset($btc_price->json()['USD']['15m'])) {
             $btc_price = $btc_price->json()['USD']['15m'];
             $this->wallets = [];
             $this->ids = [];
 
-            $withdrawal_requests->chunkById(50, function ($chunked) use($btc_price){
+            $withdrawal_requests->chunkById($count_withdraw_requests, function ($chunked) use($btc_price){
                 foreach ($chunked AS $withdraw_request) {
                     $this->ids[] = $withdraw_request->id;
                     $this->wallets[] = [

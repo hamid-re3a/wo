@@ -71,6 +71,11 @@ const WALLET_SETTINGS = [
         'title' => 'Maximum USD amount',
         'description' => 'Maximum withdrawal amount to process automatically'
     ],
+    'count_withdraw_requests_to_automatic_payout_process' => [
+        'value' => 50,
+        'title' => 'Minimum withdraw requests for automatic payout.',
+        'description' => 'Minimum withdraw requests for automatic payout'
+    ],
 
 ];
 

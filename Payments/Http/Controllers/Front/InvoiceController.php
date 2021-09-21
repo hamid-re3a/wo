@@ -45,6 +45,28 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Get user pending wallet invoice
+     * @group
+     * Public User > Invoices
+     */
+    public function pendingWalletInvoice()
+    {
+        $pending_invoice = auth()->user()->invoices()->where('payable_type','DepositWallet')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
+
+        if(!$pending_invoice) {
+            $paid_invoice = auth()->user()->invoices()->where('payable_type','DepositWallet')->where('is_paid',1)->count();
+            if($paid_invoice)
+                return api()->success(null,[
+                    'status' => 'confirmed'
+                ]);
+
+            return api()->error(null,null,404);
+        }
+
+        return api()->success(null, InvoiceResource::make($pending_invoice));
+    }
+
+    /**
      * Get invoices list
      * @group
      * Public User > Invoices

@@ -4,6 +4,8 @@ namespace Wallets\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Wallets\Jobs\ProcessBTCTransactionsJob;
 use Wallets\Models\WithdrawProfit;
 
@@ -46,31 +48,31 @@ class ProcessWithdrawalRequestsCommand extends Command
     public function handle()
     {
         $maximum_amount = walletGetSetting('maximum_auto_handle_withdrawals');
-
         //Query withdrawal requests
         $withdrawal_requests = WithdrawProfit::query()->whereHas('withdrawTransaction', function (Builder $query) use ($maximum_amount) {
-            $query->where('amount', '<=', $maximum_amount * 100);
+            $query->where(DB::raw("(SIGN(amount))"), '<=', $maximum_amount);
             $query->where('wallet_id', '!=', 1);
             $query->where('type', '=', 'withdraw');
             $query->whereHas('metaData', function (Builder $subQuery) {
                 $subQuery->where('name', '=', 'Withdraw request');
             });
         })->where('status','=',1);
+        $btc_price = Http::get('https://blockchain.info/ticker');
 
-        if ($withdrawal_requests->count() >= 50) {
-
+        if ($btc_price->ok() AND $withdrawal_requests->count() >= 50 AND is_array($btc_price) AND isset($btc_price->json()['USD']['15m'])) {
+            $btc_price = $btc_price->json()['USD']['15m'];
             $this->wallets = [];
             $this->ids = [];
 
-            $withdrawal_requests->chunkById(50, function ($chunked) {
+            $withdrawal_requests->chunkById(50, function ($chunked) use($btc_price){
                 foreach ($chunked AS $withdraw_request) {
                     $this->ids[] = $withdraw_request->id;
                     $this->wallets[] = [
-                        'destination' => $withdraw_request->wallet_address,
-                        'amount' => $withdraw_request->withdrawTransaction->amount / 100
+                        'destination' => $withdraw_request->wallet_hash,
+                        'amount' => abs($withdraw_request->withdrawTransaction->amountFloat) / $btc_price
                     ];
                 }
-                ProcessBTCTransactionsJob::dispatch($this->wallets, $this->ids);
+                ProcessBTCTransactionsJob::dispatchSync($this->wallets, $this->ids);
                 unset($this->chunked);
                 unset($withdraw_request);
                 unset($this->wallets);

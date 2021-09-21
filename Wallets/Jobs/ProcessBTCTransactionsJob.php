@@ -42,6 +42,7 @@ class ProcessBTCTransactionsJob implements ShouldQueue
      */
     public function handle()
     {
+
         $response =  Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->post(
                 config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
@@ -66,8 +67,11 @@ class ProcessBTCTransactionsJob implements ShouldQueue
                 'status' => $response->json()['status'],
             ]);
             WithdrawProfit::query()->whereIn('id',$this->withdraw_profit_request_ids)->update([
-                'network_transaction_id' => $network_transaction->id
+                'network_transaction_id' => $network_transaction->id,
+                'status' => 3
             ]);
+        } else {
+            //TODO notify admin
         }
     }
 }

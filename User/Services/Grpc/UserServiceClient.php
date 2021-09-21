@@ -31,6 +31,20 @@ class UserServiceClient extends \Grpc\BaseStub {
     }
 
     /**
+     * @param \User\Services\Grpc\Id $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \User\Services\Grpc\User
+     */
+    public function getUserByMemberId(\User\Services\Grpc\Id $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/user.services.grpc.UserService/getUserByMemberId',
+        $argument,
+        ['\User\Services\Grpc\User', 'decode'],
+        $metadata, $options);
+    }
+
+    /**
      * @param \User\Services\Grpc\WalletRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options

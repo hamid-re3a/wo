@@ -124,6 +124,7 @@ class OrderController extends Controller
     public function newOrder(OrderRequest $request)
     {
         $package = $this->validatePackage($request);
+
         try {
             DB::beginTransaction();
             $order_db = Order::query()->create([
@@ -133,7 +134,7 @@ class OrderController extends Controller
                 "payment_driver" => $request->has('payment_driver') ? $request->get('payment_driver') : null,
                 "package_id" => $request->get('package_id'),
                 'validity_in_days' => $package->getValidityInDays(),
-                'plan' => $request->get('plan')
+                'plan' => auth()->user()->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             $order_db->refreshOrder();
             //Order Resolver
@@ -142,6 +143,11 @@ class OrderController extends Controller
 
             if ($flag->code != 0)
                 throw new \Exception('MLM not responding', 406);
+
+
+            if (!$response->getStatus()) {
+                throw new \Exception($response->getMessage(), 406);
+            }
 
             //Invoice service
             $invoice_request = new Invoice();
@@ -167,7 +173,7 @@ class OrderController extends Controller
 
                 /** @var $submit_response Acknowledge */
                 list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_db->getOrderService())->wait();
-                if ($flag->code != 0 )
+                if ($flag->code != 0)
                     throw new \Exception('MLM not responding', 406);
 
                 $order_db->update([

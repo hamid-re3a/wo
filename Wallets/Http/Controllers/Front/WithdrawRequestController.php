@@ -81,7 +81,7 @@ class WithdrawRequestController extends Controller
             DB::beginTransaction();
             $this->prepareEarningWallet();
 
-            $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'),'Withdraw request');
+            $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'),null,true,'Withdraw request');
 
 
             $wallet_hash = $this->getUserWalletHash();

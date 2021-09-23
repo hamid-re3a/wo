@@ -23,9 +23,11 @@ class WithdrawProfitResource extends JsonResource
             'refund_transaction_id' => !empty($this->refund_transaction_id) ? $this->refundTransaction->uuid : null,
             'actor_full_name' => !empty($this->actor_id) ? $this->actor->full_name : null,
             'rejection_reason' => !empty($this->rejection_reason) ? $this->rejection_reason : null,
+            'pf_amount' => walletPfAmount($this->pf_amount),
+            'crypto_amount' => $this->crypto_amount,
 
             'status' => $this->status,
-            'network_hash' => $this->network_hash
+            'created_at' => $this->created_at->timestamp
         ];
     }
 }

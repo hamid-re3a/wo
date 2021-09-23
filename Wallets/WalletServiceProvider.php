@@ -5,11 +5,13 @@ namespace Wallets;
 use Wallets\Commands\ProcessWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;
+use Wallets\Models\Transaction;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Observers\EmailContentObserver;
 use Wallets\Observers\SettingObserver;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Wallets\Observers\TransactionObserver;
 use Wallets\Observers\WithdrawProfitObserver;
 
 class WalletServiceProvider extends ServiceProvider
@@ -93,6 +95,7 @@ class WalletServiceProvider extends ServiceProvider
         Setting::observe(SettingObserver::class);
         EmailContent::observe(EmailContentObserver::class);
         WithdrawProfit::observe(WithdrawProfitObserver::class);
+        Transaction::observe(TransactionObserver::class);
     }
 
 

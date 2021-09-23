@@ -47,8 +47,16 @@ class ProcessWithdrawalRequestsCommand extends Command
      */
     public function handle()
     {
-        $maximum_amount = walletGetSetting('maximum_auto_handle_withdrawals');
+        if(!walletGetSetting('auto_payout_withdrawal_request_is_enable'))
+            return null;
+
+        $maximum_amount = walletGetSetting('maximum_auto_handle_withdrawals_payout');
         $count_withdraw_requests = walletGetSetting('count_withdraw_requests_to_automatic_payout_process') ? walletGetSetting('count_withdraw_requests_to_automatic_payout_process') : 50;
+        $wallet_response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
+            ->get(
+                config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
+                config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
+
         //Query withdrawal requests
         $withdrawal_requests = WithdrawProfit::query()->whereHas('withdrawTransaction', function (Builder $query) use ($maximum_amount) {
             $query->where(DB::raw("(SIGN(amount))"), '<=', $maximum_amount);
@@ -58,22 +66,32 @@ class ProcessWithdrawalRequestsCommand extends Command
                 $subQuery->where('name', '=', 'Withdraw request');
             });
         })->where('status','=',1);
-        $btc_price = Http::get('https://blockchain.info/ticker');
 
-        if ($btc_price->ok() AND $withdrawal_requests->count() >= $count_withdraw_requests AND is_array($btc_price) AND isset($btc_price->json()['USD']['15m'])) {
-            $btc_price = $btc_price->json()['USD']['15m'];
+        $wallet_balance = $wallet_response->json()['confirmedBalance'];
+
+        $total_needed_balance = $withdrawal_requests->sum('crypto_amount');
+
+        if($total_needed_balance > $wallet_balance) {
+            //TODO Notify admin for insufficient balance
+            return;
+        }
+
+        if ($withdrawal_requests->count() >= $count_withdraw_requests) {
             $this->wallets = [];
             $this->ids = [];
 
-            $withdrawal_requests->chunkById($count_withdraw_requests, function ($chunked) use($btc_price){
+            $withdrawal_requests->chunkById($count_withdraw_requests, function ($chunked){
                 foreach ($chunked AS $withdraw_request) {
+                    /** @var $withdraw_request WithdrawProfit*/
                     $this->ids[] = $withdraw_request->id;
                     $this->wallets[] = [
                         'destination' => $withdraw_request->wallet_hash,
-                        'amount' => abs($withdraw_request->withdrawTransaction->amountFloat) / $btc_price
+                        'amount' => $withdraw_request->crypto_amount
                     ];
                 }
-                ProcessBTCTransactionsJob::dispatchSync($this->wallets, $this->ids);
+                if(count($this->ids) > 0 AND count($this->wallets) > 0 AND (count($this->wallets) == count($this->ids)) )
+                    ProcessBTCTransactionsJob::dispatch(O$this->wallets, $this->ids);
+
                 unset($this->chunked);
                 unset($withdraw_request);
                 unset($this->wallets);

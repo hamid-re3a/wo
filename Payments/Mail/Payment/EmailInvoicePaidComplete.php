@@ -49,6 +49,7 @@ class EmailInvoicePaidComplete extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{invoice_no}}',(is_null($this->invoice->transaction_id) || empty($this->invoice->transaction_id)) ? 'Unknown': $this->invoice->transaction_id,$setting['body']);
         $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->pf_amount) || empty($this->invoice->pf_amount)) ? 'Unknown' : $this->invoice->pf_amount, $setting['body']);
         $setting['body'] = str_replace('{{package_name}}', (is_null($this->package->getName()) || empty($this->package->getName())) ? 'Unknown' : $this->package->getName(), $setting['body']);
+        $setting['body'] = str_replace('{{package_short_name}}', (is_null($this->package->getShortName()) || empty($this->package->getShortName())) ? 'Unknown' : $this->package->getShortName(), $setting['body']);
 
         return $this
             ->from($setting['from'], $setting['from_name'])

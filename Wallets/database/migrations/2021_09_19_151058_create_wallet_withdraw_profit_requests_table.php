@@ -22,10 +22,13 @@ class CreateWalletWithdrawProfitRequestsTable extends Migration
             $table->foreignId('refund_transaction_id')->nullable()->constrained('transactions');
             $table->foreignId('network_transaction_id')->nullable()->constrained('wallet_network_transactions');
             $table->tinyInteger('status')->default('1')->comment('Possible values(integer) : 1 = Under review, 2 = Rejected, 3 = Processed');
+            $table->boolean('is_update_email_sent')->default(false);
+            $table->string('currency');
+            $table->unsignedDouble('pf_amount')->default(0);
+            $table->unsignedDouble('crypto_amount')->default(0);
 
             $table->foreignId('actor_id')->nullable()->constrained('users');
             $table->tinyText('rejection_reason')->nullable();
-            $table->mediumText('network_hash')->nullable();
             $table->timestamps();
         });
     }

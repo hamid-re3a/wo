@@ -20,9 +20,7 @@ class GiftcodeObserver
 
         //Giftcode UUID field
         $uuid = Uuid::uuid4()->toString();
-        while ($giftcode->where('uuid', $uuid)->first())
-            $uuid = Uuid::uuid4()->toString();
-        $giftcode->uuid = $uuid;
+        $giftcode->uuid = $giftcode->creator->member_id . mt_rand(1,100) . time();
 
         //Giftcode costs
         if(empty($giftcode->package_id)) {

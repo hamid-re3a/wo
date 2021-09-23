@@ -55,5 +55,4 @@ class Transaction extends \Bavix\Wallet\Models\Transaction
         }
     }
 
-
 }

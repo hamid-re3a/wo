@@ -98,7 +98,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <div>
                 <p>Hi {{full_name}}</p>
                 <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
-                <p>Your package ({{package_name}}) will automatically activate.</p>
+                <p>Your package ({{package_name}} ({{package_short_name}})) will automatically activate.</p>
                 <p></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
@@ -138,8 +138,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
                 <p><strong>Due Amount:</strong> {{usd_amount}} USD<strong> &asymp; </strong> {{due_amount}} {{crypto}}</p>
                 <p><strong>Payment address:</strong> {{payment_address}}</p>
-                <p><strong>Package name:</strong> {{package_name}}</p>
-                <p><strong>Package short name:</strong> {{package_short_name}}</p>
+                <p><strong>Package name:</strong> {{package_name}} ({{package_short_name}})</p>
                 <h2><strong>Note:</strong></h2>
                 <ol>
                     <li>
@@ -323,3 +322,18 @@ if (!function_exists('getPaymentEmailSetting')) {
         throw new Exception(trans('payment.responses.main-key-settings-is-missing'));
     }
 }
+
+
+
+
+if (!function_exists('paymentPfAmount')) {
+
+    function paymentPfAmount($value)
+    {
+        if(is_numeric($value))
+            $value = number_format($value, 2);
+
+        return $value;
+    }
+}
+

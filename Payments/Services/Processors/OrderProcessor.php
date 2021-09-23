@@ -70,8 +70,7 @@ class OrderProcessor extends ProcessorAbstract
         /** @var $submit_response Acknowledge */
         list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($this->order_service)->wait();
         if ($flag->code != 0)
-            throw new \Exception($submit_response->getMessage(), 406);
-
+            throw new \Exception('MLM not responding', 406);
 
         $this->invoice_db->update([
             'is_paid' => true

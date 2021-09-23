@@ -18,7 +18,10 @@ use User\Models\User;
  * @property string $status
  * @property int $actor_id
  * @property string|null $rejection_reason
- * @property string|null $network_hash
+ * @property boolean $is_update_email_sent
+ * @property string $currency
+ * @property double $pf_amount
+ * @property double $crypto_amount
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $user
@@ -38,10 +41,14 @@ class WithdrawProfit extends Model
         'user_id',
         'withdraw_transaction_id',
         'refund_transaction_id',
+        'network_transaction_id',
         'status',
         'actor_id',
         'rejection_reason',
-        'network_hash',
+        'is_update_email_sent',
+        'currency',
+        'pf_amount',
+        'crypto_amount',
     ];
 
     protected $with = [
@@ -83,6 +90,11 @@ class WithdrawProfit extends Model
     public function setUserIdAttribute($value)
     {
         $this->attributes['user_id'] = $value;
+    }
+
+    public function getCryptoAmountAttribute()
+    {
+        return number_format($this->attributes['crypto_amount'],8);
     }
 
     public function getStatusAttribute()

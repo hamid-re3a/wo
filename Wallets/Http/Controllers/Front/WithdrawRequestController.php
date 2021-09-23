@@ -5,6 +5,7 @@ namespace Wallets\Http\Controllers\Front;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use User\Services\Grpc\WalletType;
 use Wallets\Http\Requests\Front\CreateWithdrawRequest;
@@ -44,7 +45,7 @@ class WithdrawRequestController extends Controller
     }
 
     /**
-     * Create withdraw request preview
+     * Withdraw request preview
      * @group Public User > Withdraw Requests
      * @param CreateWithdrawRequest $request
      * @return JsonResponse
@@ -53,13 +54,27 @@ class WithdrawRequestController extends Controller
     {
         try {
 
+            $this->withdrawalRequestIsActive();
             //Grpc get wallet hash
             $wallet_hash = $this->getUserWalletHash();
+            $btc_price = Http::get('https://blockchain.info/ticker');
 
-            return api()->success(null,[
-                'amount' => $request->get('amount'),
-                'wallet_hash' => $wallet_hash
-            ]);
+            if($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
+
+                return api()->success(null,[
+                    'pf_amount' => walletPfAmount($request->get('amount')),
+                    'crypto_amount' => $request->get('amount') / $btc_price['USD']['15m'],
+                    'wallet_hash' => $wallet_hash
+                ]);
+
+            } else {
+                return api()->error(null,[
+                    'subject' => trans('wallet.withdraw-profit-request.check-bps-or-blockchain.com-server', [
+                        'server' => 'BlockChain.info'
+                    ])
+                ],406);
+            }
+
         } catch (\Throwable $exception) {
             Log::error('EarningWalletController@create_withdraw_request => ' . serialize($request->all()));
             return api()->error(null, [
@@ -69,28 +84,45 @@ class WithdrawRequestController extends Controller
     }
 
     /**
-     * Create withdraw request
+     * Submit withdraw request
      * @group Public User > Withdraw Requests
      * @param CreateWithdrawRequest $request
      * @return JsonResponse
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Exception
      */
     public function create_withdraw_request(CreateWithdrawRequest $request)
     {
+
         try {
             DB::beginTransaction();
+            $this->withdrawalRequestIsActive();
             $this->prepareEarningWallet();
 
-            $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'),'Withdraw request');
-
+            $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'),null,true,'Withdraw request');
 
             $wallet_hash = $this->getUserWalletHash();
+            $btc_price = Http::get('https://blockchain.info/ticker');
 
-            $withdraw_request = WithdrawProfit::query()->create([
-                'user_id' => auth()->user()->id,
-                'withdraw_transaction_id' => $withdraw_transaction->id,
-                'wallet_hash' => $wallet_hash
-            ]);
+            if($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
+
+                $withdraw_request = WithdrawProfit::query()->create([
+                    'user_id' => auth()->user()->id,
+                    'withdraw_transaction_id' => $withdraw_transaction->id,
+                    'wallet_hash' => $wallet_hash,
+                    'currency' => $request->get('currency'),
+                    'pf_amount' => $request->get('amount'),
+                    'crypto_amount' => $request->get('amount') / $btc_price['USD']['15m'],
+                ]);
+
+            } else {
+                return api()->error(null,[
+                    'subject' => trans('wallet.withdraw-profit-request.check-bps-or-blockchain.com-server', [
+                        'server' => 'BlockChain.info'
+                    ])
+                ],406);
+            }
+
+
 
             DB::commit();
             return api()->success(null, WithdrawProfitResource::make($withdraw_request->refresh()));
@@ -105,6 +137,7 @@ class WithdrawRequestController extends Controller
 
     private function getUserWalletHash()
     {
+//        return 'tb1qn6whdz3fw4f7unnvvkphgpxg58jl3mcyjreya9';
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
@@ -118,5 +151,11 @@ class WithdrawRequestController extends Controller
             ]));
 
         return $reply->getAddress();
+    }
+
+    private function withdrawalRequestIsActive()
+    {
+        if(!walletGetSetting('withdrawal_request_is_enabled'))
+            throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
     }
 }

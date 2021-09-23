@@ -191,7 +191,7 @@ class PaymentService implements PaymentsServiceInterface
             $withdraw_object = app(Withdraw::class);
             $withdraw_object->setUserId(auth()->user()->id);
             $withdraw_object->setWalletName(WalletNames::DEPOSIT);
-            $withdraw_object->setType('Purchase');
+            $withdraw_object->setType('Package purchased');
             $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
             $withdraw_object->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_object);

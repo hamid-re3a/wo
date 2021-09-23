@@ -53,7 +53,7 @@ if (!function_exists('walletPfAmount')) {
         if(is_numeric($value))
             $value = number_format($value, 2);
 
-        return "{$value}";
+        return $value;
     }
 }
 

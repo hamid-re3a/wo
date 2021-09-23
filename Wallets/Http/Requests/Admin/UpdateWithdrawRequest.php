@@ -25,10 +25,10 @@ class UpdateWithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|uuid|exists:wallet_withdraw_profit_requests,uuid',
+            'id' => 'required|integer|exists:wallet_withdraw_profit_requests,uuid,status,!2',
             'status' => 'required|in:2,3', // 2=Rejected, 3=Processed
             'rejection_reason' => 'required_if:status,2|string',
-            'network_hash' => 'required_if:status,3',
+//            'network_hash' => 'required_if:status,3',
         ];
 
     }

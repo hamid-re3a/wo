@@ -24,12 +24,12 @@ class TransferResource extends JsonResource
             'from' => [
                 'transaction_id' => $this->deposit->uuid,
                 'wallet' => $this->from->name,
-                'confirmed' => $this->deposit->confirmed
+//                'confirmed' => $this->deposit->confirmed
             ],
             'to' => [
                 'transaction_id' => $this->withdraw->uuid,
                 'wallet' => $this->to->name,
-                'confirmed' => $this->withdraw->confirmed
+//                'confirmed' => $this->withdraw->confirmed
             ],
             'amount' => walletPfAmount($this->deposit->amountFloat),
             'fee' =>  walletPfAmount($fee),

@@ -3,6 +3,7 @@
 namespace Wallets\Jobs;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Wallets\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
@@ -42,6 +43,7 @@ class ProcessBTCTransactionsJob implements ShouldQueue
      */
     public function handle()
     {
+
         $response =  Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->post(
                 config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
@@ -54,20 +56,31 @@ class ProcessBTCTransactionsJob implements ShouldQueue
                 'rbf' => true
             ]);
         if($response->ok()) {
-            $network_transaction = NetworkTransaction::query()->create([
-                'transaction_hash' => $response->json()['transactionHash'],
-                'comment' => $response->json()['comment'],
-                'labels' => $response->json()['labels'],
-                'amount' => $response->json()['amount'],
-                'blockHash' => $response->json()['blockHash'],
-                'blockHeight' => $response->json()['blockHeight'],
-                'confirmations' => $response->json()['confirmations'],
-                'timestamp' => Carbon::parse($response->json()['timestamp'])->toDateTimeString(),
-                'status' => $response->json()['status'],
-            ]);
-            WithdrawProfit::query()->whereIn('id',$this->withdraw_profit_request_ids)->update([
-                'network_transaction_id' => $network_transaction->id
-            ]);
+            try {
+                DB::beginTransaction();
+                $network_transaction = NetworkTransaction::query()->create([
+                    'transaction_hash' => $response->json()['transactionHash'],
+                    'comment' => $response->json()['comment'],
+                    'labels' => $response->json()['labels'],
+                    'amount' => $response->json()['amount'],
+                    'blockHash' => $response->json()['blockHash'],
+                    'blockHeight' => $response->json()['blockHeight'],
+                    'confirmations' => $response->json()['confirmations'],
+                    'timestamp' => Carbon::parse($response->json()['timestamp'])->toDateTimeString(),
+                    'status' => $response->json()['status'],
+                ]);
+                WithdrawProfit::query()->whereIn('id',$this->withdraw_profit_request_ids)->update([
+                    'network_transaction_id' => $network_transaction->id,
+                    'status' => 3
+                ]);
+                HandleWithdrawEmails::dispatch();
+                DB::commit();
+            } catch (\Throwable $exception) {
+                DB::rollBack();
+                //TODO notify admin for successful payment and db error
+            }
+        } else {
+            //TODO notify admin
         }
     }
 }

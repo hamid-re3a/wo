@@ -67,6 +67,10 @@ class Giftcode extends Model
         'is_expired' => 'boolean',
     ];
 
+    protected $with = [
+      'user'
+    ];
+
     protected $hidden = [
         'id'
     ];

@@ -14,7 +14,7 @@ class WithdrawProfitObserver
     public function creating(WithdrawProfit $withdrawProfit)
     {
         //UUID field
-        $withdrawProfit->uuid = $withdrawProfit->user->member_id . mt_rand(1,100) . time();
+        $withdrawProfit->uuid = $withdrawProfit->user->member_id . mt_rand(100,999) . time();
 
     }
 

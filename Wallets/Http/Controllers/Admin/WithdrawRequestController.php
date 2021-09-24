@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Payments\Services\Processors\PayoutProcessor;
 use User\Models\User;
 use Wallets\Http\Requests\Admin\PayoutGroupWithdrawRequest;
 use Wallets\Http\Requests\Admin\UpdateWithdrawRequest;
@@ -19,6 +20,13 @@ use Wallets\Services\BankService;
 
 class WithdrawRequestController extends Controller
 {
+
+    private $payout_processor;
+
+    public function __construct(PayoutProcessor $payout_processor)
+    {
+        $this->payout_processor = $payout_processor;
+    }
 
     /**
      * Withdraws list
@@ -46,27 +54,30 @@ class WithdrawRequestController extends Controller
     {
         try {
             DB::beginTransaction();
+            /**@var $withdraw_request WithdrawProfit*/
             $withdraw_request = WithdrawProfit::query()->where('uuid', '=', $request->get('id'))->first();
 
             if($request->get('status') == 3) {
                 $this->checkBPSWalletBalance($withdraw_request->crypto_amount);
 
-                ProcessBTCTransactionsJob::dispatch([
+                $this->payout_processor->pay($withdraw_request->payout_service,[
                     [
                         'destination' => $withdraw_request->wallet_hash,
                         'amount' => $withdraw_request->crypto_amount
                     ]
                 ], [$withdraw_request->id]);
+
             } else if ($request->get('status') == 2) { //Withdrawal request has been rejected, So we have to refund amount to user's earning wallet
                 //Withdraw Admin deposit wallet
                 $bank_service = new BankService(User::query()->first());
-                $bank_service->withdraw(config('depositWallet'), abs($withdraw_request->withdrawTransaction->amountFloat), [
+                $bank_service->withdraw(config('depositWallet'), $withdraw_request->pf_amount, [
                     'description' => 'Refund withdrawal request',
                     'withdrawal_request_id' => $withdraw_request->id
                 ], 'Withdrawal refund');
 
+                //Deposit user wallet
                 $bank_service = new BankService($withdraw_request->user()->first());
-                $refund_transaction = $bank_service->deposit(config('earningWallet'), abs($withdraw_request->withdrawTransaction->amountFloat), [
+                $refund_transaction = $bank_service->deposit(config('earningWallet'), $withdraw_request->pf_amount, [
                     'description' => 'Withdrawal request rejected',
                     'withdrawal_request_id' => $withdraw_request->id,
                 ], true, 'Withdrawal refund');

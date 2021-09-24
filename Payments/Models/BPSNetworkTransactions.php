@@ -1,16 +1,16 @@
 <?php
 
-namespace Wallets\Models;
+namespace Payments\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Ramsey\Uuid\Uuid;
 
 /**
- * Wallets\Models\NetworkTransaction
+ * Payments\Models\NetworkTransaction
+ *
+ * BTCPayServer network transactions
  *
  * @property int $id
- * @property string $uuid
  * @property int $user_id
  * @property string $transaction_hash
  * @property string $comment
@@ -24,10 +24,9 @@ use Ramsey\Uuid\Uuid;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class NetworkTransaction extends Model
+class BPSNetworkTransactions extends Model
 {
     protected $fillable = [
-        'uuid',
         'transaction_hash',
         'comment',
         'labels',
@@ -48,27 +47,6 @@ class NetworkTransaction extends Model
         'updated_at' => 'datetime',
     ];
 
-    protected $table = 'wallet_network_transactions';
+    protected $table = 'payment_payout_network_transactions';
 
-
-    /*
-     * Relations
-     */
-    public function withdrawProfits()
-    {
-        return $this->hasMany(WithdrawProfit::class,'network_transaction_id','id');
-    }
-
-    /*
-     * Mutators
-     */
-    public function setTransactionHashAttribute($value)
-    {
-        $this->attributes['transaction_hash'] = $value;
-
-        $uuid = Uuid::uuid4()->toString();
-        while ($this->where('uuid', $uuid)->first())
-            $uuid = Uuid::uuid4()->toString();
-        $this->attributes['uuid'] = $uuid;
-    }
 }

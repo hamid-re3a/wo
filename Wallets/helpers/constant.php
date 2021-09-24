@@ -57,7 +57,7 @@ const WALLET_SETTINGS = [
         'description' => 'Minimum allowed amount'
     ],
     'minimum_withdraw_request_from_earning_wallet_amount' => [
-        'value' => 100,
+        'value' => 1,
         'title' => 'Minimum allowed amount',
         'description' => 'Minimum allowed amount'
     ],
@@ -66,15 +66,30 @@ const WALLET_SETTINGS = [
         'title' => 'Minimum allowed amount',
         'description' => 'Minimum allowed amount'
     ],
-    'maximum_auto_handle_withdrawals' => [
+    'auto_payout_withdrawal_request_is_enable' => [
+        'value' => true,
+        'title' => 'Auto payout for limited requests',
+        'description' => 'Auto payout for limited requests'
+    ],
+    'maximum_auto_handle_withdrawals_payout' => [
         'value' => 10000,
         'title' => 'Maximum USD amount',
         'description' => 'Maximum withdrawal amount to process automatically'
     ],
     'count_withdraw_requests_to_automatic_payout_process' => [
-        'value' => 50,
+        'value' => 5,
         'title' => 'Minimum withdraw requests for automatic payout.',
         'description' => 'Minimum withdraw requests for automatic payout'
+    ],
+    'payout_btc_fee_in_percentage' => [
+        'value' => 1,
+        'title' => 'Payout fee for BTC requests',
+        'description' => 'Payout fee for BTC requests'
+    ],
+    'withdrawal_request_is_enabled' => [
+        'value' => 1,
+        'title' => 'Enable Withdrawal',
+        'description' => 'Withdrawal is enable or disable'
     ],
 
 ];

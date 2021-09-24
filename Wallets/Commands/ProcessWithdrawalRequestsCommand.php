@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Payments\Services\Processors\PayoutProcessor;
 use Wallets\Jobs\ProcessBTCTransactionsJob;
 use Wallets\Models\WithdrawProfit;
 
@@ -13,7 +15,8 @@ class ProcessWithdrawalRequestsCommand extends Command
 {
 
     private $wallets;
-    private $ids;
+    private $payout_requests;
+    private $payout_processor;
 
     /**
      * The name and signature of the console command.
@@ -32,11 +35,12 @@ class ProcessWithdrawalRequestsCommand extends Command
     /**
      * Create a new command instance.
      *
-     * @return void
+     * @param PayoutProcessor $payout_processor
      */
-    public function __construct()
+    public function __construct(PayoutProcessor $payout_processor)
     {
         parent::__construct();
+        $this->payout_processor = $payout_processor;
     }
 
     /**
@@ -47,37 +51,42 @@ class ProcessWithdrawalRequestsCommand extends Command
      */
     public function handle()
     {
-        $maximum_amount = walletGetSetting('maximum_auto_handle_withdrawals');
+        if (!walletGetSetting('auto_payout_withdrawal_request_is_enable'))
+            return null;
+
+        $maximum_amount = walletGetSetting('maximum_auto_handle_withdrawals_payout');
         $count_withdraw_requests = walletGetSetting('count_withdraw_requests_to_automatic_payout_process') ? walletGetSetting('count_withdraw_requests_to_automatic_payout_process') : 50;
+
         //Query withdrawal requests
         $withdrawal_requests = WithdrawProfit::query()->whereHas('withdrawTransaction', function (Builder $query) use ($maximum_amount) {
-            $query->where(DB::raw("(SIGN(amount))"), '<=', $maximum_amount);
-            $query->where('wallet_id', '!=', 1);
             $query->where('type', '=', 'withdraw');
             $query->whereHas('metaData', function (Builder $subQuery) {
                 $subQuery->where('name', '=', 'Withdraw request');
             });
-        })->where('status','=',1);
-        $btc_price = Http::get('https://blockchain.info/ticker');
+        })->where('pf_amount', '<=', $maximum_amount)->where('status', '=', 1);
 
-        if ($btc_price->ok() AND $withdrawal_requests->count() >= $count_withdraw_requests AND is_array($btc_price) AND isset($btc_price->json()['USD']['15m'])) {
-            $btc_price = $btc_price->json()['USD']['15m'];
-            $this->wallets = [];
-            $this->ids = [];
-
-            $withdrawal_requests->chunkById($count_withdraw_requests, function ($chunked) use($btc_price){
+        if ($withdrawal_requests->count() >= $count_withdraw_requests) {
+            $withdrawal_requests->chunkById($count_withdraw_requests, function ($chunked) {
                 foreach ($chunked AS $withdraw_request) {
-                    $this->ids[] = $withdraw_request->id;
-                    $this->wallets[] = [
+                    /** @var $withdraw_request WithdrawProfit */
+                    $this->payout_requests[$withdraw_request->payout_service]['ids'][] = $withdraw_request->id;
+                    $this->payout_requests[$withdraw_request->payout_service]['wallets'][] = [
                         'destination' => $withdraw_request->wallet_hash,
-                        'amount' => abs($withdraw_request->withdrawTransaction->amountFloat) / $btc_price
+                        'amount' => $withdraw_request->crypto_amount
                     ];
                 }
-                ProcessBTCTransactionsJob::dispatchSync($this->wallets, $this->ids);
+                foreach ($this->payout_requests AS $payout_service => $requests) {
+                    if (count($requests['ids']) > 0 AND (count($requests['ids']) == count($requests['wallets']))) {
+                        $this->payout_processor->pay($payout_service, $requests['wallets'], $requests['ids']);
+                    }
+                }
+
                 unset($this->chunked);
                 unset($withdraw_request);
-                unset($this->wallets);
-                unset($this->ids);
+                unset($payout_service);
+                unset($requests);
+                unset($this->payout_service);
+                unset($this->payout_service);
             });
         }
 

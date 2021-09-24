@@ -26,12 +26,12 @@ class WalletRepository
         $withdraw_object->setAmount($giftcode->total_cost_in_usd);
         $withdraw_object->setWalletName(WalletNames::DEPOSIT);
         $withdraw_object->setUserId($giftcode->user_id);
-        $withdraw_object->setType('Create Giftcode');
+        $withdraw_object->setType('Gift code created');
         $withdraw_object->setDescription('Giftcode #' . $giftcode->uuid);
         return $this->wallet_service->withdraw($withdraw_object);
     }
 
-    public function depositUserWallet(Giftcode $giftcode, $description = 'Giftcode refund', $type = 'Giftcode refund')
+    public function depositUserWallet(Giftcode $giftcode, $description = 'Gift code cancelled', $type = 'Gift code cancelled')
     {
         $deposit_object = app(Deposit::class);
         $deposit_object->setUserId($giftcode->user_id);

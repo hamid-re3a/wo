@@ -26,7 +26,7 @@ class TransactionResource extends JsonResource
             'before_balance' => $metaData ? walletPfAmount($metaData->pivot->wallet_before_balance) : walletPfAmount(0),
             'after_balance' => $metaData ? walletPfAmount($metaData->pivot->wallet_after_balance) : walletPfAmount(0),
             'description' => $this->meta AND array_key_exists('description',$this->meta) ? $this->meta['description'] : null,
-            'confirmed' => $this->confirmed,
+//            'confirmed' => $this->confirmed,
             'created_at' => $this->created_at->timestamp,
         ];
     }

@@ -3,6 +3,7 @@
 namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Orders\Services\OrderService;
 use Wallets\Services\BankService;
 
 class CreateWithdrawRequest extends FormRequest
@@ -33,7 +34,8 @@ class CreateWithdrawRequest extends FormRequest
         $this->maximum_amount = walletGetSetting('maximum_withdraw_request_from_earning_wallet_amount');
 
         return [
-            'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance
+            'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance,
+            'currency' => 'required|in:'. implode(',', $this->getNamePaymentCurrency()),
         ];
     }
 
@@ -52,6 +54,20 @@ class CreateWithdrawRequest extends FormRequest
             $bank_service = new BankService(auth()->user());
             $this->wallet_balance = $bank_service->getBalance(config('earningWallet'));
         }
+    }
+
+    /**
+     * get name of payment currency
+     * @return array
+     */
+    private function getNamePaymentCurrency()
+    {
+        $payment_currencies = app(OrderService::class)->getPaymentCurrencies()->getPaymentCurrencies();
+        $payment_currency_name_array = array();
+        foreach ($payment_currencies as $payment_currency) {
+            $payment_currency_name_array[] = $payment_currency->getName();
+        }
+        return $payment_currency_name_array;
     }
 
 }

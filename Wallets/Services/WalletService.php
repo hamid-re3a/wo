@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentService;
 use User\Models\User;
+use Wallets\Jobs\HandleWithdrawUnsentEmails;
+use Wallets\Models\WithdrawProfit;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\Transfer;
 use Wallets\Services\Grpc\Wallet;
@@ -152,7 +154,6 @@ class WalletService implements WalletServiceInterface
         }
     }
 
-
     public function getBalance(Wallet $wallet): Wallet
     {
         try {
@@ -172,6 +173,12 @@ class WalletService implements WalletServiceInterface
         } catch (\Throwable $exception) {
             return new Wallet();
         }
+    }
+
+    public function updateWithdrawRequestsByIds($ids,$updates)
+    {
+        WithdrawProfit::query()->whereIn('id',$ids)->update($updates);
+        HandleWithdrawUnsentEmails::dispatch();
     }
 
     /**

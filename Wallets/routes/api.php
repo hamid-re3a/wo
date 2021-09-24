@@ -27,11 +27,12 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::get('', [EmailContentController::class, 'index'])->name('list');
                 Route::patch('update', [EmailContentController::class, 'update'])->name('update');
             });
-//
-//            Route::name('withdraw-requests.')->prefix('withdraw-requests')->group(function(){
-//                Route::get('',[AdminWithdrawRequestController::class,'index'])->name('index');
-//                Route::patch('',[AdminWithdrawRequestController::class,'update'])->name('update');
-//            });
+
+            Route::name('withdraw-requests.')->prefix('withdraw-requests')->group(function(){
+                Route::get('',[AdminWithdrawRequestController::class,'index'])->name('index');
+                Route::patch('',[AdminWithdrawRequestController::class,'update'])->name('update');
+                Route::patch('payout-group',[AdminWithdrawRequestController::class,'payout_group'])->name('payout_group');
+            });
     });
 
     Route::middleware(['role:client'])->name('customer.')->group(function () {
@@ -58,7 +59,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
         });
 
         Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){
-            Route::get('withdraw-requests', [UserWithdrawRequestController::class, 'withdraw_requests'])->name('withdraw-requests');
+            Route::get('', [UserWithdrawRequestController::class, 'index'])->name('withdraw-requests');
             Route::post('preview', [UserWithdrawRequestController::class, 'create_withdraw_request_preview'])->name('create-withdraw-request-preview');
             Route::post('', [UserWithdrawRequestController::class, 'create_withdraw_request'])->name('create-withdraw-request');
         });

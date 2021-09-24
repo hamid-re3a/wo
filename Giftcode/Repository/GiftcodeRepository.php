@@ -87,7 +87,7 @@ class GiftcodeRepository
              * Refund Giftcode total paid - expiration fee
              */
             //Refund giftcode pay fee
-            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Expire Giftcode #' . $giftcode->uuid);
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Expire Giftcode #' . $giftcode->uuid,'Gift code expired');
 
             //Wallet transaction failed [Server error]
             if(!is_string($finalTransaction->getTransactionId()))
@@ -127,7 +127,7 @@ class GiftcodeRepository
              * Refund Giftcode total paid - cancelation fee
              */
             //Refund giftcode pay fee
-            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid);
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid,'Gift code cancelled');
 
             //Wallet transaction failed [Server error]
             if(!is_string($finalTransaction->getTransactionId()))

@@ -58,7 +58,7 @@ class OrderProcessor extends ProcessorAbstract
     {
 
         // send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
+        $this->socket_یservice->sendInvoiceMessage($this->invoice_db, 'paid');
 
     }
 

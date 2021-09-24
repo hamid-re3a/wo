@@ -87,13 +87,13 @@ class BankService
         $withdrawMeta = [
             'wallet_before_balance' => $from_wallet->balanceFloat,
             'wallet_after_balance' => $from_wallet->balanceFloat - $amount,
-            'type' => 'Transfer'
+            'type' => 'Funds transferred'
         ];
 
         $depositMeta = [
             'wallet_before_balance' => $to_wallet->balanceFloat,
             'wallet_after_balance' => $to_wallet->balanceFloat + $amount,
-            'type' => 'Transfer'
+            'type' => 'Funds transferred'
         ];
 
         $transfer = $from_wallet->transferFloat($to_wallet, $amount, $this->createMeta($description));

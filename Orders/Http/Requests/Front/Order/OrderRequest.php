@@ -30,7 +30,6 @@ class OrderRequest extends FormRequest
             return [
 
             'package_id' => 'required|numeric',
-            'plan' => 'required|in:' . implode(',', ORDER_PLANS),
             'payment_type' => [
                 'required',
                 'in:' . implode(',',$this->getNamePaymentType())

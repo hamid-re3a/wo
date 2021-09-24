@@ -4,7 +4,7 @@
 namespace Payments\Services\Processors;
 
 
-use App\Jobs\Order\MLMOrderJob;
+use Illuminate\Support\Facades\Log;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
@@ -15,6 +15,7 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use User\Models\User;
+use function Symfony\Component\Translation\t;
 
 class OrderProcessor extends ProcessorAbstract
 {
@@ -38,6 +39,9 @@ class OrderProcessor extends ProcessorAbstract
         $order_id = new Id();
         $order_id->setId($this->invoice_db->payable_id);
         $this->order_service = $order_service->OrderById($order_id);
+        if(!is_numeric($this->order_service->getId())){
+            Log::error('OrderProcessor Error => Cant fetch order {invoice} => ' . $invoice_db->id);
+        }
 
     }
 
@@ -58,7 +62,7 @@ class OrderProcessor extends ProcessorAbstract
     {
 
         // send web socket notification
-        $this->socket_یservice->sendInvoiceMessage($this->invoice_db, 'paid');
+        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
 
     }
 

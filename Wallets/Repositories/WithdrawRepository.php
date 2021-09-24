@@ -22,7 +22,8 @@ class WithdrawRepository
             throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
 
         /**@var $user User*/
-        $this->bankService = new BankService(auth()->user());
+        $user = auth()->user();
+        $this->bankService = new BankService($user);
         $this->wallet = config('earningWallet');
         $this->bankService->getWallet($this->wallet);
     }

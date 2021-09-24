@@ -15,7 +15,6 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use User\Models\User;
-use function Symfony\Component\Translation\t;
 
 class OrderProcessor extends ProcessorAbstract
 {
@@ -39,9 +38,6 @@ class OrderProcessor extends ProcessorAbstract
         $order_id = new Id();
         $order_id->setId($this->invoice_db->payable_id);
         $this->order_service = $order_service->OrderById($order_id);
-        if(!is_numeric($this->order_service->getId())){
-            Log::error('OrderProcessor Error => Cant fetch order {invoice} => ' . $invoice_db->id);
-        }
 
     }
 
@@ -72,13 +68,9 @@ class OrderProcessor extends ProcessorAbstract
 
         //Send order to MLM
         /** @var $submit_response Acknowledge */
-        $mlm_grpc = new \MLM\Services\Grpc\MLMServiceClient('staging-api-gateway.janex.org:9598', [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-        list($submit_response, $flag) = $mlm_grpc->submitOrder($this->order_service)->wait();
+        list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($this->order_service)->wait();
         if ($flag->code != 0)
-            throw new \Exception('MLM Grpc error', 406);
-
+            throw new \Exception($submit_response->getMessage(), 406);
 
 
         $this->invoice_db->update([

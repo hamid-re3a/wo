@@ -6,6 +6,7 @@ namespace Wallets\Repositories;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use User\Models\User;
 use User\Services\Grpc\WalletType;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
@@ -20,6 +21,7 @@ class WithdrawRepository
         if (!walletGetSetting('withdrawal_request_is_enabled'))
             throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
 
+        /**@var $user User*/
         $this->bankService = new BankService(auth()->user());
         $this->wallet = config('earningWallet');
         $this->bankService->getWallet($this->wallet);

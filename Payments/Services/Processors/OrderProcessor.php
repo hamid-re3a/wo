@@ -73,8 +73,12 @@ class OrderProcessor extends ProcessorAbstract
         //Send order to MLM
         /** @var $submit_response Acknowledge */
         list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($this->order_service)->wait();
-        if ($flag->code != 0)
-            throw new \Exception($submit_response->getMessage(), 406);
+        if (!is_object($flag) OR !$submit_response instanceof Acknowledge OR $flag->code != 0)
+            throw new \Exception('MLM Grpc error', 406);
+
+        if (!$submit_response->getStatus())
+            Log::error('MLM Status response is false');
+
 
 
         $this->invoice_db->update([

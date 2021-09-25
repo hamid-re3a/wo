@@ -76,20 +76,19 @@ class OrderProcessor extends ProcessorAbstract
             throw new \Exception('MLM Not responding', 406);
 
 
-        $this->invoice_db->update([
-            'is_paid' => true
-        ]);
-        // send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
-
-        // send thank you email notification
-        $user = User::query()->whereId($this->order_service->getUserId())->first();
-        EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db), $user->email);
-
-
         if ($submit_response->getStatus()) {
             //Update order
             app(OrderService::class)->updateOrder($this->order_service);
+
+            $this->invoice_db->update([
+                'is_paid' => true
+            ]);
+            // send web socket notification
+            $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
+
+            // send thank you email notification
+            $user = User::query()->whereId($this->order_service->getUserId())->first();
+            EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db), $user->email);
         }
 
     }

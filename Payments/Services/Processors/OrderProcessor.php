@@ -89,7 +89,6 @@ class OrderProcessor extends ProcessorAbstract
 
         if ($submit_response->getStatus()) {
             //Update order
-            $this->order_service->setIsPaidAt(now()->toDateTimeString());
             app(OrderService::class)->updateOrder($this->order_service);
         }
 

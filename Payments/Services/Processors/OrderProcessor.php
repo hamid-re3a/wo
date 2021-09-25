@@ -68,6 +68,9 @@ class OrderProcessor extends ProcessorAbstract
 
         //Send order to MLM
         /** @var $submit_response Acknowledge */
+        $this->order_service->setIsPaidAt(now()->toDateTimeString());
+        $this->order_service->getIsResolvedAt(now()->toDateTimeString());
+        $this->order_service->setIsCommissionResolvedAt(now()->toDateTimeString());
         list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($this->order_service)->wait();
         if ($flag->code != 0)
             throw new \Exception('MLM Not responding', 406);

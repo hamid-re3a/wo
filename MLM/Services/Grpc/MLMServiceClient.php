@@ -31,6 +31,20 @@ class MLMServiceClient extends \Grpc\BaseStub {
     }
 
     /**
+     * @param \User\Services\Grpc\User $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \MLM\Services\Grpc\Rank
+     */
+    public function getUserRank(\User\Services\Grpc\User $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/MLM.services.grpc.MLMService/getUserRank',
+        $argument,
+        ['\MLM\Services\Grpc\Rank', 'decode'],
+        $metadata, $options);
+    }
+
+    /**
      * @param \Orders\Services\Grpc\Order $argument input argument
      * @param array $metadata metadata
      * @param array $options call options

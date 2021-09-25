@@ -25,6 +25,15 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
+    * @param Grpc\User $request
+    * @return Rank
+    *
+    * @throws Grpc\Exception\InvokeException
+    */
+    public function getUserRank(Context $context, Grpc\User $request): Rank;
+
+    /**
+    * @param Context $context
     * @param Grpc\Order $request
     * @return Acknowledge
     *

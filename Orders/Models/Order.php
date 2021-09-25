@@ -2,6 +2,7 @@
 
 namespace Orders\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Orders\Services\Grpc\OrderPlans;
@@ -168,7 +169,7 @@ class Order extends Model
         $order_service->setPackageId((int)$this->attributes['package_id']);
 
         $order_service->setPlan((int)OrderPlans::value($this->attributes['plan']));
-        $order_service->setValidityInDays((string)$this->attributes['validity_in_days']);
+        $order_service->setValidityInDays((int)$this->attributes['validity_in_days']);
 
 
         $order_service->setDeletedAt((string)$this->attributes['deleted_at']);
@@ -188,7 +189,7 @@ class Order extends Model
             isset($this->attributes['validity_in_days']) AND isset($this->attributes['is_paid_at'])
             AND !empty($this->attributes['is_paid_at']) AND !empty($this->attributes['validity_in_days'])
         )
-            $this->attributes['expires_at'] = now()->addDays($this->attributes['validity_in_days'])->toDateTimeString();
+            $this->attributes['expires_at'] = Carbon::make($value)->addDays($this->attributes['validity_in_days'])->toDateTimeString();
     }
 
 

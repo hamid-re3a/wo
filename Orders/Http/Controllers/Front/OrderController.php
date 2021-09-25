@@ -174,9 +174,12 @@ class OrderController extends Controller
 
             if ($request->get('payment_type') != 'purchase') {
 
-
+                $order_service = $order_db->getOrderService();
+                $order_service->setIsPaidAt(now()->toDateTimeString());
+                $order_service->setIsResolvedAt(now()->toDateTimeString());
+                $order_service->setIsCommissionResolvedAt(now()->toDateTimeString());
                 /** @var $submit_response Acknowledge */
-                list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_db->getOrderService())->wait();
+                list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
                 if ($flag->code != 0)
                     throw new \Exception('MLM not responding', 406);
 

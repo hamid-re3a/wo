@@ -32,7 +32,7 @@ class GiftcodeRepository
 
             $giftcode = $this->model->query()->create([
                 'package_id' => $request->get('package_id'),
-                'user_id' => $request->get('user_id')
+                'user_id' => $request->has('user_id') ? $request->get('user_id') : auth()->user()->id
             ]);
             /**
              * Start User wallet process

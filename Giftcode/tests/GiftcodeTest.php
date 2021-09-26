@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 use User\Models\User;
+use User\UserConfigure;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\WalletService;

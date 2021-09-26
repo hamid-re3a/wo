@@ -2,15 +2,14 @@
 
 namespace Packages\Http\Controllers\Admin;
 
-use Packages\Http\Requests\Admin\Package\PackageEditRequest;
 use Illuminate\Routing\Controller;
+use Packages\Http\Requests\Admin\Package\PackageCreateRequest;
+use Packages\Http\Requests\Admin\Package\PackageEditRequest;
 use Packages\Http\Requests\Admin\Package\PackageTypeFilterRequest;
-use Packages\Http\Resources\PackageCountByMonthResource;
 use Packages\Http\Resources\PackageResource;
 use Packages\Services\Grpc\Id;
 use Packages\Services\Grpc\Package;
 use Packages\Services\PackageService;
-use Packages\Http\Resources\CountDataResource;
 
 class PackageController extends Controller
 {
@@ -45,6 +44,27 @@ class PackageController extends Controller
         return api()->success('packages.successfully-fetched-all-packages',new PackageResource($updatePackage));
     }
 
+    /**
+     * Create package
+     * @group
+     * Admin User > Packages
+     * @param PackageEditRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create(PackageCreateRequest $request)
+    {
+        $package = new Package();
+        $package->setName($request->get('name'));
+        $package->setBinaryPercentage($request->get('binary_percentage'));
+        $package->setCategoryId($request->get('category_id'));
+        $package->setDirectPercentage($request->get('direct_percentage'));
+        $package->setPrice($request->get('price'));
+        $package->setRoiPercentage($request->get('roi_percentage'));
+        $package->setShortName($request->get('short_name'));
+        $package->setValidityInDays($request->get('validity_in_days'));
+        $updatePackage = $this->package_service->createPackage($package);
+        return api()->success('packages.successfully-fetched-all-packages',new PackageResource($updatePackage));
+    }
 
     /**
      * Count Package Between two date

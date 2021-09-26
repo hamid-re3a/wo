@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Packages\Http\Controllers\Admin\CategoryController;
 use Packages\Http\Controllers\Front\PackageController;
 use Packages\Http\Controllers\Admin\PackageController as PackageAdminController;
 
@@ -8,13 +9,25 @@ use Packages\Http\Controllers\Admin\PackageController as PackageAdminController;
  * @todo before lunch project we must migrate all route to this (admin-super subscriptions-package-admin)
  * list of all route admin section
  */
-Route::/*middleware(['role:super-admin|subscriptions-package-admin'])->*/prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['role:'.USER_ROLE_SUPER_ADMIN.'|'.USER_ROLE_ADMIN_SUBSCRIPTIONS_PACKAGE])->prefix('admin')->name('admin.')->group(function () {
 
     Route::name('package')->group(function (){
         Route::post('/package_count',[PackageAdminController::class,'getCountPackageByDate']);
     });
 
+    Route::name('packages.')->group(function () {
+        Route::post('/edit',[PackageAdminController::class,'edit'])->name('edit');
+        Route::post('/create',[PackageAdminController::class,'create'])->name('create');
+        Route::post('/indirect_commissions/create_or_edit',[\Packages\Http\Controllers\Admin\PackageIndirectCommissionController::class,'edit'])->name('create_or_edit');
+    });
 
+    Route::name('categories.')->prefix('categories')->group(function () {
+        Route::put('/edit',[CategoryController::class,'edit'])->name('edit');
+        Route::post('/create',[CategoryController::class,'create'])->name('create');
+        Route::delete('/create',[CategoryController::class,'delete'])->name('delete');
+        Route::post('/indirect_commissions/create_or_edit',[CategoryController::class,'editCommission'])->name('editCommission');
+        Route::delete('/indirect_commissions/delete',[CategoryController::class,'deleteCommission'])->name('deleteCommission');
+    });
 });
 
 
@@ -24,10 +37,9 @@ Route::/*middleware(['role:super-admin|subscriptions-package-admin'])->*/prefix(
  */
 Route::middleware(['role:client'])->name('customer.')->group(function () {
 
+    Route::name('packages.')->middleware('auth')->group(function () {
+        Route::get('/', [PackageController::class, 'index'])->name('index');
+    });
 });
 
 
-Route::name('packages.')->middleware('auth')->group(function () {
-    Route::get('/',[PackageController::class,'index'])->name('index');
-    Route::post('/edit',[PackageAdminController::class,'edit'])->name('edit');
-});

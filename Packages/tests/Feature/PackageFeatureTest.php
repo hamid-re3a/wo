@@ -15,7 +15,7 @@ class PackageFeatureTest extends PackageTest
 
     public function return_package_list_green()
     {
-        $response = $this->get(route('packages.index'));
+        $response = $this->get(route('customer.packages.index'));
         $response->assertOk();
         $response->json()['data'];
     }

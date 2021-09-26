@@ -45,8 +45,8 @@ Route::name('payments.')->middleware(['auth'])->group(function () {
 
 
     Route::name('invoice.')->prefix('invoices')->group(function(){
-        Route::get('/check-pending-order-invoice',[\Payments\Http\Controllers\Front\InvoiceController::class,'pendingOrderInvoice'])->name('check');
-        Route::get('/check-pending-wallet-invoice',[\Payments\Http\Controllers\Front\InvoiceController::class,'pendingWalletInvoice'])->name('check');
+        Route::get('/check-pending-order-invoice',[\Payments\Http\Controllers\Front\InvoiceController::class,'pendingOrderInvoice'])->name('pendingOrderInvoice');
+        Route::get('/check-pending-wallet-invoice',[\Payments\Http\Controllers\Front\InvoiceController::class,'pendingWalletInvoice'])->name('pendingWalletInvoice');
         Route::get('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'index'])->name('get-list');
         Route::post('/',[\Payments\Http\Controllers\Front\InvoiceController::class,'show'])->name('get-invoice-details');
         Route::post('transactions', [\Payments\Http\Controllers\Front\InvoiceController::class, 'transactions'])->name('transactions');

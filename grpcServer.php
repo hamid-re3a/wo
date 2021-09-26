@@ -6,7 +6,7 @@ require __DIR__ . '/public/index.php';
 
 $grpc = new \Mix\Grpc\Server();
 $grpc->register(\Wallets\Services\WalletGrpcService::class);
-$grpc->register(\Packages\Services\PackageGrpcService::class);
+$grpc->register(\Packages\Services\Grpc\PackageGrpcService::class);
 
 Swoole\Coroutine\run(function () use ($grpc) {
     $server = new Swoole\Coroutine\Http\Server('0.0.0.0', 9596, false);

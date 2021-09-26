@@ -1,11 +1,10 @@
 <?php
 
 
-namespace Packages\Services;
+namespace Packages\Services\Grpc;
 
 use Mix\Grpc\Context;
-use Packages\Services\Grpc\Id;
-use Packages\Services\Grpc\Package;
+use Packages\Services\PackageService;
 
 class PackageGrpcService implements \Packages\Services\Grpc\PackagesServiceInterface
 {

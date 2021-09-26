@@ -14,7 +14,7 @@ class PackageResource extends JsonResource
      */
     public function toArray($request)
     {
-        if ($this->category->categoryIndirectCommission->count() > 0) {
+        if ($this->packageIndirectCommission->count() > 0) {
             $indirect = PackageIndirectSettingResource::collection($this->packageIndirectCommission);
         } else {
             $indirect = CategoryIndirectSettingResource::collection($this->category->categoryIndirectCommission);

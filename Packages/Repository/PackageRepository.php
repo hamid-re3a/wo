@@ -12,6 +12,21 @@ class PackageRepository
 {
     protected $entity_name = Package::class;
 
+    public function create(PackageData $package): Package
+    {
+        return (new $this->entity_name)->create([
+            "name" => $package->getName(),
+            "binary_percentage" => $package->getBinaryPercentage(),
+            "category_id" => $package->getCategoryId(),
+            "direct_percentage" => $package->getDirectPercentage(),
+            "price" => $package->getPrice(),
+            "roi_percentage" => $package->getRoiPercentage(),
+            "short_name" => $package->getShortName(),
+            "validity_in_days" => $package->getValidityInDays(),
+
+        ]);
+    }
+
     public function edit(Id $id, PackageData $package): Package
     {
         $package_entity = new $this->entity_name;
@@ -42,10 +57,30 @@ class PackageRepository
         return $package_entity->with('category', 'packageIndirectCommission')->get();
     }
 
-    public function getCountAllPackageByMonth($from_month,$until_month)
+    public function getCountAllPackageByMonth($from_month, $until_month)
     {
         $package_entity = new $this->entity_name;
-        return $package_entity->select('short_name','category_id','created_at',DB::raw('count(id) as `count`'))->whereBetween('created_at',[$from_month,$until_month])->groupby('created_at','category_id','short_name')->get();
+        return $package_entity->select('short_name', 'category_id', 'created_at', DB::raw('count(id) as `count`'))->whereBetween('created_at', [$from_month, $until_month])->groupby('created_at', 'category_id', 'short_name')->get();
+    }
+
+    public function addOrEditPackageCommission($id, $level, $percentage)
+    {
+        /** @var  $package_entity Package */
+        $package_entity = new $this->entity_name;
+        $package_indirect_commission_entity = $package_entity->findOrFail($id)
+            ->packageIndirectCommission()->firstOrPackage(['level' => $level]);
+        $package_indirect_commission_entity->update(['percentage' => $percentage]);
+        return $package_indirect_commission_entity;
+    }
+
+    public function deletePackageCommission($id, $level)
+    {
+        /** @var  $package_entity Package */
+        $package_entity = new $this->entity_name;
+        $package_indirect_commission_entity = $package_entity->findOrFail($id)
+            ->packageIndirectCommission()->firstOrPackage(['level' => $level]);
+        $package_indirect_commission_entity->delete();
+
     }
 
 }

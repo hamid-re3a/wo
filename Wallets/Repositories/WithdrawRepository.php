@@ -76,7 +76,6 @@ class WithdrawRepository
 
     private function getUserWalletHash()
     {
-        return 'tb1qn6whdz3fw4f7unnvvkphgpxg58jl3mcyjreya9';
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);

@@ -93,13 +93,13 @@ const WALLET_SETTINGS = [
     ],
     'payout_janex_fee_fixed_or_percentage' => [
         'value' => 'fixed',
-        'title' => 'Payout fee for BTC requests',
-        'description' => 'Payout fee for BTC requests'
+        'title' => 'Payout fee for JANEX requests',
+        'description' => 'Payout fee for JANEX requests'
     ],
     'payout_janex_fee' => [
         'value' => 1,
-        'title' => 'Payout fee for BTC requests',
-        'description' => 'Payout fee for BTC requests'
+        'title' => 'Payout fee for JANEX requests',
+        'description' => 'Payout fee for JANEX requests'
     ],
     'withdrawal_request_is_enabled' => [
         'value' => 1,

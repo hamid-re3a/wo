@@ -27,6 +27,8 @@ class CreateWalletWithdrawProfitRequestsTable extends Migration
             $table->string('currency');
             $table->unsignedDouble('pf_amount')->default(0);
             $table->unsignedDouble('crypto_amount')->default(0);
+            $table->unsignedDouble('crypto_rate')->default(0);
+            $table->unsignedDouble('fee')->default(0);
 
             $table->foreignId('actor_id')->nullable()->constrained('users');
             $table->tinyText('rejection_reason')->nullable();

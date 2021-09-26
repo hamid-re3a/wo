@@ -60,6 +60,7 @@ class WithdrawRepository
                     'currency' => $request->get('currency'),
                     'pf_amount' => $request->get('amount'),
                     'crypto_amount' => $request->get('amount') / $btc_price['USD']['15m'],
+                    'crypto_rate' => $btc_price['USD']['15m']
                 ]);
             } else {
 
@@ -75,6 +76,7 @@ class WithdrawRepository
 
     private function getUserWalletHash()
     {
+        return 'tb1qn6whdz3fw4f7unnvvkphgpxg58jl3mcyjreya9';
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);

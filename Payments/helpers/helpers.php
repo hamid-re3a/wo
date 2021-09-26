@@ -331,7 +331,7 @@ if (!function_exists('paymentPfAmount')) {
     function paymentPfAmount($value)
     {
         if(is_numeric($value))
-            $value = number_format($value, 2);
+            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
         return $value;
     }

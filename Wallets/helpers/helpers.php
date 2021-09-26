@@ -45,31 +45,13 @@ if(!function_exists('walletGetEmailContent')) {
 
 }
 
-
 if (!function_exists('walletPfAmount')) {
 
     function walletPfAmount($value)
     {
         if(is_numeric($value))
-            $value = number_format($value, 2);
+            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
-        return $value;
-    }
-}
-
-
-if (!function_exists('walletConvertAmountToDecimal')) {
-
-    function walletConvertAmountToDecimal($value)
-    {
-        return $value * 100;
-    }
-}
-
-if (!function_exists('walletConvertPFToBTC')) {
-
-    function walletConvertPFToBTC($value)
-    {
         return $value;
     }
 }

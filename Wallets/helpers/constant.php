@@ -81,7 +81,22 @@ const WALLET_SETTINGS = [
         'title' => 'Minimum withdraw requests for automatic payout.',
         'description' => 'Minimum withdraw requests for automatic payout'
     ],
-    'payout_btc_fee_in_percentage' => [
+    'payout_btc_fee_fixed_or_percentage' => [
+        'value' => 'percentage',
+        'title' => 'Payout fee for BTC requests',
+        'description' => 'Payout fee for BTC requests'
+    ],
+    'payout_btc_fee' => [
+        'value' => 5,
+        'title' => 'Payout fee for BTC requests',
+        'description' => 'Payout fee for BTC requests'
+    ],
+    'payout_janex_fee_fixed_or_percentage' => [
+        'value' => 'fixed',
+        'title' => 'Payout fee for BTC requests',
+        'description' => 'Payout fee for BTC requests'
+    ],
+    'payout_janex_fee' => [
         'value' => 1,
         'title' => 'Payout fee for BTC requests',
         'description' => 'Payout fee for BTC requests'

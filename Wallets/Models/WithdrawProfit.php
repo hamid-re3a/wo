@@ -23,6 +23,8 @@ use User\Models\User;
  * @property string $currency
  * @property double $pf_amount
  * @property double $crypto_amount
+ * @property double $crypto_rate
+ * @property double $fee
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $user
@@ -50,6 +52,8 @@ class WithdrawProfit extends Model
         'currency',
         'pf_amount',
         'crypto_amount',
+        'crypto_rate',
+        'fee',
     ];
 
     protected $with = [
@@ -107,4 +111,5 @@ class WithdrawProfit extends Model
                 return 'Unknown';
         }
     }
+
 }

@@ -34,7 +34,7 @@ class CreateWithdrawRequest extends FormRequest
         $this->maximum_amount = walletGetSetting('maximum_withdraw_request_from_earning_wallet_amount');
 
         return [
-            'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance,
+            'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance,
             'currency' => 'required|in:'. implode(',', $this->getNamePaymentCurrency()),
         ];
     }

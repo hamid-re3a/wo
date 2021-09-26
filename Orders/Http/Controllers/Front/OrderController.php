@@ -175,18 +175,19 @@ class OrderController extends Controller
             if ($request->get('payment_type') != 'purchase') {
 
                 $now = now()->toDateTimeString();
-                $order_db->update([
-                    'is_paid_at' => $now,
-                    'is_resolved_at' => $now,
-                    'is_commission_resolved_at' => $now,
-                ]);
-                $order_service = $order_db->fresh()->getOrderService();
 
+                $order_service = $order_db->fresh()->getOrderService();
+                $order_service->setIsPaidAt($now);
+                $order_service->setIsResolvedAt($now);
                 /** @var $submit_response Acknowledge */
                 list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
                 if ($flag->code != 0)
                     throw new \Exception('MLM not responding', 406);
-
+                $order_db->update([
+                    'is_paid_at' => $now,
+                    'is_resolved_at' => $now,
+                    'is_commission_resolved_at'=>$submit_response->getCreatedAt()
+                ]);
             }
 
             DB::commit();

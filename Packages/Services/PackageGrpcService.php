@@ -21,7 +21,7 @@ class PackageGrpcService implements \Packages\Services\Grpc\PackagesServiceInter
      */
     public function packageById(Context $context, Id $id): Package
     {
-        return $this->package_service->packageById($id);
+        return $this->package_service->packageFullById($id);
     }
 
 }

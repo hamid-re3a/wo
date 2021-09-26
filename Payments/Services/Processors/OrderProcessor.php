@@ -4,7 +4,7 @@
 namespace Payments\Services\Processors;
 
 
-use App\Jobs\Order\MLMOrderJob;
+use Illuminate\Support\Facades\Log;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
@@ -58,7 +58,7 @@ class OrderProcessor extends ProcessorAbstract
     {
 
         // send web socket notification
-        $this->socket_یservice->sendInvoiceMessage($this->invoice_db, 'paid');
+        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
 
     }
 
@@ -68,25 +68,26 @@ class OrderProcessor extends ProcessorAbstract
 
         //Send order to MLM
         /** @var $submit_response Acknowledge */
+        $this->order_service->setIsPaidAt(now()->toDateTimeString());
+        $this->order_service->setIsResolvedAt(now()->toDateTimeString());
         list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($this->order_service)->wait();
         if ($flag->code != 0)
-            throw new \Exception('MLM not responding', 406);
-
-        $this->invoice_db->update([
-            'is_paid' => true
-        ]);
-        // send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
-
-        // send thank you email notification
-        $user = User::query()->whereId($this->order_service->getUserId())->first();
-        EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db), $user->email);
+            throw new \Exception('MLM Not responding', 406);
 
 
         if ($submit_response->getStatus()) {
             //Update order
-            $this->order_service->setIsPaidAt(now()->toDateTimeString());
             app(OrderService::class)->updateOrder($this->order_service);
+
+            $this->invoice_db->update([
+                'is_paid' => true
+            ]);
+            // send web socket notification
+            $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
+
+            // send thank you email notification
+            $user = User::query()->whereId($this->order_service->getUserId())->first();
+            EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db), $user->email);
         }
 
     }

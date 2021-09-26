@@ -11,7 +11,7 @@ return [
         'cant-find-wallet-address' => 'Please register your :name wallet address.',
         'btc-price-error' => 'We can\t fetch BTC live price, contact Developer team please.',
         'insufficient-bpb-wallet-balance' => 'Insufficient balance in our BTCPayServer wallet, Charge wallet for :amount USD',
-        'check-bps-or-blockchain.com-server' => 'We cant fetch data from :server',
+        'external-resource-error' => 'We cant fetch data from :server',
     ]
 ];
 

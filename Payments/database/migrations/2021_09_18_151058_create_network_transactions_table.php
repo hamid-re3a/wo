@@ -13,9 +13,8 @@ class CreateNetworkTransactionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('wallet_network_transactions', function (Blueprint $table) {
+        Schema::create('payment_payout_network_transactions', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->unique();
             $table->mediumText('transaction_hash');
             $table->string('comment')->nullable();
             $table->json('labels')->nullable();
@@ -36,6 +35,6 @@ class CreateNetworkTransactionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('wallet_network_transactions');
+        Schema::dropIfExists('payment_payout_network_transactions');
     }
 }

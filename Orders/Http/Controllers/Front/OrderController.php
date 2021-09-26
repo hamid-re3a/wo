@@ -20,19 +20,21 @@ use Orders\Models\Order;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\Invoice;
+use Payments\Services\PaymentDrivers;
 use Payments\Services\PaymentService;
+use Payments\Services\Processors\PaymentProcessor;
 use User\Models\User;
 
 class OrderController extends Controller
 {
     use  ValidatesRequests;
 
-    private $payment_service;
+    private $payment_processor;
     private $package_service;
 
-    public function __construct(PaymentService $payment_service, PackageService $package_service)
+    public function __construct(PaymentProcessor $paymentProcessor, PackageService $package_service)
     {
-        $this->payment_service = $payment_service;
+        $this->payment_processor = $paymentProcessor;
         $this->package_service = $package_service;
     }
 
@@ -123,9 +125,11 @@ class OrderController extends Controller
      */
     public function newOrder(OrderRequest $request)
     {
-        $package = $this->validatePackage($request);
-
         try {
+            $package = $this->validatePackage($request);
+            /**@var $user User*/
+            $user = auth()->user();
+
             DB::beginTransaction();
             $order_db = Order::query()->create([
                 "user_id" => $request->header('X-user-id'),
@@ -134,7 +138,7 @@ class OrderController extends Controller
                 "payment_driver" => $request->has('payment_driver') ? $request->get('payment_driver') : null,
                 "package_id" => $request->get('package_id'),
                 'validity_in_days' => $package->getValidityInDays(),
-                'plan' => auth()->user()->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
+                'plan' => $user->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             $order_db->refreshOrder();
             //Order Resolver
@@ -157,12 +161,12 @@ class OrderController extends Controller
             $invoice_request->setPaymentDriver($order_db->payment_driver);
             $invoice_request->setPaymentType($order_db->payment_type);
             $invoice_request->setPaymentCurrency($order_db->payment_currency);
-            $invoice_request->setUser(auth()->user()->getUserService());
+            $invoice_request->setUser($user->getUserService());
             $invoice_request->setUserId(auth()->user()->id);
             $invoice_request->setPayableId($order_db->id);
             $invoice_request->setPayableType('Order');
 
-            list($payment_flag, $payment_response) = $this->payment_service->pay($invoice_request);
+            list($payment_flag, $payment_response) = $this->payment_processor->pay($invoice_request);
 
 
             if (!$payment_flag)
@@ -170,14 +174,19 @@ class OrderController extends Controller
 
             if ($request->get('payment_type') != 'purchase') {
 
+                $now = now()->toDateTimeString();
 
+                $order_service = $order_db->fresh()->getOrderService();
+                $order_service->setIsPaidAt($now);
+                $order_service->setIsResolvedAt($now);
                 /** @var $submit_response Acknowledge */
-                list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_db->getOrderService())->wait();
+                list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
                 if ($flag->code != 0)
                     throw new \Exception('MLM not responding', 406);
-
                 $order_db->update([
-                    'is_resolved_at' => $submit_response->getCreatedAt()
+                    'is_paid_at' => $now,
+                    'is_resolved_at' => $now,
+                    'is_commission_resolved_at'=>$submit_response->getCreatedAt()
                 ]);
             }
 

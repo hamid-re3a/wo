@@ -76,7 +76,6 @@ class GiftcodeController extends Controller
         try {
             $giftcode = $this->giftcode_repository->create($request->merge([
                 'package_id' => $request->get('package_id'),
-                'user_id' => auth()->check() ? auth()->user()->id : null
             ]));
             //Successful
             return api()->success(null, GiftcodeResource::make($giftcode));

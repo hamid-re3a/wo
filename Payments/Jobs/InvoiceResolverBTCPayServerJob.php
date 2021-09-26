@@ -36,9 +36,6 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
     public function handle()
     {
         try {
-            if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled' AND $this->invoice_db->payable_type !='DepositWallet'){
-                return;
-            }
             DB::beginTransaction();
             $response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
                 ->get(
@@ -60,16 +57,17 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     'status' => $response->json()['status'],
                     'additional_status' => $response->json()['additionalStatus'],
                     'paid_amount' => $amount_paid,
-                    'due_amount' => $amount_due
+                    'due_amount' => $amount_due,
+
                 ]);
 
-                if($amount_paid > $this->invoice_db->amount)
-                    $this->invoice_db->update([
-                        'additional_status' => 'PaidOver'
-                    ]);
+                if ($this->invoice_db->is_paid AND $this->invoice_db->status == 'Settled' AND $this->invoice_db->payable_type != 'DepositWallet') {
+                    DB::commit();
+                    return;
+                }
 
 
-                    switch ($this->invoice_db->payable_type) {
+                switch ($this->invoice_db->payable_type) {
                     case 'Order' :
                         $this->resolve(new OrderProcessor($this->invoice_db));
                         break;

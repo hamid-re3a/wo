@@ -19,6 +19,7 @@ use User\Models\User;
  * @property int $actor_id
  * @property string|null $rejection_reason
  * @property boolean $is_update_email_sent
+ * @property string $payout_service
  * @property string $currency
  * @property double $pf_amount
  * @property double $crypto_amount
@@ -28,7 +29,6 @@ use User\Models\User;
  * @property-read User $actor
  * @property-read Transaction $withdrawTransaction
  * @property-read Transaction $refundTransaction
- * @property-read NetworkTransaction $networkTransaction
  * @mixin \Eloquent
  */
 class WithdrawProfit extends Model
@@ -46,6 +46,7 @@ class WithdrawProfit extends Model
         'actor_id',
         'rejection_reason',
         'is_update_email_sent',
+        'payout_service',
         'currency',
         'pf_amount',
         'crypto_amount',
@@ -54,7 +55,6 @@ class WithdrawProfit extends Model
     protected $with = [
         'withdrawTransaction',
         'refundTransaction',
-        'networkTransaction',
         'user',
         'actor'
     ];
@@ -79,22 +79,14 @@ class WithdrawProfit extends Model
         return $this->belongsTo(Transaction::class, 'refund_transaction_id', 'id');
     }
 
-    public function networkTransaction()
-    {
-        return $this->belongsTo(NetworkTransaction::class,'network_transaction_id','id');
-    }
 
     /*
      * Mutators
      */
-    public function setUserIdAttribute($value)
-    {
-        $this->attributes['user_id'] = $value;
-    }
 
-    public function getCryptoAmountAttribute()
+    public function setCryptoAmountAttribute($value)
     {
-        return number_format($this->attributes['crypto_amount'],8);
+        $this->attributes['crypto_amount'] = number_format($value,8);
     }
 
     public function getStatusAttribute()

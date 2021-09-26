@@ -6,7 +6,7 @@ namespace Giftcode\Observers;
 use Exception;
 use Giftcode\Models\Giftcode;
 use Illuminate\Support\Facades\Log;
-use Ramsey\Uuid\Uuid;
+use User\Models\User;
 
 class GiftcodeObserver
 {
@@ -19,12 +19,16 @@ class GiftcodeObserver
         $giftcode->expiration_date = $expirationDate;
 
         //Giftcode UUID field
-        $uuid = Uuid::uuid4()->toString();
-        $giftcode->uuid = $giftcode->creator->member_id . mt_rand(1,100) . time();
+        if(is_null($giftcode->user_id)) {
+            Log::error('GiftcodeObserver Line 22, user_id is null');
+            throw new Exception(trans('giftcode.responses.global-error'),500);
+        }
+        $user = User::query()->find($giftcode->user_id);
+        $giftcode->uuid = $user->member_id . mt_rand(1,100) . time();
 
         //Giftcode costs
         if(empty($giftcode->package_id)) {
-            Log::error('GiftcodeObserver Line 31, package_id is null');
+            Log::error('GiftcodeObserver Line 29, package_id is null');
             throw new Exception(trans('giftcode.responses.global-error'),500);
         }
 

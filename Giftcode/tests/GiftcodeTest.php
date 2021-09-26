@@ -109,7 +109,7 @@ class GiftcodeTest extends TestCase
     {
 
         $this->deposit_user();
-        return $this->postJson(route('customer.giftcodes.create'), [
+        return $this->postJson(route('giftcodes.customer.create'), [
             'package_id' => 1,
             'user_id' => 2,
             'include_registration_fee' => true,

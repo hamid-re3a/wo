@@ -59,7 +59,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
         });
 
         Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){
-            Route::get('', [UserWithdrawRequestController::class, 'withdraw_requests'])->name('withdraw-requests');
+            Route::get('', [UserWithdrawRequestController::class, 'index'])->name('withdraw-requests');
             Route::post('preview', [UserWithdrawRequestController::class, 'create_withdraw_request_preview'])->name('create-withdraw-request-preview');
             Route::post('', [UserWithdrawRequestController::class, 'create_withdraw_request'])->name('create-withdraw-request');
         });

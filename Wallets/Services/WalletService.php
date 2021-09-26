@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentService;
+use Payments\Services\Processors\PaymentProcessor;
 use User\Models\User;
+use Wallets\Jobs\HandleWithdrawUnsentEmails;
+use Wallets\Models\WithdrawProfit;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\Transfer;
 use Wallets\Services\Grpc\Wallet;
@@ -152,7 +155,6 @@ class WalletService implements WalletServiceInterface
         }
     }
 
-
     public function getBalance(Wallet $wallet): Wallet
     {
         try {
@@ -174,9 +176,12 @@ class WalletService implements WalletServiceInterface
         }
     }
 
-    /**
-     * @param $request
-     */
+    public function updateWithdrawRequestsByIds($ids,$updates)
+    {
+        WithdrawProfit::query()->whereIn('id',$ids)->update($updates);
+        HandleWithdrawUnsentEmails::dispatch();
+    }
+
     public function invoiceWallet(Request $request)
     {
         $invoice_request = new Invoice();
@@ -186,8 +191,9 @@ class WalletService implements WalletServiceInterface
         $invoice_request->setPaymentCurrency('BTC');
         $invoice_request->setPayableType('DepositWallet');
         $invoice_request->setUser(auth()->user()->getUserService());
-        $payment_service = app(PaymentService::class);
-        return $payment_service->pay($invoice_request);
+        /**@var $payment_processor PaymentProcessor */
+        $payment_processor = app(PaymentProcessor::class);
+        return $payment_processor->pay($invoice_request);
     }
 
 }

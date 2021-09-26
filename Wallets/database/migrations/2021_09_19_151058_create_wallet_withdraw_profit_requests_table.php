@@ -20,9 +20,10 @@ class CreateWalletWithdrawProfitRequestsTable extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('withdraw_transaction_id')->constrained('transactions');
             $table->foreignId('refund_transaction_id')->nullable()->constrained('transactions');
-            $table->foreignId('network_transaction_id')->nullable()->constrained('wallet_network_transactions');
+            $table->unsignedBigInteger('network_transaction_id')->nullable();
             $table->tinyInteger('status')->default('1')->comment('Possible values(integer) : 1 = Under review, 2 = Rejected, 3 = Processed');
             $table->boolean('is_update_email_sent')->default(false);
+            $table->string('payout_service')->default('btc-pay-server');
             $table->string('currency');
             $table->unsignedDouble('pf_amount')->default(0);
             $table->unsignedDouble('crypto_amount')->default(0);

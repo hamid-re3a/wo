@@ -6,7 +6,6 @@ namespace Wallets\Services;
 use Bavix\Wallet\Interfaces\WalletFloat;
 use Illuminate\Support\Str;
 use User\Models\User;
-use Wallets\Models\TransactionType;
 
 class BankService
 {

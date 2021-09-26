@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use Wallets\Models\NetworkTransaction;
 use Wallets\Models\WithdrawProfit;
 
-class HandleWithdrawEmails implements ShouldQueue
+class HandleWithdrawUnsentEmails implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     /**
@@ -42,6 +42,6 @@ class HandleWithdrawEmails implements ShouldQueue
             'is_update_email_sent' => true
         ]);
         if($withdraw_requests = WithdrawProfit::query()->where('status','!=', 1)->where('is_update_email_sent','=',0)->first())
-            HandleWithdrawEmails::dispatch();
+            HandleWithdrawUnsentEmails::dispatch();
     }
 }

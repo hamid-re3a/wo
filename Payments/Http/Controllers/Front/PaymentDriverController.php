@@ -19,7 +19,7 @@ class PaymentDriverController extends Controller
     /**
      * All payment drivers
      * @group
-     * Public User > Payments Driver
+     * Public User > Payments
      */
     public function index()
     {

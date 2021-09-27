@@ -70,6 +70,17 @@ class PaymentService implements PaymentsServiceInterface
     /**
      * @inheritDoc
      */
+    public function getActivePaymentTypes(EmptyObject $request): PaymentTypes
+    {
+        $payment_types_data = $this->payment_type_repository->getAllActives();
+        $payment_types = new PaymentTypes();
+        $payment_types->setPaymentTypes($this->mapPaymentType($payment_types_data));
+        return $payment_types;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getPaymentTypes(EmptyObject $request): PaymentTypes
     {
         $payment_types_data = $this->payment_type_repository->getAll();

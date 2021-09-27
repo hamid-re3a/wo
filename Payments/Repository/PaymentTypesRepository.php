@@ -14,6 +14,11 @@ class PaymentTypesRepository
         return $this->entity_name::all();
     }
 
+    public function getAllActives()
+    {
+        return $this->entity_name::query()->where('is_active',true)->get();
+    }
+
     public function create(PaymentTypeObject $payment_driver)
     {
         $entity = new $this->entity_name;

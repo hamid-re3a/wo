@@ -2,11 +2,13 @@
 
 namespace Payments\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Payments\Http\Requests\PaymentType\RemovePaymentTypeRequest;
 use Payments\Http\Requests\PaymentType\StorePaymentTypeRequest;
 use Payments\Http\Requests\PaymentType\UpdatePaymentTypeRequest;
 use Payments\Http\Resources\PaymentTypeResource;
+use Payments\Repository\PaymentTypesRepository;
 use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
 use Payments\Services\Grpc\PaymentType;
@@ -14,10 +16,12 @@ use Payments\Services\Grpc\PaymentType;
 class PaymentTypeController extends Controller
 {
     private $payment_service;
+    private $payment_type_repository;
 
-    public function __construct(PaymentService $payment_service)
+    public function __construct(PaymentService $payment_service, PaymentTypesRepository $paymentTypesRepository)
     {
         $this->payment_service = $payment_service;
+        $this->payment_type_repository = $paymentTypesRepository;
     }
 
 
@@ -25,12 +29,11 @@ class PaymentTypeController extends Controller
      * payment types list
      * @group
      * Admin User > Payments > types
-     * @param UpdatePaymentTypeRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index()
     {
-        return api()->success('payment.successfully-fetched-all-payment-types',PaymentTypeResource::collection(collect($this->payment_service->getPaymentTypes( new EmptyObject())->getPaymentTypes())));
+        return api()->success('payment.successfully-fetched-all-payment-types',\Payments\Http\Resources\Admin\PaymentTypeResource::collection($this->payment_type_repository->getAll()));
 
     }
 
@@ -39,7 +42,7 @@ class PaymentTypeController extends Controller
      * @group
      * Admin User > Payments > types
      * @param UpdatePaymentTypeRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(UpdatePaymentTypeRequest $request)
     {
@@ -53,7 +56,7 @@ class PaymentTypeController extends Controller
      * @group
      * Admin User > Payments > types
      * @param StorePaymentTypeRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(StorePaymentTypeRequest $request)
     {
@@ -66,7 +69,7 @@ class PaymentTypeController extends Controller
      * @group
      * Admin User > Payments > types
      * @param RemovePaymentTypeRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function delete(RemovePaymentTypeRequest $request)
     {

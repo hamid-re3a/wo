@@ -9,6 +9,11 @@ class PaymentCurrencyRepository
 {
     protected $entity_name = PaymentCurrency::class;
 
+    public function getAllWithoutDriver()
+    {
+        return $this->entity_name::query()->all();
+    }
+
     public function getAll()
     {
         return $this->entity_name::with("paymentDriver")->get();

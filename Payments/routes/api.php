@@ -21,12 +21,14 @@ Route::middleware(['auth', 'role:super-admin|subscriptions-payment-admin'])->pre
         });
 
         Route::name('currency.')->prefix("currency")->group(function () {
+            Route::get('', [AdminPaymentCurrencyController::class, 'index'])->name('index');
             Route::post('create', [AdminPaymentCurrencyController::class, 'store'])->name('store');
             Route::patch('edit', [AdminPaymentCurrencyController::class, 'update'])->name('update');
             Route::delete('delete', [AdminPaymentCurrencyController::class, 'delete'])->name('delete');
         });
 
         Route::name('driver.')->prefix("driver")->group(function () {
+            Route::get('', [AdminPaymentDriverController::class, 'index'])->name('index');
             Route::post('create', [AdminPaymentDriverController::class, 'store'])->name('store');
             Route::patch('edit', [AdminPaymentDriverController::class, 'update'])->name('update');
             Route::delete('delete', [AdminPaymentDriverController::class, 'delete'])->name('delete');

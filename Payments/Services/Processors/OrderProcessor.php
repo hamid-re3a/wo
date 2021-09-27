@@ -81,6 +81,7 @@ class OrderProcessor extends ProcessorAbstract
 
         if ($submit_response->getStatus()) {
             //Update order
+            $order_service->setIsCommissionResolvedAt($submit_response->getCreatedAt());
             app(OrderService::class)->updateOrder($order_service);
 
             $this->invoice_db->update([

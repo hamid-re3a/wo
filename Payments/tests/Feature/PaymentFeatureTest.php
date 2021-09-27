@@ -28,12 +28,12 @@ class PaymentFeatureTest extends PaymentTest
         Mail::fake();
         $response = $this->post(route('orders.store'), [
             'package_id' => 1,
-            'from_user_id' => 1,
             'plan' => ORDER_PLAN_START,
             'payment_type' => 'purchase',
             'payment_driver' => 'btc-pay-server',
             'payment_currency' => 'BTC',
         ]);
+        dd($response->json());
         $response->assertOk();
 
         Mail::assertSent(EmailInvoiceCreated::class);

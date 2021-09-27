@@ -42,7 +42,7 @@ class CategoryService
 
     public function getAll()
     {
-        $this->category_repository->getAll();
+        return $this->category_repository->getAll();
     }
 
 

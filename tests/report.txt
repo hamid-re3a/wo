@@ -1,13 +1,1 @@
-Package Feature (Packages\tests\Feature\PackageFeature)
- [x] Return package list green
-
-Payment Admin Feature (Payments\tests\Feature\PaymentAdminFeature)
- [x] Get payment type admin
- [x] Edit payment type admin
- [x] Delete payment type admin
- [x] Create payment type admin
-
 Payment Feature (Payments\tests\Feature\PaymentFeature)
- [x] Get payment types
- [ ] Submit order with email
-

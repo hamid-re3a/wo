@@ -39,4 +39,11 @@ class CategoryService
     {
         $this->category_repository->delete($key);
     }
+
+    public function getAll()
+    {
+        $this->category_repository->getAll();
+    }
+
+
 }

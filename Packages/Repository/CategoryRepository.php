@@ -64,5 +64,12 @@ class CategoryRepository
 
     }
 
+    public function getAll()
+    {
+        /** @var  $category_entity Category */
+        $category_entity = new $this->entity_name;
+        return $category_entity->get();
+    }
+
 
 }

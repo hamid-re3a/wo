@@ -23,6 +23,7 @@ Route::middleware(['role:'.USER_ROLE_SUPER_ADMIN.'|'.USER_ROLE_ADMIN_SUBSCRIPTIO
 
     Route::name('categories.')->prefix('categories')->group(function () {
         Route::put('/edit',[CategoryController::class,'edit'])->name('edit');
+        Route::get('/',[CategoryController::class,'index'])->name('index');
         Route::post('/create',[CategoryController::class,'create'])->name('create');
         Route::delete('/create',[CategoryController::class,'delete'])->name('delete');
         Route::post('/indirect_commissions/create_or_edit',[CategoryController::class,'editCommission'])->name('editCommission');

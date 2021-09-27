@@ -28,7 +28,7 @@ class PaymentProcessor
             'payable_id' => $invoice_request->getPayableId(),
             'payable_type' => $invoice_request->getPayableType(),
             'pf_amount' => $invoice_request->getPfAmount(),
-            'amount' => pfToUsd($invoice_request->getPfAmount()),
+            'amount' => $invoice_request->getAmount(),
             'due_amount' => $invoice_request->getDueAmount(),
             'paid_amount' => $invoice_request->getPaidAmount(),
             'transaction_id' => $invoice_request->getTransactionId(),
@@ -217,7 +217,7 @@ class PaymentProcessor
             if ($response->ok() && preg_match('/:(?P<address>.*?)\?amount/', $payment_response[0]['paymentLink'], $btc_link)) {
                 DB::beginTransaction();
 
-                $invoice_request->setAmount((double)$response->json()['amount']);
+                $invoice_request->setAmount((double)$payment_response[0]['amount']);
                 $invoice_request->setDueAmount((double)$payment_response[0]['due']);
                 $invoice_request->setPaidAmount((double)$payment_response[0]['totalPaid']);
                 $invoice_request->setTransactionId($response->json()['id']);

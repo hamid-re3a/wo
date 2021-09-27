@@ -217,7 +217,7 @@ class PaymentProcessor
             if ($response->ok() && preg_match('/:(?P<address>.*?)\?amount/', $payment_response[0]['paymentLink'], $btc_link)) {
                 DB::beginTransaction();
 
-                $invoice_request->setAmount((double)$response->json()['amount']);
+                $invoice_request->setAmount((double)$payment_response[0]['amount']);
                 $invoice_request->setDueAmount((double)$payment_response[0]['due']);
                 $invoice_request->setPaidAmount((double)$payment_response[0]['totalPaid']);
                 $invoice_request->setTransactionId($response->json()['id']);

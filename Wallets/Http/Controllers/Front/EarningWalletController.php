@@ -67,6 +67,10 @@ class EarningWalletController extends Controller
                     });
                 }]
             )
+            ->withSumQuery(['transactions.amount AS spent_sum' => function (Builder $query) {
+                    $query->where('type', '=', 'withdraw');
+                }]
+            )
             ->first();
 
         return api()->success(null, [
@@ -74,6 +78,7 @@ class EarningWalletController extends Controller
             'direct_commissions_sum' => $counts->direct_commissions_sum ? walletPfAmount($counts->direct_commissions_sum) : 0,
             'indirect_commissions_sum' => $counts->indirect_commissions_sum ? walletPfAmount($counts->indirect_commissions_sum) : 0,
             'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
+            'spent_sum' => $counts->spent_sum ? $counts->spent_sum : 0,
         ]);
 
     }

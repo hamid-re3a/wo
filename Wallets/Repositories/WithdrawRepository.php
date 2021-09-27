@@ -79,14 +79,11 @@ class WithdrawRepository
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
         $req = app(\User\Services\Grpc\WalletRequest::class);
-        Log::info('request user BTC wallet => ' . auth()->user()->id);
         $req->setUserId((int)auth()->user()->id);
         $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
         /**@var $reply WalletInfo*/
         list($reply, $status) = $client->getUserWalletInfo($req)->wait();
-        Log::info(serialize('reply => ' . serialize($reply)));
-        Log::info(serialize('$status =>' . serialize($status)));
-        if (!$status->code != 0 OR !$reply->getAddress())
+        if (!$status OR $status->code != 0 OR !$reply->getAddress())
             throw new \Exception(trans('wallet.withdraw-profit-request.cant-find-wallet-address', [
                 'name' => WalletType::name(\User\Services\Grpc\WalletType::BTC)
             ]));

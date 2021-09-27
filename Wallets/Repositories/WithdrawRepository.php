@@ -16,7 +16,7 @@ class WithdrawRepository
     private $bankService;
     private $wallet;
 
-    public function __construct()
+    public function makeWithdrawRequest(Request $request)
     {
         if (!walletGetSetting('withdrawal_request_is_enabled'))
             throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
@@ -26,10 +26,7 @@ class WithdrawRepository
         $this->bankService = new BankService($user);
         $this->wallet = config('earningWallet');
         $this->bankService->getWallet($this->wallet);
-    }
 
-    public function makeWithdrawRequest(Request $request)
-    {
         try {
             switch ($request->get('currency')) {
                 case 'BTC' :

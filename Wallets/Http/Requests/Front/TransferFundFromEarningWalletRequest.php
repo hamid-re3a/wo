@@ -36,8 +36,15 @@ class TransferFundFromEarningWalletRequest extends FormRequest
         $this->maximum_amount = walletGetSetting('maximum_transfer_from_earning_to_deposit_wallet_fund_amount');
 
         return [
-            'member_id' => 'required_without:own_deposit_wallet|integer|exists:users,member_id|not_in:' . $this->member_id,
-            'own_deposit_wallet' => 'required_without:member_id|boolean',
+            'member_id' => 'required_if:own_deposit_wallet,false|integer|exists:users,member_id|not_in:' . $this->member_id,
+            'own_deposit_wallet' => [
+                'required',
+                'boolean',
+                function($attribute,$value,$fail){
+                    if(!$this->has('member_id') AND !$value)
+                        return $fail('This field must be true if you may not send funds to another member deposit wallet');
+                }
+            ],
             'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance
         ];
 

@@ -68,7 +68,7 @@ class PackageRepository
         /** @var  $package_entity Package */
         $package_entity = new $this->entity_name;
         $package_indirect_commission_entity = $package_entity->findOrFail($id)
-            ->packageIndirectCommission()->firstOrPackage(['level' => $level]);
+            ->packageIndirectCommission()->firstOrCreate(['level' => $level]);
         $package_indirect_commission_entity->update(['percentage' => $percentage]);
         return $package_indirect_commission_entity;
     }
@@ -78,7 +78,7 @@ class PackageRepository
         /** @var  $package_entity Package */
         $package_entity = new $this->entity_name;
         $package_indirect_commission_entity = $package_entity->findOrFail($id)
-            ->packageIndirectCommission()->firstOrPackage(['level' => $level]);
+            ->packageIndirectCommission()->firstOrCreate(['level' => $level]);
         $package_indirect_commission_entity->delete();
 
     }

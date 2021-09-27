@@ -49,7 +49,7 @@ class CategoryRepository
         /** @var  $category_entity Category */
         $category_entity = new $this->entity_name;
         $category_indirect_commission_entity = $category_entity->where('key',$key)->firstOrFail()
-            ->categoryIndirectCommission()->firstOrPackage(['level' => $level]);
+            ->categoryIndirectCommission()->firstOrCreate(['level' => $level]);
         $category_indirect_commission_entity->update(['percentage' => $percentage]);
         return $category_indirect_commission_entity;
     }
@@ -59,7 +59,7 @@ class CategoryRepository
         /** @var  $category_entity Category */
         $category_entity = new $this->entity_name;
         $category_indirect_commission_entity = $category_entity->where('key',$key)->firstOrFail()
-            ->categoryIndirectCommission()->firstOrPackage(['level' => $level]);
+            ->categoryIndirectCommission()->firstOrCreate(['level' => $level]);
         $category_indirect_commission_entity->delete();
 
     }

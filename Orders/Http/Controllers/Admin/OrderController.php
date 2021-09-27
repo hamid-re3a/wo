@@ -5,13 +5,22 @@ namespace Orders\Http\Controllers\Admin;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use MLM\Services\Grpc\Acknowledge;
+use Orders\Http\Requests\Admin\Order\OrderRequest;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderTypeFilterRequest;
 use Orders\Http\Resources\CountDataResource;
+use Orders\Models\Order;
 use Orders\Services\OrderService;
+use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
+use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentService;
+use User\Models\User;
 
 class OrderController extends Controller
 {
@@ -21,7 +30,7 @@ class OrderController extends Controller
     private $package_service;
     private $order_service;
 
-    public function __construct(PaymentService $payment_service,PackageService $package_service, OrderService $order_service)
+    public function __construct(PaymentService $payment_service, PackageService $package_service, OrderService $order_service)
     {
         $this->payment_service = $payment_service;
         $this->package_service = $package_service;
@@ -37,7 +46,7 @@ class OrderController extends Controller
      */
     public function getCountSubscriptions()
     {
-        return api()->success(null,new CountDataResource($this->order_service->getCountPackageSubscriptions()));
+        return api()->success(null, new CountDataResource($this->order_service->getCountPackageSubscriptions()));
     }
 
     /**
@@ -49,7 +58,7 @@ class OrderController extends Controller
      */
     public function activePackageCount()
     {
-        return api()->success(null,new CountDataResource($this->order_service->activePackageCount()));
+        return api()->success(null, new CountDataResource($this->order_service->activePackageCount()));
     }
 
     /**
@@ -61,7 +70,7 @@ class OrderController extends Controller
      */
     public function deactivatePackageCount()
     {
-        return api()->success(null,new CountDataResource($this->order_service->deactivatePackageCount()));
+        return api()->success(null, new CountDataResource($this->order_service->deactivatePackageCount()));
     }
 
     /**
@@ -73,6 +82,85 @@ class OrderController extends Controller
      */
     public function packageOverviewCount(OrderTypeFilterRequest $request)
     {
-        return api()->success(null,$this->order_service->packageOverviewCount($request->type));
+        return api()->success(null, $this->order_service->packageOverviewCount($request->type));
     }
+
+
+    /**
+     * Submit new Order
+     * @group
+     * Admin User > Orders
+     * @param OrderRequest $request
+     * @return JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function newOrder(OrderRequest $request)
+    {
+        try {
+            $package = $this->validatePackage($request);
+            /**@var $user User */
+            $user = auth()->user();
+
+            DB::beginTransaction();
+            $order_db = Order::query()->create([
+                "from_user_id" => $user->id,
+                "user_id" => $request->get('user_id'),
+                "payment_type" => 'admin',
+                "package_id" => $request->get('package_id'),
+                'validity_in_days' => $package->getValidityInDays(),
+                'plan' => $request->get('plan')
+            ]);
+            $order_db->refreshOrder();
+            //Order Resolver
+            /** @var $response Acknowledge */
+            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getOrderService())->wait();
+
+            if ($flag->code != 0)
+                throw new \Exception('MLM not responding', 406);
+
+
+            if (!$response->getStatus()) {
+                throw new \Exception($response->getMessage(), 406);
+            }
+
+            $now = now()->toDateTimeString();
+
+            $order_service = $order_db->fresh()->getOrderService();
+            $order_service->setIsPaidAt($now);
+            $order_service->setIsResolvedAt($now);
+            /** @var $submit_response Acknowledge */
+            list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
+            if ($flag->code != 0)
+                throw new \Exception('MLM not responding', 406);
+            $order_db->update([
+                'is_paid_at' => $now,
+                'is_resolved_at' => $now,
+                'is_commission_resolved_at' => $submit_response->getCreatedAt()
+            ]);
+
+
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            Log::error('OrderController@newOrder => ' . $exception->getMessage());
+            return api()->error(null, [
+                'subject' => $exception->getMessage()
+            ], $exception->getCode(), null);
+        }
+    }
+
+    private function validatePackage(Request $request)
+    {
+
+        $id = new Id;
+        $id->setId($request->package_id);
+        $package = $this->package_service->packageFullById($id);
+        if (!$package->getId()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'package_ids' => ['Package does not exist'],
+            ]);
+        }
+
+        return $package;
+    }
+
 }

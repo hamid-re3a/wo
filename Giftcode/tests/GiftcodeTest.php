@@ -98,9 +98,9 @@ class GiftcodeTest extends TestCase
                 'package_name',
                 'code',
                 'expiration_date',
-                'packages_cost_in_usd',
-                'registration_fee_in_usd',
-                'total_cost_in_usd',
+                'packages_cost_in_pf',
+                'registration_fee_in_pf',
+                'total_cost_in_pf',
                 'created_at',
             ]
         ];

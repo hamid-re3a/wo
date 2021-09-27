@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $legacy_id
  * @property int $user_id
  * @property int|null $from_user_id
- * @property int $total_cost_in_usd
- * @property int $packages_cost_in_usd
- * @property int $registration_fee_in_usd
+ * @property int $total_cost_in_pf
+ * @property int $packages_cost_in_pf
+ * @property int $registration_fee_in_pf
  * @property string|null $is_paid_at
  * @property string|null $is_resolved_at
  * @property string|null $is_refund_at

@@ -28,7 +28,7 @@ class PaymentProcessor
             'payable_id' => $invoice_request->getPayableId(),
             'payable_type' => $invoice_request->getPayableType(),
             'pf_amount' => $invoice_request->getPfAmount(),
-            'amount' => $invoice_request->getAmount(),
+            'amount' => pfToUsd($invoice_request->getPfAmount()),
             'due_amount' => $invoice_request->getDueAmount(),
             'paid_amount' => $invoice_request->getPaidAmount(),
             'transaction_id' => $invoice_request->getTransactionId(),
@@ -110,7 +110,7 @@ class PaymentProcessor
             if (!empty($giftcode_response->getIsCanceled()))
                 throw new \Exception(trans('payment.responses.giftcode.canceled'));
 
-            if(is_numeric($order_object->getRegistrationFeeInUsd()) AND $order_object->getRegistrationFeeInUsd() > 0 AND empty($giftcode_response->getRegistrationFeeInUsd()))
+            if(is_numeric($order_object->getRegistrationFeeInPf()) AND $order_object->getRegistrationFeeInPf() > 0 AND empty($giftcode_response->getRegistrationFeeInPf()))
                 throw new \Exception(trans('payment.responses.giftcode.giftcode-not-included-registration-fee'));
 
             //Redeem giftcode
@@ -204,7 +204,7 @@ class PaymentProcessor
                     config('payment.btc-pay-server-domain') .
                     'api/v1/stores/' . config('payment.btc-pay-server-store-id') . '/invoices',
                     [
-                        'amount' => $invoice_request->getPfAmount(),
+                        'amount' => pfToUsd($invoice_request->getPfAmount()),
                         'currency' => 'usd'
                     ]
                 );
@@ -217,8 +217,7 @@ class PaymentProcessor
             if ($response->ok() && preg_match('/:(?P<address>.*?)\?amount/', $payment_response[0]['paymentLink'], $btc_link)) {
                 DB::beginTransaction();
 
-                $invoice_request->setPfAmount((double)$response->json()['amount']);
-                $invoice_request->setAmount((double)$payment_response[0]['amount']);
+                $invoice_request->setAmount((double)$response->json()['amount']);
                 $invoice_request->setDueAmount((double)$payment_response[0]['due']);
                 $invoice_request->setPaidAmount((double)$payment_response[0]['totalPaid']);
                 $invoice_request->setTransactionId($response->json()['id']);

@@ -97,10 +97,6 @@ class Invoice extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>double deposit_amount = 21;</code>
      */
     protected $deposit_amount = 0.0;
-    /**
-     * Generated from protobuf field <code>repeated .payments.services.grpc.PaymentTransaction transactions = 22;</code>
-     */
-    private $transactions;
 
     /**
      * Constructor.
@@ -129,7 +125,6 @@ class Invoice extends \Google\Protobuf\Internal\Message
      *     @type string $updated_at
      *     @type \User\Services\Grpc\User $user
      *     @type float $deposit_amount
-     *     @type \Payments\Services\Grpc\PaymentTransaction[]|\Google\Protobuf\Internal\RepeatedField $transactions
      * }
      */
     public function __construct($data = NULL) {
@@ -605,28 +600,6 @@ class Invoice extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkDouble($var);
         $this->deposit_amount = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>repeated .payments.services.grpc.PaymentTransaction transactions = 22;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
-     */
-    public function getTransactions()
-    {
-        return $this->transactions;
-    }
-
-    /**
-     * Generated from protobuf field <code>repeated .payments.services.grpc.PaymentTransaction transactions = 22;</code>
-     * @param \Payments\Services\Grpc\PaymentTransaction[]|\Google\Protobuf\Internal\RepeatedField $var
-     * @return $this
-     */
-    public function setTransactions($var)
-    {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Payments\Services\Grpc\PaymentTransaction::class);
-        $this->transactions = $arr;
 
         return $this;
     }

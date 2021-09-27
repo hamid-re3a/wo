@@ -16,9 +16,9 @@ use User\Models\User;
  * @property int $id
  * @property int $user_id
  * @property int|null $from_user_id
- * @property int $total_cost_in_usd
- * @property int $packages_cost_in_usd
- * @property int $registration_fee_in_usd
+ * @property int $total_cost_in_pf
+ * @property int $packages_cost_in_pf
+ * @property int $registration_fee_in_pf
  * @property int $validity_in_days
  * @property string|null $is_paid_at
  * @property string|null $is_resolved_at
@@ -96,10 +96,16 @@ class Order extends Model
     public function reCalculateCosts()
     {
         $this->refresh();
+        if(in_array($this->plan, [ORDER_PLAN_START,ORDER_PLAN_COMPANY])){
+            $this->packages_cost_in_pf = (float)0;
+            $this->total_cost_in_pf = (float)0;
+            $this->save();
+        }
+
         if ($this->plan == ORDER_PLAN_START)
-            $this->registration_fee_in_usd = (float)getSetting('REGISTRATION_FEE');
-        $this->packages_cost_in_usd = (float)$this->orderPackagesPrice();
-        $this->total_cost_in_usd = (float)$this->packages_cost_in_usd + (float)$this->registration_fee_in_usd;
+            $this->registration_fee_in_pf = (float)getSetting('REGISTRATION_FEE');
+        $this->packages_cost_in_pf = (float)$this->orderPackagesPrice();
+        $this->total_cost_in_pf = (float)$this->packages_cost_in_pf + (float)$this->registration_fee_in_pf;
         $this->save();
     }
 
@@ -152,9 +158,9 @@ class Order extends Model
 
         $order_service->setFromUserId((int)$this->attributes['from_user_id']);
 
-        $order_service->setTotalCostInUsd((float)$this->attributes['total_cost_in_usd']);
-        $order_service->setPackagesCostInUsd((float)$this->attributes['packages_cost_in_usd']);
-        $order_service->setRegistrationFeeInUsd((float)$this->attributes['registration_fee_in_usd']);
+        $order_service->setTotalCostInPf((float)$this->attributes['total_cost_in_pf']);
+        $order_service->setPackagesCostInPf((float)$this->attributes['packages_cost_in_pf']);
+        $order_service->setRegistrationFeeInPf((float)$this->attributes['registration_fee_in_pf']);
 
         $order_service->setIsPaidAt((string)$this->attributes['is_paid_at']);
         $order_service->setIsResolvedAt((string)$this->attributes['is_resolved_at']);

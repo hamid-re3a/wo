@@ -23,7 +23,7 @@ class WalletRepository
     public function withdrawUserWallet(Giftcode $giftcode)
     {
         $withdraw_object = app(Withdraw::class);
-        $withdraw_object->setAmount($giftcode->total_cost_in_usd);
+        $withdraw_object->setAmount($giftcode->total_cost_in_pf);
         $withdraw_object->setWalletName(WalletNames::DEPOSIT);
         $withdraw_object->setUserId($giftcode->user_id);
         $withdraw_object->setType('Gift code created');
@@ -41,7 +41,7 @@ class WalletRepository
         $deposit_object->setWalletName(WalletNames::DEPOSIT);
 
         //Deposit fee to admin wallet
-        if($giftcode->total_cost_in_usd != $giftcode->getRefundAmount())
+        if($giftcode->total_cost_in_pf != $giftcode->getRefundAmount())
             $this->depositToAdminWallet($giftcode,$description);
 
         return $this->wallet_service->deposit($deposit_object);
@@ -59,7 +59,7 @@ class WalletRepository
     {
         $deposit_object = app(Deposit::class);
         $deposit_object->setUserId(1);
-        $deposit_object->setAmount(($giftcode->total_cost_in_usd - $giftcode->getRefundAmount()));
+        $deposit_object->setAmount(($giftcode->total_cost_in_pf - $giftcode->getRefundAmount()));
         $deposit_object->setType($type);
         $deposit_object->setDescription($description);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);

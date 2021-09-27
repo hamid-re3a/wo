@@ -32,7 +32,7 @@ class PaymentCurrencyController extends Controller
      */
     public function index()
     {
-        return api()->success('payment.updated-payment-currencies',new \Payments\Http\Resources\Admin\PaymentCurrencyResource($this->payment_currency_repository->getAllWithoutDriver()));
+        return api()->success('payment.updated-payment-currencies',\Payments\Http\Resources\Admin\PaymentCurrencyResource::collection($this->payment_currency_repository->getAllWithoutDriver()));
 
     }
 

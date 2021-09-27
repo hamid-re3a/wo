@@ -8,6 +8,7 @@ use Packages\Http\Requests\Admin\Package\CategoryCommissionEditRequest;
 use Packages\Http\Requests\Admin\Package\CategoryCreateRequest;
 use Packages\Http\Requests\Admin\Package\CategoryDeleteRequest;
 use Packages\Http\Requests\Admin\Package\CategoryEditRequest;
+use Packages\Http\Resources\CategoryResource;
 use Packages\Services\CategoryService;
 
 class CategoryController extends Controller
@@ -18,6 +19,17 @@ class CategoryController extends Controller
     {
         $this->category_service = $category_service;
     }
+    /**
+     * Show All Category
+     * @group
+     * Admin User > Categories
+     */
+    public function index()
+    {
+        $categories = $this->category_service->getAll();
+        return api()->success('packages.successfully-get-category',CategoryResource::collection($categories));
+    }
+
 
     /**
      * Create Category

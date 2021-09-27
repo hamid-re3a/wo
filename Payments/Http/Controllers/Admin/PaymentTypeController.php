@@ -22,7 +22,7 @@ class PaymentTypeController extends Controller
     /**
      * Update payment types
      * @group
-     * Admin User > Payments types
+     * Admin User > Payments > types
      * @param UpdatePaymentTypeRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -36,7 +36,7 @@ class PaymentTypeController extends Controller
     /**
      * Create payment types
      * @group
-     * Admin User > Payments types
+     * Admin User > Payments > types
      * @param StorePaymentTypeRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -49,7 +49,7 @@ class PaymentTypeController extends Controller
     /**
      * Delete payment types
      * @group
-     * Admin User > Payments types
+     * Admin User > Payments > types
      * @param RemovePaymentTypeRequest $request
      * @return \Illuminate\Http\JsonResponse
      */

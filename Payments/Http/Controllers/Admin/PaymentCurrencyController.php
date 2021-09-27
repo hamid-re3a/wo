@@ -23,7 +23,7 @@ class PaymentCurrencyController extends Controller
     /**
      * Update payment currency
      * @group
-     * Admin User > Payments Currencies
+     * Admin User > Payments > Currencies
      * @param UpdatePaymentCurrencyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -37,7 +37,7 @@ class PaymentCurrencyController extends Controller
     /**
      * Store payment currency
      * @group
-     * Admin User > Payments Currencies
+     * Admin User > Payments > Currencies
      * @param StorePaymentCurrencyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -50,7 +50,7 @@ class PaymentCurrencyController extends Controller
     /**
      * Delete payment currency
      * @group
-     * Admin User > Payments Currencies
+     * Admin User > Payments > Currencies
      * @param StorePaymentCurrencyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */

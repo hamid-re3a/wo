@@ -25,7 +25,7 @@ class InvoiceController extends Controller
     /**
      * Get user pending package invoice
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      */
     public function pendingOrderInvoice()
     {
@@ -47,7 +47,7 @@ class InvoiceController extends Controller
     /**
      * Get user pending wallet invoice
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      */
     public function pendingWalletInvoice()
     {
@@ -69,7 +69,7 @@ class InvoiceController extends Controller
     /**
      * Get invoices list
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      */
     public function index()
     {
@@ -80,7 +80,7 @@ class InvoiceController extends Controller
     /**
      * Get invoice details
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      * @param ShowInvoiceRequest $request
      * @return JsonResponse
      */
@@ -96,7 +96,7 @@ class InvoiceController extends Controller
     /**
      * Get invoice transactions
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      * @param ShowOrderTransactionsRequest $request
      * @return JsonResponse
      */
@@ -109,7 +109,7 @@ class InvoiceController extends Controller
     /**
      * Cancel invoice by user
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      * @param ShowOrderTransactionsRequest $request
      * @return JsonResponse
      */

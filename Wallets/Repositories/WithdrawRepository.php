@@ -77,7 +77,7 @@ class WithdrawRepository
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
         $req = app(\User\Services\Grpc\WalletRequest::class);
-        $req->setUserId(auth()->user()->id);
+        $req->setUserId((int)auth()->user()->id);
         $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
         list($reply, $status) = $client->getUserWalletInfo($req)->wait();
         if (!$status->code != 0 OR !$reply->getAddress())

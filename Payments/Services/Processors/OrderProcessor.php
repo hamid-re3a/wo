@@ -67,9 +67,13 @@ class OrderProcessor extends ProcessorAbstract
         // TODO handle if mlm grpc is down condition
 
         //Send order to MLM
-        /** @var $submit_response Acknowledge */
-        $this->order_service->setIsPaidAt(now()->toDateTimeString());
-        $this->order_service->setIsResolvedAt(now()->toDateTimeString());
+        /**
+         * @var $submit_response Acknowledge
+         * @var $order_service Order
+         */
+        $order_service = $this->order_service;
+        $order_service->setIsPaidAt(now()->toDateTimeString());
+        $order_service->setIsResolvedAt(now()->toDateTimeString());
         list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($this->order_service)->wait();
         if ($flag->code != 0)
             throw new \Exception('MLM Not responding', 406);
@@ -77,7 +81,7 @@ class OrderProcessor extends ProcessorAbstract
 
         if ($submit_response->getStatus()) {
             //Update order
-            app(OrderService::class)->updateOrder($this->order_service);
+            app(OrderService::class)->updateOrder($order_service);
 
             $this->invoice_db->update([
                 'is_paid' => true
@@ -86,7 +90,7 @@ class OrderProcessor extends ProcessorAbstract
             $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
 
             // send thank you email notification
-            $user = User::query()->whereId($this->order_service->getUserId())->first();
+            $user = User::query()->whereId($order_service->getUserId())->first();
             EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db), $user->email);
         }
 

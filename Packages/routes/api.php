@@ -19,6 +19,7 @@ Route::middleware(['role:'.USER_ROLE_SUPER_ADMIN.'|'.USER_ROLE_ADMIN_SUBSCRIPTIO
         Route::post('/edit',[PackageAdminController::class,'edit'])->name('edit');
         Route::post('/create',[PackageAdminController::class,'create'])->name('create');
         Route::post('/indirect_commissions/create_or_edit',[\Packages\Http\Controllers\Admin\PackageIndirectCommissionController::class,'edit'])->name('create_or_edit');
+        Route::delete('/indirect_commissions/delete',[\Packages\Http\Controllers\Admin\PackageIndirectCommissionController::class,'delete'])->name('delete_package_commission');
     });
 
     Route::name('categories.')->prefix('categories')->group(function () {

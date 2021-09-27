@@ -117,7 +117,7 @@ class PackageService implements PackagesServiceInterface
 
     public function createPackage(Package $package): \Packages\Models\Package
     {
-        return $this->package_repository->edit($package);
+        return $this->package_repository->create($package);
     }
 
     public function getPackages()

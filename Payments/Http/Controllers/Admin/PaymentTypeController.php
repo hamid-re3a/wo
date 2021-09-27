@@ -7,6 +7,7 @@ use Payments\Http\Requests\PaymentType\RemovePaymentTypeRequest;
 use Payments\Http\Requests\PaymentType\StorePaymentTypeRequest;
 use Payments\Http\Requests\PaymentType\UpdatePaymentTypeRequest;
 use Payments\Http\Resources\PaymentTypeResource;
+use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
 use Payments\Services\Grpc\PaymentType;
 
@@ -17,6 +18,20 @@ class PaymentTypeController extends Controller
     public function __construct(PaymentService $payment_service)
     {
         $this->payment_service = $payment_service;
+    }
+
+
+    /**
+     * payment types list
+     * @group
+     * Admin User > Payments > types
+     * @param UpdatePaymentTypeRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        return api()->success('payment.successfully-fetched-all-payment-types',PaymentTypeResource::collection(collect($this->payment_service->getPaymentTypes( new EmptyObject())->getPaymentTypes())));
+
     }
 
     /**

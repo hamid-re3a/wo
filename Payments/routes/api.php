@@ -12,9 +12,9 @@ use Payments\Http\Controllers\Front\WebhookController;
 
 Route::middleware(['auth', 'role:super-admin|subscriptions-payment-admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    Route::name('payments')->prefix('payments')->group(function () {
 
         Route::name('type.')->prefix("type")->group(function () {
+            Route::get('', [AdminPaymentController::class, 'index'])->name('index');
             Route::post('create', [AdminPaymentController::class, 'store'])->name('store');
             Route::patch('edit', [AdminPaymentController::class, 'update'])->name('update');
             Route::delete('delete', [AdminPaymentController::class, 'delete'])->name('delete');
@@ -37,7 +37,6 @@ Route::middleware(['auth', 'role:super-admin|subscriptions-payment-admin'])->pre
             Route::patch('update', [EmailContentController::class, 'update'])->name('update');
         });
 
-    });
 });
 
 Route::middleware(['role:client'])->group(function () {

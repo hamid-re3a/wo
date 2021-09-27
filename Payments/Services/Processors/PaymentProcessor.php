@@ -240,7 +240,7 @@ class PaymentProcessor
                     true,
                     [
                         'payment_currency' => $invoice_request->getPaymentCurrency(),
-                        'amount' => $invoice_request->getDueAmount(),
+                        'amount' => $invoice_request->getAmount(),
                         'checkout_link' => $invoice_request->getCheckoutLink(),
                         'transaction_id' => $invoice_request->getTransactionId(),
                         'expiration_time' => $invoice_request->getExpirationTime(),

@@ -64,7 +64,7 @@ class TransferFundFromEarningWalletRequest extends FormRequest
     {
         if(auth()->check()){
             $bank_service = new BankService(auth()->user());
-            $this->wallet_balance = $bank_service->getBalance(config('depositWallet'));
+            $this->wallet_balance = $bank_service->getBalance(config('earningWallet'));
             $this->member_id = auth()->user()->member_id;
         }
     }

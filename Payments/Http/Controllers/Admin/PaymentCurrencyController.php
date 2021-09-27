@@ -2,11 +2,13 @@
 
 namespace Payments\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Payments\Http\Requests\PaymentCurrency\RemovePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\StorePaymentCurrencyRequest;
 use Payments\Http\Requests\PaymentCurrency\UpdatePaymentCurrencyRequest;
 use Payments\Http\Resources\PaymentCurrencyResource;
+use Payments\Repository\PaymentCurrencyRepository;
 use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\Grpc\PaymentCurrency;
 use Payments\Services\PaymentService;
@@ -14,10 +16,24 @@ use Payments\Services\PaymentService;
 class PaymentCurrencyController extends Controller
 {
     private $payment_service;
+    private $payment_currency_repository;
 
-    public function __construct(PaymentService $payment_service)
+    public function __construct(PaymentService $payment_service, PaymentCurrencyRepository $paymentCurrencyRepository)
     {
         $this->payment_service = $payment_service;
+        $this->payment_currency_repository = $paymentCurrencyRepository;
+    }
+
+    /**
+     * payment currencies list
+     * @group
+     * Admin User > Payments > Currencies
+     * @return JsonResponse
+     */
+    public function index()
+    {
+        return api()->success('payment.updated-payment-currencies',new \Payments\Http\Resources\Admin\PaymentCurrencyResource($this->payment_currency_repository->getAllWithoutDriver()));
+
     }
 
     /**
@@ -25,7 +41,7 @@ class PaymentCurrencyController extends Controller
      * @group
      * Admin User > Payments > Currencies
      * @param UpdatePaymentCurrencyRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(UpdatePaymentCurrencyRequest $request)
     {
@@ -39,7 +55,7 @@ class PaymentCurrencyController extends Controller
      * @group
      * Admin User > Payments > Currencies
      * @param StorePaymentCurrencyRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(StorePaymentCurrencyRequest $request)
     {
@@ -52,7 +68,7 @@ class PaymentCurrencyController extends Controller
      * @group
      * Admin User > Payments > Currencies
      * @param StorePaymentCurrencyRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function delete(RemovePaymentCurrencyRequest $request)
     {

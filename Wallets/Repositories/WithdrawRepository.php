@@ -6,7 +6,9 @@ namespace Wallets\Repositories;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use User\Services\Grpc\WalletInfo;
 use User\Services\Grpc\WalletType;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
@@ -52,7 +54,7 @@ class WithdrawRepository
                 return WithdrawProfit::query()->create([
                     'user_id' => auth()->user()->id,
                     'withdraw_transaction_id' => $withdraw_transaction->id,
-                    'wallet_hash' => $this->getUserWalletHash(),
+                    'wallet_hash' => $this->getUserBTCWalletHash(),
                     'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
                     'currency' => $request->get('currency'),
                     'pf_amount' => $request->get('amount'),
@@ -71,18 +73,22 @@ class WithdrawRepository
         }
     }
 
-    private function getUserWalletHash()
+    private function getUserBTCWalletHash()
     {
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
         $req = app(\User\Services\Grpc\WalletRequest::class);
+        Log::info('request user BTC wallet => ' . auth()->user()->id);
         $req->setUserId((int)auth()->user()->id);
         $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
+        /**@var $reply WalletInfo*/
         list($reply, $status) = $client->getUserWalletInfo($req)->wait();
+        Log::info(serialize('reply => ' . serialize($reply)));
+        Log::info(serialize('$status =>' . serialize($status)));
         if (!$status->code != 0 OR !$reply->getAddress())
             throw new \Exception(trans('wallet.withdraw-profit-request.cant-find-wallet-address', [
-                'name' => WalletType::name(0)
+                'name' => WalletType::name(\User\Services\Grpc\WalletType::BTC)
             ]));
 
         return $reply->getAddress();

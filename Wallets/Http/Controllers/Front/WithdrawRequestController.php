@@ -89,7 +89,7 @@ class WithdrawRequestController extends Controller
             return api()->success(null, WithdrawProfitResource::make($withdraw_request->refresh()));
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('EarningWalletController@create_withdraw_request => ' . serialize($request->all()));
+            Log::error('EarningWalletController@create_withdraw_request, User => ' . auth()->user()->id .  ' => ' . serialize($request->all()));
             return api()->error(null, [
                 'subject' => $exception->getMessage()
             ]);

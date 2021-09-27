@@ -174,4 +174,9 @@ class PackageService implements PackagesServiceInterface
     {
         $this->package_repository->deletePackageCommission($id,$level);
     }
+
+    public function deletePackage($id)
+    {
+        $this->package_repository->deletePackage($id);
+    }
 }

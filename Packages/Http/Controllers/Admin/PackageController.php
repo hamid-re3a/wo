@@ -4,6 +4,7 @@ namespace Packages\Http\Controllers\Admin;
 
 use Illuminate\Routing\Controller;
 use Packages\Http\Requests\Admin\Package\PackageCreateRequest;
+use Packages\Http\Requests\Admin\Package\PackageDeleteRequest;
 use Packages\Http\Requests\Admin\Package\PackageEditRequest;
 use Packages\Http\Requests\Admin\Package\PackageTypeFilterRequest;
 use Packages\Http\Resources\PackageResource;
@@ -63,9 +64,20 @@ class PackageController extends Controller
         $package->setShortName($request->get('short_name'));
         $package->setValidityInDays($request->get('validity_in_days'));
         $updatePackage = $this->package_service->createPackage($package);
-        return api()->success('packages.successfully-fetched-all-packages',new PackageResource($updatePackage));
+        return api()->success('packages.successfully-created',new PackageResource($updatePackage));
     }
-
+    /**
+     * Delete package
+     * @group
+     * Admin User > Packages
+     * @param PackageEditRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delete(PackageDeleteRequest $request)
+    {
+        $this->package_service->deletePackage($request->get('package_id'));
+        return api()->success('packages.successfully-deleted');
+    }
     /**
      * Count Package Between two date
      * @group

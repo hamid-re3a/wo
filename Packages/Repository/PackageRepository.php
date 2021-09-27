@@ -83,4 +83,11 @@ class PackageRepository
 
     }
 
+    public function deletePackage($id)
+    {
+        /** @var  $package_entity Package */
+        $package_entity = new $this->entity_name;
+        $package_entity->findOrFail($id)->delete();
+    }
+
 }

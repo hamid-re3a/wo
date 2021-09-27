@@ -11,7 +11,7 @@ class PaymentCurrencyRepository
 
     public function getAllWithoutDriver()
     {
-        return $this->entity_name::query()->get();
+        return $this->entity_name::all();
     }
 
     public function getAll()

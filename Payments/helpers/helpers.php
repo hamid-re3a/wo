@@ -52,7 +52,8 @@ const WEBHOOK_EVENT_TYPES = [
     WEBHOOK_EVENT_TYPE_INVOICE_INVALID,
 ];
 
-const REGISTRATION_FEE = '20';
+const REGISTRATION_FEE = '19.9';
+const BF_TO_USD_RATE = 1;
 
 /**
  *  main settings
@@ -62,6 +63,11 @@ const SETTINGS = [
         'value' => REGISTRATION_FEE,
         'description' => 'Start Order Registration Fee in dollars',
         'category' => 'Order',
+    ],
+    'BF_TO_USD_RATE' => [
+        'value' => BF_TO_USD_RATE,
+        'description' => 'coefficient of bf to usd',
+        'category' => 'PF',
     ],
 ];
 
@@ -326,9 +332,9 @@ if (!function_exists('getPaymentEmailSetting')) {
 
 
 
-if (!function_exists('paymentPfAmount')) {
+if (!function_exists('formatCurrencyNumber')) {
 
-    function paymentPfAmount($value)
+    function formatCurrencyNumber($value)
     {
         if(is_numeric($value))
             $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
@@ -337,3 +343,25 @@ if (!function_exists('paymentPfAmount')) {
     }
 }
 
+if (!function_exists('usdToPf')) {
+
+    function usdToPf($value)
+    {
+        if(is_numeric($value))
+            $value = (double) number_format($value, 2);
+
+        $result =  (double)( $value / ((double) getSetting('BF_TO_USD_RATE')));
+        return formatCurrencyNumber($result);
+    }
+}
+
+if (!function_exists('pfToUsd')) {
+
+    function pfToUsd($value)
+    {
+        if(is_numeric($value))
+            $value = (double) number_format($value, 2);
+        $result = (double) ($value * ((double) getSetting('BF_TO_USD_RATE')));
+        return formatCurrencyNumber($result);
+    }
+}

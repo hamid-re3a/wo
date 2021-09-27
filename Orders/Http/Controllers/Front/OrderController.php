@@ -132,7 +132,7 @@ class OrderController extends Controller
 
             DB::beginTransaction();
             $order_db = Order::query()->create([
-                "user_id" => $request->header('X-user-id'),
+                "user_id" => $user->id,
                 "payment_type" => $request->get('payment_type'),
                 "payment_currency" => $request->has('payment_currency') ? $request->get('payment_currency') : null,
                 "payment_driver" => $request->has('payment_driver') ? $request->get('payment_driver') : null,
@@ -157,14 +157,12 @@ class OrderController extends Controller
             $invoice_request = new Invoice();
             $invoice_request->setPayableId((int)$order_db->id);
             $invoice_request->setPayableType('Order');
-            $invoice_request->setPfAmount($order_db->total_cost_in_usd);
+            $invoice_request->setPfAmount((double)$order_db->total_cost_in_pf);
             $invoice_request->setPaymentDriver($order_db->payment_driver);
             $invoice_request->setPaymentType($order_db->payment_type);
             $invoice_request->setPaymentCurrency($order_db->payment_currency);
             $invoice_request->setUser($user->getUserService());
-            $invoice_request->setUserId(auth()->user()->id);
-            $invoice_request->setPayableId($order_db->id);
-            $invoice_request->setPayableType('Order');
+            $invoice_request->setUserId((int)auth()->user()->id);
 
             list($payment_flag, $payment_response) = $this->payment_processor->pay($invoice_request);
 

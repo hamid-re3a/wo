@@ -38,8 +38,8 @@ class GiftcodeRepository
              * Start User wallet process
              */
             //Check User Balance
-            if($this->wallet_repository->checkUserBalance() < $giftcode->total_cost_in_usd)
-                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),406);
+            if($this->wallet_repository->checkUserBalance() < $giftcode->total_cost_in_pf)
+                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_pf ]),406);
             //Withdraw Balance
             $finalTransaction = $this->wallet_repository->withdrawUserWallet($giftcode);
 

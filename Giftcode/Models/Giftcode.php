@@ -21,9 +21,9 @@ use User\Models\User;
  * @property string| $redeemer_full_name
  * @property string| $creator_full_name
  * @property int $redeem_user_id
- * @property int $packages_cost_in_usd
- * @property int $registration_fee_in_usd
- * @property int $total_cost_in_usd
+ * @property int $packages_cost_in_pf
+ * @property int $registration_fee_in_pf
+ * @property int $total_cost_in_pf
  * @property boolean $is_canceled
  * @property boolean $is_expired
  * @property string|null $deleted_at
@@ -48,9 +48,9 @@ class Giftcode extends Model
         'expiration_date',
         'redeem_date',
         'redeem_user_id',
-        'packages_cost_in_usd',
-        'registration_fee_in_usd',
-        'total_cost_in_usd',
+        'packages_cost_in_pf',
+        'registration_fee_in_pf',
+        'total_cost_in_pf',
         'is_canceled',
         'is_expired',
     ];
@@ -161,11 +161,11 @@ class Giftcode extends Model
 
         //Check we should calculate cancelation fee or not
         if (!$fee)
-            return $this->total_cost_in_usd;
+            return $this->total_cost_in_pf;
 
         //Calculate refundable amount
-        $refund_fee_in_fiat = ($this->total_cost_in_usd * $fee) / 100;
-        return $this->total_cost_in_usd - $refund_fee_in_fiat;
+        $refund_fee_in_fiat = ($this->total_cost_in_pf * $fee) / 100;
+        return $this->total_cost_in_pf - $refund_fee_in_fiat;
     }
 
 
@@ -178,9 +178,9 @@ class Giftcode extends Model
         $giftcode_service->setPackageId((int)$this->attributes['package_id']);
         $giftcode_service->setOrderId((int)$this->attributes['order_id']);
 
-        $giftcode_service->setPackagesCostInUsd((float)$this->attributes['packages_cost_in_usd']);
-        $giftcode_service->setRegistrationFeeInUsd((float)$this->attributes['registration_fee_in_usd']);
-        $giftcode_service->setTotalCostInUsd((float)$this->attributes['total_cost_in_usd']);
+        $giftcode_service->setPackagesCostInPf((float)$this->attributes['packages_cost_in_pf']);
+        $giftcode_service->setRegistrationFeeInPf((float)$this->attributes['registration_fee_in_pf']);
+        $giftcode_service->setTotalCostInPf((float)$this->attributes['total_cost_in_pf']);
 
         $giftcode_service->setCode((string)$this->attributes['code']);
 

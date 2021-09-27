@@ -49,8 +49,7 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{full_name}}', (is_null($this->getUserFullName()) || empty($this->getUserFullName())) ? 'Unknown' : $this->getUserFullName(), $setting['body']);
         $setting['body'] = str_replace('{{invoice_no}}',(is_null($this->invoice->getTransactionId()) || empty($this->invoice->getTransactionId())) ? 'Unknown': $this->invoice->getTransactionId(),$setting['body']);
         $setting['body'] = str_replace('{{due_amount}}', (is_null($this->invoice->getAmount()) || empty($this->invoice->getAmount())) ? 'Unknown' : $this->invoice->getAmount(), $setting['body']);
-        $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->getPfAmount()) || empty($this->invoice->getPfAmount())) ? 'Unknown' : $this->invoice->getPfAmount(), $setting['body']);
-        $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->getPfAmount()) || empty($this->invoice->getPfAmount())) ? 'Unknown' : $this->invoice->getPfAmount(), $setting['body']);
+        $setting['body'] = str_replace('{{usd_amount}}', (is_null($this->invoice->getPfAmount()) || empty($this->invoice->getPfAmount())) ? 'Unknown' : pfToUsd($this->invoice->getPfAmount()), $setting['body']);
         $setting['body'] = str_replace('{{payment_address}}', (is_null($this->invoice->getCheckoutLink()) || empty($this->invoice->getCheckoutLink())) ? 'Unknown' : $this->invoice->getCheckoutLink(), $setting['body']);
         $setting['body'] = str_replace('{{package_name}}', (is_null($this->package->getName()) || empty($this->package->getName())) ? 'Unknown' : $this->package->getName(), $setting['body']);
         $setting['body'] = str_replace('{{package_short_name}}', (is_null($this->package->getShortName()) || empty($this->package->getShortName())) ? 'Unknown' : $this->package->getShortName(), $setting['body']);

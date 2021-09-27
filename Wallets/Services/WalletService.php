@@ -185,7 +185,7 @@ class WalletService implements WalletServiceInterface
     public function invoiceWallet(Request $request)
     {
         $invoice_request = new Invoice();
-        $invoice_request->setPfAmount($request->get('amount'));
+        $invoice_request->setPfAmount(usdToPf($request->get('amount')));
         $invoice_request->setPaymentDriver('btc-pay-server');
         $invoice_request->setPaymentType('purchase');
         $invoice_request->setPaymentCurrency('BTC');

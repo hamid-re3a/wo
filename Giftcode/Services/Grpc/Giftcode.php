@@ -30,17 +30,17 @@ class Giftcode extends \Google\Protobuf\Internal\Message
      */
     protected $package_id = 0;
     /**
-     * Generated from protobuf field <code>double packages_cost_in_usd = 5;</code>
+     * Generated from protobuf field <code>double packages_cost_in_pf = 5;</code>
      */
-    protected $packages_cost_in_usd = 0.0;
+    protected $packages_cost_in_pf = 0.0;
     /**
-     * Generated from protobuf field <code>double registration_fee_in_usd = 6;</code>
+     * Generated from protobuf field <code>double registration_fee_in_pf = 6;</code>
      */
-    protected $registration_fee_in_usd = 0.0;
+    protected $registration_fee_in_pf = 0.0;
     /**
-     * Generated from protobuf field <code>double total_cost_in_usd = 7;</code>
+     * Generated from protobuf field <code>double total_cost_in_pf = 7;</code>
      */
-    protected $total_cost_in_usd = 0.0;
+    protected $total_cost_in_pf = 0.0;
     /**
      * Generated from protobuf field <code>string code = 8;</code>
      */
@@ -96,9 +96,9 @@ class Giftcode extends \Google\Protobuf\Internal\Message
      *     @type string $uuid
      *     @type int|string $user_id
      *     @type int|string $package_id
-     *     @type float $packages_cost_in_usd
-     *     @type float $registration_fee_in_usd
-     *     @type float $total_cost_in_usd
+     *     @type float $packages_cost_in_pf
+     *     @type float $registration_fee_in_pf
+     *     @type float $total_cost_in_pf
      *     @type string $code
      *     @type string $expiration_date
      *     @type int|string $redeem_user_id
@@ -206,67 +206,67 @@ class Giftcode extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double packages_cost_in_usd = 5;</code>
+     * Generated from protobuf field <code>double packages_cost_in_pf = 5;</code>
      * @return float
      */
-    public function getPackagesCostInUsd()
+    public function getPackagesCostInPf()
     {
-        return $this->packages_cost_in_usd;
+        return $this->packages_cost_in_pf;
     }
 
     /**
-     * Generated from protobuf field <code>double packages_cost_in_usd = 5;</code>
+     * Generated from protobuf field <code>double packages_cost_in_pf = 5;</code>
      * @param float $var
      * @return $this
      */
-    public function setPackagesCostInUsd($var)
+    public function setPackagesCostInPf($var)
     {
         GPBUtil::checkDouble($var);
-        $this->packages_cost_in_usd = $var;
+        $this->packages_cost_in_pf = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>double registration_fee_in_usd = 6;</code>
+     * Generated from protobuf field <code>double registration_fee_in_pf = 6;</code>
      * @return float
      */
-    public function getRegistrationFeeInUsd()
+    public function getRegistrationFeeInPf()
     {
-        return $this->registration_fee_in_usd;
+        return $this->registration_fee_in_pf;
     }
 
     /**
-     * Generated from protobuf field <code>double registration_fee_in_usd = 6;</code>
+     * Generated from protobuf field <code>double registration_fee_in_pf = 6;</code>
      * @param float $var
      * @return $this
      */
-    public function setRegistrationFeeInUsd($var)
+    public function setRegistrationFeeInPf($var)
     {
         GPBUtil::checkDouble($var);
-        $this->registration_fee_in_usd = $var;
+        $this->registration_fee_in_pf = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>double total_cost_in_usd = 7;</code>
+     * Generated from protobuf field <code>double total_cost_in_pf = 7;</code>
      * @return float
      */
-    public function getTotalCostInUsd()
+    public function getTotalCostInPf()
     {
-        return $this->total_cost_in_usd;
+        return $this->total_cost_in_pf;
     }
 
     /**
-     * Generated from protobuf field <code>double total_cost_in_usd = 7;</code>
+     * Generated from protobuf field <code>double total_cost_in_pf = 7;</code>
      * @param float $var
      * @return $this
      */
-    public function setTotalCostInUsd($var)
+    public function setTotalCostInPf($var)
     {
         GPBUtil::checkDouble($var);
-        $this->total_cost_in_usd = $var;
+        $this->total_cost_in_pf = $var;
 
         return $this;
     }

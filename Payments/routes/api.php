@@ -10,7 +10,7 @@ use Payments\Http\Controllers\Front\PaymentCurrencyController;
 use Payments\Http\Controllers\Front\PaymentTypeController;
 use Payments\Http\Controllers\Front\WebhookController;
 
-Route::middleware(['auth', 'role:super-admin|subscriptions-payment-admin'])->prefix('admin.')->name('admin')->group(function () {
+Route::middleware(['auth', 'role:super-admin|subscriptions-payment-admin'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::name('payments')->prefix('payments')->group(function () {
 

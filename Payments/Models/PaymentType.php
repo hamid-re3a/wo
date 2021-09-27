@@ -35,11 +35,4 @@ class PaymentType extends Model
     use HasFactory,SoftDeletes;
     protected $fillable = ["name","is_active"];
     protected $guarded = [];
-
-    protected static function booted()
-    {
-        static::addGlobalScope('actives', function (Builder $builder) {
-            $builder->where('is_active', '=', true);
-        });
-    }
 }

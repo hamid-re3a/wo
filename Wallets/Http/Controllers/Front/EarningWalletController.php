@@ -67,6 +67,10 @@ class EarningWalletController extends Controller
                     });
                 }]
             )
+            ->withSumQuery(['transactions.amount AS spent_sum' => function (Builder $query) {
+                    $query->where('type', '=', 'withdraw');
+                }]
+            )
             ->first();
 
         return api()->success(null, [

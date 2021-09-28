@@ -56,10 +56,7 @@ class Category extends Model
         return $this->hasMany(Package::class);
     }
 
-    /**
-     * relation with categoryIndicatorCommission
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
+
     public function categoryIndirectCommission()
     {
         return $this->hasMany(CategoriesIndirectCommission::class);

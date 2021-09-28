@@ -6,15 +6,16 @@ namespace Wallets\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Payments\Services\Processors\PayoutProcessor;
 use User\Models\User;
+use Wallets\Http\Requests\IndexWithdrawRequest;
 use Wallets\Http\Requests\Admin\PayoutGroupWithdrawRequest;
 use Wallets\Http\Requests\Admin\UpdateWithdrawRequest;
 use Wallets\Http\Resources\WithdrawProfitResource;
-use Wallets\Jobs\ProcessBTCTransactionsJob;
 use Wallets\Models\Transaction;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
@@ -85,11 +86,17 @@ class WithdrawRequestController extends Controller
     /**
      * Withdraws list
      * @group Admin User > Wallets > Withdraw Requests
+     * @queryParam status integer Field to filter withdraw requests. The value must be one of 1, 2, 3, or 4.
+     * @param IndexWithdrawRequest $request
+     * @return JsonResponse
      */
-    public function index()
+    public function index(IndexWithdrawRequest $request)
     {
         try {
-            return api()->success(null, WithdrawProfitResource::collection(WithdrawProfit::query()->simplePaginate())->response()->getData());
+            $withdrawRequests = WithdrawProfit::query();
+            if($request->has('status'))
+                $withdrawRequests->where('status','=',$request->get('status'));
+            return api()->success(null, WithdrawProfitResource::collection($withdrawRequests->simplePaginate())->response()->getData());
         } catch (\Throwable $exception) {
             Log::error('Admin/WithdrawRequestController@index => ' . serialize(request()->all()));
             return api()->error(null, [

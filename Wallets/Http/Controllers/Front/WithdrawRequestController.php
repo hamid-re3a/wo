@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Http\Requests\Front\CreateWithdrawRequest;
+use Wallets\Http\Requests\IndexWithdrawRequest;
 use Wallets\Http\Resources\WithdrawProfitResource;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Repositories\WithdrawRepository;
@@ -78,11 +79,19 @@ class WithdrawRequestController extends Controller
     /**
      * Withdraw requests
      * @group Public User > Withdraw Requests
+     * @queryParam status integer Field to filter withdraw requests. The value must be one of 1, 2, 3, or 4.
+     * @param IndexWithdrawRequest $request
+     * @return JsonResponse
      */
-    public function index()
+    public function index(IndexWithdrawRequest $request)
     {
         try {
-            return api()->success(null, WithdrawProfitResource::collection(auth()->user()->withdrawRequests()->simplePaginate())->response()->getData());
+            /** @var $withdrawRequests WithdrawProfit */
+            $withdrawRequests = auth()->user()->withdrawRequests();
+            if($request->has('status'))
+                $withdrawRequests->where('status','=', $request->get('status'));
+
+            return api()->success(null, WithdrawProfitResource::collection($withdrawRequests->simplePaginate())->response()->getData());
         } catch (\Throwable $exception) {
             Log::error('EarningWalletController@withdraw_requests => ' . serialize(request()->all()));
             return api()->error(null, [

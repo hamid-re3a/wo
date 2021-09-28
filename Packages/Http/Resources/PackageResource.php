@@ -17,7 +17,7 @@ class PackageResource extends JsonResource
         if ($this->packageIndirectCommission->count() > 0) {
             $indirect = PackageIndirectSettingResource::collection($this->packageIndirectCommission);
         } else {
-            $indirect = CategoryIndirectSettingResource::collection($this->category()->categoryIndirectCommission);
+            $indirect = CategoryIndirectSettingResource::collection($this->category->categoryIndirectCommission);
         }
         return [
             'id' => $this->id,

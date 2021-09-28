@@ -16,7 +16,7 @@ jobs:
     - name: Config composer
       run: composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
     - name: Install Dependencies
-      run: composer update
+      run: composer install
     - name: Generate key
       run: php artisan key:generate
     - name: Directory Permissions
@@ -34,16 +34,16 @@ jobs:
     - uses: actions/checkout@v2
     - name: Copy project to deployment directory
       run: |
-        shopt -s dotglob 
-        sudo mkdir -p /home/subscription/public_html/Subscriptions/temp-project 
+        shopt -s dotglob
+        sudo mkdir -p /home/subscription/public_html/Subscriptions/temp-project
         sudo cp -r . /home/subscription/public_html/Subscriptions/temp-project/
         sudo rm -rf /home/subscription/public_html/Subscriptions/server_deploy.sh
         sudo mv /home/subscription/public_html/Subscriptions/temp-project/server_deploy.sh /home/subscription/public_html/Subscriptions/
         sudo chown subscription:subscription /home/subscription/public_html/Subscriptions/server_deploy.sh
         sudo chmod 700 /home/subscription/public_html/Subscriptions/server_deploy.sh
-        sudo chown -R subscription:subscription /home/subscription/public_html/Subscriptions/temp-project 
+        sudo chown -R subscription:subscription /home/subscription/public_html/Subscriptions/temp-project
     - name: Run server_deploy.sh
-      run: | 
+      run: |
         sudo su - subscription -c '/home/subscription/public_html/Subscriptions/server_deploy.sh'
     - name: Restart supervisord subscription workers
       run: |

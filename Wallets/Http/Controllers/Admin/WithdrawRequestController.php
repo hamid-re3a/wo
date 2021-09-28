@@ -4,16 +4,18 @@
 namespace Wallets\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Payments\Services\Processors\PayoutProcessor;
 use User\Models\User;
+use Wallets\Http\Requests\IndexWithdrawRequest;
 use Wallets\Http\Requests\Admin\PayoutGroupWithdrawRequest;
 use Wallets\Http\Requests\Admin\UpdateWithdrawRequest;
 use Wallets\Http\Resources\WithdrawProfitResource;
-use Wallets\Jobs\ProcessBTCTransactionsJob;
 use Wallets\Models\Transaction;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
@@ -28,14 +30,73 @@ class WithdrawRequestController extends Controller
         $this->payout_processor = $payout_processor;
     }
 
+
+    /**
+     * Get counts
+     * @group Admin User > Wallets > Withdraw Requests
+     */
+    public function counts()
+    {
+        $counts = User::query()
+            ->withCount([
+                'withdrawRequests AS count_all_requests',
+                'withdrawRequests AS count_pending_requests' => function (Builder $query) {
+                    $query->where('status', '=', 1);
+                },
+                'withdrawRequests AS count_rejected_requests' => function (Builder $query) {
+                    $query->where('status', '=', 2);
+                },
+                'withdrawRequests AS count_processed_requests' => function (Builder $query) {
+                    $query->where('status', '=', 3);
+                },
+                'withdrawRequests AS count_postponed_requests' => function (Builder $query) {
+                    $query->where('status', '=', 4);
+                },
+            ])
+            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_pending_requests' => function (Builder $query) {
+                    $query->where('status', '=', 1);
+                }]
+            )
+            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_rejected_requests' => function (Builder $query) {
+                    $query->where('status', '=', 2);
+                }]
+            )
+            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_processed_requests' => function (Builder $query) {
+                    $query->where('status', '=', 3);
+                }]
+            )
+            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_postponed_requests' => function (Builder $query) {
+                    $query->where('status', '=', 4);
+                }]
+            )->where('id','!=',1)->first()->toArray();
+
+        return api()->success(null, [
+            'count_all_requests' => $counts['count_all_requests'],
+            'count_pending_requests' => $counts['count_pending_requests'],
+            'count_rejected_requests' => $counts['count_rejected_requests'],
+            'count_processed_requests' => $counts['count_processed_requests'],
+            'count_postponed_requests' => $counts['count_postponed_requests'],
+            'sum_amount_pending_requests' => empty($counts['sum_amount_pending_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_pending_requests']),
+            'sum_amount_rejected_requests' => empty($counts['sum_amount_rejected_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_rejected_requests']),
+            'sum_amount_processed_requests' => empty($counts['sum_amount_processed_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_processed_requests']),
+            'sum_amount_postponed_requests' => empty($counts['sum_amount_postponed_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_postponed_requests']),
+        ]);
+    }
+
     /**
      * Withdraws list
      * @group Admin User > Wallets > Withdraw Requests
+     * @queryParam status integer Field to filter withdraw requests. The value must be one of 1 = Under review, 2 = Rejected, 3 = Processed OR 4 = Postponed.
+     * @param IndexWithdrawRequest $request
+     * @return JsonResponse
      */
-    public function index()
+    public function index(IndexWithdrawRequest $request)
     {
         try {
-            return api()->success(null, WithdrawProfitResource::collection(WithdrawProfit::query()->simplePaginate())->response()->getData());
+            $withdrawRequests = WithdrawProfit::query();
+            if($request->has('status'))
+                $withdrawRequests->where('status','=',$request->get('status'));
+            return api()->success(null, WithdrawProfitResource::collection($withdrawRequests->simplePaginate())->response()->getData());
         } catch (\Throwable $exception) {
             Log::error('Admin/WithdrawRequestController@index => ' . serialize(request()->all()));
             return api()->error(null, [
@@ -90,6 +151,8 @@ class WithdrawRequestController extends Controller
                     'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
                 ]);
 
+            } else if ($request->get('status') == 4) {
+                $withdraw_request->update($request->validated());
             }
 
 

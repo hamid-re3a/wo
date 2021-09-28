@@ -58,7 +58,12 @@ class ProcessWithdrawalRequestsCommand extends Command
         $count_withdraw_requests = walletGetSetting('count_withdraw_requests_to_automatic_payout_process') ? walletGetSetting('count_withdraw_requests_to_automatic_payout_process') : 50;
 
         //Query withdrawal requests
-        $withdrawal_requests = WithdrawProfit::query()->whereHas('withdrawTransaction', function (Builder $query) use ($maximum_amount) {
+        $withdrawal_requests = WithdrawProfit::query()
+            ->where(function(Builder $query){
+                $query->whereNull('postponed_to')
+                        ->orWhere('postponed_to', '>=' , now()->toDateTimeString());
+            })
+            ->whereHas('withdrawTransaction', function (Builder $query) use ($maximum_amount) {
             $query->where('type', '=', 'withdraw');
             $query->whereHas('metaData', function (Builder $subQuery) {
                 $subQuery->where('name', '=', 'Withdraw request');

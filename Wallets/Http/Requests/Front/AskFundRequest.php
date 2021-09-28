@@ -39,8 +39,8 @@ class AskFundRequest extends FormRequest
     public function messages()
     {
         return [
-            'amount.min' => 'Minimum allowed amount is ' . walletPfAmount($this->minimum_amount) . ' PF',
-            'amount.max' => 'Maximum allowed amount is ' . walletPfAmount($this->maximum_amount) . ' PF',
+            'amount.min' => 'Minimum allowed amount is ' . formatCurrencyFormat($this->minimum_amount) . ' PF',
+            'amount.max' => 'Maximum allowed amount is ' . formatCurrencyFormat($this->maximum_amount) . ' PF',
             'member_id.exists' => 'Invalid Membership ID',
             'member_id.not_in' => 'You are not allowed to ask PF from your own .'
         ];

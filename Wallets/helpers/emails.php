@@ -44,6 +44,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'variables_description' => 'full_name user full name, amount transfer amount,sender_name from user full name,sender_member_id from user member id',
         'type' => 'email',
     ],
+
     'PAYMENT_REQUEST' => [
         'is_active' => true,
         'subject' => '{{request_first_name}} sent you a payment request',
@@ -63,6 +64,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'variables_description' => 'full_name user full name, amount payment request amount,request_full_name payment requester',
         'type' => 'email',
     ],
+
     'WITHDRAW_REQUEST_SUBMITTED' => [
         'is_active' => true,
         'subject' => 'We received your withdrawal request',
@@ -95,7 +97,6 @@ CONST WALLET_EMAIL_CONTENTS = [
                 ',
         'type' => 'email',
     ],
-
     'WITHDRAW_REQUEST_REJECTED' => [
         'is_active' => true,
         'subject' => 'Your withdrawal request rejected',
@@ -130,7 +131,6 @@ CONST WALLET_EMAIL_CONTENTS = [
                 ',
         'type' => 'email',
     ],
-
     'WITHDRAW_REQUEST_PROCESSED' => [
         'is_active' => true,
         'subject' => 'Your withdrawal request processed',
@@ -148,6 +148,39 @@ CONST WALLET_EMAIL_CONTENTS = [
                 <p>Update Date : {{updated_at}}</p>
                 <p>Withdrawal transaction ID : {{withdraw_transaction_uuid}}</p>
                 <p>Network hash : {{network_hash}}</p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables' => 'full_name,amount_in_pf,amount_in_btc,created_at,refund_transaction_uuid',
+        'variables_description' => '
+                full_name user full name,
+                amount_in_pf withdraw request amount in pf,
+                amount_in_btc withdraw request in BTC
+                amount_in_btc withdraw request in BTC,
+                created_at withdraw request date,
+                refund_transaction_uuid refund transaction id in our system,
+
+                ',
+        'type' => 'email',
+    ],
+    'WITHDRAW_REQUEST_POSTPONED' => [
+        'is_active' => true,
+        'subject' => 'Your withdrawal request postponed',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
+                <div>
+                <p>Hello <b>{{full_name}}</b>,</p>
+                <p>Your withdrawal request has been processed.</p>
+                <p></p>
+                <p>ID : {{uuid}}</p>
+                <p>Amount in PF : {{amount_in_pf}}</p>
+                <p>Amount in BTC : {{amount_in_btc}}</p>
+                <p>Withdrawal transaction ID : {{withdraw_transaction_uuid}}</p>
+                <p>Request Date : {{created_at}}</p>
+                <p>Update Date : {{updated_at}}</p>
+                <p>Postpone Date : {{postpone_to}}</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>

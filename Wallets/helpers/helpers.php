@@ -45,9 +45,9 @@ if(!function_exists('walletGetEmailContent')) {
 
 }
 
-if (!function_exists('walletPfAmount')) {
+if (!function_exists('formatCurrencyFormat')) {
 
-    function walletPfAmount($value)
+    function formatCurrencyFormat($value)
     {
         if(is_numeric($value))
             $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));

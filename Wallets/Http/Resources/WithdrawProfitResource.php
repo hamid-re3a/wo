@@ -18,6 +18,7 @@ class WithdrawProfitResource extends JsonResource
 
         return [
             'id' => $this->uuid,
+            'user_member_id' => $this->user->member_id,
             'user_full_name' => $this->user->full_name,
             'withdraw_transaction_id' => $this->withdrawTransaction->uuid,
             'refund_transaction_id' => !empty($this->refund_transaction_id) ? $this->refundTransaction->uuid : null,
@@ -26,8 +27,8 @@ class WithdrawProfitResource extends JsonResource
             'wallet_hash' => $this->wallet_hash,
             'currency' => $this->currency,
             'crypto_rate' => $this->crypto_rate,
-            'fee' => walletPfAmount($this->fee),
-            'pf_amount' => walletPfAmount($this->pf_amount),
+            'fee' => formatCurrencyFormat($this->fee),
+            'pf_amount' => formatCurrencyFormat($this->pf_amount),
             'crypto_amount' => $this->crypto_amount,
             'status' => $this->status,
             'created_at' => $this->created_at->timestamp

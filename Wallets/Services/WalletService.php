@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Payments\Services\Grpc\Invoice;
-use Payments\Services\PaymentService;
-use Payments\Services\Processors\PaymentProcessor;
+use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
 use Wallets\Jobs\HandleWithdrawUnsentEmails;
 use Wallets\Models\WithdrawProfit;
@@ -191,9 +190,8 @@ class WalletService implements WalletServiceInterface
         $invoice_request->setPaymentCurrency('BTC');
         $invoice_request->setPayableType('DepositWallet');
         $invoice_request->setUser(auth()->user()->getUserService());
-        /**@var $payment_processor PaymentProcessor */
-        $payment_processor = app(PaymentProcessor::class);
-        return $payment_processor->pay($invoice_request);
+
+        return PaymentFacade::pay($invoice_request);
     }
 
 }

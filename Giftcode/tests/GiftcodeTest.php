@@ -7,7 +7,10 @@ namespace Giftcode\tests;
 use Giftcode\GiftCodeConfigure;
 use Giftcode\Models\Package;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Packages\PackageConfigure;
+use Payments\PaymentConfigure;
 use Spatie\Permission\Models\Role;
 use Tests\CreatesApplication;
 use Tests\TestCase;
@@ -26,8 +29,10 @@ class GiftcodeTest extends TestCase
     {
         parent::setUp();
         $this->app->setLocale('en');
-        $this->withHeaders($this->getHeaders());
+
+        UserConfigure::seed();
         GiftCodeConfigure::seed();
+        $this->withHeaders($this->getHeaders());
         Package::query()->firstOrCreate([
             "id" => 1,
             "name" => 'Beginner',
@@ -44,29 +49,15 @@ class GiftcodeTest extends TestCase
             "$class must have method $method"
         );
     }
-
     public function getHeaders()
     {
 
-        $user = User::query()->firstOrCreate([
-            'id' => 2,
-            'member_id' => '2000',
-            'email' => 'janexstaging@gmail.com',
-            'first_name' => 'John',
-            'last_name' => 'Due',
-            'username' => 'johny',
-        ]);
-        $user = $user->fresh();
-        if(defined('USER_ROLES'))
-            foreach (USER_ROLES as $role)
-                Role::query()->firstOrCreate(['name' => $role]);
-        $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_SUPER_ADMIN]);
+        $user = User::query()->first();
         $hash = md5(serialize($user->getUserService()));
         return [
-            'X-user-id' => '2',
+            'X-user-id' => '1',
             'X-user-hash' => $hash,
         ];
-
     }
 
     protected function deposit_user()
@@ -112,7 +103,7 @@ class GiftcodeTest extends TestCase
         $this->deposit_user();
         return $this->postJson(route('giftcodes.customer.create'), [
             'package_id' => 1,
-            'user_id' => 2,
+            'user_id' => 1,
             'include_registration_fee' => true,
             'wallet' => 'Deposit Wallet'
         ]);

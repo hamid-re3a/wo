@@ -21,26 +21,6 @@ use Wallets\Services\Grpc\Withdraw;
 class PaymentProcessor
 {
 
-    private function createInvoiceModel(Invoice $invoice_request)
-    {
-        return \Payments\Models\Invoice::query()->create([
-            'user_id' => $invoice_request->getUser()->getId(),
-            'payable_id' => $invoice_request->getPayableId(),
-            'payable_type' => $invoice_request->getPayableType(),
-            'pf_amount' => $invoice_request->getPfAmount(),
-            'amount' => $invoice_request->getAmount(),
-            'due_amount' => $invoice_request->getDueAmount(),
-            'paid_amount' => $invoice_request->getPaidAmount(),
-            'transaction_id' => $invoice_request->getTransactionId(),
-            'checkout_link' => $invoice_request->getCheckoutLink(),
-            'expiration_time' => Carbon::createFromTimestamp($invoice_request->getExpirationTime()),
-            'status' => $invoice_request->getStatus(),
-            'additional_status' => $invoice_request->getAdditionalStatus(),
-            'payment_type' => $invoice_request->getPaymentType(),
-            'payment_driver' => $invoice_request->getPaymentDriver(),
-            'payment_currency' => $invoice_request->getPaymentCurrency(),
-        ]);
-    }
 
     /**
      * pay by every payment Driver
@@ -255,6 +235,26 @@ class PaymentProcessor
             Log::error('PaymentService@payBtcServer error ' . $exception->getMessage());
             return [false,trans('payment.responses.payment-service.btc-pay-server-error')];
         }
+    }
+    private function createInvoiceModel(Invoice $invoice_request)
+    {
+        return \Payments\Models\Invoice::query()->create([
+            'user_id' => $invoice_request->getUser()->getId(),
+            'payable_id' => $invoice_request->getPayableId(),
+            'payable_type' => $invoice_request->getPayableType(),
+            'pf_amount' => $invoice_request->getPfAmount(),
+            'amount' => $invoice_request->getAmount(),
+            'due_amount' => $invoice_request->getDueAmount(),
+            'paid_amount' => $invoice_request->getPaidAmount(),
+            'transaction_id' => $invoice_request->getTransactionId(),
+            'checkout_link' => $invoice_request->getCheckoutLink(),
+            'expiration_time' => Carbon::createFromTimestamp($invoice_request->getExpirationTime()),
+            'status' => $invoice_request->getStatus(),
+            'additional_status' => $invoice_request->getAdditionalStatus(),
+            'payment_type' => $invoice_request->getPaymentType(),
+            'payment_driver' => $invoice_request->getPaymentDriver(),
+            'payment_currency' => $invoice_request->getPaymentCurrency(),
+        ]);
     }
 
 }

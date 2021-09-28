@@ -112,7 +112,7 @@ class WithdrawRequestController extends Controller
     }
 
     /**
-     * Withdraws list
+     * Withdraw requests list
      * @group Admin User > Wallets > Withdraw Requests
      * @queryParam status integer Field to filter withdraw requests. The value must be one of 1 = Under review, 2 = Rejected, 3 = Processed OR 4 = Postponed.
      * @param IndexWithdrawRequest $request
@@ -198,7 +198,7 @@ class WithdrawRequestController extends Controller
 
 
     /**
-     * Payout group withdraw request
+     * Payout group withdraw requests
      * @group Admin User > Wallets > Withdraw Requests
      * @param PayoutGroupWithdrawRequest $request
      * @return JsonResponse

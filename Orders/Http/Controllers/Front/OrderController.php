@@ -3,7 +3,6 @@
 namespace Orders\Http\Controllers\Front;
 
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -11,30 +10,27 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use MLM\Services\Grpc\Acknowledge;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
 use Orders\Models\Order;
+use Orders\Services\Grpc\MlmClientFacade;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\PaymentDrivers;
-use Payments\Services\PaymentService;
-use Payments\Services\Processors\PaymentProcessor;
+use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
 
 class OrderController extends Controller
 {
     use  ValidatesRequests;
 
-    private $payment_processor;
     private $package_service;
 
-    public function __construct(PaymentProcessor $paymentProcessor, PackageService $package_service)
+    public function __construct(PackageService $package_service)
     {
-        $this->payment_processor = $paymentProcessor;
         $this->package_service = $package_service;
     }
 
@@ -91,13 +87,13 @@ class OrderController extends Controller
                 $query->whereNotNull('is_paid_at');
                 $query->where('plan', ORDER_PLAN_COMPANY);
             },
-            'orders AS total_expired_count' => function(Builder $query) use($now) {
+            'orders AS total_expired_count' => function (Builder $query) use ($now) {
                 $query->whereNotNull('is_paid_at');
                 $query->where('expires_at', '<', $now);
             },
-            'orders AS total_active_count' => function(Builder $query) use($now) {
+            'orders AS total_active_count' => function (Builder $query) use ($now) {
                 $query->whereNotNull('is_paid_at');
-                $query->where('expires_at', '>' , $now);
+                $query->where('expires_at', '>', $now);
             }
         ])->first()->toArray();
 
@@ -157,7 +153,7 @@ class OrderController extends Controller
     {
         try {
             $package = $this->validatePackage($request);
-            /**@var $user User*/
+            /**@var $user User */
             $user = auth()->user();
 
             DB::beginTransaction();
@@ -172,12 +168,7 @@ class OrderController extends Controller
             ]);
             $order_db->refreshOrder();
             //Order Resolver
-            /** @var $response Acknowledge */
-            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getOrderService())->wait();
-
-            if ($flag->code != 0)
-                throw new \Exception('MLM not responding', 406);
-
+            $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
@@ -194,7 +185,7 @@ class OrderController extends Controller
             $invoice_request->setUser($user->getUserService());
             $invoice_request->setUserId((int)auth()->user()->id);
 
-            list($payment_flag, $payment_response) = $this->payment_processor->pay($invoice_request);
+            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request);
 
 
             if (!$payment_flag)
@@ -207,14 +198,13 @@ class OrderController extends Controller
                 $order_service = $order_db->fresh()->getOrderService();
                 $order_service->setIsPaidAt($now);
                 $order_service->setIsResolvedAt($now);
-                /** @var $submit_response Acknowledge */
-                list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
-                if ($flag->code != 0)
-                    throw new \Exception('MLM not responding', 406);
+
+                $submit_response = MlmClientFacade::submitOrder($order_service);
+
                 $order_db->update([
                     'is_paid_at' => $now,
                     'is_resolved_at' => $now,
-                    'is_commission_resolved_at'=>$submit_response->getCreatedAt()
+                    'is_commission_resolved_at' => $submit_response->getCreatedAt()
                 ]);
             }
 

@@ -5,6 +5,7 @@ namespace Wallets\tests\Feature;
 
 
 use Illuminate\Support\Facades\Mail;
+use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
 use Wallets\Services\BankService;
 use Wallets\tests\WalletTest;
@@ -37,7 +38,7 @@ class DepositWalletFeatureTest extends WalletTest
     /**
      * @test
      */
-    public  function get_transactions_list()
+    public function get_transactions_list()
     {
         $response = $this->get(route('wallets.customer.deposit.get-transactions'));
         $response->assertOk();
@@ -55,7 +56,7 @@ class DepositWalletFeatureTest extends WalletTest
     /**
      * @test
      */
-    public  function get_transfers_list()
+    public function get_transfers_list()
     {
         $response = $this->get(route('wallets.customer.deposit.get-transfers'));
         $response->assertOk();
@@ -73,10 +74,10 @@ class DepositWalletFeatureTest extends WalletTest
     /**
      * @test
      */
-    public  function transfer_fund_preview_insufficient_balance()
+    public function transfer_fund_preview_insufficient_balance()
     {
         $user_2 = User::factory()->create();
-        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund-preview'),[
+        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund-preview'), [
             'amount' => 101,
             'member_id' => $user_2->member_id
         ]);
@@ -97,20 +98,20 @@ class DepositWalletFeatureTest extends WalletTest
     public function transfer_fund_preview_sufficient_balance()
     {
         Mail::fake();
-        $user_1 = User::query()->where('username','=','admin')->first();
+        $user_1 = User::query()->where('username', '=', 'admin')->first();
         $bank_service = new BankService($user_1);
-        $bank_service->deposit('Deposit Wallet',30000);
+        $bank_service->deposit('Deposit Wallet', 30000);
 
         $user_2 = User::factory()->create();
-        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund-preview'),[
+        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund-preview'), [
             'amount' => 101,
             'member_id' => $user_2->member_id
         ]);
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'status',
-            'message',
-            'data'
+                'status',
+                'message',
+                'data'
             ]
         );
     }
@@ -122,7 +123,7 @@ class DepositWalletFeatureTest extends WalletTest
     {
 
         $user_2 = User::factory()->create();
-        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund'),[
+        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund'), [
             'amount' => 101,
             'member_id' => $user_2->member_id
         ]);
@@ -143,12 +144,12 @@ class DepositWalletFeatureTest extends WalletTest
     public function transfer_fund_sufficient_balance()
     {
         Mail::fake();
-        $user_1 = User::query()->where('username','=','admin')->first();
+        $user_1 = User::query()->where('username', '=', 'admin')->first();
         $bank_service = new BankService($user_1);
-        $bank_service->deposit('Deposit Wallet',30000);
+        $bank_service->deposit('Deposit Wallet', 30000);
 
         $user_2 = User::factory()->create();
-        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund'),[
+        $response = $this->postJson(route('wallets.customer.deposit.transfer-fund'), [
             'amount' => 101,
             'member_id' => $user_2->member_id
         ]);
@@ -167,7 +168,14 @@ class DepositWalletFeatureTest extends WalletTest
     public function deposit_fund()
     {
         Mail::fake();
-        $response = $this->postJson(route('wallets.customer.deposit.deposit-funds'),[
+        PaymentFacade::shouldReceive('pay')->once()->andReturn([true, [
+            "payment_currency" => "nothing",
+            "amount" => "nothing",
+            "checkout_link" => "nothing",
+            "transaction_id" => "nothing",
+            "expiration_time" => "nothing",
+        ]]);
+        $response = $this->postJson(route('wallets.customer.deposit.deposit-funds'), [
             'amount' => 102,
         ]);
         $response->assertStatus(200);

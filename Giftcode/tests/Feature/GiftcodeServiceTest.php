@@ -75,7 +75,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
 
-        $user = User::query()->whereId(2)->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
@@ -93,7 +93,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $response->assertOk();
 
-        $user = User::query()->whereId(2)->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
@@ -112,7 +112,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $response->assertOk();
 
-        $user = User::query()->whereId(2)->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
@@ -131,7 +131,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $response->assertOk();
 
-        $user = User::query()->whereId(2)->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);

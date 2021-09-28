@@ -16,11 +16,14 @@ class CheckRequestBodyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if($request->has('member_id'))
-            updateUserFromGrpcServerByMemberId($request->get('member_id'));
+        if(!app()->environment() === 'testing'){
+            if($request->has('member_id'))
+                updateUserFromGrpcServerByMemberId($request->get('member_id'));
 
-        if($request->has('user_id'))
-            updateUserFromGrpcServer($request->get('user_id'));
+            if($request->has('user_id'))
+                updateUserFromGrpcServer($request->get('user_id'));
+
+        }
 
         return $next($request);
     }

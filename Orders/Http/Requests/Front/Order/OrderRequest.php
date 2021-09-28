@@ -3,9 +3,7 @@
 namespace Orders\Http\Requests\Front\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Orders\Services\OrderService;
-use Payments\Services\Grpc\PaymentCurrency;
 
 class OrderRequest extends FormRequest
 {

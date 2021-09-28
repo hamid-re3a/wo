@@ -45,34 +45,59 @@ class OrderController extends Controller
      */
     public function counts()
     {
+        $now = now()->toDateTimeString();
         $total_counts = User::query()->whereId(auth()->user()->id)->withCount([
             'orders AS total_orders',
             'orders AS total_paid' => function (Builder $query) {
                 $query->whereNotNull('is_paid_at');
             },
             'orders AS total_resolved' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->whereNotNull('is_resolved_at');
             },
             'orders AS total_refund' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->whereNotNull('is_refund_at');
             },
             'orders AS total_commission_paid' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->whereNotNull('is_commission_resolved_at');
             },
             'orders AS total_paid_with_wallet' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->where('payment_driver', 'deposit');
             },
             'orders AS total_paid_with_giftcode' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->where('payment_driver', 'giftcode');
             },
             'orders AS total_paid_with_purchase' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->where('payment_driver', 'purchase');
             },
             'orders AS total_plan_start' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->where('plan', ORDER_PLAN_START);
             },
             'orders AS total_plan_purchase' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
                 $query->where('plan', ORDER_PLAN_PURCHASE);
+            },
+            'orders AS total_plan_special' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
+                $query->where('plan', ORDER_PLAN_SPECIAL);
+            },
+            'orders AS total_plan_company' => function (Builder $query) {
+                $query->whereNotNull('is_paid_at');
+                $query->where('plan', ORDER_PLAN_COMPANY);
+            },
+            'orders AS total_expired_count' => function(Builder $query) use($now) {
+                $query->whereNotNull('is_paid_at');
+                $query->where('expires_at', '<', $now);
+            },
+            'orders AS total_active_count' => function(Builder $query) use($now) {
+                $query->whereNotNull('is_paid_at');
+                $query->where('expires_at', '>' , $now);
             }
         ])->first()->toArray();
 
@@ -80,12 +105,17 @@ class OrderController extends Controller
             'total_orders' => $total_counts['total_orders'],
             'total_paid' => $total_counts['total_paid'],
             'total_resolved' => $total_counts['total_resolved'],
+            'total_refund' => $total_counts['total_refund'],
             'total_commission_paid' => $total_counts['total_commission_paid'],
             'total_paid_with_wallet' => $total_counts['total_paid_with_wallet'],
             'total_paid_with_giftcode' => $total_counts['total_paid_with_giftcode'],
             'total_paid_with_purchase' => $total_counts['total_paid_with_purchase'],
             'total_plan_start' => $total_counts['total_plan_start'],
-            'total_plan_purchase' => $total_counts['total_plan_purchase']
+            'total_plan_purchase' => $total_counts['total_plan_purchase'],
+            'total_plan_special' => $total_counts['total_plan_special'],
+            'total_plan_company' => $total_counts['total_plan_company'],
+            'total_expired_count' => $total_counts['total_expired_count'],
+            'total_active_count' => $total_counts['total_active_count'],
         ]);
     }
 

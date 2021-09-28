@@ -31,8 +31,8 @@ class TransferResource extends JsonResource
                 'wallet' => $this->to->name,
 //                'confirmed' => $this->withdraw->confirmed
             ],
-            'amount' => walletPfAmount($this->deposit->amountFloat),
-            'fee' =>  walletPfAmount($fee),
+            'amount' => formatCurrencyFormat($this->deposit->amountFloat),
+            'fee' =>  formatCurrencyFormat($fee),
             'created_at' => $this->created_at->timestamp
         ];
     }

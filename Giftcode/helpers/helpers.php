@@ -40,31 +40,3 @@ if(!function_exists('giftcodeGetEmailContent')) {
 
 }
 
-if(!function_exists('prepareGiftcodeUser')) {
-
-    function prepareGiftcodeUser(\User\Models\User $user)
-    {
-        $userService = app(\User\Services\User::class);
-        $userService->setId($user->id);
-        $userService->setFirstName($user->first_name);
-        $userService->setLastName($user->last_name);
-        $userService->setUsername($user->username);
-        $userService->setEmail($user->email);
-        $userService->setRole('User');
-        return $userService;
-    }
-
-}
-
-if(!function_exists('prepareGiftcodeWallet')) {
-
-    function prepareGiftcodeWallet(\User\Models\User $user,$wallet)
-    {
-        $walletService = app(\Wallets\Services\Wallet::class);
-        $walletService->setUser($user->getUserService());
-        $walletService->setName($wallet);
-        return $walletService;
-    }
-
-}
-

@@ -21,7 +21,7 @@ class CreateWalletWithdrawProfitRequestsTable extends Migration
             $table->foreignId('withdraw_transaction_id')->constrained('transactions');
             $table->foreignId('refund_transaction_id')->nullable()->constrained('transactions');
             $table->unsignedBigInteger('network_transaction_id')->nullable();
-            $table->tinyInteger('status')->default('1')->comment('Possible values(integer) : 1 = Under review, 2 = Rejected, 3 = Processed');
+            $table->tinyInteger('status')->default('1')->comment('Possible values(integer) : 1 = Under review, 2 = Rejected, 3 = Processed, 4 = Postponed');
             $table->boolean('is_update_email_sent')->default(false);
             $table->string('payout_service')->default('btc-pay-server');
             $table->string('currency');
@@ -32,6 +32,8 @@ class CreateWalletWithdrawProfitRequestsTable extends Migration
 
             $table->foreignId('actor_id')->nullable()->constrained('users');
             $table->tinyText('rejection_reason')->nullable();
+
+            $table->time('postponed_to')->nullable();
             $table->timestamps();
         });
     }

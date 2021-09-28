@@ -87,7 +87,7 @@ class DepositWalletController extends Controller
         UrgentEmailJob::dispatch(new RequestFundEmail($user,auth()->user(),$request->get('amount')),$user->email);
 
         return api()->success(null,[
-            'amount' => walletPfAmount($request->get('amount')),
+            'amount' => formatCurrencyFormat($request->get('amount')),
             'receiver_full_name' => $user->full_name
         ]);
 
@@ -123,10 +123,10 @@ class DepositWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
-                'received_amount' => walletPfAmount($request->get('amount')),
-                'transfer_fee' =>  walletPfAmount($fee),
-                'current_balance' =>  walletPfAmount($balance),
-                'balance_after_transfer' =>  walletPfAmount($remain_balance)
+                'received_amount' => formatCurrencyFormat($request->get('amount')),
+                'transfer_fee' =>  formatCurrencyFormat($fee),
+                'current_balance' =>  formatCurrencyFormat($balance),
+                'balance_after_transfer' =>  formatCurrencyFormat($remain_balance)
             ]);
 
         } catch (\Throwable $exception) {

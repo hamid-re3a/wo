@@ -2,6 +2,7 @@
 
 namespace Wallets\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use User\Models\User;
 
@@ -25,6 +26,7 @@ use User\Models\User;
  * @property double $crypto_amount
  * @property double $crypto_rate
  * @property double $fee
+ * @property Carbon $postponed_to
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $user
@@ -54,6 +56,13 @@ class WithdrawProfit extends Model
         'crypto_amount',
         'crypto_rate',
         'fee',
+        'postponed_to'
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'postponed_to' => 'datetime'
     ];
 
     protected $with = [
@@ -106,7 +115,9 @@ class WithdrawProfit extends Model
             case 3:
                 return 'Processed';
                 break;
-
+            case 4:
+                return 'Postponed';
+                break;
             default:
                 return 'Unknown';
         }

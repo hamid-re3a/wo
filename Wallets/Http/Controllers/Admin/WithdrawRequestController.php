@@ -30,6 +30,34 @@ class WithdrawRequestController extends Controller
         $this->payout_processor = $payout_processor;
     }
 
+    /**
+     * Get payout wallets balance
+     * @group Admin User > Wallets > Withdraw Requests
+     */
+    public function walletsBalance()
+    {
+        try {
+            $bps_wallet_response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
+                ->get(
+                    config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
+                    config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
+            if(!$bps_wallet_response->ok())
+                throw new \Exception(trans('payment.responses.payment-service.btc-pay-server-error'));
+
+            $bps_wallet_balance = $bps_wallet_response->json()['confirmedBalance'];
+
+            //TODO Janex wallet
+
+            return api()->success(null,[
+                'btc_wallet' => $bps_wallet_balance
+            ]);
+
+        } catch (\Throwable $exception) {
+            return api()->error(null,[
+                'subject' => $exception->getMessage()
+            ],$exception->getMessage());
+        }
+    }
 
     /**
      * Get counts

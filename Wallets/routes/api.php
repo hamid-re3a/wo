@@ -29,6 +29,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             });
 
             Route::name('withdraw-requests.')->prefix('withdraw-requests')->group(function(){
+                Route::get('wallets-balance',[AdminWithdrawRequestController::class,'walletsBalance'])->name('wallets-balance');
                 Route::get('counts',[AdminWithdrawRequestController::class,'counts'])->name('counts');
                 Route::get('',[AdminWithdrawRequestController::class,'index'])->name('index');
                 Route::patch('',[AdminWithdrawRequestController::class,'update'])->name('update');

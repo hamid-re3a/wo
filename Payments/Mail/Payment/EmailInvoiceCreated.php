@@ -64,7 +64,7 @@ class EmailInvoiceCreated extends Mailable implements SettingableMail
 
     public function getSetting(): array
     {
-        return getPaymentEmailSetting('INVOICE_CRATED_EMAIL');
+        return getPaymentEmailSetting('INVOICE_CREATED_EMAIL');
     }
 
     private function getUserFullName()

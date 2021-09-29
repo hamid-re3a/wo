@@ -7,6 +7,7 @@ namespace Payments\Services\Processors;
 use Illuminate\Support\Facades\Log;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoiceExpired;
+use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaid;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidComplete;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidPartial;
 use Payments\Models\Invoice;
@@ -53,6 +54,7 @@ class WalletProcessor extends ProcessorAbstract
 
         // send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
+        EmailJob::dispatch(new EmailWalletInvoicePaid($this->user_db, $this->invoice_db), $this->user_db->email);
 
     }
 

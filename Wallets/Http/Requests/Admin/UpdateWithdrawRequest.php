@@ -26,9 +26,9 @@ class UpdateWithdrawRequest extends FormRequest
     {
         return [
             'id' => 'required|integer|exists:wallet_withdraw_profit_requests,uuid,status,!2',
-            'status' => 'required|in:2,3', // 2=Rejected, 3=Processed
+            'status' => 'required|in:2,3,4', // 2=Rejected, 3=Processed, 4=Postponed
             'rejection_reason' => 'required_if:status,2|string',
-//            'network_hash' => 'required_if:status,3',
+            'postponed_to' => 'required_if:status,4|datetime|after:today'
         ];
 
     }
@@ -37,7 +37,7 @@ class UpdateWithdrawRequest extends FormRequest
     {
         return [
             'rejection_reason.required_if' => 'The rejection reason field is required when status is rejected',
-            'network_hash.required_if' => 'The network hash field is required when status is processed',
+            'postponed_to.required_if' => 'The postponed date field is required when status is postponed',
         ];
     }
 

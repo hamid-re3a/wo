@@ -87,7 +87,7 @@ class DepositWalletController extends Controller
         UrgentEmailJob::dispatch(new RequestFundEmail($user,auth()->user(),$request->get('amount')),$user->email);
 
         return api()->success(null,[
-            'amount' => walletPfAmount($request->get('amount')),
+            'amount' => formatCurrencyFormat($request->get('amount')),
             'receiver_full_name' => $user->full_name
         ]);
 
@@ -123,18 +123,16 @@ class DepositWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
-                'received_amount' => walletPfAmount($request->get('amount')),
-                'transfer_fee' =>  walletPfAmount($fee),
-                'current_balance' =>  walletPfAmount($balance),
-                'balance_after_transfer' =>  walletPfAmount($remain_balance)
+                'received_amount' => formatCurrencyFormat($request->get('amount')),
+                'transfer_fee' =>  formatCurrencyFormat($fee),
+                'current_balance' =>  formatCurrencyFormat($balance),
+                'balance_after_transfer' =>  formatCurrencyFormat($remain_balance)
             ]);
 
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error .' . $exception->getMessage());
 
-            return api()->error(null, [
-                'subject' => trans('wallet.responses.something-went-wrong')
-            ], 500);
+            throw new $exception;
         }
     }
 
@@ -189,10 +187,7 @@ class DepositWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-
-            return api()->error(null, [
-                'subject' => trans('wallet.responses.something-went-wrong')
-            ], 500);
+            throw new $exception;
         }
 
     }
@@ -224,16 +219,16 @@ class DepositWalletController extends Controller
 
     private function calculateTransferAmount($amount)
     {
-        $percentage_fee = walletGetSetting('percentage_transfer_fee');
-        $fix_fee = walletGetSetting('fix_transfer_fee');
+        $transfer_fee = walletGetSetting('transfer_fee');
         $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
 
-        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($percentage_fee) AND $percentage_fee > 0)
-            $fix_fee = $amount * $percentage_fee / 100;
+        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
+            $transfer_fee = $amount * $transfer_fee / 100;
 
-        if (empty($fix_fee) OR $fix_fee <= 0)
-            $fix_fee = 10;
-        $total = $amount + $fix_fee;
-        return [$total, $fix_fee];
+        if (empty($transfer_fee) OR $transfer_fee <= 0)
+            $transfer_fee = 10;
+
+        $total = $amount + $transfer_fee;
+        return [$total, $transfer_fee];
     }
 }

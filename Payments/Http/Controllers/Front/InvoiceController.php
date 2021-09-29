@@ -109,7 +109,7 @@ class InvoiceController extends Controller
     /**
      * Cancel invoice by user
      * @group
-     * Public User > Payments > Invoices
+     * Public User > Invoices
      * @param ShowOrderTransactionsRequest $request
      * @return JsonResponse
      */

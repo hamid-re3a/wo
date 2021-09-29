@@ -39,7 +39,7 @@ class WithdrawRepository
                     break;
             }
         } catch (\Throwable $exception) {
-            throw $exception;
+            throw new $exception;
         }
     }
 
@@ -69,12 +69,13 @@ class WithdrawRepository
 
             }
         }catch (\Throwable $exception) {
-            throw $exception;
+            throw new $exception;
         }
     }
 
     private function getUserBTCWalletHash()
     {
+        return '12';
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);

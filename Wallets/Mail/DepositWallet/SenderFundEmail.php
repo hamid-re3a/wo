@@ -62,7 +62,7 @@ class SenderFundEmail extends Mailable implements SettingableMail
             return walletGetEmailContent('TRANSFER_FUNDS_SENDER');
         } catch (\Throwable $exception) {
             Log::error('walletGetEmailContent [Wallets\Mail\DepositWallet\SenderFundEmail]');
-            throw $exception;
+            throw new $exception;
         }
     }
 }

@@ -92,7 +92,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
                 DB::commit();
             } catch (\Throwable $exception) {
                 DB::rollBack();
-                //TODO notify admin for successful payment and db error
+                //TODO notify admin for unsuccessful payout and db error
             }
         } else {
             //TODO notify admin

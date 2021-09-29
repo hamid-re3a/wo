@@ -74,9 +74,9 @@ class EarningWalletController extends Controller
             ->first();
 
         return api()->success(null, [
-            'binary_commissions_sum' => $counts->binary_commissions_sum ? walletPfAmount($counts->binary_commissions_sum) : 0,
-            'direct_commissions_sum' => $counts->direct_commissions_sum ? walletPfAmount($counts->direct_commissions_sum) : 0,
-            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? walletPfAmount($counts->indirect_commissions_sum) : 0,
+            'binary_commissions_sum' => $counts->binary_commissions_sum ? formatCurrencyFormat($counts->binary_commissions_sum) : 0,
+            'direct_commissions_sum' => $counts->direct_commissions_sum ? formatCurrencyFormat($counts->direct_commissions_sum) : 0,
+            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? formatCurrencyFormat($counts->indirect_commissions_sum) : 0,
             'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
             'spent_sum' => $counts->spent_sum ? $counts->spent_sum : 0,
         ]);
@@ -150,18 +150,15 @@ class EarningWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user ? $to_user->member_id : null,
                 'receiver_full_name' => $to_user ? $to_user->full_name : null,
-                'received_amount' => walletPfAmount($request->get('amount')),
-                'transfer_fee' => walletPfAmount($fee),
-                'current_balance' => walletPfAmount($balance),
-                'balance_after_transfer' => walletPfAmount($remain_balance)
+                'received_amount' => formatCurrencyFormat($request->get('amount')),
+                'transfer_fee' => formatCurrencyFormat($fee),
+                'current_balance' => formatCurrencyFormat($balance),
+                'balance_after_transfer' => formatCurrencyFormat($remain_balance)
             ]);
 
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error :' . $exception->getMessage());
-
-            return api()->error(null, [
-                'subject' => trans('wallet.responses.something-went-wrong')
-            ], 500);
+            throw new $exception;
         }
     }
 
@@ -213,10 +210,7 @@ class EarningWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-
-            return api()->error(null, [
-                'subject' => trans('wallet.responses.something-went-wrong')
-            ], 500);
+            throw new $exception;
         }
     }
 

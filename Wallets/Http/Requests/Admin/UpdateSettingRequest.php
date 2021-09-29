@@ -46,10 +46,9 @@ class UpdateSettingRequest extends FormRequest
         if ($this->has('name')) {
             $settings = Setting::all();
             switch ($this->get('name')) {
-                case 'percentage_transfer_fee':
+                case 'transfer_fee':
                 case 'maximum_auto_handle_withdrawals_payout':
                 case 'count_withdraw_requests_to_automatic_payout_process':
-                case 'fix_transfer_fee':
                     return 'required|integer|min:1';
                     break;
                 case 'transaction_fee_calculation' :

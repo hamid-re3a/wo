@@ -11,6 +11,7 @@ use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceExpired;
+use Payments\Mail\Payment\EmailInvoicePaid;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
@@ -21,9 +22,11 @@ class OrderProcessor extends ProcessorAbstract
     /**
      * @var $order_service Order
      * @var $invoice_db Invoice
+     * @var $user User
      */
 
     private $order_service;
+    private $user;
 
     public function __construct(Invoice $invoice_db)
     {
@@ -39,6 +42,8 @@ class OrderProcessor extends ProcessorAbstract
         $order_id->setId($this->invoice_db->payable_id);
         $this->order_service = $order_service->OrderById($order_id);
 
+        $this->user = User::query()->whereId($this->order_service->getUserId())->first();
+
     }
 
     public function partial()
@@ -48,8 +53,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'partial_paid');
 
         // send email notification for due amount
-        $user = User::query()->whereId($this->order_service->getUserId())->first();
-        EmailJob::dispatch(new EmailInvoicePaidPartial($user->getUserService(), $this->invoice_db, $this->order_service), $user->email);
+        EmailJob::dispatch(new EmailInvoicePaidPartial($this->user->getUserService(), $this->invoice_db, $this->order_service), $this->user->email);
 
 
     }
@@ -59,6 +63,9 @@ class OrderProcessor extends ProcessorAbstract
 
         // send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
+
+
+        EmailJob::dispatch(new EmailInvoicePaid($this->user->getUserService(), $this->invoice_db), $this->user->email);
 
     }
 
@@ -91,8 +98,7 @@ class OrderProcessor extends ProcessorAbstract
             $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
 
             // send thank you email notification
-            $user = User::query()->whereId($order_service->getUserId())->first();
-            EmailJob::dispatch(new EmailInvoicePaidComplete($user->getUserService(), $this->invoice_db), $user->email);
+            EmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getUserService(), $this->invoice_db), $this->user->email);
         }
 
     }
@@ -104,8 +110,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'expired');
 
         // send email to user to regenerate new invoice for due amount
-        $user = User::query()->whereId($this->order_service->getUserId())->first();
-        EmailJob::dispatch(new EmailInvoiceExpired($user->getUserService(), $this->invoice_db), $user->email);
+        EmailJob::dispatch(new EmailInvoiceExpired($this->user->getUserService(), $this->invoice_db), $this->user->email);
 
     }
 

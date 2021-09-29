@@ -58,7 +58,7 @@ class RedeemedGiftcodeCreatorEmail extends Mailable implements SettingableMail
             return giftcodeGetEmailContent('GIFTCODE_REDEEMED_CREATOR_EMAIL');
         } catch (\Throwable $exception) {
             Log::error('giftcodeGetEmailContent [Giftcode\Mail\User\RedeemedGiftcodeCreatorEmail]');
-            throw $exception;
+            throw new $exception;
         }
     }
 }

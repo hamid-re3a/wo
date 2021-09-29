@@ -61,7 +61,7 @@ class RequestFundEmail extends Mailable implements SettingableMail
             return walletGetEmailContent('PAYMENT_REQUEST');
         } catch (\Throwable $exception) {
             Log::error('walletGetEmailContent [Wallets\Mail\DepositWallet\RequestFundEmail]');
-            throw new $exception;
+            throw $exception;
         }
     }
 }

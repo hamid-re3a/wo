@@ -64,7 +64,7 @@ class WalletRepository
         $deposit_object->setDescription($description);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);
         //Deposit transaction
-        $this->wallet_service->deposit($deposit_object);
+        $this->wallet_service->withdraw($deposit_object);
     }
 
     private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode', $type = 'Gift code Refund fee')

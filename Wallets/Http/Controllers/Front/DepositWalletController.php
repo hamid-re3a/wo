@@ -132,7 +132,7 @@ class DepositWalletController extends Controller
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error .' . $exception->getMessage());
 
-            throw new $exception;
+            throw $exception;
         }
     }
 
@@ -187,7 +187,7 @@ class DepositWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-            throw new $exception;
+            throw $exception;
         }
 
     }

@@ -83,7 +83,7 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('GiftcodeController@store  => ' . $exception->getMessage() . ' Line => ' . $exception->getLine());
-            throw new $exception;
+            throw $exception;
         }
     }
 
@@ -119,7 +119,7 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('Cancel giftcode error,iftcode uuid => <' . $request->get('uuid') . '>');
-            throw new $exception;
+            throw $exception;
 
         }
     }

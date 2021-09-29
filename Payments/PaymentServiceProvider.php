@@ -22,14 +22,15 @@ class PaymentServiceProvider extends ServiceProvider
     public function register()
     {
 
-        if (!$this->app->runningInConsole()) {
-            return;
-        }
-
         /**
          * related Facades
          */
         PaymentFacade::shouldProxyTo(PaymentProcessor::class);
+
+        if (!$this->app->runningInConsole()) {
+            return;
+        }
+
 
         if ($this->shouldMigrate()) {
             $this->loadMigrationsFrom([

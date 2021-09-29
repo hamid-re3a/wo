@@ -15,11 +15,11 @@ class PaymentFacade extends Facade
 {
     public static function getFacadeAccessor()
     {
-        return 'PaymentFacade';
+        return __CLASS__;
     }
 
     public static function shouldProxyTo($class)
     {
-        return app()->bind(self::getFacadeAccessor(),$class);
+        return app()->singleton(self::getFacadeAccessor(),$class);
     }
 }

@@ -20,6 +20,6 @@ class PaymentFacade extends Facade
 
     public static function shouldProxyTo($class)
     {
-        return app()->bind(self::getFacadeAccessor(),$class);
+        return app()->OrderController.php(self::getFacadeAccessor(),$class);
     }
 }

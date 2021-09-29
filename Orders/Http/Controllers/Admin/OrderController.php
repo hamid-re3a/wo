@@ -15,6 +15,7 @@ use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderTypeFilterRequest;
 use Orders\Http\Resources\CountDataResource;
 use Orders\Models\Order;
+use Orders\Services\MlmClientFacade;
 use Orders\Services\OrderService;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
@@ -111,13 +112,8 @@ class OrderController extends Controller
                 'plan' => $request->get('plan')
             ]);
             $order_db->refreshOrder();
-            //Order Resolver
-            /** @var $response Acknowledge */
-            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getOrderService())->wait();
 
-            if ($flag->code != 0)
-                throw new \Exception('MLM not responding', 406);
-
+            $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
@@ -128,10 +124,8 @@ class OrderController extends Controller
             $order_service = $order_db->fresh()->getOrderService();
             $order_service->setIsPaidAt($now);
             $order_service->setIsResolvedAt($now);
-            /** @var $submit_response Acknowledge */
-            list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
-            if ($flag->code != 0)
-                throw new \Exception('MLM not responding', 406);
+
+            $submit_response = MlmClientFacade::submitOrder($order_db->getOrderService());
             $order_db->update([
                 'is_paid_at' => $now,
                 'is_resolved_at' => $now,

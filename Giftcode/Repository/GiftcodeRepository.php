@@ -83,11 +83,15 @@ class GiftcodeRepository
                 'is_expired' => true
             ]);
 
+            //Withdraw from admin wallet
+            $this->wallet_repository->withdrawFromAdminWallet($giftcode,'Expired Gift code #' . $giftcode->uuid,'Gift code expired');
+
+
             /**
              * Refund Giftcode total paid - expiration fee
              */
             //Refund giftcode pay fee
-            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Expire Giftcode #' . $giftcode->uuid,'Gift code expired');
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Expire Gift code #' . $giftcode->uuid,'Gift code expired');
 
             //Wallet transaction failed [Server error]
             if(!is_string($finalTransaction->getTransactionId()))
@@ -110,6 +114,7 @@ class GiftcodeRepository
     {
         try {
             DB::beginTransaction();
+            /**@var $giftcode Giftcode*/
             $giftcode = $this->getByUuid($request->get('id'));
 
             if($giftcode->is_canceled == true)
@@ -122,6 +127,11 @@ class GiftcodeRepository
             $giftcode->update([
                 'is_canceled' => true
             ]);
+
+            //Withdraw from admin wallet
+            $this->wallet_repository->withdrawFromAdminWallet($giftcode,'Canceled Gift code #' . $giftcode->uuid,'Gift code cancelled');
+
+
 
             /**
              * Refund Giftcode total paid - cancelation fee

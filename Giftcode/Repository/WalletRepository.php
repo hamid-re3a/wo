@@ -55,7 +55,19 @@ class WalletRepository
         return $this->wallet_service->getBalance($wallet)->getBalance();
     }
 
-    private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode', $type = 'Giftcode Refund fee')
+    public function withdrawFromAdminWallet(Giftcode $giftcode, $description = 'Giftcode', $type = 'Gift code Refund fee')
+    {
+        $deposit_object = app(Withdraw::class);
+        $deposit_object->setUserId(1);
+        $deposit_object->setAmount($giftcode->getRefundAmount());
+        $deposit_object->setType($type);
+        $deposit_object->setDescription($description);
+        $deposit_object->setWalletName(WalletNames::DEPOSIT);
+        //Deposit transaction
+        $this->wallet_service->deposit($deposit_object);
+    }
+
+    private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode', $type = 'Gift code Refund fee')
     {
         $deposit_object = app(Deposit::class);
         $deposit_object->setUserId(1);
@@ -66,6 +78,8 @@ class WalletRepository
         //Deposit transaction
         $this->wallet_service->deposit($deposit_object);
     }
+
+
 
 
 }

@@ -20,17 +20,20 @@ class DepositWalletResource extends JsonResource
         $total_sum = User::query()->where('id','=',auth()->user()->id)
             ->withSumQuery([
                 'transactions.amount AS total_received' => function (Builder $query) {
+                    $query->where('wallet_id','=',$this->id);
                     $query->where('type', '=', 'deposit');
                 }
             ])
             ->withSumQuery([
                 'transactions.amount AS total_spent' => function (Builder $query) {
+                    $query->where('wallet_id','=',$this->id);
                     $query->where('type', 'withdraw');
 
                 }
             ])
             ->withSumQuery([
                 'transactions.amount AS total_transfer' => function (Builder $query) {
+                    $query->where('wallet_id','=',$this->id);
                     $query->where('type','withdraw');
                     $query->whereHas('metaData', function(Builder $subQuery) {
                         $subQuery->where('name','=','Transfer');

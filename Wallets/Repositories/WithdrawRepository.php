@@ -39,7 +39,7 @@ class WithdrawRepository
                     break;
             }
         } catch (\Throwable $exception) {
-            throw $exception;
+            throw new $exception;
         }
     }
 
@@ -69,7 +69,7 @@ class WithdrawRepository
 
             }
         }catch (\Throwable $exception) {
-            throw $exception;
+            throw new $exception;
         }
     }
 

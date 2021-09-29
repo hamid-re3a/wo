@@ -26,6 +26,6 @@ class MlmClientFacade extends Facade
 
     public static function shouldProxyTo($class)
     {
-        return app()->singleton(self::getFacadeAccessor(),$class);
+        return app()->bind(self::getFacadeAccessor(),$class);
     }
 }

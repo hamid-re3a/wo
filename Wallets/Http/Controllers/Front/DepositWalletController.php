@@ -224,16 +224,16 @@ class DepositWalletController extends Controller
 
     private function calculateTransferAmount($amount)
     {
-        $percentage_fee = walletGetSetting('percentage_transfer_fee');
-        $fix_fee = walletGetSetting('fix_transfer_fee');
+        $transfer_fee = walletGetSetting('transfer_fee');
         $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
 
-        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($percentage_fee) AND $percentage_fee > 0)
-            $fix_fee = $amount * $percentage_fee / 100;
+        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
+            $transfer_fee = $amount * $transfer_fee / 100;
 
-        if (empty($fix_fee) OR $fix_fee <= 0)
-            $fix_fee = 10;
-        $total = $amount + $fix_fee;
-        return [$total, $fix_fee];
+        if (empty($transfer_fee) OR $transfer_fee <= 0)
+            $transfer_fee = 10;
+
+        $total = $amount + $transfer_fee;
+        return [$total, $transfer_fee];
     }
 }

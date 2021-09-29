@@ -26,6 +26,8 @@ class GiftcodeRepository
 
     public function create(Request $request)
     {
+        /**@var $giftcode Giftcode*/
+
         try {
             DB::beginTransaction();
             //All stuff fixed in GiftcodeObserver
@@ -76,12 +78,15 @@ class GiftcodeRepository
 
     public function expire(Giftcode $giftcode)
     {
+        /**@var $giftcode Giftcode*/
+
         try {
             DB::beginTransaction();
 
             $giftcode->update([
                 'is_expired' => true
             ]);
+            $giftcode->refresh();
 
             //Withdraw from admin wallet
             $this->wallet_repository->withdrawFromAdminWallet($giftcode,'Expired Gift code #' . $giftcode->uuid,'Gift code expired');
@@ -112,9 +117,10 @@ class GiftcodeRepository
 
     public function cancel(Request $request)
     {
+        /**@var $giftcode Giftcode*/
+
         try {
             DB::beginTransaction();
-            /**@var $giftcode Giftcode*/
             $giftcode = $this->getByUuid($request->get('id'));
 
             if($giftcode->is_canceled == true)
@@ -127,9 +133,10 @@ class GiftcodeRepository
             $giftcode->update([
                 'is_canceled' => true
             ]);
+            $giftcode->refresh();
 
             //Withdraw from admin wallet
-            $this->wallet_repository->withdrawFromAdminWallet($giftcode,'Canceled Gift code #' . $giftcode->uuid,'Gift code cancelled');
+            $this->wallet_repository->withdrawFromAdminWallet($giftcode,'Cancel Gift code #' . $giftcode->uuid,'Gift code cancelled');
 
 
 

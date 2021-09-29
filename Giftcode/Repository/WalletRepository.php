@@ -40,10 +40,6 @@ class WalletRepository
         $deposit_object->setDescription($description);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);
 
-        //Deposit fee to admin wallet
-        if($giftcode->total_cost_in_pf != $giftcode->getRefundAmount())
-            $this->depositToAdminWallet($giftcode,$description);
-
         return $this->wallet_service->deposit($deposit_object);
     }
 

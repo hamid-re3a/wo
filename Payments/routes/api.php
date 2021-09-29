@@ -45,7 +45,7 @@ Route::middleware(['role:client'])->group(function () {
     Route::name('invoices.')->prefix("invoices")->group(function () {
         Route::post('cancel_invoice', [InvoiceController::class, 'cancelInvoice'])->name('cancel_invoice');
         Route::get('/check-pending-order-invoice', [InvoiceController::class, 'pendingOrderInvoice'])->name('check');
-        Route::get('/check-pending-wallet-invoice', [InvoiceController::class, 'pendingWalletInvoice'])->name('check');
+        Route::get('/check-pending-wallet-invoice', [InvoiceController::class, 'pendingWalletInvoice'])->name('pendingWalletInvoice');
         Route::get('/', [InvoiceController::class, 'index'])->name('get-list');
         Route::post('/', [InvoiceController::class, 'show'])->name('get-invoice-details');
         Route::post('transactions', [InvoiceController::class, 'transactions'])->name('transactions');

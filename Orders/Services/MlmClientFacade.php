@@ -1,12 +1,13 @@
 <?php
 
 
-namespace Orders\Services\Grpc;
+namespace Orders\Services;
 
 
 use Illuminate\Support\Facades\Facade;
 use MLM\Services\Grpc\Acknowledge;
 use MLM\Services\Grpc\Rank;
+use Orders\Services\Grpc\Order;
 use User\Services\Grpc\User;
 
 /**

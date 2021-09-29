@@ -6,7 +6,7 @@ namespace Orders\tests\Feature;
 
 use Illuminate\Support\Facades\Mail;
 use MLM\Services\Grpc\Acknowledge;
-use Orders\Services\Grpc\MlmClientFacade;
+use Orders\Services\MlmClientFacade;
 use Orders\tests\OrderTest;
 use Payments\Mail\Payment\EmailInvoiceCreated;
 use Payments\Services\Processors\PaymentFacade;

@@ -15,7 +15,7 @@ use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
 use Orders\Models\Order;
-use Orders\Services\Grpc\MlmClientFacade;
+use Orders\Services\MlmClientFacade;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\Invoice;
@@ -213,9 +213,7 @@ class OrderController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('OrderController@newOrder => ' . $exception->getMessage());
-            return api()->error(null, [
-                'subject' => $exception->getMessage()
-            ], $exception->getCode(), null);
+            throw new $exception;
         }
     }
 

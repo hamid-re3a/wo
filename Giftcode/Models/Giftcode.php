@@ -156,7 +156,7 @@ class Giftcode extends Model
         $fee = null;
         if($this->is_canceled AND giftcodeGetSetting('include_cancellation_fee') == TRUE)
             $fee = giftcodeGetSetting('cancellation_fee');
-        else if($this->is_expired)
+        else if($this->is_expired AND giftcodeGetSetting('include_expiration_fee') == TRUE)
             $fee = giftcodeGetSetting('expiration_fee');
 
         //Check we should calculate cancelation fee or not

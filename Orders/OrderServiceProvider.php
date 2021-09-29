@@ -23,14 +23,14 @@ class OrderServiceProvider extends ServiceProvider
     public function register()
     {
 
-
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
         if (!$this->app->runningInConsole()) {
             return;
         }
         /**
          * related Facades
          */
-        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
+
 
         if ($this->shouldMigrate()) {
             $this->loadMigrationsFrom([

@@ -15,7 +15,7 @@ class PaymentFacade extends Facade
 {
     public static function getFacadeAccessor()
     {
-        return __CLASS__;
+        return 'PaymentFacade';
     }
 
     public static function shouldProxyTo($class)

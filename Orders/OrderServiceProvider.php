@@ -5,8 +5,8 @@ namespace Orders;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Orders\Services\Grpc\MlmClientFacade;
-use Orders\Services\Grpc\MlmGrpcClientProvider;
+use Orders\Services\MlmClientFacade;
+use Orders\Services\MlmGrpcClientProvider;
 
 class OrderServiceProvider extends ServiceProvider
 {

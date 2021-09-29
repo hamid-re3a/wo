@@ -53,9 +53,8 @@ class WithdrawRequestController extends Controller
             ]);
 
         } catch (\Throwable $exception) {
-            return api()->error(null,[
-                'subject' => $exception->getMessage()
-            ],$exception->getMessage());
+            Log::error('Wallets\Http\Controllers\Admin\WithdrawRequestController@walletBalance => ' . $exception->getMessage());
+            throw new $exception;
         }
     }
 
@@ -127,9 +126,7 @@ class WithdrawRequestController extends Controller
             return api()->success(null, WithdrawProfitResource::collection($withdrawRequests->simplePaginate())->response()->getData());
         } catch (\Throwable $exception) {
             Log::error('Admin/WithdrawRequestController@index => ' . serialize(request()->all()));
-            return api()->error(null, [
-                'subject' => $exception->getMessage()
-            ]);
+            throw new $exception;
         }
     }
 
@@ -190,9 +187,7 @@ class WithdrawRequestController extends Controller
         } catch (\Throwable $exception) {
             DB::rollback();
             Log::error('Admin/WithdrawRequestController@update => ' . serialize($request->all()));
-            return api()->error(null, [
-                'subject' => $exception->getMessage()
-            ]);
+            throw new $exception;
         }
     }
 
@@ -236,9 +231,7 @@ class WithdrawRequestController extends Controller
         } catch (\Throwable $exception) {
             DB::rollback();
             Log::error('Admin/WithdrawRequestController@payout_group => ' . serialize($request->all()));
-            return api()->error(null, [
-                'subject' => $exception->getMessage()
-            ]);
+            throw new $exception;
         }
     }
 

@@ -158,10 +158,7 @@ class EarningWalletController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error :' . $exception->getMessage());
-
-            return api()->error(null, [
-                'subject' => trans('wallet.responses.something-went-wrong')
-            ], 500);
+            throw new $exception;
         }
     }
 
@@ -213,10 +210,7 @@ class EarningWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-
-            return api()->error(null, [
-                'subject' => trans('wallet.responses.something-went-wrong')
-            ], 500);
+            throw new $exception;
         }
     }
 

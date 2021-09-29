@@ -1,15 +1,10 @@
 <?php
 
 const WALLET_SETTINGS = [
-    'fix_transfer_fee' => [
+    'transfer_fee' => [
         'value' => 10,
-        'title' => 'Fix transfer amount',
-        'description' => 'Fix transfer amount'
-    ],
-    'percentage_transfer_fee' => [
-        'value' => 10,
-        'title' => 'Transfer fee percentage',
-        'description' => 'Transfer fee in percentage'
+        'title' => 'Transfer fee',
+        'description' => 'Transfer fee'
     ],
     'transaction_fee_calculation' => [
         'value' => 'fix',

@@ -17,7 +17,7 @@ class MlmGrpcClientProvider
         self::$client = getMLMGrpcClient();
     }
 
-    public function submitOrder(Order $order) : Acknowledge
+    public static function submitOrder(Order $order) : Acknowledge
     {
         /** @var $submit_response Acknowledge */
         list($submit_response, $flag) = self::$client->submitOrder($order)->wait();

@@ -51,7 +51,7 @@ class GiftcodeExpiredEmail extends Mailable implements SettingableMail
             return giftcodeGetEmailContent('GIFTCODE_EXPIRED_EMAIL');
         } catch (\Throwable $exception) {
             Log::error('giftcodeGetEmailContent [Giftcode\Mail\User\GiftcodeWillExpireSoonEmail]');
-            throw new $exception;
+            throw $exception;
         }
     }
 }

@@ -67,7 +67,7 @@ class WithdrawProfitRequestedUpdated extends Mailable implements SettingableMail
             return walletGetEmailContent($key);
         } catch (\Throwable $exception) {
             Log::error('walletGetEmailContent [Wallets\Mail\EarningWallet\WithdrawProfitRequestedUpdate]');
-            throw new $exception;
+            throw $exception;
         }
     }
 }

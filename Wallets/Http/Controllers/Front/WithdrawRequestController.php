@@ -94,7 +94,7 @@ class WithdrawRequestController extends Controller
             return api()->success(null, WithdrawProfitResource::collection($withdrawRequests->simplePaginate())->response()->getData());
         } catch (\Throwable $exception) {
             Log::error('EarningWalletController@withdraw_requests => ' . serialize(request()->all()));
-            throw new $exception;
+            throw $exception;
         }
     }
 
@@ -124,7 +124,7 @@ class WithdrawRequestController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('EarningWalletController@create_withdraw_request_preview => ' . serialize($request->all()));
-            throw new $exception;
+            throw $exception;
         }
 
     }
@@ -149,7 +149,7 @@ class WithdrawRequestController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('EarningWalletController@create_withdraw_request, User => ' . auth()->user()->id . ' => ' . serialize($request->all()));
-            throw new $exception;
+            throw $exception;
         }
 
     }

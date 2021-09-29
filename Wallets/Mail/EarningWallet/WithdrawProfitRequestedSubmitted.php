@@ -57,7 +57,7 @@ class WithdrawProfitRequestedSubmitted extends Mailable implements SettingableMa
             return walletGetEmailContent('WITHDRAW_REQUEST_SUBMITTED');
         } catch (\Throwable $exception) {
             Log::error('walletGetEmailContent [Wallets\Mail\EarningWallet\WithdrawProfitRequestedSubmitted]');
-            throw new $exception;
+            throw $exception;
         }
     }
 }

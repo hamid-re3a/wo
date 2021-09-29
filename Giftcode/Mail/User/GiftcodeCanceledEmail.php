@@ -56,7 +56,7 @@ class GiftcodeCanceledEmail extends Mailable implements SettingableMail
             return giftcodeGetEmailContent('GIFT_CODE_CANCELED');
         } catch (\Throwable $exception) {
             Log::error('giftcodeGetEmailContent [Giftcode\Mail\User\GiftcodeCanceledEmail]');
-            throw new $exception;
+            throw $exception;
         }
     }
 }

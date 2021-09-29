@@ -55,7 +55,7 @@ class GiftcodeRepository
             return $giftcode;
         } catch (\Throwable $exception) {
             DB::rollBack();
-            throw new $exception;
+            throw $exception;
         }
     }
 
@@ -106,7 +106,7 @@ class GiftcodeRepository
             return $giftcode->fresh();
         } catch (\Throwable $exception) {
             DB::rollBack();
-            throw new $exception;
+            throw $exception;
         }
     }
 
@@ -152,7 +152,7 @@ class GiftcodeRepository
             return $giftcode->fresh();
         } catch (\Throwable $exception) {
             DB::rollBack();
-            throw new $exception;
+            throw $exception;
         }
     }
 
@@ -182,7 +182,7 @@ class GiftcodeRepository
             return $giftcode->fresh();
         } catch (\Throwable $exception) {
             DB::rollBack();
-            throw new $exception;
+            throw $exception;
 
         }
     }

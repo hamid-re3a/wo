@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Orders\Http\Controllers\Front\DashboardController as UserDashboardController;
 use Orders\Http\Controllers\Front\OrderController;
 use Orders\Http\Controllers\Admin\OrderController as OrderAdminController;
 use Orders\Http\Controllers\Front\PackageController;
@@ -30,9 +31,9 @@ Route::middleware(['role:client'])->name('customer.')->group(function () {
 });
 
 Route::name('orders.')->middleware('auth')->group(function () {
-    Route::post('', [OrderController::class, 'index'])->name('list');
-    Route::get('counts', [OrderController::class, 'counts'])->name('counts');
-    Route::post('show', [OrderController::class, 'showOrder'])->name('show');
+    Route::get('counts', [UserDashboardController::class, 'counts'])->name('counts');
+    Route::post('', [UserDashboardController::class, 'index'])->name('list');
+    Route::post('show', [UserDashboardController::class, 'showOrder'])->name('show');
     Route::post('store',[OrderController::class,'newOrder'])->name('store');
 });
 

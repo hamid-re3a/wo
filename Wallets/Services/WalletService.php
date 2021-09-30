@@ -86,7 +86,7 @@ class WalletService implements WalletServiceInterface
             if (
                 $withdraw->getAmount() > 0 AND
                 $withdraw->getUserId() AND
-                $withdraw->getType() AND
+                !is_null($withdraw->getType()) AND
                 in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($withdraw->getUserId());

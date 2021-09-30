@@ -26,12 +26,13 @@ class BankService
 
         $slug = Str::slug($wallet_name);
 
-        $this->owner->wallets()->firstOrCreate(
-            ['name' => $wallet_name],
-            ['slug' => $slug]
-        );
+        if(!$wallet = $this->owner->getWallet($slug))
+            $wallet = $this->owner->wallets()->create([
+                'name' => $wallet_name,
+                'slug' => $slug
+            ]);
 
-        return $this->owner->getWallet($slug);
+        return $wallet;
 
     }
 

@@ -48,11 +48,11 @@ class Transaction extends \Bavix\Wallet\Models\Transaction
                 ]);
             } else {
                 Log::error('Transaction undefined type . <<<' . serialize($data) . '>>>');
-                throw new \Exception(trans('wallet.responses.something-went-wrong'));
+                throw new \Exception();
             }
         } catch (\Throwable $exception) {
             Log::error('Wallets\Models\Transaction error => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'), $exception->getCode());
+            throw new $exception;
         }
     }
 

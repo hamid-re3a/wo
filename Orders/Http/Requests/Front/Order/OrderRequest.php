@@ -25,16 +25,16 @@ class OrderRequest extends FormRequest
      */
     public function rules()
     {
-            return [
+        return [
 
             'package_id' => 'required|numeric',
             'payment_type' => [
                 'required',
-                'in:' . implode(',',$this->getNamePaymentType())
+                'in:' . implode(',', $this->getNamePaymentType())
             ],
             'payment_currency' => [
                 'required_if:payment_type,purchase',
-                'in:'. implode(',', $this->getNamePaymentCurrency())
+                'in:' . implode(',', $this->getNamePaymentCurrency())
             ],
             'payment_driver' => [
                 'required_if:payment_type,purchase',
@@ -71,7 +71,6 @@ class OrderRequest extends FormRequest
         }
         return $payment_type_name_array;
     }
-
 
 
 }

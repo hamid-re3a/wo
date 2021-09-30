@@ -360,11 +360,7 @@ if (!function_exists('usdToPf')) {
 
     function usdToPf($value)
     {
-        if(is_numeric($value))
-            $value = (double) number_format($value, 2);
-
-        $result = (double)( $value / ((double) getSetting('BF_TO_USD_RATE')));
-        return formatCurrencyNumber($result);
+        return (double) ( $value / (double) (getSetting('BF_TO_USD_RATE')));
     }
 }
 
@@ -372,9 +368,6 @@ if (!function_exists('pfToUsd')) {
 
     function pfToUsd($value)
     {
-        if(is_numeric($value))
-            $value = (double) number_format($value, 2);
-        $result = (double) ($value * ((double) getSetting('BF_TO_USD_RATE')));
-        return formatCurrencyNumber($result);
+        return (double) ( $value * ((double) getSetting('BF_TO_USD_RATE')));
     }
 }

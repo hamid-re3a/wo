@@ -41,8 +41,22 @@ class UserWalletTableSeeder extends Seeder
         ]);
         $bankService = new BankService($user);
         $bankService->getWallet('Deposit Wallet');
-//        $bankService->deposit('Deposit Wallet',10000);
+        $bankService->deposit('Deposit Wallet',10000000000);
         $user->assignRole([USER_ROLE_SUPER_ADMIN,USER_ROLE_CLIENT]);
+
+        $customer_user = User::query()->firstOrCreate([
+            'id' => 3,
+            'member_id' => '2000',
+            'email' => 'janexstaging@gmail.com',
+            'first_name' => 'John',
+            'last_name' => 'Due',
+            'username' => 'johny',
+        ]);
+        $bankService = new BankService($customer_user);
+        $bankService->getWallet('Deposit Wallet');
+        $bankService->deposit('Deposit Wallet',10000000000);
+        $bankService->deposit('Earning Wallet',10000000000);
+        $customer_user->assignRole([USER_ROLE_CLIENT]);
 
 
 

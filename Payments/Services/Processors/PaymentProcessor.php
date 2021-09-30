@@ -155,11 +155,12 @@ class PaymentProcessor
             $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
             $withdraw_object->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_object);
+
             //Do withdraw
-            if (!is_string($withdraw_response->getTransactionId()))
+            if (empty($withdraw_response->getTransactionId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'));
 
-            //used same time as Giftcode redeem date for future usage
+
             $order_object->setIsPaidAt(now()->toDateTimeString());
             $order_object->setPaymentDriver('deposit');
             $order_service->updateOrder($order_object);

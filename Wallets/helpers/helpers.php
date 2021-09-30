@@ -50,8 +50,8 @@ if (!function_exists('formatCurrencyFormat')) {
     function formatCurrencyFormat($value)
     {
         if(is_numeric($value))
-            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
-//            $value = number_format($value,2);
+            $value = number_format($value,2);
+//            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
         return $value;
     }

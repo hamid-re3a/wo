@@ -56,7 +56,7 @@ class BankService
 
     public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true)
     {
-
+        Log::info('BankService@withdraw Start');
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
             throw new \Exception();
 
@@ -66,10 +66,13 @@ class BankService
             'type' => $type,
             'sub_type' => $sub_type
         ];
+        Log::info('BankService@withdraw $data is ready');
         $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description), $confirmed);
         if($this->owner->id != 1)
             $this->toAdminDepositWallet($transaction,$amount,$description,$type);
+        Log::info('BankService@withdraw Start sync data');
         $transaction->syncMetaData($data);
+        Log::info('BankService@withdraw Data synced');
         return $transaction;
 
     }

@@ -126,27 +126,19 @@ class PaymentProcessor
         try {
             DB::beginTransaction();
 
-            //Load order
-            $order_service = app(OrderService::class);
-            $id_object = app(\Orders\Services\Grpc\Id::class);
-            $id_object->setId($invoice_request->getPayableId());
-            $order_object = $order_service->OrderById($id_object);
-
-            if(empty($order_object->getId()))
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
-
             //Wallet service
             $wallet_service = app(WalletService::class);
-
+            Log::info('Get Balance Start');
             //Check wallet balance
             $wallet = app(Wallet::class);
             $wallet->setUserId($invoice_request->getUserId());
             $wallet->setName(config('depositWallet'));
             $balance = $wallet_service->getBalance($wallet)->getBalance();
-
+            Log::info('Balance => ' . $balance);
             if ($balance < $invoice_request->getPfAmount())
                 throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
 
+            Log::info('Start Withdraw');
             //Prepare withdraw message
             $withdraw_object = app(Withdraw::class);
             $withdraw_object->setAmount((double)$invoice_request->getPfAmount());
@@ -155,15 +147,10 @@ class PaymentProcessor
             $withdraw_object->setType('Package purchased');
             $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
             $withdraw_response = $wallet_service->withdraw($withdraw_object);
-
+            Log::info('Withdraw ended => ' . $withdraw_response->getTransactionId());
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'));
-
-
-            $order_object->setIsPaidAt(now()->toDateTimeString());
-            $order_object->setPaymentDriver('deposit');
-            $order_service->updateOrder($order_object);
 
             DB::commit();
             return [

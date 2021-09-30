@@ -55,7 +55,8 @@ class OrderController extends Controller
                 'plan' => $user->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             $order_db->refreshOrder();
-            //Order Resolver
+
+            Log::info('First MLM request');
             $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
 
             if (!$response->getStatus()) {
@@ -87,6 +88,7 @@ class OrderController extends Controller
                 $order_service->setIsPaidAt($now);
                 $order_service->setIsResolvedAt($now);
 
+                Log::info('Second MLM request');
                 $submit_response = MlmClientFacade::submitOrder($order_service);
 
                 $order_db->update([

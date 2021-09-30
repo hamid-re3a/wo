@@ -102,7 +102,7 @@ class OrderController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('OrderController@newOrder => ' . $exception->getMessage());
-            throw new $exception;
+            throw $exception;
         }
     }
 

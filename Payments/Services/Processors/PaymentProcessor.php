@@ -172,7 +172,7 @@ class PaymentProcessor
             ];
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('PaymentService@payFromDepositWallet error ' . $exception->getMessage());
+            Log::error('PaymentService@payFromDepositWallet error Line =>  ' . $exception->getLine() . ' | MSG => ' . $exception->getMessage());
             return [false,$exception->getMessage()];
         }
     }

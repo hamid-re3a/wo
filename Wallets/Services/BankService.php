@@ -9,6 +9,9 @@ use User\Models\User;
 
 class BankService
 {
+    /**
+     * @var $owner User
+     */
     private $owner;
 
     public function __construct(WalletFloat $owner)
@@ -18,15 +21,14 @@ class BankService
 
     public function getWallet($wallet_name)
     {
+
         $slug = Str::slug($wallet_name);
 
-        if (!$this->owner->hasWallet($slug))
-            $this->owner->createWallet([
-                'name' => $wallet_name,
-                'slug' => $slug
-            ]);
+        return $this->owner->wallets()->firstOrCreate([
+            'name' => $wallet_name,
+            'slug' => $slug
+        ]);
 
-        return $this->owner->getWallet($slug);
     }
 
     public function getAllWallets()

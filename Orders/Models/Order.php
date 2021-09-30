@@ -90,7 +90,7 @@ class Order extends Model
 
     public function refreshOrder()
     {
-        $this->reCalculateCosts();
+        $this->reCalculatteCosts();
     }
 
     public function reCalculateCosts()

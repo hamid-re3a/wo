@@ -55,7 +55,7 @@ class WalletServiceTest extends WalletTest
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
         $this->assertIsObject($deposit);
-        $this->assertIsString($deposit->getTransactionId());
+        $this->assertIsInt($deposit->getTransactionId());
 
     }
 
@@ -77,7 +77,7 @@ class WalletServiceTest extends WalletTest
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
         $this->assertIsObject($deposit);
-        $this->assertIsString($deposit->getTransactionId());
+        $this->assertIsInt($deposit->getTransactionId());
 
     }
 
@@ -120,7 +120,7 @@ class WalletServiceTest extends WalletTest
         $withdraw_service->setAmount(100);
         $withdraw = $wallet_service->withdraw($withdraw_service);
         $this->assertIsObject($withdraw);
-        $this->assertIsString($withdraw->getTransactionId());
+        $this->assertIsInt($withdraw->getTransactionId());
     }
 
     /**
@@ -147,8 +147,8 @@ class WalletServiceTest extends WalletTest
 
         $transaction_response = $wallet_service->transfer($transfer_service);
         $this->assertIsObject($transaction_response);
-        $this->assertIsString($transaction_response->getDepositTransactionId());
-        $this->assertIsString($transaction_response->getWithdrawTransactionId());
+        $this->assertIsInt($transaction_response->getDepositTransactionId());
+        $this->assertIsInt($transaction_response->getWithdrawTransactionId());
     }
 
     /**

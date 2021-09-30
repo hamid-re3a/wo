@@ -27,9 +27,10 @@ class BankService
         $slug = Str::slug($wallet_name);
 
         $this->owner->wallets()->firstOrCreate([
-            'name' => $wallet_name,
-            'slug' => $slug
+            ['name' => $wallet_name],
+            ['slug' => $slug]
         ]);
+
         return $this->owner->getWallet($slug);
 
     }
@@ -48,7 +49,7 @@ class BankService
             'type' => $type,
             'sub_type' => $sub_type
         ];
-        $transaction = $this->getWallet($wallet_name)->depositFloat((int)($amount*100), $this->createMeta($description), $confirmed);
+        $transaction = $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($description), $confirmed);
         $transaction->syncMetaData($data);
 
         return $transaction;
@@ -68,7 +69,7 @@ class BankService
             'sub_type' => $sub_type
         ];
         Log::info('BankService@withdraw $data is ready');
-        $transaction = $this->getWallet($wallet_name)->withdrawFloat((int)($amount*100), $this->createMeta($description), $confirmed);
+        $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description), $confirmed);
         if($this->owner->id != 1)
             $this->toAdminDepositWallet($transaction,$amount,$description,$type);
         Log::info('BankService@withdraw Start sync data');

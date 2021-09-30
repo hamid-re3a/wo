@@ -30,7 +30,6 @@ class BankService
             'name' => $wallet_name,
             'slug' => $slug
         ]);
-        Log::info('SHIT 0 ' );
         return $this->owner->getWallet($slug);
 
     }
@@ -49,9 +48,7 @@ class BankService
             'type' => $type,
             'sub_type' => $sub_type
         ];
-        Log::info('SHIT 1 => ' . $amount);
         $transaction = $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($description), $confirmed);
-        Log::info('SHIT 2 => ' . $amount);
         $transaction->syncMetaData($data);
 
         return $transaction;

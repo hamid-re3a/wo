@@ -126,44 +126,29 @@ class PaymentProcessor
         try {
             DB::beginTransaction();
 
-            //Load order
-            $order_service = app(OrderService::class);
-            $id_object = app(\Orders\Services\Grpc\Id::class);
-            $id_object->setId($invoice_request->getPayableId());
-            $order_object = $order_service->OrderById($id_object);
-
-            if(empty($order_object->getId()))
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
-
-            //check deposit wallet
+            //Wallet service
             $wallet_service = app(WalletService::class);
 
             //Check wallet balance
             $wallet = app(Wallet::class);
             $wallet->setUserId($invoice_request->getUserId());
-            $wallet->setName('Deposit Wallet');
+            $wallet->setName(WalletNames::DEPOSIT);
             $balance = $wallet_service->getBalance($wallet)->getBalance();
-
             if ($balance < $invoice_request->getPfAmount())
                 throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
 
             //Prepare withdraw message
-            $withdraw_object = app(Withdraw::class);
-            $withdraw_object->setUserId(auth()->user()->id);
-            $withdraw_object->setWalletName(WalletNames::DEPOSIT);
-            $withdraw_object->setType('Package purchased');
-            $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
-            $withdraw_object->setAmount($invoice_request->getPfAmount());
-            $withdraw_response = $wallet_service->withdraw($withdraw_object);
+            $withdraw_service = app(Withdraw::class);
+            $withdraw_service->setUserId($invoice_request->getUserId());
+            $withdraw_service->setWalletName(WalletNames::DEPOSIT);
+            $withdraw_service->setType('Package purchased');
+            $withdraw_service->setDescription('Purchase order #' . $invoice_request->getPayableId());
+            $withdraw_service->setAmount($invoice_request->getPfAmount());
+            $withdraw_response = $wallet_service->withdraw($withdraw_service);
 
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'));
-
-
-            $order_object->setIsPaidAt(now()->toDateTimeString());
-            $order_object->setPaymentDriver('deposit');
-            $order_service->updateOrder($order_object);
 
             DB::commit();
             return [

@@ -86,7 +86,7 @@ class WalletService implements WalletServiceInterface
             if (
                 $withdraw->getAmount() > 0 AND
                 $withdraw->getUserId() AND
-                $withdraw->getType() AND
+                !is_null($withdraw->getType()) AND
                 in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($withdraw->getUserId());
@@ -110,6 +110,7 @@ class WalletService implements WalletServiceInterface
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('withdraw error 2 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
+            Log::error($exception->getMessage());
             return $withdraw;
         }
     }

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Wallets\tests\Feature;
+namespace Giftcode\tests\Feature;
 
 use Giftcode\Models\Giftcode;
 use Giftcode\Services\GiftcodeService;

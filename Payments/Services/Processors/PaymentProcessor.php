@@ -135,13 +135,13 @@ class PaymentProcessor
             if(empty($order_object->getId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'));
 
-            //check deposit wallet
+            //Wallet service
             $wallet_service = app(WalletService::class);
 
             //Check wallet balance
             $wallet = app(Wallet::class);
             $wallet->setUserId($invoice_request->getUserId());
-            $wallet->setName('Deposit Wallet');
+            $wallet->setName(config('depositWallet'));
             $balance = $wallet_service->getBalance($wallet)->getBalance();
 
             if ($balance < $invoice_request->getPfAmount())
@@ -149,11 +149,11 @@ class PaymentProcessor
 
             //Prepare withdraw message
             $withdraw_object = app(Withdraw::class);
-            $withdraw_object->setUserId(auth()->user()->id);
+            $withdraw_object->setAmount((double)$invoice_request->getPfAmount());
             $withdraw_object->setWalletName(WalletNames::DEPOSIT);
+            $withdraw_object->setUserId($invoice_request->getUserId());
             $withdraw_object->setType('Package purchased');
             $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
-            $withdraw_object->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_object);
 
             //Do withdraw

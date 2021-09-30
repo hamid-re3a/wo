@@ -139,7 +139,7 @@ class PaymentProcessor
             if ($balance < $invoice_request->getPfAmount())
                 throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
 
-            Log::info('Start Withdraw');
+            Log::info('Start Withdraw => amount : ' . $invoice_request->getPfAmount()  .' UserID => ' . $invoice_request->getUserId() . ' Order #' . $invoice_request->getPayableId());
             //Prepare withdraw message
             $withdraw_object = app(Withdraw::class);
             $withdraw_object->setAmount($invoice_request->getPfAmount());

@@ -36,6 +36,7 @@ class OrderController extends Controller
      * @param OrderRequest $request
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws \Throwable
      */
     public function newOrder(OrderRequest $request)
     {

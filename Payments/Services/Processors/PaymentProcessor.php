@@ -27,7 +27,7 @@ class PaymentProcessor
      * pay by every payment Driver
      * @inheritDoc
      */
-    public function pay(Invoice $invoice_request, Order $order_service): array
+    public function pay(Invoice $invoice_request, Order $order_service = null): array
     {
         switch ($invoice_request->getPaymentType()) {
             case 'purchase':

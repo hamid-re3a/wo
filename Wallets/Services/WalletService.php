@@ -196,7 +196,7 @@ class WalletService implements WalletServiceInterface
         $invoice_request->setPayableType('DepositWallet');
         $invoice_request->setUser(auth()->user()->getUserService());
 
-        return PaymentFacade::pay($invoice_request,new Order());
+        return PaymentFacade::pay($invoice_request);
     }
 
 }

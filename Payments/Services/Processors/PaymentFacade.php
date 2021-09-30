@@ -9,7 +9,7 @@ use Orders\Services\Grpc\Order;
 use Payments\Services\Grpc\Invoice;
 
 /**
- * @method static array pay(Invoice $invoice,Order $order)
+ * @method static array pay(Invoice $invoice,Order $order = null)
  */
 
 class PaymentFacade extends Facade

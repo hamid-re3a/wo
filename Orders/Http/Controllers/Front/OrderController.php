@@ -55,6 +55,7 @@ class OrderController extends Controller
                 'plan' => $user->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             $order_db->refreshOrder();
+            Log::info(serialize($order_db->toArray()));
 
             Log::info('First MLM request');
             $response = MlmClientFacade::simulateOrder($order_db->getOrderService());

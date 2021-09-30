@@ -51,6 +51,7 @@ class Transaction extends \Bavix\Wallet\Models\Transaction
                 throw new \Exception(trans('wallet.responses.something-went-wrong'));
             }
         } catch (\Throwable $exception) {
+            Log::error('Wallets\Models\Transaction error => ' . $exception->getMessage());
             throw new \Exception(trans('wallet.responses.something-went-wrong'), $exception->getCode());
         }
     }

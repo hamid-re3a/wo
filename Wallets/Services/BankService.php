@@ -57,6 +57,7 @@ class BankService
     public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true)
     {
         Log::info('BankService@withdraw Start');
+        Log::info($wallet_name . ' | ' . $amount . ' | ' . $description . ' | ' . $type);
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
             throw new \Exception();
 

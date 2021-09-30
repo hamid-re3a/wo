@@ -7,6 +7,7 @@ namespace Wallets\Services;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Orders\Services\Grpc\Order;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
@@ -195,7 +196,7 @@ class WalletService implements WalletServiceInterface
         $invoice_request->setPayableType('DepositWallet');
         $invoice_request->setUser(auth()->user()->getUserService());
 
-        return PaymentFacade::pay($invoice_request);
+        return PaymentFacade::pay($invoice_request,new Order());
     }
 
 }

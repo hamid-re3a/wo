@@ -89,18 +89,14 @@ class WalletService implements WalletServiceInterface
                 !is_null($withdraw->getType()) AND
                 in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
-                Log::info('WalletService@withdraw conditions passed');
                 $walletUser = $this->walletUser($withdraw->getUserId());
                 $bankService = new BankService($walletUser);
-                Log::info('WalletService@withdraw bank service loaded');
 
                 $wallet_name = $this->earningWallet;
                 if($withdraw->getWalletName() == WalletNames::DEPOSIT)
                     $wallet_name = $this->depositWallet;
-                Log::info('WalletService@withdraw wallet is ready');
 
                 $transaction = $bankService->withdraw($wallet_name, $withdraw->getAmount(), $withdraw->getDescription() ?: null, $withdraw->getType(),empty($withdraw->getSubType()) ? null : $withdraw->getSubType());
-                Log::info('WalletService@withdraw Transaction is ok => ' . $transaction->uuid);
                 $withdraw->setTransactionId($transaction->uuid);
 
                 DB::commit();

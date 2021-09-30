@@ -129,17 +129,14 @@ class PaymentProcessor
             //Wallet service
             $wallet_service = app(WalletService::class);
 
-            Log::info('Get Balance Start');
             //Check wallet balance
             $wallet = app(Wallet::class);
             $wallet->setUserId($invoice_request->getUserId());
             $wallet->setName(WalletNames::DEPOSIT);
             $balance = $wallet_service->getBalance($wallet)->getBalance();
-            Log::info('Balance => ' . $balance);
             if ($balance < $invoice_request->getPfAmount())
                 throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
 
-            Log::info('Start Withdraw => amount : ' . $invoice_request->getPfAmount()  .' UserID => ' . $invoice_request->getUserId() . ' Order #' . $invoice_request->getPayableId());
             //Prepare withdraw message
             $withdraw_service = app(Withdraw::class);
             $withdraw_service->setUserId($invoice_request->getUserId());
@@ -149,7 +146,6 @@ class PaymentProcessor
             $withdraw_service->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_service);
 
-            Log::info('Withdraw ended => ' . $withdraw_response->getTransactionId());
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'));

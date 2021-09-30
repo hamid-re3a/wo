@@ -58,7 +58,6 @@ class OrderController extends Controller
             $order_db->refreshOrder();
             Log::info(serialize($order_db->toArray()));
 
-            Log::info('First MLM request');
             $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
 
             if (!$response->getStatus()) {
@@ -76,7 +75,6 @@ class OrderController extends Controller
             $invoice_request->setUser($user->getUserService());
             $invoice_request->setUserId((int)auth()->user()->id);
 
-            Log::info('Start PaymentFacade');
             list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request);
 
 

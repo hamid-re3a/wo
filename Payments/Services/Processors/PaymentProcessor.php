@@ -58,7 +58,7 @@ class PaymentProcessor
         return [false,trans('payment.responses.payment-service.gateway-error')];
     }
 
-    private function payFromGiftcode(Invoice $invoice_request,$order_service): array
+    private function payFromGiftcode(Invoice $invoice_request,Order $order_service): array
     {
         try {
             DB::beginTransaction();

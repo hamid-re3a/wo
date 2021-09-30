@@ -5,10 +5,11 @@ namespace Payments\Services\Processors;
 
 
 use Illuminate\Support\Facades\Facade;
+use Orders\Services\Grpc\Order;
 use Payments\Services\Grpc\Invoice;
 
 /**
- * @method static array pay(Invoice $invoice)
+ * @method static array pay(Invoice $invoice,Order $order)
  */
 
 class PaymentFacade extends Facade

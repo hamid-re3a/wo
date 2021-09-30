@@ -23,7 +23,7 @@ class PackageResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'short_name' => $this->short_name,
-            'validity_in_days' => is_null($this->validity_in_days) ? $this->category->validity_in_days : $this->validity_in_days,
+            'validity_in_days' => is_null($this->validity_in_days) ? $this->category->package_validity_in_days : $this->validity_in_days,
             'price' => $this->price,
             'roi_percentage' => is_null($this->roi_percentage) ? $this->category->roi_percentage : $this->roi_percentage,
             'direct_percentage' => is_null($this->direct_percentage) ? $this->category->direct_percentage : $this->direct_percentage,

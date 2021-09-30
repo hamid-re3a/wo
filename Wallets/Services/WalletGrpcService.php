@@ -11,6 +11,9 @@ use Wallets\Services\Grpc\Withdraw;
 
 class WalletGrpcService implements \Wallets\Services\Grpc\WalletServiceInterface
 {
+    /**
+     * @var $wallet_service WalletService
+     */
     private $wallet_service;
 
     public function __construct()

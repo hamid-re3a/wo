@@ -4,8 +4,10 @@
 namespace Wallets\Services;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use User\Models\User;
+use Wallets\Models\Transaction;
 
 class BankService
 {
@@ -24,10 +26,12 @@ class BankService
 
         $slug = Str::slug($wallet_name);
 
-        return $this->owner->wallets()->firstOrCreate([
+        $this->owner->wallets()->firstOrCreate([
             'name' => $wallet_name,
             'slug' => $slug
         ]);
+        Log::info('SHIT 0 ' );
+        return $this->owner->getWallet($slug);
 
     }
 
@@ -38,14 +42,16 @@ class BankService
 
     public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit', $sub_type = null)
     {
+        /**@var $transaction Transaction*/
         $data = [
             'wallet_before_balance' => $this->getBalance($wallet_name),
             'wallet_after_balance' => $this->getBalance($wallet_name) + $amount,
             'type' => $type,
             'sub_type' => $sub_type
         ];
-
+        Log::info('SHIT 1 => ' . $amount);
         $transaction = $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($description), $confirmed);
+        Log::info('SHIT 2 => ' . $amount);
         $transaction->syncMetaData($data);
 
         return $transaction;

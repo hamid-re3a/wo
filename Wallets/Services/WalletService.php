@@ -35,7 +35,7 @@ class WalletService implements WalletServiceInterface
     private function walletUser($user_id)
     {
 
-        return User::firstOrCreate(
+        return User::query()->firstOrCreate(
             ['id' => $user_id]
         );
 

@@ -132,8 +132,8 @@ class PaymentProcessor
             Log::info('Get Balance Start');
             //Check wallet balance
             $wallet = app(Wallet::class);
-            $wallet->setUserId((int)$invoice_request->getUserId());
-            $wallet->setName(config('depositWallet'));
+            $wallet->setUserId($invoice_request->getUserId());
+            $wallet->setName(WalletNames::DEPOSIT);
             $balance = $wallet_service->getBalance($wallet)->getBalance();
             Log::info('Balance => ' . $balance);
             if ($balance < $invoice_request->getPfAmount())
@@ -142,9 +142,9 @@ class PaymentProcessor
             Log::info('Start Withdraw');
             //Prepare withdraw message
             $withdraw_object = app(Withdraw::class);
-            $withdraw_object->setAmount((double)$invoice_request->getPfAmount());
+            $withdraw_object->setAmount($invoice_request->getPfAmount());
             $withdraw_object->setWalletName(WalletNames::DEPOSIT);
-            $withdraw_object->setUserId((int)$invoice_request->getUserId());
+            $withdraw_object->setUserId($invoice_request->getUserId());
             $withdraw_object->setType('Package purchased');
             $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
             $withdraw_response = $wallet_service->withdraw($withdraw_object);

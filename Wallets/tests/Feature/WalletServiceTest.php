@@ -55,7 +55,7 @@ class WalletServiceTest extends WalletTest
         //Deposit transaction
         $deposit = $wallet_service->deposit($deposit_service);
         $this->assertIsObject($deposit);
-        $this->assertIsInt($deposit->getTransactionId());
+        $this->assertIsInt((int)$deposit->getTransactionId());
 
     }
 

@@ -60,7 +60,7 @@ class WalletService implements WalletServiceInterface
                     $wallet_name = $this->depositWallet;
 
                 $transaction = $bankService->deposit($wallet_name, $deposit->getAmount(), $deposit->getDescription() ?: null, true, $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
-                $deposit->setTransactionId($transaction->uuid);
+                $deposit->setTransactionId((int)$transaction->uuid);
 
                 DB::commit();
                 return $deposit;
@@ -69,7 +69,7 @@ class WalletService implements WalletServiceInterface
                 Log::error('Deposit error 1 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
                 throw new \Exception();
             }
-        } catch (\Throwable $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
             Log::error('Deposit error 2 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
             Log::error('Message => ' . $exception->getMessage());

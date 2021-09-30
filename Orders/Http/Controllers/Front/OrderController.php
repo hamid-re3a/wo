@@ -75,6 +75,7 @@ class OrderController extends Controller
             $invoice_request->setUser($user->getUserService());
             $invoice_request->setUserId((int)auth()->user()->id);
 
+            Log::info('Start PaymentFacade');
             list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request);
 
 

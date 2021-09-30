@@ -42,21 +42,20 @@ class OrderController extends Controller
     {
         try {
             $package = $this->validatePackage($request);
+
             /**@var $user User */
             $user = auth()->user();
-
             DB::beginTransaction();
             $order_db = Order::query()->create([
                 "user_id" => $user->id,
                 "payment_type" => $request->get('payment_type'),
-                "payment_currency" => $request->has('payment_currency') ? $request->get('payment_currency') : null,
-                "payment_driver" => $request->has('payment_driver') ? $request->get('payment_driver') : null,
+                "payment_currency" => $request->get('payment_type') != 'deposit' ? $request->get('payment_currency') : null,
+                "payment_driver" => $request->get('payment_type') != 'deposit' ? $request->get('payment_driver') : null,
                 "package_id" => $request->get('package_id'),
                 'validity_in_days' => $package->getValidityInDays(),
                 'plan' => $user->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             $order_db->refreshOrder();
-            Log::info(serialize($order_db->toArray()));
 
             $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
 

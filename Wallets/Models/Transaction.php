@@ -16,10 +16,6 @@ class Transaction extends \Bavix\Wallet\Models\Transaction
         'metaData'
     ];
 
-    protected $casts = [
-        'uuid' => 'integer'
-    ];
-
     public function metaData()
     {
         return $this->belongsToMany(TransactionType::class, 'wallet_transaction_meta_data', 'transaction_id', 'type_id')

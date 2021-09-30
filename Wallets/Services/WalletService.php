@@ -48,8 +48,8 @@ class WalletService implements WalletServiceInterface
 
             if (
                 $deposit->getAmount() > 0 AND
-                $deposit->getWalletName() AND
                 $deposit->getUserId() AND
+                !is_null($deposit->getType()) AND
                 in_array($deposit->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($deposit->getUserId());
@@ -66,6 +66,7 @@ class WalletService implements WalletServiceInterface
                 return $deposit;
 
             } else {
+                DB::rollBack();
                 Log::error('Deposit error 1 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
                 throw new \Exception();
             }
@@ -84,7 +85,6 @@ class WalletService implements WalletServiceInterface
 
             if (
                 $withdraw->getAmount() > 0 AND
-                $withdraw->getWalletName() AND
                 $withdraw->getUserId() AND
                 $withdraw->getType() AND
                 in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
@@ -103,6 +103,7 @@ class WalletService implements WalletServiceInterface
                 return $withdraw;
 
             } else {
+                DB::rollBack();
                 Log::error('withdraw error 1 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
                 throw new \Exception();
             }
@@ -145,6 +146,7 @@ class WalletService implements WalletServiceInterface
                 return $transfer;
 
             } else {
+                DB::rollBack();
                 Log::error('transfer error 1 :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
                 throw new \Exception();
             }

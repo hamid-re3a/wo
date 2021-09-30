@@ -72,6 +72,7 @@ class WalletService implements WalletServiceInterface
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Deposit error 2 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
+            Log::error('Message => ' . $exception->getMessage());
             return $deposit;
         }
     }

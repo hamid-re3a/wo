@@ -141,13 +141,14 @@ class PaymentProcessor
 
             Log::info('Start Withdraw => amount : ' . $invoice_request->getPfAmount()  .' UserID => ' . $invoice_request->getUserId() . ' Order #' . $invoice_request->getPayableId());
             //Prepare withdraw message
-            $withdraw_object = app(Withdraw::class);
-            $withdraw_object->setAmount($invoice_request->getPfAmount());
-            $withdraw_object->setWalletName(WalletNames::DEPOSIT);
-            $withdraw_object->setUserId($invoice_request->getUserId());
-            $withdraw_object->setType('Package purchased');
-            $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
-            $withdraw_response = $wallet_service->withdraw($withdraw_object);
+            $withdraw_service = app(Withdraw::class);
+            $withdraw_service->setUserId($invoice_request->getUserId());
+            $withdraw_service->setWalletName(WalletNames::DEPOSIT);
+            $withdraw_service->setType('Package purchased');
+            $withdraw_service->setDescription('Purchase order #' . $invoice_request->getPayableId());
+            $withdraw_service->setAmount($invoice_request->getPfAmount());
+            $withdraw_response = $wallet_service->withdraw($withdraw_service);
+
             Log::info('Withdraw ended => ' . $withdraw_response->getTransactionId());
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))

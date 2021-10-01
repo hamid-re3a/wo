@@ -179,6 +179,7 @@ class BankService
 
     private function createMeta($meta)
     {
+        $meta = ($meta == 'b:0;' || @unserialize($meta) !== false) ? unserialize($meta) : $meta;
         if (is_array($meta))
             return $meta;
 

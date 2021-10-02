@@ -64,7 +64,8 @@ class DashboardController extends Controller
      */
     public function index(ListOrderRequest $request)
     {
-        $orders = auth()->user()->orders()->filter()->simplePaginate();
+        /**@var $user User*/
+        $orders = $user->orders()->filter()->simplePaginate();
         return api()->success(null, OrderResource::collection($orders)->response()->getData());
     }
 

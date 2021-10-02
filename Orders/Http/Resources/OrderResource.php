@@ -22,7 +22,8 @@ class OrderResource extends JsonResource
             'is_paid_at' => !empty($this->is_paid_at) ? $this->is_paid_at->timestamp : null,
             'payment_currency' => $this->payment_currency,
             'payment_type' => $this->payment_type,
-            'created_at' => !empty($this->created_at) ? $this->created_at->timestamp : null
+            'expires_at' => !empty($this->expires_at) ? $this->expires_at->timestamp : null,
+            'created_at' => !empty($this->created_at) ? $this->created_at->timestamp : null,
         ];
     }
 }

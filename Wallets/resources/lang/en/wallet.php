@@ -13,6 +13,7 @@ return [
         'btc-price-error' => 'We can\t fetch BTC live price, contact Developer team please.',
         'insufficient-bpb-wallet-balance' => 'Insufficient balance in our BTCPayServer wallet, Charge wallet for :amount USD',
         'external-resource-error' => 'We cant fetch data from :server',
+        'not-enough-balance' => 'Insufficient balance, :amount + :fee',
     ]
 ];
 

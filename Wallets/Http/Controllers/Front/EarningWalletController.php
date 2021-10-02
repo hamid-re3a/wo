@@ -20,6 +20,10 @@ use Wallets\Services\BankService;
 
 class EarningWalletController extends Controller
 {
+    /**
+     * @var $bankService BankService
+     * @var $user User
+     */
     private $bankService;
     private $wallet;
 
@@ -167,6 +171,7 @@ class EarningWalletController extends Controller
      * @group Public User > Earning Wallet
      * @param TransferFundFromEarningWalletRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function transfer_to_deposit_wallet(TransferFundFromEarningWalletRequest $request)
     {
@@ -180,15 +185,24 @@ class EarningWalletController extends Controller
             $description = [];
             $fee = 0;
             if ($request->has('member_id')) {
-                $another_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
-                $bank_service = new BankService($another_member);
-                $deposit_wallet = $bank_service->getWallet(config('depositWallet'));
-                list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
+                $other_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
+                $other_member_bank_service = new BankService($other_member);
+                $deposit_wallet = $other_member_bank_service->getWallet(config('depositWallet'));
+                list($total, $fee) = $this->calculateTransferAmount($amount);
                 $description = [
                     'member_id' => $request->get('member_id'),
                     'fee' => $fee,
                     'type' => 'Transfer'
                 ];
+
+                $balance = $this->bankService->getBalance(config('earningWallet'));
+                if ($balance < $total)
+                    return api()->error(null, null, 406, [
+                        'subject' => trans('wallet.responses.not-enough-balance',[
+                            'amount' => $amount,
+                            'fee' => $fee
+                        ])
+                    ]);
 
             }
 
@@ -217,16 +231,16 @@ class EarningWalletController extends Controller
 
     private function calculateTransferAmount($amount)
     {
-        $percentage_fee = walletGetSetting('percentage_transfer_fee');
-        $fix_fee = walletGetSetting('fix_transfer_fee');
+        $transfer_fee = walletGetSetting('transfer_fee');
         $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
 
-        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($percentage_fee) AND $percentage_fee > 0)
-            $fix_fee = $amount * $percentage_fee / 100;
+        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
+            $transfer_fee = $amount * $transfer_fee / 100;
 
-        if (empty($fix_fee) OR $fix_fee <= 0)
-            $fix_fee = 10;
-        $total = $amount + $fix_fee;
-        return [$total, $fix_fee];
+        if (empty($transfer_fee) OR $transfer_fee <= 0)
+            $transfer_fee = 10;
+
+        $total = $amount + $transfer_fee;
+        return [$total, $transfer_fee];
     }
 }

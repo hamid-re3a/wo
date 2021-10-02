@@ -19,7 +19,7 @@ if (!function_exists('walletGetSetting')) {
             return WALLET_SETTINGS[$key]['value'];
 
         \Illuminate\Support\Facades\Log::error('walletGetSetting => ' . $key);
-        throw new Exception(trans('wallet.responses.email-key-doesnt-exists'));
+        throw new Exception(trans('wallet.responses.setting-key-doesnt-exists'));
     }
 }
 

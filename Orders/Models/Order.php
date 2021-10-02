@@ -107,6 +107,7 @@ class Order extends Model
         $this->packages_cost_in_pf = (float)$this->orderPackagesPrice();
         $this->total_cost_in_pf = (float)$this->packages_cost_in_pf + (float)$this->registration_fee_in_pf;
         $this->save();
+        $this->refresh();
     }
 
     private function orderPackagesPrice()

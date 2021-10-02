@@ -26,25 +26,23 @@ jobs:
 #        mkdir -p database
 #        touch database/database.sqlite
 
-
   laravel-deploy:
     runs-on: vmi627964
 #    needs: laravel-tests
     steps:
     - uses: actions/checkout@v2
-    - name: Copy project to deployment directory
+    - name: Building docker image
       run: |
         shopt -s dotglob
-        sudo mkdir -p /home/subscription/public_html/Subscriptions/temp-project
-        sudo cp -r . /home/subscription/public_html/Subscriptions/temp-project/
-        sudo rm -rf /home/subscription/public_html/Subscriptions/server_deploy.sh
-        sudo mv /home/subscription/public_html/Subscriptions/temp-project/server_deploy.sh /home/subscription/public_html/Subscriptions/
-        sudo chown subscription:subscription /home/subscription/public_html/Subscriptions/server_deploy.sh
-        sudo chmod 700 /home/subscription/public_html/Subscriptions/server_deploy.sh
-        sudo chown -R subscription:subscription /home/subscription/public_html/Subscriptions/temp-project
-    - name: Run server_deploy.sh
+        sudo docker build --network=mysql_wo_r2f -t subscription:1 .
+    - name: deploy docker-compose
+      run: | 
+        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml stop subscription
+        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml rm -f subscription
+        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml up -d subscription
+    - name: Handle laravel-log directory issue
       run: |
-        sudo su - subscription -c '/home/subscription/public_html/Subscriptions/server_deploy.sh'
-    - name: Restart supervisord subscription workers
-      run: |
-        sudo supervisorctl restart subscription-grpcServer:subscription-grpcServer_00
+        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/logs
+        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/framework/sessions
+        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/framework/views
+

@@ -183,7 +183,7 @@ class EarningWalletController extends Controller
                 $another_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 $bank_service = new BankService($another_member);
                 $deposit_wallet = $bank_service->getWallet(config('depositWallet'));
-                list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
+                list($total, $fee) = $this->calculateTransferAmount($request->get('amount'));
                 $description = [
                     'member_id' => $request->get('member_id'),
                     'fee' => $fee,

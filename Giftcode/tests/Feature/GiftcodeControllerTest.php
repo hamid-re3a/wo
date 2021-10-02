@@ -32,7 +32,7 @@ class GiftcodeControllerTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
         $giftcode = Giftcode::query()->first();
-        $response = $this->getJson(route('customer.giftcodes.show', [
+        $response = $this->getJson(route('giftcodes.customer.show', [
             'uuid' => $giftcode->uuid
         ]));
         $response->assertOk();
@@ -49,7 +49,7 @@ class GiftcodeControllerTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
         $giftcode = Giftcode::query()->first();
-        $response = $this->postJson(route('customer.giftcodes.cancel'), [
+        $response = $this->postJson(route('giftcodes.customer.cancel'), [
             'id' => $giftcode->uuid
         ]);
 

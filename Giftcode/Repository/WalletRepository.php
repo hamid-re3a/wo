@@ -5,11 +5,8 @@ namespace Giftcode\Repository;
 
 
 use Giftcode\Models\Giftcode;
-use Illuminate\Http\Request;
-use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\WalletNames;
-use Wallets\Services\Transaction;
 use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\WalletService;
 use Wallets\Services\Grpc\Withdraw;
@@ -26,28 +23,22 @@ class WalletRepository
     public function withdrawUserWallet(Giftcode $giftcode)
     {
         $withdraw_object = app(Withdraw::class);
-        $withdraw_object->setConfirmed(true);
-        $withdraw_object->setAmount($giftcode->total_cost_in_usd);
+        $withdraw_object->setAmount($giftcode->total_cost_in_pf);
         $withdraw_object->setWalletName(WalletNames::DEPOSIT);
         $withdraw_object->setUserId($giftcode->user_id);
-        $withdraw_object->setType('Create Giftcode');
+        $withdraw_object->setType('Gift code created');
         $withdraw_object->setDescription('Giftcode #' . $giftcode->uuid);
         return $this->wallet_service->withdraw($withdraw_object);
     }
 
-    public function depositUserWallet(Giftcode $giftcode, $description = 'Giftcode refund')
+    public function depositUserWallet(Giftcode $giftcode, $description = 'Gift code cancelled', $type = 'Gift code cancelled')
     {
         $deposit_object = app(Deposit::class);
-        $deposit_object->setConfirmed(true);
         $deposit_object->setUserId($giftcode->user_id);
         $deposit_object->setAmount($giftcode->getRefundAmount());
-        $deposit_object->setType('Giftcode refund');
+        $deposit_object->setType($type);
         $deposit_object->setDescription($description);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);
-
-        //Deposit fee to admin wallet
-        if($giftcode->total_cost_in_usd != $giftcode->getRefundAmount())
-            $this->depositToAdminWallet($giftcode,$description);
 
         return $this->wallet_service->deposit($deposit_object);
     }
@@ -55,23 +46,36 @@ class WalletRepository
     public function checkUserBalance()
     {
         $wallet = app(Wallet::class);
-        $wallet->setUserId(request()->user->id);
+        $wallet->setUserId(auth()->check() ? auth()->user()->id : 2);
         $wallet->setName(WalletNames::DEPOSIT);
         return $this->wallet_service->getBalance($wallet)->getBalance();
     }
 
-    private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode')
+    public function withdrawFromAdminWallet(Giftcode $giftcode, $description = 'Giftcode', $type = 'Gift code Refund fee')
+    {
+        $deposit_object = app(Withdraw::class);
+        $deposit_object->setUserId(1);
+        $deposit_object->setAmount($giftcode->getRefundAmount());
+        $deposit_object->setType($type);
+        $deposit_object->setDescription($description);
+        $deposit_object->setWalletName(WalletNames::DEPOSIT);
+        //Deposit transaction
+        $this->wallet_service->withdraw($deposit_object);
+    }
+
+    private function depositToAdminWallet(Giftcode $giftcode, $description = 'Giftcode', $type = 'Gift code Refund fee')
     {
         $deposit_object = app(Deposit::class);
-        $deposit_object->setConfirmed(true);
         $deposit_object->setUserId(1);
-        $deposit_object->setAmount(($giftcode->total_cost_in_usd - $giftcode->getRefundAmount()));
-        $deposit_object->setType('Giftcode refund');
+        $deposit_object->setAmount(($giftcode->total_cost_in_pf - $giftcode->getRefundAmount()));
+        $deposit_object->setType($type);
         $deposit_object->setDescription($description);
         $deposit_object->setWalletName(WalletNames::DEPOSIT);
         //Deposit transaction
         $this->wallet_service->deposit($deposit_object);
     }
+
+
 
 
 }

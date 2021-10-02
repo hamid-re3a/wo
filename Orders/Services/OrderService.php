@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Orders\Repository\OrderRepository;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
@@ -58,11 +59,11 @@ class OrderService implements OrdersServiceInterface
         $order_db = \Orders\Models\Order::query()->find($order->getId());
         $order_db->update([
             'user_id' => !empty($order->getUserId()) ? $order->getUserId() : $order_db->user_id,
-            'to_user_id' => !empty($order->getToUserId()) ? $order->getToUserId() : $order_db->to_user_id,
+            'from_user_id' => !empty($order->getFromUserId()) ? $order->getFromUserId() : $order_db->from_user_id,
             'package_id' => !empty($order->getPackageId()) ? $order->getPackageId() : $order_db->package_id,
-            'total_cost_in_usd' => !empty($order->getTotalCostInUsd()) ? $order->getTotalCostInUsd() : $order_db->total_cost_in_usd,
-            'packages_cost_in_usd' => !empty($order->getPackagesCostInUsd()) ? $order->getPackagesCostInUsd() : $order_db->packages_cost_in_usd,
-            'registration_fee_in_usd' => !empty($order->getRegistrationFeeInUsd()) ? $order->getRegistrationFeeInUsd() : $order_db->registration_fee_in_usd,
+            'total_cost_in_pf' => !empty($order->getTotalCostInPf()) ? $order->getTotalCostInPf() : $order_db->total_cost_in_pf,
+            'packages_cost_in_pf' => !empty($order->getPackagesCostInPf()) ? $order->getPackagesCostInPf() : $order_db->packages_cost_in_pf,
+            'registration_fee_in_pf' => !empty($order->getRegistrationFeeInPf()) ? $order->getRegistrationFeeInPf() : $order_db->registration_fee_in_pf,
             'is_paid_at' => !empty($order->getIsPaidAt()) ? $order->getIsPaidAt() : $order_db->is_paid_at,
             'is_resolved_at' => !empty($order->getIsResolvedAt()) ? $order->getIsResolvedAt() : $order_db->is_resolved_at,
             'is_refund_at' => !empty($order->getIsRefundAt()) ? $order->getIsRefundAt() : $order_db->is_refund_at,
@@ -70,7 +71,7 @@ class OrderService implements OrdersServiceInterface
             'payment_type' => !empty($order->getPaymentType()) ? $order->getPaymentType() : $order_db->payment_type,
             'payment_currency' => !empty($order->getPaymentCurrency()) ? $order->getPaymentCurrency() : $order_db->payment_currency,
             'payment_driver' => !empty($order->getPaymentDriver()) ? $order->getPaymentDriver() : $order_db->payment_driver,
-            'plan' => !empty($order->getPlan()) ? $order->getPlan() : $order_db->plan,
+            'plan' => !empty($order->getPlan()) ? OrderPlans::name($order->getPlan()) : $order_db->plan,
         ]);
         return $order;
     }

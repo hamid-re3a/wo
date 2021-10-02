@@ -1,11 +1,3 @@
-Package Feature (Packages\tests\Feature\PackageFeature)
- [x] Return package list green
-
-Payment Feature (Payments\tests\Feature\PaymentFeature)
- [x] Get payment types
+Order Feature (Orders\tests\Feature\OrderFeature)
  [x] Submit order with email
- [x] Get payment currencies
-
-Consume Data User Update (User\tests\Feature\ConsumeDataUserUpdate)
- [x] Update exist user consume change rabbit
 

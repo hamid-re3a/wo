@@ -9,12 +9,8 @@
             <directory suffix="Test.php">Packages/tests/Feature</directory>
         </testsuite>
 
-        <testsuite name="Unit">
-            <directory suffix="Test.php">Payments/tests/Feature</directory>
-        </testsuite>
-
         <testsuite name="Feature">
-            <directory suffix="Test.php">User/tests/Feature</directory>
+            <directory suffix="Test.php">Payments/tests/Feature</directory>
         </testsuite>
 
         <testsuite name="Feature">
@@ -23,6 +19,10 @@
 
         <testsuite name="Feature">
             <directory suffix="Test.php">Giftcode/tests/Feature</directory>
+        </testsuite>
+
+        <testsuite name="Feature">
+            <directory suffix="Test.php">Orders/tests/Feature</directory>
         </testsuite>
 
     </testsuites>

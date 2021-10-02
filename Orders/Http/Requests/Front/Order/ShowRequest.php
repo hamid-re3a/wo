@@ -24,7 +24,7 @@ class ShowRequest extends FormRequest
      */
     public function rules()
     {
-        $id = request()->user ? request()->user->id : null;
+        $id = auth()->user() ? auth()->user()->id : null;
         return [
             'id' => 'required|integer|exists:orders,id,user_id,' . $id
         ];

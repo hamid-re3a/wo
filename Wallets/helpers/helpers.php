@@ -19,7 +19,7 @@ if (!function_exists('walletGetSetting')) {
             return WALLET_SETTINGS[$key]['value'];
 
         \Illuminate\Support\Facades\Log::error('walletGetSetting => ' . $key);
-        throw new Exception(trans('wallet.responses.email-key-doesnt-exists'));
+        throw new Exception(trans('wallet.responses.setting-key-doesnt-exists'));
     }
 }
 
@@ -45,23 +45,14 @@ if(!function_exists('walletGetEmailContent')) {
 
 }
 
+if (!function_exists('formatCurrencyFormat')) {
 
-if (!function_exists('walletPfAmount')) {
-
-    function walletPfAmount($value)
+    function formatCurrencyFormat($value)
     {
         if(is_numeric($value))
-            $value = number_format($value, 2);
+            $value = number_format($value,2);
+//            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
-        return "{$value}";
-    }
-}
-
-
-if (!function_exists('walletConvertAmountToDecimal')) {
-
-    function walletConvertAmountToDecimal($value)
-    {
-        return $value * 100;
+        return $value;
     }
 }

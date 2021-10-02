@@ -5,12 +5,12 @@ return [
         'something-went-wrong' => 'Oops, Something went wrong, Try again please.',
 
         'giftcode' => [
-            'wrong-code' => 'Invalid giftcode .',
-            'expired' => 'Entered giftcode has been expired .',
-            'used' => 'Giftcode is not usable .',
-            'wrong-package' => 'Giftcode is not usable .',
-            'canceled' => 'Giftcode has been canceled .',
-            'giftcode-not-included-registration-fee' => 'Selected giftcode does not include registration fee .',
+            'wrong-code' => 'Gift code is wrong.',
+            'expired' => 'Gift code is expired.',
+            'used' => 'Gift code is already used.',
+            'wrong-package' => 'Gift code is created for another package.',
+            'canceled' => 'Gift code is canceled .',
+            'giftcode-not-included-registration-fee' => 'Gift code doesn\'t include registration fee .',
             'done' => 'Done .',
         ],
 

@@ -19,12 +19,12 @@ class CreateOrderHistoriesTable extends Migration
             $table->unsignedBigInteger('legacy_id');
             $table->unsignedBigInteger('user_id');
 
-            $table->unsignedBigInteger('to_user_id')->nullable();
+            $table->unsignedBigInteger('from_user_id')->nullable();
 
 
-            $table->unsignedBigInteger('total_cost_in_usd')->default(0);
-            $table->unsignedBigInteger('packages_cost_in_usd')->default(0);
-            $table->unsignedBigInteger('registration_fee_in_usd')->default(0);
+            $table->unsignedBigInteger('total_cost_in_pf')->default(0);
+            $table->unsignedBigInteger('packages_cost_in_pf')->default(0);
+            $table->unsignedBigInteger('registration_fee_in_pf')->default(0);
 
             $table->timestamp('is_paid_at')->nullable();
             $table->timestamp('is_resolved_at')->nullable();

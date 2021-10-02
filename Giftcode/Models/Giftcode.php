@@ -21,10 +21,11 @@ use User\Models\User;
  * @property string| $redeemer_full_name
  * @property string| $creator_full_name
  * @property int $redeem_user_id
- * @property int $packages_cost_in_usd
- * @property int $registration_fee_in_usd
- * @property int $total_cost_in_usd
+ * @property int $packages_cost_in_pf
+ * @property int $registration_fee_in_pf
+ * @property int $total_cost_in_pf
  * @property boolean $is_canceled
+ * @property boolean $is_expired
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -47,10 +48,11 @@ class Giftcode extends Model
         'expiration_date',
         'redeem_date',
         'redeem_user_id',
-        'packages_cost_in_usd',
-        'registration_fee_in_usd',
-        'total_cost_in_usd',
-        'is_canceled'
+        'packages_cost_in_pf',
+        'registration_fee_in_pf',
+        'total_cost_in_pf',
+        'is_canceled',
+        'is_expired',
     ];
 
     protected $casts = [
@@ -61,7 +63,12 @@ class Giftcode extends Model
         'expiration_date' => 'datetime',
         'redeem_date' => 'datetime',
         'redeem_user_id' => 'integer',
-        'is_canceled' => 'boolean'
+        'is_canceled' => 'boolean',
+        'is_expired' => 'boolean',
+    ];
+
+    protected $with = [
+      'user'
     ];
 
     protected $hidden = [
@@ -99,10 +106,15 @@ class Giftcode extends Model
 
     public function getPackageNameAttribute()
     {
-        if ($this->package()->exists() AND !is_null($this->package->name))
-            return $this->package->name;
+        $name = null;
+        if ($this->package()->exists() AND !is_null($this->package->name)) {
+            $name = $this->package->name;
+            if($this->package->short_name)
+                $name = $name . ' (' . $this->package->short_name .')' ;
 
-        return null;
+        }
+
+        return $name;
     }
 
     public function getRedeemerFullNameAttribute()
@@ -131,7 +143,7 @@ class Giftcode extends Model
         if (isset($this->attributes['expiration_date']) AND $this->expiration_date->isPast())
             return 'Expired';
 
-        return 'Ready to use';
+        return 'Unused';
     }
 
 
@@ -140,14 +152,20 @@ class Giftcode extends Model
      */
     public function getRefundAmount()
     {
-        //Check we should calculate cancelation fee or not
-        if (!giftcodeGetSetting('include_cancellation_fee'))
-            return $this->total_cost_in_usd;
 
-        //Calculate cancelation fee in fiat (USD)
-        $cancelation_fee_in_percent = giftcodeGetSetting('cancellation_fee');
-        $cancelation_fee_in_fiat = ($this->total_cost_in_usd * $cancelation_fee_in_percent) / 100;
-        return $this->total_cost_in_usd - $cancelation_fee_in_fiat;
+        $fee = null;
+        if($this->is_canceled AND giftcodeGetSetting('include_cancellation_fee') == TRUE)
+            $fee = giftcodeGetSetting('cancellation_fee');
+        else if($this->is_expired AND giftcodeGetSetting('include_expiration_fee') == TRUE)
+            $fee = giftcodeGetSetting('expiration_fee');
+
+        //Check we should calculate cancelation fee or not
+        if (!$fee)
+            return $this->total_cost_in_pf;
+
+        //Calculate refundable amount
+        $refund_fee_in_fiat = ($this->total_cost_in_pf * $fee) / 100;
+        return $this->total_cost_in_pf - $refund_fee_in_fiat;
     }
 
 
@@ -160,9 +178,9 @@ class Giftcode extends Model
         $giftcode_service->setPackageId((int)$this->attributes['package_id']);
         $giftcode_service->setOrderId((int)$this->attributes['order_id']);
 
-        $giftcode_service->setPackagesCostInUsd((float)$this->attributes['packages_cost_in_usd']);
-        $giftcode_service->setRegistrationFeeInUsd((float)$this->attributes['registration_fee_in_usd']);
-        $giftcode_service->setTotalCostInUsd((float)$this->attributes['total_cost_in_usd']);
+        $giftcode_service->setPackagesCostInPf((float)$this->attributes['packages_cost_in_pf']);
+        $giftcode_service->setRegistrationFeeInPf((float)$this->attributes['registration_fee_in_pf']);
+        $giftcode_service->setTotalCostInPf((float)$this->attributes['total_cost_in_pf']);
 
         $giftcode_service->setCode((string)$this->attributes['code']);
 

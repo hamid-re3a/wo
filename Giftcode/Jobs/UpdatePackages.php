@@ -38,7 +38,7 @@ class UpdatePackages implements ShouldQueue
     {
         foreach($this->packageService->getPackages() AS $package) {
             $package = $this->getPackage($package['id']);
-            Package::firstOrCreate([
+            Package::query()->firstOrCreate([
                 'id' => $package->getId()
             ])->update([
                 'name' => $package->getName(),

@@ -6,9 +6,13 @@ namespace Wallets\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Orders\Services\Grpc\Order;
 use Payments\Services\Grpc\Invoice;
-use Payments\Services\PaymentService;
+use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
+use Wallets\Jobs\HandleWithdrawUnsentEmails;
+use Wallets\Models\WithdrawProfit;
 use Wallets\Services\Grpc\Deposit;
 use Wallets\Services\Grpc\Transfer;
 use Wallets\Services\Grpc\Wallet;
@@ -32,7 +36,7 @@ class WalletService implements WalletServiceInterface
     private function walletUser($user_id)
     {
 
-        return User::firstOrCreate(
+        return User::query()->firstOrCreate(
             ['id' => $user_id]
         );
 
@@ -44,10 +48,9 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
 
             if (
-                $deposit->getConfirmed() > 0 AND
                 $deposit->getAmount() > 0 AND
-                $deposit->getWalletName() AND
                 $deposit->getUserId() AND
+                !is_null($deposit->getType()) AND
                 in_array($deposit->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($deposit->getUserId());
@@ -57,18 +60,21 @@ class WalletService implements WalletServiceInterface
                 if($deposit->getWalletName() == WalletNames::DEPOSIT)
                     $wallet_name = $this->depositWallet;
 
-                $transaction = $bankService->deposit($wallet_name, $deposit->getAmount(), $deposit->getDescription() ?: null, $deposit->getConfirmed(), $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
-                $deposit->setTransactionId($transaction->uuid);
+                $transaction = $bankService->deposit($wallet_name, $deposit->getAmount(), $deposit->getDescription() ?: null, true, $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
+                $deposit->setTransactionId((int)$transaction->uuid);
 
                 DB::commit();
                 return $deposit;
 
             } else {
+                DB::rollBack();
+                Log::error('Deposit error 1 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
                 throw new \Exception();
             }
-        } catch (\Throwable $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
-            $deposit->setConfirmed(false);
+            Log::error('Deposit error 2 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
+            Log::error('Message => ' . $exception->getMessage());
             return $deposit;
         }
     }
@@ -79,11 +85,9 @@ class WalletService implements WalletServiceInterface
             DB::beginTransaction();
 
             if (
-                $withdraw->getConfirmed() AND
                 $withdraw->getAmount() > 0 AND
-                $withdraw->getWalletName() AND
                 $withdraw->getUserId() AND
-                $withdraw->getType() AND
+                !is_null($withdraw->getType()) AND
                 in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($withdraw->getUserId());
@@ -100,11 +104,14 @@ class WalletService implements WalletServiceInterface
                 return $withdraw;
 
             } else {
+                DB::rollBack();
+                Log::error('withdraw error 1 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
-            $withdraw->setConfirmed(false);
+            Log::error('withdraw error 2 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
+            Log::error($exception->getMessage());
             return $withdraw;
         }
     }
@@ -117,7 +124,6 @@ class WalletService implements WalletServiceInterface
                 $transfer->getFromUserId() AND
                 $transfer->getToUserId() AND
                 $transfer->getAmount() > 0 AND
-                $transfer->getConfirmed() AND
                 in_array($transfer->getToWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT]) AND
                 in_array($transfer->getFromWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
@@ -142,15 +148,16 @@ class WalletService implements WalletServiceInterface
                 return $transfer;
 
             } else {
+                DB::rollBack();
+                Log::error('transfer error 1 :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
                 throw new \Exception();
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
-            $transfer->setConfirmed(false);
+            Log::error('transfer error 2 :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
             return $transfer;
         }
     }
-
 
     public function getBalance(Wallet $wallet): Wallet
     {
@@ -173,20 +180,23 @@ class WalletService implements WalletServiceInterface
         }
     }
 
-    /**
-     * @param $request
-     */
+    public function updateWithdrawRequestsByIds($ids,$updates)
+    {
+        WithdrawProfit::query()->whereIn('id',$ids)->update($updates);
+        HandleWithdrawUnsentEmails::dispatch();
+    }
+
     public function invoiceWallet(Request $request)
     {
         $invoice_request = new Invoice();
-        $invoice_request->setPfAmount($request->get('amount'));
+        $invoice_request->setPfAmount(usdToPf($request->get('amount')));
         $invoice_request->setPaymentDriver('btc-pay-server');
         $invoice_request->setPaymentType('purchase');
         $invoice_request->setPaymentCurrency('BTC');
         $invoice_request->setPayableType('DepositWallet');
-        $invoice_request->setUser($request->user->getUserService());
-        $payment_service = app(PaymentService::class);
-        return $payment_service->pay($invoice_request);
+        $invoice_request->setUser(auth()->user()->getUserService());
+
+        return PaymentFacade::pay($invoice_request);
     }
 
 }

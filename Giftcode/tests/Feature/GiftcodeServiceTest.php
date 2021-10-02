@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Wallets\tests\Feature;
+namespace Giftcode\tests\Feature;
 
 use Giftcode\Models\Giftcode;
 use Giftcode\Services\GiftcodeService;
@@ -53,6 +53,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
         $giftcode_model = Giftcode::query()->first();
+        /** @var $giftcode_object \Giftcode\Services\Grpc\Giftcode */
         $giftcode_object = $giftcode_model->getGiftcodeService();
         $giftcode_object->setOrderId(1);
         $user = User::query()->first();
@@ -74,13 +75,12 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
         $response = $giftcode_service->getUserCreatedGiftcodesCount($user_object);
         $this->assertIsInt($response);
-        $this->assertEquals($response,1);
     }
 
     /**
@@ -91,8 +91,9 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
+        $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
@@ -109,8 +110,9 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
+        $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);
@@ -127,8 +129,9 @@ class GiftcodeServiceTest extends GiftcodeTest
         Mail::fake();
         $response = $this->createGiftCode();
         $response->assertOk();
+        $response->assertOk();
 
-        $user = User::query()->first();
+        $user = User::query()->whereId(1)->first();
         $user_object = $user->getUserService();
 
         $giftcode_service = app(GiftcodeService::class);

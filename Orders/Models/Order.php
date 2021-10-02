@@ -2,6 +2,7 @@
 
 namespace Orders\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Orders\Services\Grpc\OrderPlans;
@@ -14,15 +15,16 @@ use User\Models\User;
  *
  * @property int $id
  * @property int $user_id
- * @property int|null $to_user_id
- * @property int $total_cost_in_usd
- * @property int $packages_cost_in_usd
- * @property int $registration_fee_in_usd
+ * @property int|null $from_user_id
+ * @property int $total_cost_in_pf
+ * @property int $packages_cost_in_pf
+ * @property int $registration_fee_in_pf
  * @property int $validity_in_days
  * @property string|null $is_paid_at
  * @property string|null $is_resolved_at
  * @property string|null $is_refund_at
  * @property string|null $is_commission_resolved_at
+ * @property string|null $expires_at
  * @property string $payment_type
  * @property string $payment_currency
  * @property string|null $payment_driver
@@ -47,13 +49,13 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Order wherePaymentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order wherePlan($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereRegistrationFeeInUsd($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereToUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereFromUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTotalCostInUsd($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
  * @mixin \Eloquent
  * @property-read \Orders\Models\User $user
- * @property-read \Orders\Models\User $toUser
+ * @property-read \Orders\Models\User $fromUser
  * @property-read \Illuminate\Database\Eloquent\Collection|\Orders\Models\OrderPackage[] $packages
  * @property-read int|null $packages_count
  * @method static \Illuminate\Database\Eloquent\Builder|Order filter()
@@ -69,7 +71,7 @@ class Order extends Model
         'is_paid_at' => 'datetime',
         'is_resolved_at' => 'datetime',
         'is_refund_at' => 'datetime',
-        'is_expired_at' => 'datetime',
+        'expires_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
 
@@ -81,9 +83,9 @@ class Order extends Model
     }
 
 
-    public function toUser()
+    public function fromUser()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'from_user_id', 'id');
     }
 
     public function refreshOrder()
@@ -94,11 +96,18 @@ class Order extends Model
     public function reCalculateCosts()
     {
         $this->refresh();
+        if(in_array($this->plan, [ORDER_PLAN_START,ORDER_PLAN_COMPANY])){
+            $this->packages_cost_in_pf = (float)0;
+            $this->total_cost_in_pf = (float)0;
+            $this->save();
+        }
+
         if ($this->plan == ORDER_PLAN_START)
-            $this->registration_fee_in_usd = (float)getSetting('REGISTRATION_FEE');
-        $this->packages_cost_in_usd = (float)$this->orderPackagesPrice();
-        $this->total_cost_in_usd = (float)$this->packages_cost_in_usd + (float)$this->registration_fee_in_usd;
+            $this->registration_fee_in_pf = (float)getSetting('REGISTRATION_FEE');
+        $this->packages_cost_in_pf = (float)$this->orderPackagesPrice();
+        $this->total_cost_in_pf = (float)$this->packages_cost_in_pf + (float)$this->registration_fee_in_pf;
         $this->save();
+        $this->refresh();
     }
 
     private function orderPackagesPrice()
@@ -110,7 +119,7 @@ class Order extends Model
     }
 
 
-    /**
+    /*
      * Scopes
      */
     public function scopeFilter($query)
@@ -139,27 +148,24 @@ class Order extends Model
         return $query;
     }
 
-    /**
+    /*
      * Methods
      */
     public function getOrderService()
     {
         $order_service = new \Orders\Services\Grpc\Order();
         $order_service->setId((int)$this->attributes['id']);
-        $order_service->setUser($this->user->getUserService());
         $order_service->setUserId((int)$this->attributes['user_id']);
 
-        $order_service->setToUserId((int)$this->attributes['to_user_id']);
+        $order_service->setFromUserId((int)$this->attributes['from_user_id']);
 
-        $order_service->setTotalCostInUsd((float)$this->attributes['total_cost_in_usd']);
-        $order_service->setPackagesCostInUsd((float)$this->attributes['packages_cost_in_usd']);
-        $order_service->setRegistrationFeeInUsd((float)$this->attributes['registration_fee_in_usd']);
+        $order_service->setTotalCostInPf((float)$this->attributes['total_cost_in_pf']);
+        $order_service->setPackagesCostInPf((float)$this->attributes['packages_cost_in_pf']);
+        $order_service->setRegistrationFeeInPf((float)$this->attributes['registration_fee_in_pf']);
+
         $order_service->setIsPaidAt((string)$this->attributes['is_paid_at']);
-
         $order_service->setIsResolvedAt((string)$this->attributes['is_resolved_at']);
-
         $order_service->setIsRefundAt((string)$this->attributes['is_refund_at']);
-
         $order_service->setIsCommissionResolvedAt((string)$this->attributes['is_commission_resolved_at']);
 
         $order_service->setPaymentType((string)$this->attributes['payment_type']);
@@ -170,7 +176,8 @@ class Order extends Model
         $order_service->setPackageId((int)$this->attributes['package_id']);
 
         $order_service->setPlan((int)OrderPlans::value($this->attributes['plan']));
-        $order_service->setValidityInDays((string)$this->attributes['validity_in_days']);
+        $order_service->setValidityInDays((int)$this->attributes['validity_in_days']);
+
 
         $order_service->setDeletedAt((string)$this->attributes['deleted_at']);
         $order_service->setCreatedAt((string)$this->attributes['created_at']);
@@ -179,6 +186,18 @@ class Order extends Model
         return $order_service;
     }
 
+    /*
+     * Mutators
+     */
+    public function setIsPaidAtAttribute($value)
+    {
+        $this->attributes['is_paid_at'] = $value;
+        if (
+            isset($this->attributes['validity_in_days']) AND isset($this->attributes['is_paid_at'])
+            AND !empty($this->attributes['is_paid_at']) AND !empty($this->attributes['validity_in_days'])
+        )
+            $this->attributes['expires_at'] = Carbon::make($value)->addDays($this->attributes['validity_in_days'])->toDateTimeString();
+    }
 
 
 }

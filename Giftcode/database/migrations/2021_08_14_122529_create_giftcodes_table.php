@@ -21,9 +21,9 @@ class CreateGiftcodesTable extends Migration
             $table->foreignId('user_id')->constrained('users','id');
             $table->foreignId('package_id')->constrained('giftcode_packages','id');
 
-            $table->unsignedBigInteger('packages_cost_in_usd')->default(0);
-            $table->unsignedBigInteger('registration_fee_in_usd')->default(0);
-            $table->unsignedBigInteger('total_cost_in_usd')->default(0);
+            $table->unsignedBigInteger('packages_cost_in_pf')->default(0);
+            $table->unsignedBigInteger('registration_fee_in_pf')->default(0);
+            $table->unsignedBigInteger('total_cost_in_pf')->default(0);
 
             $table->string('code')->unique();
             $table->timestamp('expiration_date')->nullable();
@@ -31,6 +31,7 @@ class CreateGiftcodesTable extends Migration
             $table->timestamp('redeem_date')->nullable();
 
             $table->boolean('is_canceled')->default(FALSE);
+            $table->boolean('is_expired')->default(FALSE);
 
             $table->softDeletes();
             $table->timestamps();

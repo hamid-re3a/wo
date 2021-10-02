@@ -2,9 +2,10 @@
 
 namespace Payments;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Payments\Services\Processors\PaymentFacade;
+use Payments\Services\Processors\PaymentProcessor;
 
 class PaymentServiceProvider extends ServiceProvider
 {
@@ -20,9 +21,17 @@ class PaymentServiceProvider extends ServiceProvider
      */
     public function register()
     {
+
+        /**
+         * related Facades
+         */
+        PaymentFacade::shouldProxyTo(PaymentProcessor::class);
+
         if (!$this->app->runningInConsole()) {
             return;
         }
+
+
         if ($this->shouldMigrate()) {
             $this->loadMigrationsFrom([
                 __DIR__ . '/database/migrations',

@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Wallets\Http\Requests\Front\GetTransactionRequest;
 use Wallets\Http\Resources\TransactionResource;
-use Wallets\Http\Resources\WalletResource;
+use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Services\BankService;
 
 class WalletController extends Controller
@@ -17,7 +17,7 @@ class WalletController extends Controller
 
     public function readyBankService()
     {
-        $this->bankService = new BankService(request()->user);
+        $this->bankService = new BankService(auth()->user());
         $this->earningWallet = config('earningWallet');
         $this->depositWallet = config('depositWallet');
         if($this->bankService->getAllWallets()->count() == 0) {
@@ -32,7 +32,7 @@ class WalletController extends Controller
     public function index()
     {
         $this->readyBankService();
-        return api()->success(null,WalletResource::collection($this->bankService->getAllWallets()));
+        return api()->success(null,EarningWalletResource::collection($this->bankService->getAllWallets()));
     }
 
 

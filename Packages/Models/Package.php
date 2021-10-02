@@ -4,6 +4,7 @@ namespace Packages\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Orders\Models\Order;
 
 /**
@@ -37,28 +38,26 @@ use Orders\Models\Order;
  * @method static \Illuminate\Database\Eloquent\Builder|Package whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Package whereValidityInDays($value)
  * @mixin \Eloquent
- * @property-read \Packages\Models\Category $Category
+ * @property-read \Packages\Models\Category $category
  * @property-read \Illuminate\Database\Eloquent\Collection|\Packages\Models\PackagesIndirectCommission[] $packageIndirectCommission
  * @property-read int|null $package_indirect_commission_count
  */
 class Package extends Model
 {
     use HasFactory;
+    use SoftDeletes;
     protected $guarded = [];
 
     /**
      * relation with Category
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function Category()
+    public function category()
     {
         return $this->belongsTo(Category::class)->with('categoryIndirectCommission');
     }
 
-    /**
-     * relation with packageIndicatorCommission
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
+
     public function packageIndirectCommission()
     {
         return $this->hasMany(PackagesIndirectCommission::class);

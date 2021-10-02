@@ -5,6 +5,7 @@ namespace Payments\Services;
 
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class Socket
 {
@@ -13,6 +14,7 @@ class Socket
 
     public function sendInvoiceMessage(\Payments\Models\Invoice $invoice_model, $status)
     {
+        Log::info('Socket sent => ' . $invoice_model->transaction_id . ' name => ' . $status . ' checkout_link => ' . $invoice_model->checkout_link);
         Http::post($this->socket_url, [
             "uid" => $invoice_model->transaction_id,
             "content" => [

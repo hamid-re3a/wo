@@ -3,24 +3,20 @@
 use Illuminate\Http\Request;
 const ORDER_PLAN_PURCHASE = 'ORDER_PLAN_PURCHASE';
 const ORDER_PLAN_START = 'ORDER_PLAN_START';
+const ORDER_PLAN_SPECIAL = 'ORDER_PLAN_SPECIAL';
+const ORDER_PLAN_COMPANY = 'ORDER_PLAN_COMPANY';
 const ORDER_PLANS = [
     ORDER_PLAN_START,
-    ORDER_PLAN_PURCHASE
+    ORDER_PLAN_PURCHASE,
+    ORDER_PLAN_SPECIAL,
+    ORDER_PLAN_COMPANY
 ];
 
-if (!function_exists('user')) {
-
-    function user(int $id ) : ?\User\Services\Grpc\User
+if (!function_exists('getMLMGrpcClient')) {
+    function getMLMGrpcClient()
     {
-        $user_db = \User\Models\User::query()->find($id);
-
-        $user = new \User\Services\Grpc\User();
-        $user->setId((int)$user_db->id);
-        $user->setFirstName($user_db->first_name);
-        $user->setLastName($user_db->last_name);
-        $user->setUsername($user_db->username);
-        $user->setEmail($user_db->email);
-        return $user;
-
+        return new \MLM\Services\Grpc\MLMServiceClient('staging-api-gateway.janex.org:9598', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
     }
 }

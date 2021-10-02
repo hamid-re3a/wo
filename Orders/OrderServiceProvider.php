@@ -5,6 +5,8 @@ namespace Orders;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Orders\Services\MlmClientFacade;
+use Orders\Services\MlmGrpcClientProvider;
 
 class OrderServiceProvider extends ServiceProvider
 {
@@ -20,9 +22,17 @@ class OrderServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        /**
+         * related Facades
+         */
+
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
+
         if (!$this->app->runningInConsole()) {
             return;
         }
+
+
         if ($this->shouldMigrate()) {
             $this->loadMigrationsFrom([
                 __DIR__ . '/database/migrations',

@@ -21,7 +21,7 @@ class PaymentCurrencyController extends Controller
     /**
      * All payment currencies
      * @group
-     * Public User > Payments Currency
+     * Public User > Payments
      */
     public function index()
     {

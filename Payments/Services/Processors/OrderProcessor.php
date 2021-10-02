@@ -4,24 +4,29 @@
 namespace Payments\Services\Processors;
 
 
-use App\Jobs\Order\MLMOrderJob;
+use Illuminate\Support\Facades\Log;
+use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceExpired;
+use Payments\Mail\Payment\EmailInvoicePaid;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
+use User\Models\User;
 
 class OrderProcessor extends ProcessorAbstract
 {
     /**
      * @var $order_service Order
      * @var $invoice_db Invoice
+     * @var $user User
      */
 
     private $order_service;
+    private $user;
 
     public function __construct(Invoice $invoice_db)
     {
@@ -37,6 +42,8 @@ class OrderProcessor extends ProcessorAbstract
         $order_id->setId($this->invoice_db->payable_id);
         $this->order_service = $order_service->OrderById($order_id);
 
+        $this->user = User::query()->whereId($this->order_service->getUserId())->first();
+
     }
 
     public function partial()
@@ -46,7 +53,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'partial_paid');
 
         // send email notification for due amount
-        EmailJob::dispatch(new EmailInvoicePaidPartial($this->order_service->getUser(), $this->invoice_db,$this->order_service), $this->order_service->getUser()->getEmail());
+        EmailJob::dispatch(new EmailInvoicePaidPartial($this->user->getUserService(), $this->invoice_db, $this->order_service), $this->user->email);
 
 
     }
@@ -57,27 +64,43 @@ class OrderProcessor extends ProcessorAbstract
         // send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
 
+
+        EmailJob::dispatch(new EmailInvoicePaid($this->user->getUserService(), $this->invoice_db), $this->user->email);
+
     }
 
     public function completed()
     {
-        $this->invoice_db->update([
-            'is_paid' => true
-        ]);
-
-        // send web socket notification
-        $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
-
-        // send thank you email notification
-        EmailJob::dispatch(new EmailInvoicePaidComplete($this->order_service->getUser(), $this->invoice_db), $this->order_service->getUser()->getEmail());
-
-
-        //Update order
-        $this->order_service->setIsPaidAt(now()->toDateTimeString());
-        app(OrderService::class)->updateOrder($this->order_service);
+        // TODO handle if mlm grpc is down condition
 
         //Send order to MLM
-        MLMOrderJob::dispatch(serialize($this->order_service))->onConnection('rabbit')->onQueue('mlm');
+        /**
+         * @var $submit_response Acknowledge
+         * @var $order_service Order
+         */
+        $order_service = $this->order_service;
+        $order_service->setIsPaidAt(now()->toDateTimeString());
+        $order_service->setIsResolvedAt(now()->toDateTimeString());
+        list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
+        if ($flag->code != 0)
+            throw new \Exception('MLM Not responding', 406);
+
+
+        if ($submit_response->getStatus()) {
+            //Update order
+            $order_service->setIsCommissionResolvedAt($submit_response->getCreatedAt());
+            app(OrderService::class)->updateOrder($order_service);
+
+            $this->invoice_db->update([
+                'is_paid' => true
+            ]);
+            // send web socket notification
+            $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
+
+            // send thank you email notification
+            EmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getUserService(), $this->invoice_db), $this->user->email);
+        }
+
     }
 
     public function expired()
@@ -87,7 +110,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'expired');
 
         // send email to user to regenerate new invoice for due amount
-        EmailJob::dispatch(new EmailInvoiceExpired($this->order_service->getUser(), $this->invoice_db), $this->order_service->getUser()->getEmail());
+        EmailJob::dispatch(new EmailInvoiceExpired($this->user->getUserService(), $this->invoice_db), $this->user->email);
 
     }
 

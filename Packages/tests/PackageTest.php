@@ -10,6 +10,7 @@ use Packages\PackageConfigure;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 use User\Models\User;
+use User\UserConfigure;
 
 class PackageTest extends TestCase
 {
@@ -20,8 +21,9 @@ class PackageTest extends TestCase
     {
         parent::setUp();
         $this->app->setLocale('en');
-        $this->withHeaders($this->getHeaders());
         PackageConfigure::seed();
+        UserConfigure::seed();
+        $this->withHeaders($this->getHeaders());
     }
 
     public function hasMethod($class, $method)
@@ -43,7 +45,8 @@ class PackageTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $hash = Hash::make(serialize($user->getUserService()));
+        $user->assignRole(USER_ROLE_CLIENT);
+        $hash = md5(serialize($user->getUserService()));
         return [
             'X-user-id' => '1',
             'X-user-hash' => $hash,

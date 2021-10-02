@@ -7,11 +7,13 @@ namespace Payments\Services\Processors;
 use Illuminate\Support\Facades\Log;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoiceExpired;
+use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaid;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidComplete;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidPartial;
 use Payments\Models\Invoice;
 use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\WalletService;
 
 class WalletProcessor extends ProcessorAbstract
@@ -52,6 +54,7 @@ class WalletProcessor extends ProcessorAbstract
 
         // send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
+        EmailJob::dispatch(new EmailWalletInvoicePaid($this->user_db, $this->invoice_db), $this->user_db->email);
 
     }
 
@@ -62,18 +65,20 @@ class WalletProcessor extends ProcessorAbstract
             ($this->invoice_db->pf_amount / $this->invoice_db->amount) * $this->invoice_db->paid_amount
             , 2, '.', '');
 
-        if ($pf_paid > (double)$this->invoice_db->deposit_amount) {
+        if ($pf_paid >= (double)$this->invoice_db->deposit_amount) {
             $deposit_amount = $pf_paid - ((double)$this->invoice_db->deposit_amount);
+        } else {
+            $deposit_amount = $pf_paid;
+        }
 
-
+        if($deposit_amount > 0) {
             //Deposit Service
             $deposit_service = app(Deposit::class);
-            $deposit_service->setConfirmed(true);
             $deposit_service->setUserId($this->user_db->id);
-            $deposit_service->setAmount($this->invoice_db->pf_amount);
-            $deposit_service->setType('Deposit');
+            $deposit_service->setAmount($deposit_amount);
+            $deposit_service->setType('Funds deposited');
             $deposit_service->setDescription('Invoice #' . $this->invoice_db->transaction_id);
-            $deposit_service->setWalletName('Deposit Wallet');
+            $deposit_service->setWalletName(WalletNames::DEPOSIT);
 
             //Deposit transaction
             /**
@@ -82,9 +87,10 @@ class WalletProcessor extends ProcessorAbstract
             $deposit = $this->wallet_service->deposit($deposit_service);
 
             //Deposit check
-            if($deposit->getConfirmed()) {
+            if (is_string($deposit->getTransactionId())) {
                 $this->invoice_db->update([
-                    'is_paid' => true
+                    'is_paid' => true,
+                    'deposit_amount' => $pf_paid
                 ]);
 
                 // send web socket notification
@@ -93,11 +99,10 @@ class WalletProcessor extends ProcessorAbstract
                 Log::error('Deposit wallet user error , InvoiceID => ' . $this->invoice_db->id);
                 //TODO email admin/dev-team email
             }
-
-
-            // send user email
-            EmailJob::dispatch(new EmailWalletInvoicePaidComplete($this->user_db, $this->invoice_db),$this->user_db->email);
         }
+
+        // send user email
+        EmailJob::dispatch(new EmailWalletInvoicePaidComplete($this->user_db, $this->invoice_db), $this->user_db->email);
 
     }
 

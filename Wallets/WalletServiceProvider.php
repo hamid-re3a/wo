@@ -2,12 +2,17 @@
 
 namespace Wallets;
 
+use Wallets\Commands\ProcessWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;
+use Wallets\Models\Transaction;
+use Wallets\Models\WithdrawProfit;
 use Wallets\Observers\EmailContentObserver;
 use Wallets\Observers\SettingObserver;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Wallets\Observers\TransactionObserver;
+use Wallets\Observers\WithdrawProfitObserver;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -50,6 +55,8 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
+        $this->registerCommands();
+
         $this->registerWalletsName();
 
         Route::prefix('v1/wallets')
@@ -71,19 +78,31 @@ class WalletServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register Commands
+     */
+    private function registerCommands()
+    {
+        $this->commands([
+            ProcessWithdrawalRequestsCommand::class
+        ]);
+    }
+
+    /**
      * Register Observers
      */
-    protected function registerObservers()
+    private function registerObservers()
     {
         Setting::observe(SettingObserver::class);
         EmailContent::observe(EmailContentObserver::class);
+        WithdrawProfit::observe(WithdrawProfitObserver::class);
+        Transaction::observe(TransactionObserver::class);
     }
 
 
     /**
      * Set Config files.
      */
-    protected function setupConfig()
+    private function setupConfig()
     {
         $path = realpath($raw = __DIR__ . '/config/' . $this->config_file_name . '.php') ?: $raw;
         $this->mergeConfigFrom($path, 'api');
@@ -93,7 +112,7 @@ class WalletServiceProvider extends ServiceProvider
     /**
      * Register helpers.
      */
-    protected function registerHelpers()
+    private function registerHelpers()
     {
         if (file_exists($helperFile = __DIR__ . '/helpers/constant.php')) {
             require_once($helperFile);
@@ -106,12 +125,16 @@ class WalletServiceProvider extends ServiceProvider
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
             require_once $helperFile;
         }
+
+        if (file_exists($helperFile = __DIR__ . '/helpers/queryMacros.php')) {
+            require_once $helperFile;
+        }
     }
 
     /**
      * Register wallets name
      */
-    protected function registerWalletsName()
+    private function registerWalletsName()
     {
         config([
             'depositWallet' => 'Deposit Wallet',
@@ -125,7 +148,7 @@ class WalletServiceProvider extends ServiceProvider
      *
      * @return bool
      */
-    protected function shouldMigrate()
+    private function shouldMigrate()
     {
         return WalletConfigure::$runsMigrations;
     }

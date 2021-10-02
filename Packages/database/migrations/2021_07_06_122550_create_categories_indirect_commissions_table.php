@@ -19,7 +19,7 @@ class CreateCategoriesIndirectCommissionsTable extends Migration
             $table->unsignedBigInteger('category_id');
 
             $table->integer('level');
-            $table->integer('percentage');
+            $table->integer('percentage')->default(0);
 
             $table->unique(['category_id', 'level']);
 

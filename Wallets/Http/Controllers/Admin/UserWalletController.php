@@ -8,11 +8,11 @@ use User\Models\User;
 use Wallets\Http\Requests\Admin\GetUserWalletBalanceRequest;
 use Wallets\Http\Requests\Admin\GetUserTransfersRequest;
 use Wallets\Http\Requests\Admin\GetUserTransactionsRequest;
-use Wallets\Http\Requests\Admin\UserDepositRequest;
 use Wallets\Http\Requests\Admin\UserIdRequest;
-use Wallets\Http\Resources\TransactionResource;
+use Wallets\Http\Resources\Admin\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\WalletResource;
+use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Models\Transaction;
 use Wallets\Services\BankService;
 
 class UserWalletController extends Controller
@@ -21,7 +21,7 @@ class UserWalletController extends Controller
     private $depositWallet;
     private $earningWallet;
 
-    public function __construct(UserIdRequest $request)
+    public function prepare($request)
     {
         $user = User::find($request->get('user_id'))->first();
         $this->bankService = new BankService($user);
@@ -36,6 +36,18 @@ class UserWalletController extends Controller
     }
 
     /**
+     * Get all transactions
+     * @group Admin User > Wallets
+     */
+    public function getAllTransactions()
+    {
+        //Get all transactions except admin's wallet
+        $transactions = Transaction::query()->where('payable_id','!=',1)->simplePaginate();
+        return api()->success(null,TransactionResource::collection($transactions)->response()->getData());
+
+    }
+
+    /**
      * Get user's wallets
      * @group Admin User > Wallets
      * @param UserIdRequest $request
@@ -43,8 +55,8 @@ class UserWalletController extends Controller
      */
     public function getWalletsList(UserIdRequest $request) //UserIdRequest needed for Scribe documentation
     {
-
-        return api()->success(null,WalletResource::collection($this->bankService->getAllWallets()));
+        $this->middleware($request);
+        return api()->success(null,EarningWalletResource::collection($this->bankService->getAllWallets()));
 
     }
 

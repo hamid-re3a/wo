@@ -25,14 +25,36 @@ class InvoiceController extends Controller
     /**
      * Get user pending package invoice
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      */
     public function pendingOrderInvoice()
     {
-        $pending_invoice = request()->user->invoices()->where('payable_type','Order')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
+        $pending_invoice = auth()->user()->invoices()->where('payable_type','Order')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
 
         if(!$pending_invoice) {
-            $paid_invoice = request()->user()->invoices()->where('payable_type','Order')->where('is_paid',1)->count();
+            $paid_invoice = auth()->user()->invoices()->where('payable_type','Order')->where('is_paid',1)->count();
+            if($paid_invoice)
+                return api()->success(null,[
+                    'status' => 'confirmed'
+                ]);
+
+            return api()->error(null,null,404);
+        }
+
+        return api()->success(null, InvoiceResource::make($pending_invoice));
+    }
+
+    /**
+     * Get user pending wallet invoice
+     * @group
+     * Public User > Payments > Invoices
+     */
+    public function pendingWalletInvoice()
+    {
+        $pending_invoice = auth()->user()->invoices()->where('payable_type','DepositWallet')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
+
+        if(!$pending_invoice) {
+            $paid_invoice = auth()->user()->invoices()->where('payable_type','DepositWallet')->where('is_paid',1)->count();
             if($paid_invoice)
                 return api()->success(null,[
                     'status' => 'confirmed'
@@ -47,7 +69,7 @@ class InvoiceController extends Controller
     /**
      * Get invoices list
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      */
     public function index()
     {
@@ -58,7 +80,7 @@ class InvoiceController extends Controller
     /**
      * Get invoice details
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      * @param ShowInvoiceRequest $request
      * @return JsonResponse
      */
@@ -74,7 +96,7 @@ class InvoiceController extends Controller
     /**
      * Get invoice transactions
      * @group
-     * Public User > Invoices
+     * Public User > Payments > Invoices
      * @param ShowOrderTransactionsRequest $request
      * @return JsonResponse
      */

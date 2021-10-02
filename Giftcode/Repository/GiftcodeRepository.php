@@ -8,6 +8,7 @@ use Exception;
 use Giftcode\Jobs\UrgentEmailJob;
 use Giftcode\Mail\User\GiftcodeCanceledEmail;
 use Giftcode\Mail\User\GiftcodeCreatedEmail;
+use Giftcode\Mail\User\GiftcodeExpiredEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,34 +26,34 @@ class GiftcodeRepository
 
     public function create(Request $request)
     {
+        /**@var $giftcode Giftcode*/
+
         try {
             DB::beginTransaction();
             //All stuff fixed in GiftcodeObserver
 
             $giftcode = $this->model->query()->create([
                 'package_id' => $request->get('package_id'),
-                'user_id' => $request->get('user_id')
+                'user_id' => $request->has('user_id') ? $request->get('user_id') : auth()->user()->id
             ]);
             /**
              * Start User wallet process
              */
             //Check User Balance
-            if($this->wallet_repository->checkUserBalance() < $giftcode->total_cost_in_usd)
-                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_usd ]),406);
+            if($this->wallet_repository->checkUserBalance() < $giftcode->total_cost_in_pf)
+                throw new \Exception(trans('giftcode.validation.inefficient-account-balance',['amount' => (float)$giftcode->total_cost_in_pf ]),406);
             //Withdraw Balance
             $finalTransaction = $this->wallet_repository->withdrawUserWallet($giftcode);
 
             //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfirmed())
+            if(!is_string($finalTransaction->getTransactionId()))
                 throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
             /**
              * End User wallet process
              */
-
             UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
 
             DB::commit();
-
             return $giftcode;
         } catch (\Throwable $exception) {
             DB::rollBack();
@@ -75,8 +76,49 @@ class GiftcodeRepository
         return $this->model->query()->where('code',$code)->first();
     }
 
+    public function expire(Giftcode $giftcode)
+    {
+        /**@var $giftcode Giftcode*/
+
+        try {
+            DB::beginTransaction();
+
+            $giftcode->update([
+                'is_expired' => true
+            ]);
+            $giftcode->refresh();
+
+            //Withdraw from admin wallet
+            $this->wallet_repository->withdrawFromAdminWallet($giftcode,'Expired Gift code #' . $giftcode->uuid,'Gift code expired');
+
+
+            /**
+             * Refund Giftcode total paid - expiration fee
+             */
+            //Refund giftcode pay fee
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Expire Gift code #' . $giftcode->uuid,'Gift code expired');
+
+            //Wallet transaction failed [Server error]
+            if(!is_string($finalTransaction->getTransactionId()))
+                throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
+            /**
+             * End refund
+             */
+            UrgentEmailJob::dispatch(new GiftcodeExpiredEmail($giftcode),$giftcode->creator->email);
+
+
+            DB::commit();
+            return $giftcode->fresh();
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
     public function cancel(Request $request)
     {
+        /**@var $giftcode Giftcode*/
+
         try {
             DB::beginTransaction();
             $giftcode = $this->getByUuid($request->get('id'));
@@ -91,15 +133,21 @@ class GiftcodeRepository
             $giftcode->update([
                 'is_canceled' => true
             ]);
+            $giftcode->refresh();
+
+            //Withdraw from admin wallet
+            $this->wallet_repository->withdrawFromAdminWallet($giftcode,'Cancel Gift code #' . $giftcode->uuid,'Gift code cancelled');
+
+
 
             /**
              * Refund Giftcode total paid - cancelation fee
              */
             //Refund giftcode pay fee
-            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid);
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid,'Gift code cancelled');
 
             //Wallet transaction failed [Server error]
-            if(!$finalTransaction->getConfirmed())
+            if(!is_string($finalTransaction->getTransactionId()))
                 throw new \Exception(trans('giftcode.validation.wallet-withdrawal-error'),500);
             /**
              * End refund
@@ -133,7 +181,7 @@ class GiftcodeRepository
                 throw new \Exception(trans('giftcode.responses.giftcode-is-expired-and-user-cant-redeem'),406);
 
             $giftcode->update([
-                'redeem_user_id' => $request->user->id,
+                'redeem_user_id' => auth()->user()->id,
                 'redeem_date' => now()->toDateTimeString(),
                 'order_id' => $request->get('order_id')
             ]);

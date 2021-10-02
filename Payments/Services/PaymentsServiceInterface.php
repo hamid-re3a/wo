@@ -19,8 +19,6 @@ interface PaymentsServiceInterface
 
     public function getInvoiceById( Id $request): Invoice;
 
-    public function pay( Invoice $request): array;
-
     public function getPaymentCurrencies( EmptyObject $request): PaymentCurrencies;
 
     public function getPaymentTypes( EmptyObject $request): PaymentTypes;

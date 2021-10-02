@@ -91,6 +91,10 @@ class OrderController extends Controller
                 Log::info('Second MLM request');
                 $submit_response = MlmClientFacade::submitOrder($order_service);
 
+                if (!$response->getStatus()) {
+                    throw new \Exception($response->getMessage(), 406);
+                }
+
                 $order_db->update([
                     'is_paid_at' => $now,
                     'is_resolved_at' => $now,

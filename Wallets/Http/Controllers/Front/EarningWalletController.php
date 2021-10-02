@@ -134,6 +134,7 @@ class EarningWalletController extends Controller
      * @group Public User > Earning Wallet
      * @param TransferFundFromEarningWalletRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function transfer_to_deposit_wallet_preview(TransferFundFromEarningWalletRequest $request)
     {

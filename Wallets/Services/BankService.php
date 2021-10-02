@@ -44,9 +44,10 @@ class BankService
     public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit', $sub_type = null)
     {
         /**@var $transaction Transaction*/
+        $balance = $this->getBalance($wallet_name);
         $data = [
-            'wallet_before_balance' => $this->getBalance($wallet_name),
-            'wallet_after_balance' => $this->getBalance($wallet_name) + $amount,
+            'wallet_before_balance' => $balance,
+            'wallet_after_balance' => $balance + $amount,
             'type' => $type,
             'sub_type' => $sub_type
         ];
@@ -61,9 +62,10 @@ class BankService
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
             throw new \Exception();
 
+        $balance = $this->getBalance($wallet_name);
         $data = [
-            'wallet_before_balance' => $this->getBalance($wallet_name),
-            'wallet_after_balance' => $this->getBalance($wallet_name) - $amount,
+            'wallet_before_balance' => $balance,
+            'wallet_after_balance' => $balance - $amount,
             'type' => $type,
             'sub_type' => $sub_type
         ];
@@ -79,7 +81,6 @@ class BankService
     {
         return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($description));
     }
-
 
     public function transfer($from_wallet, $to_wallet, $amount, $description = null)
     {
@@ -110,6 +111,7 @@ class BankService
     public function getBalance($wallet_name)
     {
         $wallet = $this->getWallet($wallet_name);
+        $wallet->refreshBalance();
         return $wallet->balanceFloat;
     }
 

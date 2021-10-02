@@ -153,7 +153,7 @@ class BankService
         }
 
 
-        return $transactionQuery->orderBy('created_at','DESC');
+        return $transactionQuery->orderBy('id','DESC');
     }
 
     public function getTransfers($wallet_name)

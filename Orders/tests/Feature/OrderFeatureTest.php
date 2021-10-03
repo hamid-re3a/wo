@@ -26,7 +26,7 @@ class OrderFeatureTest extends OrderTest
         MlmClientFacade::shouldReceive('simulateOrder')->once()->andReturn($acknowledge);
         PaymentFacade::shouldReceive('pay')->once()->andReturn([true,'']);
 
-        $response = $this->post(route('orders.store'), [
+        $response = $this->post(route('customer.orders.store'), [
             'package_id' => 1,
             'plan' => ORDER_PLAN_START,
             'payment_type' => 'purchase',

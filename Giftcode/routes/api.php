@@ -2,7 +2,7 @@
 
 use Giftcode\Http\Controllers\Admin\EmailContentController;
 use Giftcode\Http\Controllers\Admin\SettingController;
-use Giftcode\Http\Controllers\User\GiftcodeController;
+use Giftcode\Http\Controllers\Front\GiftcodeController;
 use Illuminate\Support\Facades\Route;
 
 

@@ -73,8 +73,14 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = Invoice::query()->where('user_id',request()->header('X-user-id'))->simplePaginate();
-        return api()->success(null,InvoiceResource::collection($invoices)->response()->getData());
+        $list = Invoice::query()->where('user_id',request()->header('X-user-id'))->paginate();
+        return api()->success(null,[
+            'list' => InvoiceResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
     }
 
     /**

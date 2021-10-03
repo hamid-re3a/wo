@@ -55,9 +55,14 @@ class DepositWalletController extends Controller
     {
 
         $this->prepareDepositWallet();
-        $data = $this->bankService->getTransactions($this->wallet)
-            ->simplePaginate();
-        return api()->success(null, TransactionResource::collection($data)->response()->getData());
+        $list = $this->bankService->getTransactions($this->wallet)
+            ->paginate();
+        return api()->success(null, [
+            'list' => TransactionResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]]);
 
     }
 
@@ -83,10 +88,10 @@ class DepositWalletController extends Controller
      */
     public function paymentRequest(AskFundRequest $request)
     {
-        $user = User::query()->where('member_id',$request->get('member_id'))->first();
-        UrgentEmailJob::dispatch(new RequestFundEmail($user,auth()->user(),$request->get('amount')),$user->email);
+        $user = User::query()->where('member_id', $request->get('member_id'))->first();
+        UrgentEmailJob::dispatch(new RequestFundEmail($user, auth()->user(), $request->get('amount')), $user->email);
 
-        return api()->success(null,[
+        return api()->success(null, [
             'amount' => formatCurrencyFormat($request->get('amount')),
             'receiver_full_name' => $user->full_name
         ]);
@@ -109,7 +114,7 @@ class DepositWalletController extends Controller
             list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
 
             if ($balance < $amount)
-                return api()->error(null, null,406, [
+                return api()->error(null, null, 406, [
                     'subject' => trans('wallet.responses.not-enough-balance')
                 ]);
 
@@ -124,9 +129,9 @@ class DepositWalletController extends Controller
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
                 'received_amount' => formatCurrencyFormat($request->get('amount')),
-                'transfer_fee' =>  formatCurrencyFormat($fee),
-                'current_balance' =>  formatCurrencyFormat($balance),
-                'balance_after_transfer' =>  formatCurrencyFormat($remain_balance)
+                'transfer_fee' => formatCurrencyFormat($fee),
+                'current_balance' => formatCurrencyFormat($balance),
+                'balance_after_transfer' => formatCurrencyFormat($remain_balance)
             ]);
 
         } catch (\Throwable $exception) {
@@ -154,7 +159,7 @@ class DepositWalletController extends Controller
             list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
 
             if ($balance < $amount)
-                return api()->error(null, null,406, [
+                return api()->error(null, null, 406, [
                     'subject' => trans('wallet.responses.not-enough-balance')
                 ]);
 
@@ -174,9 +179,9 @@ class DepositWalletController extends Controller
                 ]
             );
 
-            $this->bankService->withdraw($this->wallet, $fee,[
+            $this->bankService->withdraw($this->wallet, $fee, [
                 'transfer_id' => $transfer->id
-            ],'Transfer fee');
+            ], 'Transfer fee');
 
             UrgentEmailJob::dispatch(new SenderFundEmail(auth()->user(), $transfer), auth()->user()->email);
             UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user, $transfer), $to_user->email);
@@ -201,15 +206,15 @@ class DepositWalletController extends Controller
     public function deposit(ChargeDepositWalletRequest $request)
     {
         $wallet_service = app(WalletService::class);
-        list($flag,$response) = $wallet_service->invoiceWallet($request);
+        list($flag, $response) = $wallet_service->invoiceWallet($request);
 
-        if(!$flag)
-            return api()->error(null,[
+        if (!$flag)
+            return api()->error(null, [
                 'subject' => $response
             ]);
 
         return api()->success('success', [
-            'payment_currency'=> $response['payment_currency'],
+            'payment_currency' => $response['payment_currency'],
             'amount' => $response['amount'],
             'checkout_link' => $response['checkout_link'],
             'transaction_id' => $response['transaction_id'],

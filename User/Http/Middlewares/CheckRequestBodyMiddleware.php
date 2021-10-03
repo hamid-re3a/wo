@@ -16,7 +16,7 @@ class CheckRequestBodyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if(!app()->environment() === 'testing'){
+        if(!app()->environment('testing')){
             if($request->has('member_id'))
                 updateUserFromGrpcServerByMemberId($request->get('member_id'));
 

@@ -8,6 +8,7 @@ use Giftcode\Services\GiftcodeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
@@ -26,13 +27,13 @@ class PaymentProcessor
      * pay by every payment Driver
      * @inheritDoc
      */
-    public function pay(Invoice $invoice_request): array
+    public function pay(Invoice $invoice_request, Order $order_service = null): array
     {
         switch ($invoice_request->getPaymentType()) {
             case 'purchase':
                 return $this->payFromGateway($invoice_request);
             case 'giftcode':
-                return $this->payFromGiftcode($invoice_request);
+                return $this->payFromGiftcode($invoice_request,$order_service);
                 break;
             case 'deposit' :
                 return $this->payFromDepositWallet($invoice_request);
@@ -57,18 +58,11 @@ class PaymentProcessor
         return [false,trans('payment.responses.payment-service.gateway-error')];
     }
 
-    private function payFromGiftcode(Invoice $invoice_request): array
+    private function payFromGiftcode(Invoice $invoice_request,Order $order_service): array
     {
         try {
             DB::beginTransaction();
 
-            //Load order
-            $order_service = app(OrderService::class);
-            $id_object = app(\Orders\Services\Grpc\Id::class);
-            $id_object->setId($invoice_request->getPayableId());
-            $order_object = $order_service->OrderById($id_object);
-            if(empty($order_object->getId()))
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
             //check giftcode
             $giftcode_service = app(GiftcodeService::class);
             $giftcode_object = app(Giftcode::class);
@@ -78,7 +72,7 @@ class PaymentProcessor
             if (!$giftcode_response->getId()) // code is not valid
                 throw new \Exception(trans('payment.responses.giftcode.wrong-code'));
 
-            if ($giftcode_response->getPackageId() != $order_object->getPackageId())
+            if ($giftcode_response->getPackageId() != $order_service->getPackageId())
                 throw new \Exception(trans('payment.responses.giftcode.wrong-package'));
 
             if (!empty($giftcode_response->getRedeemUserId()))
@@ -90,24 +84,15 @@ class PaymentProcessor
             if (!empty($giftcode_response->getIsCanceled()))
                 throw new \Exception(trans('payment.responses.giftcode.canceled'));
 
-            if(is_numeric($order_object->getRegistrationFeeInPf()) AND $order_object->getRegistrationFeeInPf() > 0 AND empty($giftcode_response->getRegistrationFeeInPf()))
+            if(is_numeric($order_service->getRegistrationFeeInPf()) AND $order_service->getRegistrationFeeInPf() > 0 AND empty($giftcode_response->getRegistrationFeeInPf()))
                 throw new \Exception(trans('payment.responses.giftcode.giftcode-not-included-registration-fee'));
 
             //Redeem giftcode
-            $giftcode_response->setOrderId($order_object->getId());
+            $giftcode_response->setOrderId($order_service->getId());
             $redeem_giftcode = $giftcode_service->redeemGiftcode($giftcode_response, $invoice_request->getUser());
 
             if (!$redeem_giftcode->getRedeemUserId())
                 throw new \Exception(trans('payment.responses.something-went-wrong'));
-
-            //Update Order
-            if(!$order_object->getId() OR $order_object->getId() != $invoice_request->getPayableId())
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
-
-            //used same time as Giftcode redeem date for future usage
-            $order_object->setIsPaidAt($redeem_giftcode->getRedeemDate());
-            $order_object->setPaymentDriver('giftcode');
-            $order_service->updateOrder($order_object);
 
             DB::commit();
             return [
@@ -126,44 +111,29 @@ class PaymentProcessor
         try {
             DB::beginTransaction();
 
-            //Load order
-            $order_service = app(OrderService::class);
-            $id_object = app(\Orders\Services\Grpc\Id::class);
-            $id_object->setId($invoice_request->getPayableId());
-            $order_object = $order_service->OrderById($id_object);
-
-            if(empty($order_object->getId()))
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
-
-            //check deposit wallet
+            //Wallet service
             $wallet_service = app(WalletService::class);
 
             //Check wallet balance
             $wallet = app(Wallet::class);
             $wallet->setUserId($invoice_request->getUserId());
-            $wallet->setName('Deposit Wallet');
+            $wallet->setName(WalletNames::DEPOSIT);
             $balance = $wallet_service->getBalance($wallet)->getBalance();
-
             if ($balance < $invoice_request->getPfAmount())
                 throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
 
             //Prepare withdraw message
-            $withdraw_object = app(Withdraw::class);
-            $withdraw_object->setUserId(auth()->user()->id);
-            $withdraw_object->setWalletName(WalletNames::DEPOSIT);
-            $withdraw_object->setType('Package purchased');
-            $withdraw_object->setDescription('Purchase order #' . $invoice_request->getPayableId());
-            $withdraw_object->setAmount($invoice_request->getPfAmount());
-            $withdraw_response = $wallet_service->withdraw($withdraw_object);
+            $withdraw_service = app(Withdraw::class);
+            $withdraw_service->setUserId($invoice_request->getUserId());
+            $withdraw_service->setWalletName(WalletNames::DEPOSIT);
+            $withdraw_service->setType('Package purchased');
+            $withdraw_service->setDescription('Purchase order #' . $invoice_request->getPayableId());
+            $withdraw_service->setAmount($invoice_request->getPfAmount());
+            $withdraw_response = $wallet_service->withdraw($withdraw_service);
 
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'));
-
-
-            $order_object->setIsPaidAt(now()->toDateTimeString());
-            $order_object->setPaymentDriver('deposit');
-            $order_service->updateOrder($order_object);
 
             DB::commit();
             return [
@@ -172,7 +142,7 @@ class PaymentProcessor
             ];
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('PaymentService@payFromDepositWallet error ' . $exception->getMessage());
+            Log::error('PaymentService@payFromDepositWallet error Line =>  ' . $exception->getLine() . ' | MSG => ' . $exception->getMessage());
             return [false,$exception->getMessage()];
         }
     }

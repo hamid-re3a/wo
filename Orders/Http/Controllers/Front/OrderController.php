@@ -36,11 +36,13 @@ class OrderController extends Controller
      * @param OrderRequest $request
      * @return JsonResponse
      * @throws \Illuminate\Validation\ValidationException
+     * @throws \Throwable
      */
     public function newOrder(OrderRequest $request)
     {
         try {
             $package = $this->validatePackage($request);
+
             /**@var $user User */
             $user = auth()->user();
 
@@ -57,14 +59,15 @@ class OrderController extends Controller
                 "from_user_id" => $user_who_pays_for_package->id,
                 "user_id" => $user_who_is_package_for->id,
                 "payment_type" => $request->get('payment_type'),
-                "payment_currency" => $request->has('payment_currency') ? $request->get('payment_currency') : null,
-                "payment_driver" => $request->has('payment_driver') ? $request->get('payment_driver') : null,
+                "payment_currency" => $request->get('payment_type') == 'purchase' ? $request->get('payment_currency') : null,
+                "payment_driver" => $request->get('payment_type') == 'purchase' ? $request->get('payment_driver') : null,
                 "package_id" => $request->get('package_id'),
                 'validity_in_days' => $package->getValidityInDays(),
                 'plan' => $user_who_is_package_for->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             $order_db->refreshOrder();
-            //Order Resolver
+
+            Log::info('Front/OrderController@newOrder First MLM request');
             $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
 
             if (!$response->getStatus()) {
@@ -82,7 +85,7 @@ class OrderController extends Controller
             $invoice_request->setUser($user_who_pays_for_package->getUserService());
             $invoice_request->setUserId((int)auth()->user()->id);
 
-            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request);
+            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getOrderService());
 
 
             if (!$payment_flag)
@@ -96,7 +99,12 @@ class OrderController extends Controller
                 $order_service->setIsPaidAt($now);
                 $order_service->setIsResolvedAt($now);
 
+                Log::info('Front/OrderController@newOrder Second MLM request');
                 $submit_response = MlmClientFacade::submitOrder($order_service);
+
+                if (!$response->getStatus()) {
+                    throw new \Exception($response->getMessage(), 406);
+                }
 
                 $order_db->update([
                     'is_paid_at' => $now,
@@ -111,7 +119,7 @@ class OrderController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('OrderController@newOrder => ' . $exception->getMessage());
-            throw new $exception;
+            throw $exception;
         }
     }
 

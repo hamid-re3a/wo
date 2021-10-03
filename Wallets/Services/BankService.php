@@ -4,7 +4,6 @@
 namespace Wallets\Services;
 
 use Bavix\Wallet\Interfaces\WalletFloat;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use User\Models\User;
 use Wallets\Models\Transaction;
@@ -26,12 +25,13 @@ class BankService
 
         $slug = Str::slug($wallet_name);
 
-        $this->owner->wallets()->firstOrCreate([
-            'name' => $wallet_name,
-            'slug' => $slug
-        ]);
-        Log::info('SHIT 0 ' );
-        return $this->owner->getWallet($slug);
+        if (!$wallet = $this->owner->getWallet($slug))
+            $wallet = $this->owner->createWallet([
+                'name' => $wallet_name,
+                'slug' => $slug
+            ]);
+
+        return $wallet;
 
     }
 
@@ -42,36 +42,35 @@ class BankService
 
     public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit', $sub_type = null)
     {
-        /**@var $transaction Transaction*/
+        /**@var $transaction Transaction */
+        $balance = $this->getBalance($wallet_name);
         $data = [
-            'wallet_before_balance' => $this->getBalance($wallet_name),
-            'wallet_after_balance' => $this->getBalance($wallet_name) + $amount,
+            'wallet_before_balance' => $balance,
+            'wallet_after_balance' => $balance + $amount,
             'type' => $type,
             'sub_type' => $sub_type
         ];
-        Log::info('SHIT 1 => ' . $amount);
         $transaction = $this->getWallet($wallet_name)->depositFloat($amount, $this->createMeta($description), $confirmed);
-        Log::info('SHIT 2 => ' . $amount);
         $transaction->syncMetaData($data);
 
         return $transaction;
     }
 
-    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null)
+    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true)
     {
-
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
             throw new \Exception();
 
+        $balance = $this->getBalance($wallet_name);
         $data = [
-            'wallet_before_balance' => $this->getBalance($wallet_name),
-            'wallet_after_balance' => $this->getBalance($wallet_name) - $amount,
+            'wallet_before_balance' => $balance,
+            'wallet_after_balance' => $balance - $amount,
             'type' => $type,
             'sub_type' => $sub_type
         ];
-        $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description));
-        if($this->owner->id != 1)
-            $this->toAdminDepositWallet($transaction,$amount,$description,$type);
+        $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description), $confirmed);
+        if ($this->owner->id != 1)
+            $this->toAdminDepositWallet($transaction, $amount, $description, $type);
         $transaction->syncMetaData($data);
         return $transaction;
 
@@ -81,7 +80,6 @@ class BankService
     {
         return $this->getWallet($wallet_name)->forceWithdrawFloat($amount, $this->createMeta($description));
     }
-
 
     public function transfer($from_wallet, $to_wallet, $amount, $description = null)
     {
@@ -112,6 +110,7 @@ class BankService
     public function getBalance($wallet_name)
     {
         $wallet = $this->getWallet($wallet_name);
+        $wallet->refreshBalance();
         return $wallet->balanceFloat;
     }
 
@@ -130,7 +129,11 @@ class BankService
             $transactionQuery->where('uuid', request()->get('transaction_id'));
 
         if (request()->has('type'))
-            $transactionQuery->whereType(request()->get('type'));
+            $transactionQuery->whereHas('metaData', function ($query) {
+                $query->whereHas('transactionType', function ($subQuery) {
+                    $subQuery->where('name', '=', trim(request()->get('type')));
+                });
+            });
 
         if (request()->has('amount'))
             $transactionQuery->whereAmount(request()->get('amount'));
@@ -153,15 +156,15 @@ class BankService
         }
 
 
-        return $transactionQuery->orderBy('created_at','DESC');
+        return $transactionQuery->orderBy('id','desc');
     }
 
     public function getTransfers($wallet_name)
     {
-        return $this->getWallet($wallet_name)->transfers()->where('to_id','!=',1);
+        return $this->getWallet($wallet_name)->transfers()->where('to_id', '!=', 1);
     }
 
-    public function toAdminDepositWallet($transaction,$amount,$description,$type)
+    public function toAdminDepositWallet($transaction, $amount, $description, $type)
     {
         $this->owner = User::query()->find(1);
         $admin_wallet = $this->getWallet(Str::slug('Deposit Wallet'));
@@ -181,6 +184,7 @@ class BankService
 
     private function createMeta($meta)
     {
+        $meta = ($meta == 'b:0;' || @unserialize($meta) !== false) ? unserialize($meta) : $meta;
         if (is_array($meta))
             return $meta;
 

@@ -73,6 +73,7 @@ if (!function_exists('updateUserFromGrpcServerByMemberId')) {
             /** @var $user \User\Services\Grpc\User */
             list($user, $status) = $client->getUserByMemberId($id)->wait();
             if ($status->code == 0 && $user->getId()) {
+                \Illuminate\Support\Facades\Log::info('User Updated by GRPC/MemberID => ' . $user->getId());
                 app(UserService::class)->userUpdate($user);
                 return $user;
             }

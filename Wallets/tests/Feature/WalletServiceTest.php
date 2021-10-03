@@ -138,7 +138,7 @@ class WalletServiceTest extends WalletTest
         $withdraw_service->setUserId(1);
         $withdraw_service->setWalletName(WalletNames::DEPOSIT);
         $withdraw_service->setType('Giftcode');
-        $withdraw_service->setAmount(100);
+        $withdraw_service->setAmount(119.8);
         $withdraw = $wallet_service->withdraw($withdraw_service);
         $this->assertIsObject($withdraw);
         $this->assertIsInt((int)$withdraw->getTransactionId());

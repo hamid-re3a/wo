@@ -7,6 +7,7 @@ namespace Wallets\Services;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Orders\Services\Grpc\Order;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
@@ -86,7 +87,7 @@ class WalletService implements WalletServiceInterface
             if (
                 $withdraw->getAmount() > 0 AND
                 $withdraw->getUserId() AND
-                $withdraw->getType() AND
+                !is_null($withdraw->getType()) AND
                 in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
             ) {
                 $walletUser = $this->walletUser($withdraw->getUserId());
@@ -110,6 +111,7 @@ class WalletService implements WalletServiceInterface
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('withdraw error 2 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
+            Log::error($exception->getMessage());
             return $withdraw;
         }
     }

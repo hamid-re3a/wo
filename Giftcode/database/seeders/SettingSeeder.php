@@ -71,6 +71,12 @@ class SettingSeeder extends Seeder
                 'description' => 'Include cancellation fee'
             ],
             [
+                'name' => 'cancellation_fee_type',
+                'value' => 'fixed',
+                'title' => 'Cancellation fee fix or percentage',
+                'description' => 'Cancellation fee fix or percentage'
+            ],
+            [
                 'name' => 'cancellation_fee',
                 'value' => 1,
                 'title' => 'Cancelation fee',

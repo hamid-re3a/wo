@@ -27,6 +27,7 @@ class OrderRequest extends FormRequest
     {
         return [
 
+            'to_user_id' => 'sometimes|exists:users,id',
             'package_id' => 'required|numeric',
             'payment_type' => [
                 'required',

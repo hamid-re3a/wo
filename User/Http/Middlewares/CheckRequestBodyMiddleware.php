@@ -24,7 +24,7 @@ class CheckRequestBodyMiddleware
                 updateUserFromGrpcServer($request->get('user_id'));
 
             if($request->has('to_user_id'))
-                updateUserFromGrpcServer($request->get('user_id'));
+                updateUserFromGrpcServer($request->get('to_user_id'));
 
         }
 

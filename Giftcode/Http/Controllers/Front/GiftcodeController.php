@@ -62,7 +62,7 @@ class GiftcodeController extends Controller
     {
         /**@var $user User*/
         $user = auth()->user();
-        $list = $user->giftcodes()->orderBy('created_at', 'DESC')->paginate(1);
+        $list = $user->giftcodes()->orderBy('created_at', 'DESC')->paginate();
 
         return api()->success(null, [
             'list' => GiftcodeResource::collection($list),

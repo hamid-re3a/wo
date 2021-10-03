@@ -15,6 +15,7 @@ use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Http\Resources\WithdrawProfitResource;
+use Wallets\Models\Transaction;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
 
@@ -109,8 +110,13 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        $data = $this->bankService->getTransactions($this->wallet)->simplePaginate();
-        return api()->success(null, TransactionResource::collection($data)->response()->getData());
+        $list = $this->bankService->getTransactions($this->wallet)->paginate();
+        return api()->success(null, [
+            'list' => TransactionResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]]);
 
     }
 

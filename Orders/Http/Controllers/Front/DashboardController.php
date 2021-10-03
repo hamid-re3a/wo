@@ -64,9 +64,16 @@ class DashboardController extends Controller
      */
     public function index(ListOrderRequest $request)
     {
-        /**@var $user User*/
-        $orders = $user->orders()->filter()->simplePaginate();
-        return api()->success(null, OrderResource::collection($orders)->response()->getData());
+        /**@var $user User */
+        $user = auth()->user();
+        $list = $user->orders()->filter()->paginate();
+        return api()->success(null, [
+            'list' => OrderResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
     }
 
     /**

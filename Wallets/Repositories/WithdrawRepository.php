@@ -75,6 +75,9 @@ class WithdrawRepository
 
     private function getUserBTCWalletHash()
     {
+        if(app()->environment('testing'))
+            return 'grpc called';
+
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);

@@ -116,7 +116,8 @@ class EarningWalletController extends Controller
             'pagination' => [
                 'total' => $list->total(),
                 'per_page' => $list->perPage(),
-            ]]);
+            ]
+        ]);
 
     }
 
@@ -129,11 +130,16 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        $data = $this->bankService->transfers($this->wallet)->simplePaginate();
-        return api()->success(null, TransferResource::collection($data)->response()->getData());
+        $list = $this->bankService->getTransfers($this->wallet)->paginate();
+        return api()->success(null, [
+            'list' => TransferResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
 
     }
-
 
     /**
      * Transfer funds preview
@@ -205,7 +211,7 @@ class EarningWalletController extends Controller
                 $balance = $this->bankService->getBalance(config('earningWallet'));
                 if ($balance < $total)
                     return api()->error(null, null, 406, [
-                        'subject' => trans('wallet.responses.not-enough-balance',[
+                        'subject' => trans('wallet.responses.not-enough-balance', [
                             'amount' => $amount,
                             'fee' => $fee
                         ])
@@ -234,7 +240,6 @@ class EarningWalletController extends Controller
             throw $exception;
         }
     }
-
 
     private function calculateTransferAmount($amount)
     {

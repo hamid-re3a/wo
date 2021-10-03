@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Mail;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\MlmClientFacade;
 use Orders\tests\OrderTest;
-use Payments\Mail\Payment\EmailInvoiceCreated;
 use Payments\Services\Processors\PaymentFacade;
 
 class OrderFeatureTest extends OrderTest

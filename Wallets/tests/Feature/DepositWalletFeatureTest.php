@@ -46,9 +46,8 @@ class DepositWalletFeatureTest extends WalletTest
             'status',
             'message',
             'data' => [
-                'data',
-                'links',
-                'meta'
+                'list',
+                'pagination',
             ],
         ]);
     }
@@ -66,7 +65,6 @@ class DepositWalletFeatureTest extends WalletTest
             'data' => [
                 'data',
                 'links',
-                'meta'
             ],
         ]);
     }

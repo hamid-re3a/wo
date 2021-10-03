@@ -75,23 +75,34 @@ class WithdrawRequestController extends Controller
         ]);
     }
 
-
     /**
      * Withdraw requests
      * @group Public User > Withdraw Requests
      * @queryParam status integer Field to filter withdraw requests. The value must be one of 1 = Under review, 2 = Rejected, 3 = Processed OR 4 = Postponed.
      * @param IndexWithdrawRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function index(IndexWithdrawRequest $request)
     {
         try {
-            /** @var $withdrawRequests WithdrawProfit */
-            $withdrawRequests = auth()->user()->withdrawRequests();
+            /**
+             * @var $withdrawRequests WithdrawProfit
+             * @var $user User
+             */
+            $user = auth()->user();
+            $withdrawRequests = $user->withdrawRequests();
             if($request->has('status'))
                 $withdrawRequests->where('status','=', $request->get('status'));
 
-            return api()->success(null, WithdrawProfitResource::collection($withdrawRequests->simplePaginate())->response()->getData());
+            $list = $withdrawRequests->paginate();
+            return api()->success(null, [
+                'list' => WithdrawProfitResource::collection($list),
+                'pagination' => [
+                    'total' => $list->total(),
+                    'per_page' => $list->perPage()
+                ]
+            ]);
         } catch (\Throwable $exception) {
             Log::error('EarningWalletController@withdraw_requests => ' . serialize(request()->all()));
             throw $exception;
@@ -103,6 +114,7 @@ class WithdrawRequestController extends Controller
      * @group Public User > Withdraw Requests
      * @param CreateWithdrawRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function create_withdraw_request_preview(CreateWithdrawRequest $request)
     {
@@ -134,7 +146,7 @@ class WithdrawRequestController extends Controller
      * @group Public User > Withdraw Requests
      * @param CreateWithdrawRequest $request
      * @return JsonResponse
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function create_withdraw_request(CreateWithdrawRequest $request)
     {

@@ -103,6 +103,7 @@ class DepositWalletController extends Controller
      * @group Public User > Deposit Wallet
      * @param TransferFundFromDepositWallet $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function transferPreview(TransferFundFromDepositWallet $request)
     {
@@ -128,10 +129,10 @@ class DepositWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
-                'received_amount' => formatCurrencyFormat($request->get('amount')),
-                'transfer_fee' => formatCurrencyFormat($fee),
-                'current_balance' => formatCurrencyFormat($balance),
-                'balance_after_transfer' => formatCurrencyFormat($remain_balance)
+                'received_amount' => $request->get('amount'),
+                'transfer_fee' => $fee,
+                'current_balance' => $balance,
+                'balance_after_transfer' => $remain_balance
             ]);
 
         } catch (\Throwable $exception) {

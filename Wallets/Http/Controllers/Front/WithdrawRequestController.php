@@ -127,8 +127,8 @@ class WithdrawRequestController extends Controller
 
             DB::rollBack();
             return api()->success(null, [
-                'fee' => formatCurrencyFormat($withdraw_request->fee),
-                'pf_amount' => formatCurrencyFormat($withdraw_request->pf_amount),
+                'fee' => $withdraw_request->fee,
+                'pf_amount' => $withdraw_request->pf_amount,
                 'crypto_amount' => $withdraw_request->crypto_amount,
                 'wallet_hash' => $withdraw_request->wallet_hash,
                 'currency' => $withdraw_request->currency,

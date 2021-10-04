@@ -17,6 +17,7 @@ class CategoryRepository
             "short_name" => $request->get('short_name'),
             "roi_percentage" => $request->get('roi_percentage'),
             "direct_percentage"=> $request->get('direct_percentage'),
+            "binary_percentage"=> $request->get('binary_percentage'),
             "package_validity_in_days" => $request->get('validity_in_days'),
         ]);
     }
@@ -29,6 +30,7 @@ class CategoryRepository
         $category_find->short_name = $request->get('short_name');
         $category_find->roi_percentage = $request->get('roi_percentage');
         $category_find->direct_percentage = $request->get('direct_percentage');
+        $category_find->binary_percentage = $request->get('binary_percentage');
         $category_find->package_validity_in_days = $request->get('validity_in_days');
         $category_find->save();
         return $category_find;

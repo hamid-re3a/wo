@@ -25,7 +25,8 @@ ENV WEB_DOCUMENT_ROOT /app/public
 #supervisor
 COPY supervisor.d/ /opt/docker/etc/supervisor.d/
 
-
+# User
+USER application
 # src
 COPY . /app
 

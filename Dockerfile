@@ -1,4 +1,4 @@
-FROM webdevops/php-apache:7.4
+FROM webdevops/php-nginx:7.4
 
 # php modules
 RUN apt update -y 
@@ -18,9 +18,10 @@ RUN echo 'extension=swoole.so' > /usr/local/etc/php/conf.d/swoole.ini
 RUN pecl install grpc
 RUN echo 'extension=grpc.so' >> /usr/local/etc/php/conf.d/grpc.ini
 # apache configuration
-RUN rm -rf /opt/docker/etc/httpd/vhost.conf
-COPY apache-default-vhost.conf /opt/docker/etc/httpd/vhost.conf
+#RUN rm -rf /opt/docker/etc/httpd/vhost.conf
+#COPY apache-default-vhost.conf /opt/docker/etc/httpd/vhost.conf
 
+ENV WEB_DOCUMENT_ROOT /app/public
 #supervisor
 COPY supervisor.d/ /opt/docker/etc/supervisor.d/
 

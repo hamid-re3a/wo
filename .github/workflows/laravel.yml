@@ -42,7 +42,6 @@ jobs:
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml up -d subscription
     - name: Handle laravel-log directory issue
       run: |
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/logs
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/framework/sessions
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/framework/views
 

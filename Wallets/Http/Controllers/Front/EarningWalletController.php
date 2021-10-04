@@ -79,9 +79,9 @@ class EarningWalletController extends Controller
             ->first();
 
         return api()->success(null, [
-            'binary_commissions_sum' => $counts->binary_commissions_sum ? formatCurrencyFormat($counts->binary_commissions_sum) : 0,
-            'direct_commissions_sum' => $counts->direct_commissions_sum ? formatCurrencyFormat($counts->direct_commissions_sum) : 0,
-            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? formatCurrencyFormat($counts->indirect_commissions_sum) : 0,
+            'binary_commissions_sum' => $counts->binary_commissions_sum ? $counts->binary_commissions_sum : 0,
+            'direct_commissions_sum' => $counts->direct_commissions_sum ? $counts->direct_commissions_sum : 0,
+            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? $counts->indirect_commissions_sum : 0,
             'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
             'spent_sum' => $counts->spent_sum ? $counts->spent_sum : 0,
         ]);
@@ -167,10 +167,10 @@ class EarningWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user ? $to_user->member_id : null,
                 'receiver_full_name' => $to_user ? $to_user->full_name : null,
-                'received_amount' => formatCurrencyFormat($request->get('amount')),
-                'transfer_fee' => formatCurrencyFormat($fee),
-                'current_balance' => formatCurrencyFormat($balance),
-                'balance_after_transfer' => formatCurrencyFormat($remain_balance)
+                'received_amount' => $request->get('amount'),
+                'transfer_fee' => $fee,
+                'current_balance' => $balance,
+                'balance_after_transfer' => $remain_balance
             ]);
 
         } catch (\Throwable $exception) {

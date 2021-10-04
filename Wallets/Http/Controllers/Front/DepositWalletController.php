@@ -92,7 +92,7 @@ class DepositWalletController extends Controller
         UrgentEmailJob::dispatch(new RequestFundEmail($user, auth()->user(), $request->get('amount')), $user->email);
 
         return api()->success(null, [
-            'amount' => formatCurrencyFormat($request->get('amount')),
+            'amount' => $request->get('amount'),
             'receiver_full_name' => $user->full_name
         ]);
 

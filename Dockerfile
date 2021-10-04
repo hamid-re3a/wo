@@ -25,8 +25,6 @@ ENV WEB_DOCUMENT_ROOT /app/public
 #supervisor
 COPY supervisor.d/ /opt/docker/etc/supervisor.d/
 
-# User
-USER application
 # src
 COPY . /app
 
@@ -42,3 +40,7 @@ RUN php artisan migrate:fresh
 RUN php artisan db:seed
 RUN php artisan scribe:generate
 RUN php artisan optimize:clear
+
+
+# permission
+RUN chown -R application:application /app

@@ -79,7 +79,9 @@ class WithdrawRequestController extends Controller
                 'withdrawRequests AS count_postponed_requests' => function (Builder $query) {
                     $query->where('status', '=', 4);
                 },
-            ])
+            ])->where('id','!=',1)->first()->toArray();
+
+        $sums = User::query()
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_pending_requests' => function (Builder $query) {
                     $query->where('status', '=', 1);
                 }]
@@ -98,15 +100,15 @@ class WithdrawRequestController extends Controller
             )->where('id','!=',1)->first()->toArray();
 
         return api()->success(null, [
-            'count_all_requests' => $counts['count_all_requests'],
-            'count_pending_requests' => $counts['count_pending_requests'],
-            'count_rejected_requests' => $counts['count_rejected_requests'],
-            'count_processed_requests' => $counts['count_processed_requests'],
-            'count_postponed_requests' => $counts['count_postponed_requests'],
-            'sum_amount_pending_requests' => empty($counts['sum_amount_pending_requests']) ? 0 : $counts['sum_amount_pending_requests'],
-            'sum_amount_rejected_requests' => empty($counts['sum_amount_rejected_requests']) ? 0 : $counts['sum_amount_rejected_requests'],
-            'sum_amount_processed_requests' => empty($counts['sum_amount_processed_requests']) ? 0 : $counts['sum_amount_processed_requests'],
-            'sum_amount_postponed_requests' => empty($counts['sum_amount_postponed_requests']) ? 0 : $counts['sum_amount_postponed_requests'],
+            'count_all_requests' => isset($counts['count_all_requests']) ? $counts['count_all_requests'] : 0 ,
+            'count_pending_requests' => isset($counts['count_pending_requests']) ? $counts['count_pending_requests'] : 0 ,
+            'count_rejected_requests' => isset($counts['count_rejected_requests']) ? $counts['count_rejected_requests'] : 0 ,
+            'count_processed_requests' => isset($counts['count_processed_requests']) ? $counts['count_processed_requests'] : 0 ,
+            'count_postponed_requests' => isset($counts['count_postponed_requests']) ? $counts['count_postponed_requests'] : 0 ,
+            'sum_amount_pending_requests' => isset($sums['sum_amount_pending_requests']) AND !empty($sums['sum_amount_pending_requests']) ? $sums['sum_amount_pending_requests'] : 0 ,
+            'sum_amount_rejected_requests' => isset($sums['sum_amount_rejected_requests']) AND !empty($sums['sum_amount_rejected_requests']) ? $sums['sum_amount_rejected_requests'] : 0 ,
+            'sum_amount_processed_requests' => isset($sums['sum_amount_processed_requests']) AND !empty($sums['sum_amount_processed_requests']) ? $sums['sum_amount_processed_requests'] : 0 ,
+            'sum_amount_postponed_requests' => isset($sums['sum_amount_postponed_requests']) AND !empty($sums['sum_amount_postponed_requests']) ? $sums['sum_amount_postponed_requests'] : 0 ,
         ]);
     }
 
@@ -150,7 +152,10 @@ class WithdrawRequestController extends Controller
     {
         try {
             DB::beginTransaction();
-            /**@var $withdraw_request WithdrawProfit*/
+            /**
+             * @var $withdraw_request WithdrawProfit
+             * @var $user User
+             */
             $withdraw_request = WithdrawProfit::query()->where('uuid', '=', $request->get('id'))->first();
 
             if($request->get('status') == 3) {
@@ -172,7 +177,8 @@ class WithdrawRequestController extends Controller
                 ], 'Withdrawal refund');
 
                 //Deposit user wallet
-                $bank_service = new BankService($withdraw_request->user()->first());
+                $user = $withdraw_request->user()->first();
+                $bank_service = new BankService($user);
                 $refund_transaction = $bank_service->deposit(config('earningWallet'), $withdraw_request->pf_amount, [
                     'description' => 'Withdrawal request rejected',
                     'withdrawal_request_id' => $withdraw_request->id,

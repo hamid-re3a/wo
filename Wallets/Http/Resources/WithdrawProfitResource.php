@@ -31,7 +31,9 @@ class WithdrawProfitResource extends JsonResource
             'pf_amount' => $this->pf_amount,
             'crypto_amount' => $this->crypto_amount,
             'status' => $this->status,
-            'created_at' => $this->created_at->timestamp
+            'postponed_to' => $this->postponed_to->timestamp,
+            'created_at' => $this->created_at->timestamp,
+            'updated_at' => $this->updated_at->timestamp,
         ];
     }
 }

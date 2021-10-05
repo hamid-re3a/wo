@@ -25,7 +25,7 @@ class BankService
 
         $slug = Str::slug($wallet_name);
 
-        if (!$wallet = $this->owner->getWallet($wallet_name) OR !$wallet = $this->owner->getWallet($slug))
+        if (!$this->owner->hasWallet($slug) OR !$wallet = $this->owner->getWallet($slug))
             $wallet = $this->owner->createWallet([
                 'name' => $wallet_name,
                 'slug' => $slug
@@ -107,7 +107,7 @@ class BankService
         return $transfer;
     }
 
-    public function getBalance($wallet_name)
+    public function geUtBalance($wallet_name)
     {
         $wallet = $this->getWallet($wallet_name);
         $wallet->refreshBalance();

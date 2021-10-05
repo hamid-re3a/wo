@@ -41,14 +41,14 @@ class WithdrawRequestController extends Controller
                 ->get(
                     config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
                     config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
-            if(!$bps_wallet_response->ok())
+            if (!$bps_wallet_response->ok())
                 throw new \Exception(trans('payment.responses.payment-service.btc-pay-server-error'));
 
             $bps_wallet_balance = $bps_wallet_response->json()['confirmedBalance'];
 
             //TODO Janex wallet
 
-            return api()->success(null,[
+            return api()->success(null, [
                 'btc_wallet' => $bps_wallet_balance
             ]);
 
@@ -64,51 +64,18 @@ class WithdrawRequestController extends Controller
      */
     public function counts()
     {
-        $counts = User::query()
-            ->withCount([
-                'withdrawRequests AS count_all_requests',
-                'withdrawRequests AS count_pending_requests' => function (Builder $query) {
-                    $query->where('status', '=', 1);
-                },
-                'withdrawRequests AS count_rejected_requests' => function (Builder $query) {
-                    $query->where('status', '=', 2);
-                },
-                'withdrawRequests AS count_processed_requests' => function (Builder $query) {
-                    $query->where('status', '=', 3);
-                },
-                'withdrawRequests AS count_postponed_requests' => function (Builder $query) {
-                    $query->where('status', '=', 4);
-                },
-            ])->where('id','!=',1)->first()->toArray();
-
-        $sums = User::query()
-            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_pending_requests' => function (Builder $query) {
-                    $query->where('status', '=', 1);
-                }]
-            )
-            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_rejected_requests' => function (Builder $query) {
-                    $query->where('status', '=', 2);
-                }]
-            )
-            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_processed_requests' => function (Builder $query) {
-                    $query->where('status', '=', 3);
-                }]
-            )
-            ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_postponed_requests' => function (Builder $query) {
-                    $query->where('status', '=', 4);
-                }]
-            )->where('id','!=',1)->first()->toArray();
+        $model = app(WithdrawProfit::class);
 
         return api()->success(null, [
-            'count_all_requests' => isset($counts['count_all_requests']) ? $counts['count_all_requests'] : 0 ,
-            'count_pending_requests' => isset($counts['count_pending_requests']) ? $counts['count_pending_requests'] : 0 ,
-            'count_rejected_requests' => isset($counts['count_rejected_requests']) ? $counts['count_rejected_requests'] : 0 ,
-            'count_processed_requests' => isset($counts['count_processed_requests']) ? $counts['count_processed_requests'] : 0 ,
-            'count_postponed_requests' => isset($counts['count_postponed_requests']) ? $counts['count_postponed_requests'] : 0 ,
-            'sum_amount_pending_requests' => isset($sums['sum_amount_pending_requests']) AND !empty($sums['sum_amount_pending_requests']) ? $sums['sum_amount_pending_requests'] : 0 ,
-            'sum_amount_rejected_requests' => isset($sums['sum_amount_rejected_requests']) AND !empty($sums['sum_amount_rejected_requests']) ? $sums['sum_amount_rejected_requests'] : 0 ,
-            'sum_amount_processed_requests' => isset($sums['sum_amount_processed_requests']) AND !empty($sums['sum_amount_processed_requests']) ? $sums['sum_amount_processed_requests'] : 0 ,
-            'sum_amount_postponed_requests' => isset($sums['sum_amount_postponed_requests']) AND !empty($sums['sum_amount_postponed_requests']) ? $sums['sum_amount_postponed_requests'] : 0 ,
+            'count_all_requests' => $model->count() ,
+            'count_pending_requests' => $model->where('status','1')->count(),
+            'count_rejected_requests' => $model->where('status','2')->count(),
+            'count_processed_requests' => $model->where('status','3')->count(),
+            'count_postponed_requests' => $model->where('status','4')->count(),
+            'sum_amount_pending_requests' => $model->where('status','1')->sum('pf_amount'),
+            'sum_amount_rejected_requests' => $model->where('status','2')->sum('pf_amount'),
+            'sum_amount_processed_requests' => $model->where('status','3')->sum('pf_amount'),
+            'sum_amount_postponed_requests' => $model->where('status','4')->sum('pf_amount'),
         ]);
     }
 
@@ -124,8 +91,8 @@ class WithdrawRequestController extends Controller
     {
         try {
             $withdrawRequests = WithdrawProfit::query();
-            if($request->has('status'))
-                $withdrawRequests->where('status','=',$request->get('status'));
+            if ($request->has('status'))
+                $withdrawRequests->where('status', '=', $request->get('status'));
 
             $list = $withdrawRequests->paginate();
             return api()->success(null, [
@@ -158,10 +125,10 @@ class WithdrawRequestController extends Controller
              */
             $withdraw_request = WithdrawProfit::query()->where('uuid', '=', $request->get('id'))->first();
 
-            if($request->get('status') == 3) {
+            if ($request->get('status') == 3) {
                 $this->checkBPSWalletBalance($withdraw_request->crypto_amount);
 
-                $this->payout_processor->pay($withdraw_request->payout_service,[
+                $this->payout_processor->pay($withdraw_request->payout_service, [
                     [
                         'destination' => $withdraw_request->wallet_hash,
                         'amount' => $withdraw_request->crypto_amount
@@ -222,11 +189,11 @@ class WithdrawRequestController extends Controller
             DB::beginTransaction();
             $withdraw_requests = WithdrawProfit::query()->where('status', '=', 1)->whereIn('uuid', $request->get('ids'));
             $this->checkBPSWalletBalance($withdraw_requests->sum('crypto_amount'));
-            $withdraw_requests->chunkById(50, function ($chunked){
+            $withdraw_requests->chunkById(50, function ($chunked) {
                 $wallets = [];
                 $ids = [];
                 foreach ($chunked AS $withdraw_request) {
-                    /** @var $withdraw_request WithdrawProfit*/
+                    /** @var $withdraw_request WithdrawProfit */
                     $ids[] = $withdraw_request->id;
                     $wallets[] = [
                         'destination' => $withdraw_request->wallet_hash,
@@ -265,8 +232,8 @@ class WithdrawRequestController extends Controller
             $wallet_balance = $wallet_response->json()['confirmedBalance'];
 
 
-            if($amount > $wallet_balance)
-                throw new \Exception(trans('wallet.withdraw-profit-request.insufficient-bpb-wallet-balance',[
+            if ($amount > $wallet_balance)
+                throw new \Exception(trans('wallet.withdraw-profit-request.insufficient-bpb-wallet-balance', [
                     'amount' => ($amount - $wallet_balance)
                 ]));
 

@@ -49,11 +49,11 @@ class WithdrawRequestController extends Controller
 
         $sums = User::query()->whereId(auth()->user()->id)
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_pending_requests' => function (Builder $query) {
-                    $query->where('status', '=', 2);
+                    $query->where('status', '=', 1);
                 }]
             )
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_rejected_requests' => function (Builder $query) {
-                    $query->where('status', '=', 1);
+                    $query->where('status', '=', 2);
                 }]
             )
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_processed_requests' => function (Builder $query) {
@@ -72,10 +72,10 @@ class WithdrawRequestController extends Controller
             'count_rejected_requests' => isset($counts['count_rejected_requests']) ? $counts['count_rejected_requests'] : 0,
             'count_processed_requests' => isset($counts['count_processed_requests']) ? $counts['count_processed_requests'] : 0,
             'count_postponed_requests' => isset($counts['count_postponed_requests']) ? $counts['count_postponed_requests'] : 0,
-            'sum_amount_pending_requests' => isset($sums['sum_amount_pending_requests']) AND !empty($sums['sum_amount_pending_requests']) ? $sums['sum_amount_pending_requests'] : 0,
-            'sum_amount_rejected_requests' => isset($sums['sum_amount_rejected_requests']) AND !empty($sums['sum_amount_rejected_requests']) ? $sums['sum_amount_rejected_requests'] : 0,
-            'sum_amount_processed_requests' => isset($sums['sum_amount_processed_requests']) AND !empty($sums['sum_amount_processed_requests']) ? $sums['sum_amount_processed_requests'] : 0 ,
-            'sum_amount_postponed_requests' => !isset($sums['sum_amount_postponed_requests']) AND !empty($sums['sum_amount_postponed_requests']) ? $sums['sum_amount_postponed_requests'] : 0,
+            'sum_amount_pending_requests' => !empty($sums['sum_amount_pending_requests']) ? $sums['sum_amount_pending_requests'] : 0 ,
+            'sum_amount_rejected_requests' => !empty($sums['sum_amount_rejected_requests']) ? $sums['sum_amount_rejected_requests'] : 0 ,
+            'sum_amount_processed_requests' => !empty($sums['sum_amount_processed_requests']) ? $sums['sum_amount_processed_requests'] : 0 ,
+            'sum_amount_postponed_requests' => !empty($sums['sum_amount_postponed_requests']) ? $sums['sum_amount_postponed_requests'] : 0 ,
         ]);
     }
 

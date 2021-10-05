@@ -107,7 +107,7 @@ class BankService
         return $transfer;
     }
 
-    public function geUtBalance($wallet_name)
+    public function getBalance($wallet_name)
     {
         $wallet = $this->getWallet($wallet_name);
         $wallet->refreshBalance();

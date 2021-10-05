@@ -68,10 +68,10 @@ class WithdrawRequestController extends Controller
             'count_rejected_requests' => $counts['count_rejected_requests'],
             'count_processed_requests' => $counts['count_processed_requests'],
             'count_postponed_requests' => $counts['count_postponed_requests'],
-            'sum_amount_pending_requests' => empty($counts['sum_amount_pending_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_pending_requests']),
-            'sum_amount_rejected_requests' => empty($counts['sum_amount_rejected_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_rejected_requests']),
-            'sum_amount_processed_requests' => empty($counts['sum_amount_processed_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_processed_requests']),
-            'sum_amount_postponed_requests' => empty($counts['sum_amount_postponed_requests']) ? 0 : formatCurrencyFormat($counts['sum_amount_postponed_requests'],)
+            'sum_amount_pending_requests' => empty($counts['sum_amount_pending_requests']) ? 0 : $counts['sum_amount_pending_requests'],
+            'sum_amount_rejected_requests' => empty($counts['sum_amount_rejected_requests']) ? 0 : $counts['sum_amount_rejected_requests'],
+            'sum_amount_processed_requests' => empty($counts['sum_amount_processed_requests']) ? 0 : $counts['sum_amount_processed_requests'],
+            'sum_amount_postponed_requests' => empty($counts['sum_amount_postponed_requests']) ? 0 : $counts['sum_amount_postponed_requests'],
         ]);
     }
 
@@ -127,8 +127,8 @@ class WithdrawRequestController extends Controller
 
             DB::rollBack();
             return api()->success(null, [
-                'fee' => formatCurrencyFormat($withdraw_request->fee),
-                'pf_amount' => formatCurrencyFormat($withdraw_request->pf_amount),
+                'fee' => $withdraw_request->fee,
+                'pf_amount' => $withdraw_request->pf_amount,
                 'crypto_amount' => $withdraw_request->crypto_amount,
                 'wallet_hash' => $withdraw_request->wallet_hash,
                 'currency' => $withdraw_request->currency,

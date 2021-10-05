@@ -43,12 +43,12 @@ class DepositWalletResource extends JsonResource
             ->first();
         return [
             'name' => $this->name,
-            'balance' => formatCurrencyFormat($this->balanceFloat),
+            'balance' => $this->balanceFloat,
             'transactions_count' => (int) $this->transactions->where('wallet_id','=',$this->id)->count(),
             'transfers_count' => (int) $this->transfers->count(),
-            'total_transfer' => $total_sum->total_transfer ? formatCurrencyFormat($total_sum->total_transfer / 100) : 0,
-            'total_received' => $total_sum->total_received ? formatCurrencyFormat($total_sum->total_received / 100) : 0,
-            'total_spent' => $total_sum->total_spent ? formatCurrencyFormat($total_sum->total_spent / 100) : 0
+            'total_transfer' => $total_sum->total_transfer ?$total_sum->total_transfer / 100 : 0,
+            'total_received' => $total_sum->total_received ? $total_sum->total_received / 100 : 0,
+            'total_spent' => $total_sum->total_spent ? $total_sum->total_spent / 100 : 0
         ];
     }
 }

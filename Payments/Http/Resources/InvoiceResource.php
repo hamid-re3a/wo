@@ -17,7 +17,7 @@ class InvoiceResource extends JsonResource
         return [
             'transaction_id' => $this->transaction_id,
             'type' => $this->type,
-            'status' => $this->status,
+            'status' => $this->full_status,
             'amount' => $this->amount,
             'checkout_link' => $this->checkout_link,
             'is_paid' => $this->is_paid,

@@ -1,7 +1,7 @@
 name: Laravel
 on:
-  pull_request:
-    branches: [ master ]
+  push:
+    branches: [ development ]
 jobs:
 #  laravel-tests:
 #    runs-on: ubuntu-latest
@@ -40,9 +40,4 @@ jobs:
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml stop subscription
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml rm -f subscription
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml up -d subscription
-    - name: Handle laravel-log directory issue
-      run: |
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/logs
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/framework/sessions
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T subscription chmod -R 777 storage/framework/views
 

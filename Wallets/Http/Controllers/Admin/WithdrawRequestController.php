@@ -116,6 +116,7 @@ class WithdrawRequestController extends Controller
      * @queryParam status integer Field to filter withdraw requests. The value must be one of 1 = Under review, 2 = Rejected, 3 = Processed OR 4 = Postponed.
      * @param IndexWithdrawRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function index(IndexWithdrawRequest $request)
     {
@@ -123,7 +124,15 @@ class WithdrawRequestController extends Controller
             $withdrawRequests = WithdrawProfit::query();
             if($request->has('status'))
                 $withdrawRequests->where('status','=',$request->get('status'));
-            return api()->success(null, WithdrawProfitResource::collection($withdrawRequests->simplePaginate())->response()->getData());
+
+            $list = $withdrawRequests->paginate();
+            return api()->success(null, [
+                'list' => WithdrawProfitResource::collection($list),
+                'pagination' => [
+                    'total' => $list->total(),
+                    'per_page' => $list->perPage()
+                ]
+            ]);
         } catch (\Throwable $exception) {
             Log::error('Admin/WithdrawRequestController@index => ' . serialize(request()->all()));
             throw $exception;
@@ -135,6 +144,7 @@ class WithdrawRequestController extends Controller
      * @group Admin User > Wallets > Withdraw Requests
      * @param UpdateWithdrawRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function update(UpdateWithdrawRequest $request)
     {
@@ -197,6 +207,7 @@ class WithdrawRequestController extends Controller
      * @group Admin User > Wallets > Withdraw Requests
      * @param PayoutGroupWithdrawRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function payout_group(PayoutGroupWithdrawRequest $request)
     {

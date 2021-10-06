@@ -36,7 +36,7 @@ RUN composer config --global --auth http-basic.ride-to-the-future.repo.repman.io
 RUN composer install
 RUN php artisan key:generate
 RUN php artisan vendor:publish --all
-RUN php artisan migrate:fresh
+RUN php artisan migrate
 RUN php artisan db:seed
 RUN php artisan scribe:generate
 RUN php artisan optimize:clear

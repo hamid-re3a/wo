@@ -27,11 +27,13 @@ class WithdrawProfitResource extends JsonResource
             'wallet_hash' => $this->wallet_hash,
             'currency' => $this->currency,
             'crypto_rate' => $this->crypto_rate,
-            'fee' => formatCurrencyFormat($this->fee),
-            'pf_amount' => formatCurrencyFormat($this->pf_amount),
+            'fee' => $this->fee,
+            'pf_amount' => $this->pf_amount,
             'crypto_amount' => $this->crypto_amount,
             'status' => $this->status,
-            'created_at' => $this->created_at->timestamp
+            'postponed_to' => !empty($this->postponed_to) ? $this->postponed_to->timestamp : null,
+            'created_at' => $this->created_at->timestamp,
+            'updated_at' => $this->updated_at->timestamp,
         ];
     }
 }

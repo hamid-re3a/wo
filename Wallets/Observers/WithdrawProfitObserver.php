@@ -28,9 +28,9 @@ class WithdrawProfitObserver
                 $fee = 0;
                 break;
         }
-        $fee = $fix_or_percentage == 'fixed' ? formatCurrencyFormat($fee) : formatCurrencyFormat(($withdrawProfit->pf_amount * $fee) / 100);
+        $fee = $fix_or_percentage == 'fixed' ? $fee : ($withdrawProfit->pf_amount * $fee / 100);
 
-        $withdrawProfit->pf_amount = formatCurrencyFormat($withdrawProfit->pf_amount - $fee);
+        $withdrawProfit->pf_amount = $withdrawProfit->pf_amount - $fee;
         $withdrawProfit->crypto_amount = $withdrawProfit->pf_amount / $withdrawProfit->crypto_rate;
         $withdrawProfit->fee = $fee;
         $withdrawProfit->uuid = $withdrawProfit->user->member_id . mt_rand(100,999) . time();

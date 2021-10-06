@@ -28,7 +28,7 @@ class UpdateWithdrawRequest extends FormRequest
             'id' => 'required|integer|exists:wallet_withdraw_profit_requests,uuid,status,!2',
             'status' => 'required|in:2,3,4', // 2=Rejected, 3=Processed, 4=Postponed
             'rejection_reason' => 'required_if:status,2|string',
-            'postponed_to' => 'required_if:status,4|datetime|after:today'
+            'postponed_to' => 'required_if:status,4|date|date_format:Y/m/d|after:today'
         ];
 
     }

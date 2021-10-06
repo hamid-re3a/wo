@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Packages\Http\Controllers\Admin\CategoryController;
+use Packages\Http\Controllers\Admin\PackageIndirectCommissionController;
 use Packages\Http\Controllers\Front\PackageController;
 use Packages\Http\Controllers\Admin\PackageController as PackageAdminController;
 
@@ -19,8 +20,8 @@ Route::middleware(['role:'.USER_ROLE_SUPER_ADMIN.'|'.USER_ROLE_ADMIN_SUBSCRIPTIO
         Route::post('/edit',[PackageAdminController::class,'edit'])->name('edit');
         Route::post('/create',[PackageAdminController::class,'create'])->name('create');
         Route::delete('/delete',[PackageAdminController::class,'delete'])->name('delete');
-        Route::post('/indirect_commissions/create_or_edit',[\Packages\Http\Controllers\Admin\PackageIndirectCommissionController::class,'edit'])->name('create_or_edit');
-        Route::delete('/indirect_commissions/delete',[\Packages\Http\Controllers\Admin\PackageIndirectCommissionController::class,'delete'])->name('delete_package_commission');
+        Route::post('/indirect_commissions/create_or_edit',[PackageIndirectCommissionController::class,'edit'])->name('create-or-edit-package-commission');
+        Route::delete('/indirect_commissions/delete',[PackageIndirectCommissionController::class,'delete'])->name('delete_package_commission');
     });
 
     Route::name('categories.')->prefix('categories')->group(function () {

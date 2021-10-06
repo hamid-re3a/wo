@@ -24,6 +24,7 @@ class PackageEditRequest extends FormRequest
     public function rules()
     {
         return [
+            'package_exactly' => 'sometimes|boolean',
             'package_id' => 'required|exists:packages,id',
             'name' => 'required|string',
             'short_name' => 'required|string',

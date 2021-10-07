@@ -33,7 +33,7 @@ print_r($status);
 
 
 
-$client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
+$client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);
 $req = app(\User\Services\Grpc\WalletRequest::class);

@@ -173,7 +173,6 @@ class WithdrawRequestController extends Controller
             if (!$flag) {
                 DB::rollBack();
                 throw new \Exception($response,406);
-
             }
 
             DB::commit();

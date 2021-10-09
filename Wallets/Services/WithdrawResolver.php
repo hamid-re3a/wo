@@ -62,32 +62,29 @@ class WithdrawResolver
 
     private function checkDistribution()
     {
-        try {
-            if (walletGetSetting('withdrawal_distribution_is_enabled')) {
+        if (walletGetSetting('withdrawal_distribution_is_enabled')) {
 
-                $sum_withdraw_requests_for_today = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
-                    ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
-                    ->sum('pf_amount');
+            $sum_withdraw_requests_for_today = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
+                ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
+                ->sum('pf_amount');
 
-                $sum_withdraw_requests_for_today_for_currency = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
-                    ->where('currency', $this->withdrawRequest->currency)
-                    ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
-                    ->sum('pf_amount');
+            $sum_withdraw_requests_for_today_for_currency = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
+                ->where('currency', $this->withdrawRequest->currency)
+                ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
+                ->sum('pf_amount');
 
-                if ($this->withdrawRequest->currency == 'BTC')
-                    $distribution = walletGetSetting('withdrawal_distribution_in_btc');
-                else
-                    $distribution = walletGetSetting('withdrawal_distribution_in_janex');
+            if ($this->withdrawRequest->currency == 'BTC')
+                $distribution = walletGetSetting('withdrawal_distribution_in_btc');
+            else
+                $distribution = walletGetSetting('withdrawal_distribution_in_janex');
 
-                $currency_distribution_for_user = ($sum_withdraw_requests_for_today_for_currency / $sum_withdraw_requests_for_today) * 100 ;
+            $currency_distribution_for_user = ($sum_withdraw_requests_for_today_for_currency / $sum_withdraw_requests_for_today) * 100 ;
 
-                if($currency_distribution_for_user >= $distribution)
-                    return [false,trans('wallet.responses.withdraw-profit-request.withdraw_distribution_limit', ['currency' => $this->withdrawRequest->currency])];
+            if($currency_distribution_for_user >= $distribution)
+                return [false,trans('wallet.responses.withdraw-profit-request.withdraw_distribution_limit', ['currency' => $this->withdrawRequest->currency])];
 
-                return [true,''];
+            return [true,''];
 
-            }
-        } catch (\Exception $e) {
         }
     }
 }

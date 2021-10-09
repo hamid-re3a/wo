@@ -86,6 +86,7 @@ class UpdateSettingRequest extends FormRequest
                     break;
                 case 'withdrawal_request_is_enabled':
                 case 'auto_payout_withdrawal_request_is_enable':
+                case 'withdrawal_distribution_is_enabled':
                     return 'required|boolean';
                     break;
                 case 'payout_btc_fee_fixed_or_percentage':
@@ -95,6 +96,14 @@ class UpdateSettingRequest extends FormRequest
                 case 'payout_btc_fee':
                 case 'payout_janex_fee':
                     return 'required|integer';
+                    break;
+                case 'withdrawal_distribution_in_btc' :
+                    $withdrawal_distribution_in_janex = (int) walletGetSetting('withdrawal_distribution_in_janex');
+                    return 'required|min:0|max:' . (100 - $withdrawal_distribution_in_janex);
+                    break;
+                case 'withdrawal_distribution_in_janex' :
+                    $withdrawal_distribution_in_btc = (int) walletGetSetting('withdrawal_distribution_in_janex');
+                    return 'required|min:0|max:' . (100 - $withdrawal_distribution_in_btc);
                     break;
                 default:
                     return 'required';

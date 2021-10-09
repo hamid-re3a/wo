@@ -13,6 +13,7 @@ use Wallets\Http\Requests\IndexWithdrawRequest;
 use Wallets\Http\Resources\WithdrawProfitResource;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Repositories\WithdrawRepository;
+use Wallets\Services\WithdrawResolver;
 
 class WithdrawRequestController extends Controller
 {
@@ -72,10 +73,10 @@ class WithdrawRequestController extends Controller
             'count_rejected_requests' => isset($counts['count_rejected_requests']) ? $counts['count_rejected_requests'] : 0,
             'count_processed_requests' => isset($counts['count_processed_requests']) ? $counts['count_processed_requests'] : 0,
             'count_postponed_requests' => isset($counts['count_postponed_requests']) ? $counts['count_postponed_requests'] : 0,
-            'sum_amount_pending_requests' => !empty($sums['sum_amount_pending_requests']) ? $sums['sum_amount_pending_requests'] : 0 ,
-            'sum_amount_rejected_requests' => !empty($sums['sum_amount_rejected_requests']) ? $sums['sum_amount_rejected_requests'] : 0 ,
-            'sum_amount_processed_requests' => !empty($sums['sum_amount_processed_requests']) ? $sums['sum_amount_processed_requests'] : 0 ,
-            'sum_amount_postponed_requests' => !empty($sums['sum_amount_postponed_requests']) ? $sums['sum_amount_postponed_requests'] : 0 ,
+            'sum_amount_pending_requests' => !empty($sums['sum_amount_pending_requests']) ? $sums['sum_amount_pending_requests'] : 0,
+            'sum_amount_rejected_requests' => !empty($sums['sum_amount_rejected_requests']) ? $sums['sum_amount_rejected_requests'] : 0,
+            'sum_amount_processed_requests' => !empty($sums['sum_amount_processed_requests']) ? $sums['sum_amount_processed_requests'] : 0,
+            'sum_amount_postponed_requests' => !empty($sums['sum_amount_postponed_requests']) ? $sums['sum_amount_postponed_requests'] : 0,
         ]);
     }
 
@@ -96,8 +97,8 @@ class WithdrawRequestController extends Controller
              */
             $user = auth()->user();
             $withdrawRequests = $user->withdrawRequests();
-            if($request->has('status'))
-                $withdrawRequests->where('status','=', $request->get('status'));
+            if ($request->has('status'))
+                $withdrawRequests->where('status', '=', $request->get('status'));
 
             $list = $withdrawRequests->paginate();
             return api()->success(null, [
@@ -128,8 +129,13 @@ class WithdrawRequestController extends Controller
 
             /**@var $withdraw_request WithdrawProfit */
             $withdraw_request = $this->withdraw_repository->makeWithdrawRequest($request);
+            $withdraw_resolver = new WithdrawResolver($withdraw_request);
+            list($flag, $response) = $withdraw_resolver->verifyWithdrawRequest();
 
             DB::rollBack();
+            if (!$flag)
+                throw new \Exception($response);
+
             return api()->success(null, [
                 'fee' => $withdraw_request->fee,
                 'pf_amount' => $withdraw_request->pf_amount,
@@ -137,6 +143,7 @@ class WithdrawRequestController extends Controller
                 'wallet_hash' => $withdraw_request->wallet_hash,
                 'currency' => $withdraw_request->currency,
             ]);
+
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('EarningWalletController@create_withdraw_request_preview => ' . serialize($request->all()));
@@ -159,6 +166,15 @@ class WithdrawRequestController extends Controller
 
             /**@var $withdraw_request WithdrawProfit */
             $withdraw_request = $this->withdraw_repository->makeWithdrawRequest($request);
+
+            $withdraw_resolver = new WithdrawResolver($withdraw_request);
+            list($flag, $response) = $withdraw_resolver->verifyWithdrawRequest();
+
+            if (!$flag) {
+                DB::rollBack();
+                throw new \Exception($response,406);
+
+            }
 
             DB::commit();
             return api()->success(null, WithdrawProfitResource::make($withdraw_request->refresh()));

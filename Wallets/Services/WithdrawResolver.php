@@ -25,6 +25,24 @@ class WithdrawResolver
      */
     public function verifyWithdrawRequest()
     {
+
+        //Check daily limit
+        list($flag,$response) = $this->checkDailyLimit();
+        if(!$flag)
+            return [$flag,$response];
+
+        //Check system token distribution conditions
+        list($flag,$response) = $this->checkDistribution();
+        if(!$flag)
+            return [$flag,$response];
+
+        return [true,''];
+
+
+    }
+
+    private function checkDailyLimit()
+    {
         /**@var $user_db User */
         $user_db = $this->withdrawRequest->user()->first();
         $user_service = $user_db->getUserService();
@@ -39,14 +57,7 @@ class WithdrawResolver
         if ($db_sum > $user_rank->getWithdrawalLimit())
             return [false, trans('wallet.responses.withdraw-profit-request.withdraw_rank_limit', ['amount' => $user_rank->getWithdrawalLimit() - $db_sum])];
 
-        //Check system token distribution conditions
-        list($flag,$response) = $this->checkDistribution();
-        if(!$flag)
-            return [$flag,$response];
-
         return [true,''];
-
-
     }
 
     private function checkDistribution()

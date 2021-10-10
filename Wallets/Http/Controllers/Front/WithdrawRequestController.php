@@ -45,12 +45,15 @@ class WithdrawRequestController extends Controller
                     $query->where('status', '=', 4);
                 },
             ])
+            ->first()->toArray();
+
+        $sums = User::query()->whereId(auth()->user()->id)
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_pending_requests' => function (Builder $query) {
-                    $query->where('status', '=', 2);
+                    $query->where('status', '=', 1);
                 }]
             )
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_rejected_requests' => function (Builder $query) {
-                    $query->where('status', '=', 1);
+                    $query->where('status', '=', 2);
                 }]
             )
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_processed_requests' => function (Builder $query) {
@@ -60,18 +63,19 @@ class WithdrawRequestController extends Controller
             ->withSumQuery(['withdrawRequests.pf_amount AS sum_amount_postponed_requests' => function (Builder $query) {
                     $query->where('status', '=', 4);
                 }]
-            )->first()->toArray();
+            )
+            ->first()->toArray();
 
         return api()->success(null, [
-            'count_all_requests' => $counts['count_all_requests'],
-            'count_pending_requests' => $counts['count_pending_requests'],
-            'count_rejected_requests' => $counts['count_rejected_requests'],
-            'count_processed_requests' => $counts['count_processed_requests'],
-            'count_postponed_requests' => $counts['count_postponed_requests'],
-            'sum_amount_pending_requests' => empty($counts['sum_amount_pending_requests']) ? 0 : $counts['sum_amount_pending_requests'],
-            'sum_amount_rejected_requests' => empty($counts['sum_amount_rejected_requests']) ? 0 : $counts['sum_amount_rejected_requests'],
-            'sum_amount_processed_requests' => empty($counts['sum_amount_processed_requests']) ? 0 : $counts['sum_amount_processed_requests'],
-            'sum_amount_postponed_requests' => empty($counts['sum_amount_postponed_requests']) ? 0 : $counts['sum_amount_postponed_requests'],
+            'count_all_requests' => isset($counts['count_all_requests']) ? $counts['count_all_requests'] : 0,
+            'count_pending_requests' => isset($counts['count_pending_requests']) ? $counts['count_pending_requests'] : 0,
+            'count_rejected_requests' => isset($counts['count_rejected_requests']) ? $counts['count_rejected_requests'] : 0,
+            'count_processed_requests' => isset($counts['count_processed_requests']) ? $counts['count_processed_requests'] : 0,
+            'count_postponed_requests' => isset($counts['count_postponed_requests']) ? $counts['count_postponed_requests'] : 0,
+            'sum_amount_pending_requests' => !empty($sums['sum_amount_pending_requests']) ? $sums['sum_amount_pending_requests'] : 0 ,
+            'sum_amount_rejected_requests' => !empty($sums['sum_amount_rejected_requests']) ? $sums['sum_amount_rejected_requests'] : 0 ,
+            'sum_amount_processed_requests' => !empty($sums['sum_amount_processed_requests']) ? $sums['sum_amount_processed_requests'] : 0 ,
+            'sum_amount_postponed_requests' => !empty($sums['sum_amount_postponed_requests']) ? $sums['sum_amount_postponed_requests'] : 0 ,
         ]);
     }
 

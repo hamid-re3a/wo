@@ -1,7 +1,7 @@
-name: Laravel
+name: Staging
 on:
   push:
-    branches: [ development ]
+    branches: [ staging ]
 jobs:
 #  laravel-tests:
 #    runs-on: ubuntu-latest
@@ -27,13 +27,15 @@ jobs:
 #        touch database/database.sqlite
 
   laravel-deploy:
-    runs-on: vmi627964
+    runs-on: staging
 #    needs: laravel-tests
     steps:
     - uses: actions/checkout@v2
     - name: Building docker image
       run: |
         shopt -s dotglob
+        rm -rf .env
+        cp .env.staging .env
         sudo docker build --network=mysql_wo_r2f -t subscription:1 .
     - name: deploy docker-compose
       run: | 

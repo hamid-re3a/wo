@@ -25,7 +25,7 @@ class BankService
 
         $slug = Str::slug($wallet_name);
 
-        if (!$wallet = $this->owner->getWallet($slug))
+        if (!$this->owner->hasWallet($slug) OR !$wallet = $this->owner->getWallet($slug))
             $wallet = $this->owner->createWallet([
                 'name' => $wallet_name,
                 'slug' => $slug

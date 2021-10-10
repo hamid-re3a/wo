@@ -102,5 +102,23 @@ const WALLET_SETTINGS = [
         'description' => 'Withdrawal is enable or disable'
     ],
 
+    'withdrawal_distribution_is_enabled' => [
+        'value' => true,
+        'title' => 'Distribution enabled',
+        'description' => 'You can enable/disable Withdraw distribution feature'
+    ],
+
+    'withdrawal_distribution_in_btc' => [
+        'value' => 10,
+        'title' => 'BTC distribution',
+        'description' => 'BTC distribution'
+    ],
+
+    'withdrawal_distribution_in_janex' => [
+        'value' => 90,
+        'title' => 'Janex distribution',
+        'description' => 'Janex distribution'
+    ],
+
 ];
 

@@ -36,7 +36,7 @@ class WithdrawResolver
         if(!$flag)
             return [$flag,$response];
 
-        return [true,''];
+        return [true,null];
 
 
     }
@@ -57,7 +57,7 @@ class WithdrawResolver
         if ($db_sum > $user_rank->getWithdrawalLimit())
             return [false, trans('wallet.responses.withdraw-profit-request.withdraw_rank_limit', ['amount' => $user_rank->getWithdrawalLimit() - $db_sum])];
 
-        return [true,''];
+        return [true,null];
     }
 
     private function checkDistribution()
@@ -83,8 +83,10 @@ class WithdrawResolver
             if($currency_distribution_for_user >= $distribution)
                 return [false,trans('wallet.responses.withdraw-profit-request.withdraw_distribution_limit', ['currency' => $this->withdrawRequest->currency])];
 
-            return [true,''];
+            return [true,null];
 
+        } else {
+            return [true,null];
         }
     }
 }

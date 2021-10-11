@@ -15,6 +15,8 @@ use Illuminate\Support\ServiceProvider;
 use Wallets\Observers\TransactionObserver;
 use Wallets\Observers\TransferObserver;
 use Wallets\Observers\WithdrawProfitObserver;
+use Wallets\Services\MlmClientFacade;
+use Wallets\Services\MlmGrpcClientProvider;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -51,6 +53,8 @@ class WalletServiceProvider extends ServiceProvider
     public function boot()
     {
 
+        $this->registerFacades();
+
         $this->registerObservers();
 
         $this->setupConfig();
@@ -77,6 +81,14 @@ class WalletServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/resources/lang' => resource_path('lang'),
         ], 'user-resources');
+    }
+
+    /**
+     * Register Facades
+     */
+    private function registerFacades()
+    {
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
     }
 
     /**

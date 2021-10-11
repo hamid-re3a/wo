@@ -2,7 +2,7 @@
 
 namespace Wallets;
 
-use Wallets\Commands\ProcessWithdrawalRequestsCommand;
+use Wallets\Commands\ProcessBTCWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;
 use Wallets\Models\Transaction;
@@ -22,7 +22,7 @@ class WalletServiceProvider extends ServiceProvider
 {
     private $namespace = 'Wallets';
     private $name = 'wallets';
-    private $config_file_name = 'wallet';
+    private $config_file_name = 'wallet-domain';
 
     /**
      * Register API class.
@@ -97,7 +97,7 @@ class WalletServiceProvider extends ServiceProvider
     private function registerCommands()
     {
         $this->commands([
-            ProcessWithdrawalRequestsCommand::class
+            ProcessBTCWithdrawalRequestsCommand::class
         ]);
     }
 

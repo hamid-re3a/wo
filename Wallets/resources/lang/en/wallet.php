@@ -16,6 +16,7 @@ return [
         'not-enough-balance' => 'Insufficient balance, :amount + :fee',
         'withdraw_rank_limit' => 'You can\t withdraw more than :amount for today',
         'withdraw_distribution_limit' => 'You can\t withdraw :currency for today,Choose another one please.',
+        'different-currency-payout' => 'All withdraw request should have same currency'
     ]
 ];
 

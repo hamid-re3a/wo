@@ -29,20 +29,20 @@ class UserWalletController extends Controller
 
     public function __construct()
     {
-        if (request()->has('user_id'))
-            $this->prepare(request());
+        if (request()->has('member_id'))
+            $this->prepare();
     }
 
-    private function prepare(Request $request)
+    private function prepare()
     {
 
-        $user = User::query()->whereMemberId($request->get('user_id'))->first();
+        $user = User::query()->whereMemberId(request()->get('member_id'))->first();
         $this->bankService = new BankService($user);
 
         $this->earningWallet = config('earningWallet');
         $this->depositWallet = config('depositWallet');
 
-        if ($this->bankService->getAllWallets()->count() == 0) {
+        if ($this->bankService->getAllWallets()->count() != 2) {
             $this->bankService->getWallet($this->depositWallet);
             $this->bankService->getWallet($this->earningWallet);
         }

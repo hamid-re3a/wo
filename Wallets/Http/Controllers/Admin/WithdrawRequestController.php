@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -67,15 +68,15 @@ class WithdrawRequestController extends Controller
         $model = app(WithdrawProfit::class);
 
         return api()->success(null, [
-            'count_all_requests' => $model->count() ,
-            'count_pending_requests' => $model->where('status','1')->count(),
-            'count_rejected_requests' => $model->where('status','2')->count(),
-            'count_processed_requests' => $model->where('status','3')->count(),
-            'count_postponed_requests' => $model->where('status','4')->count(),
-            'sum_amount_pending_requests' => $model->where('status','1')->sum('pf_amount'),
-            'sum_amount_rejected_requests' => $model->where('status','2')->sum('pf_amount'),
-            'sum_amount_processed_requests' => $model->where('status','3')->sum('pf_amount'),
-            'sum_amount_postponed_requests' => $model->where('status','4')->sum('pf_amount'),
+            'count_all_requests' => $model->count(),
+            'count_pending_requests' => $model->where('status', '1')->count(),
+            'count_rejected_requests' => $model->where('status', '2')->count(),
+            'count_processed_requests' => $model->where('status', '3')->count(),
+            'count_postponed_requests' => $model->where('status', '4')->count(),
+            'sum_amount_pending_requests' => $model->where('status', '1')->sum('pf_amount'),
+            'sum_amount_rejected_requests' => $model->where('status', '2')->sum('pf_amount'),
+            'sum_amount_processed_requests' => $model->where('status', '3')->sum('pf_amount'),
+            'sum_amount_postponed_requests' => $model->where('status', '4')->sum('pf_amount'),
         ]);
     }
 
@@ -125,46 +126,19 @@ class WithdrawRequestController extends Controller
              */
             $withdraw_request = WithdrawProfit::query()->where('uuid', '=', $request->get('id'))->first();
 
-            if ($request->get('status') == 3) {
+            if ($request->get('status') == WITHDRAW_COMMAND_PROCESS) {
                 $this->checkBPSWalletBalance($withdraw_request->crypto_amount);
+                $this->payout_processor->pay($withdraw_request->currency, $withdraw_request->toArray());
 
-                $this->payout_processor->pay($withdraw_request->payout_service, [
-                    [
-                        'destination' => $withdraw_request->wallet_hash,
-                        'amount' => $withdraw_request->crypto_amount
-                    ]
-                ], [$withdraw_request->id]);
+            } else if ($request->get('status') == WITHDRAW_COMMAND_REJECT) {
+                $this->rejectWithdrawRequest($request, $withdraw_request);
 
-            } else if ($request->get('status') == 2) { //Withdrawal request has been rejected, So we have to refund amount to user's earning wallet
-                //Withdraw Admin deposit wallet
-                $bank_service = new BankService(User::query()->first());
-                $bank_service->withdraw(config('depositWallet'), $withdraw_request->pf_amount, [
-                    'description' => 'Refund withdrawal request',
-                    'withdrawal_request_id' => $withdraw_request->id
-                ], 'Withdrawal refund');
-
-                //Deposit user wallet
-                $user = $withdraw_request->user()->first();
-                $bank_service = new BankService($user);
-                $refund_transaction = $bank_service->deposit(config('earningWallet'), $withdraw_request->pf_amount, [
-                    'description' => 'Withdrawal request rejected',
-                    'withdrawal_request_id' => $withdraw_request->id,
-                ], true, 'Withdrawal refund');
-
-
-                $withdraw_request->update([
-                    'status' => $request->get('status'),
-                    'rejection_reason' => $request->has('rejection_reason') ? $request->get('rejection_reason') : $withdraw_request->rejection_reason,
-                    'actor_id' => auth()->user()->id,
-                    'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
-                ]);
-
-            } else if ($request->get('status') == 4) {
+            } else if ($request->get('status') == WITHDRAW_COMMAND_POSTPONE) {
                 $withdraw_request->update($request->validated());
             }
 
-
             $withdraw_request->refresh();
+
             DB::commit();
             return api()->success(null, WithdrawProfitResource::make($withdraw_request));
         } catch (\Throwable $exception) {
@@ -187,28 +161,14 @@ class WithdrawRequestController extends Controller
 
         try {
             DB::beginTransaction();
-            $withdraw_requests = WithdrawProfit::query()->where('status', '=', 1)->whereIn('uuid', $request->get('ids'));
+            /**@var $first_request WithdrawProfit*/
+            $withdraw_requests = WithdrawProfit::query()->where('status', '=', 1)->whereIn('uuid', $request->get('ids'))->get();
+
+            $currency = $this->validateWithdrawRequestsCurrency($withdraw_requests);
+
             $this->checkBPSWalletBalance($withdraw_requests->sum('crypto_amount'));
-            $withdraw_requests->chunkById(50, function ($chunked) {
-                $wallets = [];
-                $ids = [];
-                foreach ($chunked AS $withdraw_request) {
-                    /** @var $withdraw_request WithdrawProfit */
-                    $ids[] = $withdraw_request->id;
-                    $wallets[] = [
-                        'destination' => $withdraw_request->wallet_hash,
-                        'amount' => $withdraw_request->crypto_amount
-                    ];
-                }
-                if (count($wallets) > 0 AND count($ids) > 0 AND (count($wallets) == count($ids)))
-                    ProcessBTCTransactionsJob::dispatch($wallets, $ids);
 
-                unset($chunked);
-                unset($withdraw_request);
-                unset($wallets);
-                unset($ids);
-            });
-
+            $this->payout_processor->pay($currency, $withdraw_requests->toArray());
 
             DB::commit();
             return api()->success(null, null);
@@ -242,6 +202,54 @@ class WithdrawRequestController extends Controller
                 'server' => 'BTCPayServer'
             ]));
         }
+    }
+
+    /**
+     * @param UpdateWithdrawRequest $request
+     * @param $withdraw_request
+     * @throws \Exception
+     */
+    private function rejectWithdrawRequest(UpdateWithdrawRequest $request, $withdraw_request): void
+    {
+//Withdraw Admin deposit wallet
+        $bank_service = new BankService(User::query()->first());
+        $bank_service->withdraw(config('depositWallet'), $withdraw_request->pf_amount, [
+            'description' => 'Refund withdrawal request',
+            'withdrawal_request_id' => $withdraw_request->id
+        ], 'Withdrawal refund');
+
+        //Deposit user wallet
+        $user = $withdraw_request->user()->first();
+        $bank_service = new BankService($user);
+        $refund_transaction = $bank_service->deposit(config('earningWallet'), $withdraw_request->pf_amount, [
+            'description' => 'Withdrawal request rejected',
+            'withdrawal_request_id' => $withdraw_request->id,
+        ], true, 'Withdrawal refund');
+
+
+        $withdraw_request->update([
+            'status' => $request->get('status'),
+            'rejection_reason' => $request->has('rejection_reason') ? $request->get('rejection_reason') : $withdraw_request->rejection_reason,
+            'actor_id' => auth()->user()->id,
+            'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
+        ]);
+    }
+
+    /**
+     * @param $withdraw_requests Collection
+     * @return
+     * @throws \Exception
+     */
+    private function validateWithdrawRequestsCurrency($withdraw_requests)
+    {
+        /**
+         * @var $first_request WithdrawProfit
+         */
+        $first_request = $withdraw_requests->first();
+        if ($withdraw_requests->where('currency', '!=', $first_request->currency)->count())
+            throw new \Exception(trans('wallet.withdraw-profit-request.different-currency-payout'));
+
+        return $first_request->currency;
     }
 
 }

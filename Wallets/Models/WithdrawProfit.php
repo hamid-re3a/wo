@@ -4,6 +4,7 @@ namespace Wallets\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Payments\Models\BPSNetworkTransactions;
 use User\Models\User;
 
 /**
@@ -33,6 +34,7 @@ use User\Models\User;
  * @property-read User $actor
  * @property-read Transaction $withdrawTransaction
  * @property-read Transaction $refundTransaction
+ * @property-read BPSNetworkTransactions $networkTransaction
  * @mixin \Eloquent
  */
 class WithdrawProfit extends Model
@@ -68,6 +70,7 @@ class WithdrawProfit extends Model
     protected $with = [
         'withdrawTransaction',
         'refundTransaction',
+        'networkTransaction',
         'user',
         'actor'
     ];
@@ -90,6 +93,11 @@ class WithdrawProfit extends Model
     public function refundTransaction()
     {
         return $this->belongsTo(Transaction::class, 'refund_transaction_id', 'id');
+    }
+
+    public function networkTransaction()
+    {
+        return $this->belongsTo(BPSNetworkTransactions::class,'network_transaction_id','id');
     }
 
 

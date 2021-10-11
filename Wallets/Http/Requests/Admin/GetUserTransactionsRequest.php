@@ -27,7 +27,7 @@ class GetUserTransactionsRequest extends FormRequest
         $depositWallet = config('depositWallet');
         $earningWallet = config('earningWallet');
         return [
-            'user_id' => 'required|exists:users,member_id',
+            'member_id' => 'required|exists:users,member_id',
             'wallet_name' => "required|in:{$depositWallet},{$earningWallet}",
             'transaction_id' => 'nullable|uuid|exists:transactions,uuid,payable_id,' . request()->get('user_id'),
             'type' => 'nullable|in:deposit,withdraw',

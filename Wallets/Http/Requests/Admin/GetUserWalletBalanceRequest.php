@@ -27,7 +27,7 @@ class GetUserWalletBalanceRequest extends FormRequest
         $depositWallet = config('depositWallet');
         $earningWallet = config('earningWallet');
         return [
-            'user_id' => 'required|exists:users,member_id',
+            'member_id' => 'required|exists:users,member_id',
             'wallet_name' => "required|in:{$depositWallet},{$earningWallet}",
         ];
 

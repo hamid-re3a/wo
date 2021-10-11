@@ -1,9 +1,11 @@
 <?php
 
 return [
-    'btc-pay-server-domain' => 'https://testnet.demo.btcpayserver.org/',
-    'btc-pay-server-store-id' => 'BbPfXmDoY2jhaCAkz2fxxYfnNgkRLCv2Agp1W1BNHUhE',
-    'btc-pay-server-api-token' => 'token 2ce510aee96c5fa134622dd8adf95acb9f87c171',
+    'btc-pay-server-domain' => env('BTC_PAY_SERVER_DOMAIN','https://btcpay214900.lndyn.com/'),
+    'btc-pay-server-store-id' => env('BTC_PAY_SERVER_STORE_ID','7LeJqgcLrNHrC3ia8ABPev3oWviBAFwNggnDngkf9mYa'),
+    'btc-pay-server-api-token' => env('BTC_PAY_SERVER_API_TOKEN','i1MplO0Y770MIYH1Hl7pZ7vk7PkYVEBMVEW7LEUorWr'),
+
+    'invoice_user_cancel_status' => 'user_cancel',
 
     'payment_types' => [
         [
@@ -31,5 +33,6 @@ return [
             'name'=>'btc-pay-server',
             'is_active'=>true,
         ]
-    ]
+    ],
+
 ];

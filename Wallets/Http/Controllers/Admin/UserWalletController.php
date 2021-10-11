@@ -42,7 +42,7 @@ class UserWalletController extends Controller
         $this->earningWallet = config('earningWallet');
         $this->depositWallet = config('depositWallet');
 
-        if ($this->bankService->getAllWallets()->count() == 0) {
+        if ($this->bankService->getAllWallets()->count() != 2) {
             $this->bankService->getWallet($this->depositWallet);
             $this->bankService->getWallet($this->earningWallet);
         }

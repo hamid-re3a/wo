@@ -25,7 +25,7 @@ class PayoutGroupWithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'ids' => 'required|array',
+            'ids' => 'required|array|max:50',
             'ids.*' => 'required|integer|exists:wallet_withdraw_profit_requests,uuid,status,1',
         ];
 
@@ -34,6 +34,7 @@ class PayoutGroupWithdrawRequest extends FormRequest
     public function messages()
     {
         return [
+            'ids.max' => 'Maximum allowed payout requests is 50 ',
             'ids.*.required' => 'Invalid withdraw request selected .',
             'ids.*.uuid' => 'Invalid withdraw request selected .',
             'ids.*.exists' => 'Invalid withdraw request selected .',

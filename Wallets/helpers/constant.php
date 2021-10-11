@@ -1,4 +1,15 @@
 <?php
+const WITHDRAW_COMMAND_UNDER_REVIEW = 1;
+const WITHDRAW_COMMAND_REJECT = 2;
+const WITHDRAW_COMMAND_PROCESS = 3;
+const WITHDRAW_COMMAND_POSTPONE = 4;
+
+const WITHDRAW_COMMAND = [
+    WITHDRAW_COMMAND_UNDER_REVIEW,
+    WITHDRAW_COMMAND_REJECT,
+    WITHDRAW_COMMAND_PROCESS,
+    WITHDRAW_COMMAND_POSTPONE
+];
 
 const WALLET_SETTINGS = [
     'transfer_fee' => [
@@ -103,7 +114,7 @@ const WALLET_SETTINGS = [
     ],
 
     'withdrawal_distribution_is_enabled' => [
-        'value' => true,
+        'value' => false,
         'title' => 'Distribution enabled',
         'description' => 'You can enable/disable Withdraw distribution feature'
     ],

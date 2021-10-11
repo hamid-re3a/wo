@@ -7,6 +7,7 @@ return [
 
     'invoice_user_cancel_status' => 'user_cancel',
 
+
     'payment_types' => [
         [
             'name'=>'giftcode',

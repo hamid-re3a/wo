@@ -10,10 +10,15 @@ use Wallets\Models\WithdrawProfit;
 class WithdrawResolver
 {
     public $withdrawRequest;
+    private $user_service;
 
     public function __construct(WithdrawProfit $withdrawRequest)
     {
         $this->withdrawRequest = $withdrawRequest;
+        /**@var $user_db User */
+        $user_db = $this->withdrawRequest->user()->first();
+        $this->user_service = $user_db->getUserService();
+
     }
 
     /**
@@ -27,66 +32,70 @@ class WithdrawResolver
     {
 
         //Check daily limit
-        list($flag,$response) = $this->checkDailyLimit();
-        if(!$flag)
-            return [$flag,$response];
+        list($flag, $response) = $this->checkDailyLimit();
+        if (!$flag)
+            return [$flag, $response];
 
         //Check system token distribution conditions
-        list($flag,$response) = $this->checkDistribution();
-        if(!$flag)
-            return [$flag,$response];
+        list($flag, $response) = $this->checkDistribution();
+        if (!$flag)
+            return [$flag, $response];
 
-        return [true,null];
+        return [true, null];
 
 
     }
 
     private function checkDailyLimit()
     {
-        /**@var $user_db User */
-        $user_db = $this->withdrawRequest->user()->first();
-        $user_service = $user_db->getUserService();
 
         //get user today's withdraw sum
         $db_sum = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
-            ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
-            ->sum('pf_amount');
+                ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
+                ->sum('pf_amount');
 
         //Get user rank from MLM service
-        $user_rank = MlmClientFacade::getUserRank($user_service);
-        if ($db_sum > $user_rank->getWithdrawalLimit())
+        $user_rank = MlmClientFacade::getUserRank($this->user_service);
+        if (( $db_sum + $this->withdrawRequest->pf_amount ) > $user_rank->getWithdrawalLimit())
             return [false, trans('wallet.responses.withdraw-profit-request.withdraw_rank_limit', ['amount' => $user_rank->getWithdrawalLimit() - $db_sum])];
 
-        return [true,null];
+        return [true, null];
     }
 
     private function checkDistribution()
     {
-        if (walletGetSetting('withdrawal_distribution_is_enabled')) {
+        if (!walletGetSetting('withdrawal_distribution_is_enabled'))
+            return [true, null];
 
-            $sum_withdraw_requests_for_today = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
-                ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
-                ->sum('pf_amount');
+        $distribution_setting = $this->getDistributionSetting();
 
-            $sum_withdraw_requests_for_today_for_currency = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
-                ->where('currency', $this->withdrawRequest->currency)
-                ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
-                ->sum('pf_amount');
+        $user_rank = MlmClientFacade::getUserRank($this->user_service);
 
-            if ($this->withdrawRequest->currency == 'BTC')
-                $distribution = walletGetSetting('withdrawal_distribution_in_btc');
-            else
-                $distribution = walletGetSetting('withdrawal_distribution_in_janex');
 
-            $currency_distribution_for_user = ($sum_withdraw_requests_for_today_for_currency / $sum_withdraw_requests_for_today) * 100 ;
+        $sum_withdraw_requests_for_currency_for_today = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
+            ->where('currency', $this->withdrawRequest->currency)
+            ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
+            ->sum('pf_amount');
 
-            if($currency_distribution_for_user >= $distribution)
-                return [false,trans('wallet.responses.withdraw-profit-request.withdraw_distribution_limit', ['currency' => $this->withdrawRequest->currency])];
 
-            return [true,null];
+        $daily_limit_for_currency = ($distribution_setting * $user_rank->getWithdrawalLimit()) / 100;
 
-        } else {
-            return [true,null];
-        }
+        if ( $daily_limit_for_currency <= ($sum_withdraw_requests_for_currency_for_today + $this->withdrawRequest->pf_amount) )
+            return [false, trans('wallet.responses.withdraw-profit-request.withdraw_distribution_limit', ['currency' => $this->withdrawRequest->currency])];
+
+        return [true, null];
+
+    }
+
+    private function getDistributionSetting()
+    {
+        if ($this->withdrawRequest->currency == 'BTC')
+            $distribution = walletGetSetting('withdrawal_distribution_in_btc');
+        else
+            $distribution = walletGetSetting('withdrawal_distribution_in_janex');
+
+        if ($distribution > 100 OR $distribution < 0)
+            throw new \Exception('Distribution error');
+        return $distribution;
     }
 }

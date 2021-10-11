@@ -13,7 +13,24 @@ class WithdrawProfitObserver
 {
     public function creating(WithdrawProfit $withdrawProfit)
     {
-        //UUID field
+        $withdrawProfit = $this->calculateFee($withdrawProfit);
+        $withdrawProfit->uuid = $withdrawProfit->user->member_id . mt_rand(10, 9999) . time();
+
+    }
+
+    public function created(WithdrawProfit $withdrawProfit)
+    {
+        UrgentEmailJob::dispatch(new WithdrawProfitRequestedSubmitted($withdrawProfit), $withdrawProfit->user->email);
+    }
+
+
+    public function updated(WithdrawProfit $withdrawProfit)
+    {
+        UrgentEmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+    }
+
+    private function calculateFee(WithdrawProfit $withdrawProfit)
+    {
         switch ($withdrawProfit->currency) {
             case 'BTC' :
                 $fix_or_percentage = walletGetSetting('payout_btc_fee_fixed_or_percentage');
@@ -33,18 +50,7 @@ class WithdrawProfitObserver
         $withdrawProfit->pf_amount = $withdrawProfit->pf_amount - $fee;
         $withdrawProfit->crypto_amount = $withdrawProfit->pf_amount / $withdrawProfit->crypto_rate;
         $withdrawProfit->fee = $fee;
-        $withdrawProfit->uuid = $withdrawProfit->user->member_id . mt_rand(100,999) . time();
 
-    }
-
-    public function created(WithdrawProfit $withdrawProfit)
-    {
-        UrgentEmailJob::dispatch(new WithdrawProfitRequestedSubmitted($withdrawProfit), $withdrawProfit->user->email);
-    }
-
-
-    public function updated(WithdrawProfit $withdrawProfit)
-    {
-        UrgentEmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+        return $withdrawProfit;
     }
 }

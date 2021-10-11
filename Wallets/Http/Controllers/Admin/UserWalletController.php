@@ -3,6 +3,7 @@
 namespace Wallets\Http\Controllers\Admin;
 
 use Illuminate\Http\JsonResponse as JsonResponseAlias;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use User\Models\User;
 use Wallets\Http\Requests\Admin\GetUserWalletBalanceRequest;
@@ -17,22 +18,35 @@ use Wallets\Services\BankService;
 
 class UserWalletController extends Controller
 {
+
+    /**
+     * @var $bankService BankService
+     */
+
     private $bankService;
     private $depositWallet;
     private $earningWallet;
 
-    public function prepare($request)
+    public function __construct()
     {
-        $user = User::find($request->get('user_id'))->first();
+        if (request()->has('user_id'))
+            $this->prepare(request());
+    }
+
+    private function prepare(Request $request)
+    {
+
+        $user = User::query()->whereMemberId($request->get('user_id'))->first();
         $this->bankService = new BankService($user);
 
         $this->earningWallet = config('earningWallet');
         $this->depositWallet = config('depositWallet');
 
-        if($this->bankService->getAllWallets()->count() == 0) {
+        if ($this->bankService->getAllWallets()->count() == 0) {
             $this->bankService->getWallet($this->depositWallet);
             $this->bankService->getWallet($this->earningWallet);
         }
+
     }
 
     /**
@@ -42,8 +56,14 @@ class UserWalletController extends Controller
     public function getAllTransactions()
     {
         //Get all transactions except admin's wallet
-        $transactions = Transaction::query()->where('payable_id','!=',1)->simplePaginate();
-        return api()->success(null,TransactionResource::collection($transactions)->response()->getData());
+        $list = Transaction::query()->where('payable_id', '!=', 1)->paginate();
+        return api()->success(null, [
+            'list' => TransactionResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
 
     }
 
@@ -55,8 +75,7 @@ class UserWalletController extends Controller
      */
     public function getWalletsList(UserIdRequest $request) //UserIdRequest needed for Scribe documentation
     {
-        $this->middleware($request);
-        return api()->success(null,EarningWalletResource::collection($this->bankService->getAllWallets()));
+        return api()->success(null, EarningWalletResource::collection($this->bankService->getAllWallets()));
 
     }
 
@@ -68,8 +87,7 @@ class UserWalletController extends Controller
      */
     public function getWalletBalance(GetUserWalletBalanceRequest $request)
     {
-
-        return api()->success(null,[
+        return api()->success(null, [
             'balance' => $this->bankService->getBalance($request->get('wallet_name'))
         ]);
 
@@ -83,9 +101,14 @@ class UserWalletController extends Controller
      */
     public function getWalletTransactions(GetUserTransactionsRequest $request)
     {
-
-        $data = $this->bankService->getTransactions($request->get('wallet_name'))->simplePaginate();
-        return api()->success(null,TransactionResource::collection($data)->response()->getData());
+        $list = $this->bankService->getTransactions($request->get('wallet_name'))->paginate();
+        return api()->success(null, [
+            'list' => TransactionResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
 
     }
 
@@ -97,8 +120,14 @@ class UserWalletController extends Controller
      */
     public function getWalletTransfers(GetUserTransfersRequest $request)
     {
-        $data = $this->bankService->getTransfers($request->get('wallet_name'))->simplePaginate();
-        return api()->success(null,TransferResource::collection($data)->response()->getData());
+        $list = $this->bankService->getTransfers($request->get('wallet_name'))->paginate();
+        return api()->success(null, [
+            'list' => TransferResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
 
     }
 

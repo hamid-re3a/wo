@@ -17,7 +17,7 @@ $client = new \Packages\Services\Grpc\PackagesServiceClient('staging-subscriptio
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);
 $request = new \Packages\Services\Grpc\Id();
-$request->setId((int)1);
+$request->setId((int)24);
 
 list($reply, $status) = $client->packageById($request)->wait();
 

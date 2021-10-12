@@ -13,9 +13,9 @@ class TransactionObserver
         //UUID field
         /**@var $user User*/
         $user = $transaction->payable;
-        $uuid = $user->member_id .  time() . mt_rand(100,999);
+        $uuid = $user->member_id . mt_rand(10,9999) .  time() ;
         while(Transaction::query()->where('uuid', $uuid)->exists())
-            $uuid = $user->member_id .  time() . mt_rand(100,999);
+            $uuid = $user->member_id . mt_rand(10,9999) .  time() ;
         $transaction->uuid = $uuid;
     }
 

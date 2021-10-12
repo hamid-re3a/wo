@@ -29,9 +29,11 @@ class UpdatePaymentCurrencyRequest extends FormRequest
 
         return [
             'id' => 'required|exists:payment_currencies',
-            'name' => array('string',
+            'name' => array('required','string',
                 Rule::unique('payment_currencies')->ignore($this->request->get('id'), 'id')),
-            'is_active' => 'boolean'
+            'is_active' => 'required|boolean',
+            'available_services' => array('nullable','array'),
+            'available_services.*' => 'in:'.implode(',',CURRENCY_SERVICES),
         ];
     }
 }

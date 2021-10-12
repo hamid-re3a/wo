@@ -6,6 +6,7 @@ namespace Wallets\tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Payments\PaymentConfigure;
 use Spatie\Permission\Models\Role;
 use User\Models\User;
 use Wallets\WalletConfigure;
@@ -23,6 +24,8 @@ class WalletTest extends TestCase
         $this->app->setLocale('en');
         $this->withHeaders($this->getHeaders());
         WalletConfigure::seed();
+
+        PaymentConfigure::seed();
     }
 
     public function hasMethod($class, $method)

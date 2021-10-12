@@ -37,7 +37,11 @@ class PaymentCurrency extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [ "name", "is_active"];
+    protected $fillable = [ "name", "is_active","available_services"];
+
+    protected $casts = [
+        'available_services'=> 'json'
+    ];
 
     public function paymentDriver()
     {

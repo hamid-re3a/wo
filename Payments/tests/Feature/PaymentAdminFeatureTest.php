@@ -2,6 +2,7 @@
 
 namespace Payments\tests\Feature;
 
+use Payments\Models\PaymentCurrency;
 use Payments\Models\PaymentType;
 use Payments\tests\PaymentTest;
 
@@ -35,6 +36,22 @@ class PaymentAdminFeatureTest extends PaymentTest
         $response->json()['data'];
     }
 
+
+    /**
+     * edit payment currency
+     * @test
+     */
+    public function edit_payment_currency_admin()
+    {
+        $payment_currency = PaymentCurrency::query()->first();
+        $data['name'] = 'btc';
+        $data['is_active'] = true;
+        $data['id'] = $payment_currency->id;
+        $data['available_services'] = ['purchase'];
+        $response = $this->patch(route('payments.admin.currency.update',$data));
+        $response->assertOk();
+        $response->json()['data'];
+    }
     /**
      * delete payment type test
      * @test

@@ -25,7 +25,7 @@ class UserIdRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|exists:wallet_users,user_id',
+            'member_id' => 'required|exists:users,member_id',
         ];
 
     }

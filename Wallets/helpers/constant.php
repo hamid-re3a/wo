@@ -1,4 +1,15 @@
 <?php
+const WITHDRAW_COMMAND_UNDER_REVIEW = 1;
+const WITHDRAW_COMMAND_REJECT = 2;
+const WITHDRAW_COMMAND_PROCESS = 3;
+const WITHDRAW_COMMAND_POSTPONE = 4;
+
+const WITHDRAW_COMMAND = [
+    WITHDRAW_COMMAND_UNDER_REVIEW,
+    WITHDRAW_COMMAND_REJECT,
+    WITHDRAW_COMMAND_PROCESS,
+    WITHDRAW_COMMAND_POSTPONE
+];
 
 const WALLET_SETTINGS = [
     'transfer_fee' => [
@@ -100,6 +111,24 @@ const WALLET_SETTINGS = [
         'value' => 1,
         'title' => 'Enable Withdrawal',
         'description' => 'Withdrawal is enable or disable'
+    ],
+
+    'withdrawal_distribution_is_enabled' => [
+        'value' => false,
+        'title' => 'Distribution enabled',
+        'description' => 'You can enable/disable Withdraw distribution feature'
+    ],
+
+    'withdrawal_distribution_in_btc' => [
+        'value' => 10,
+        'title' => 'BTC distribution',
+        'description' => 'BTC distribution'
+    ],
+
+    'withdrawal_distribution_in_janex' => [
+        'value' => 90,
+        'title' => 'Janex distribution',
+        'description' => 'Janex distribution'
     ],
 
 ];

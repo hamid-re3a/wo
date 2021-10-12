@@ -15,6 +15,10 @@ use Wallets\Services\BankService;
 
 class WithdrawRepository
 {
+    /**
+     * @var $bankService BankService
+     *
+     */
     private $bankService;
     private $wallet;
 
@@ -50,7 +54,7 @@ class WithdrawRepository
 
             if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
 
-                $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'), null, true, 'Withdraw request');
+                $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'), null, 'Withdraw request', null);
                 return WithdrawProfit::query()->create([
                     'user_id' => auth()->user()->id,
                     'withdraw_transaction_id' => $withdraw_transaction->id,
@@ -58,8 +62,8 @@ class WithdrawRepository
                     'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
                     'currency' => $request->get('currency'),
                     'pf_amount' => $request->get('amount'),
-                    'crypto_amount' => $request->get('amount') / $btc_price['USD']['15m'],
-                    'crypto_rate' => $btc_price['USD']['15m']
+                    'crypto_amount' => $request->get('amount') / $btc_price->json()['USD']['15m'],
+                    'crypto_rate' => $btc_price->json()['USD']['15m']
                 ]);
             } else {
 

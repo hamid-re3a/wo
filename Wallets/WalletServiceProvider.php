@@ -2,7 +2,7 @@
 
 namespace Wallets;
 
-use Wallets\Commands\ProcessWithdrawalRequestsCommand;
+use Wallets\Commands\ProcessBTCWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;
 use Wallets\Models\Transaction;
@@ -15,12 +15,14 @@ use Illuminate\Support\ServiceProvider;
 use Wallets\Observers\TransactionObserver;
 use Wallets\Observers\TransferObserver;
 use Wallets\Observers\WithdrawProfitObserver;
+use Wallets\Services\MlmClientFacade;
+use Wallets\Services\MlmGrpcClientProvider;
 
 class WalletServiceProvider extends ServiceProvider
 {
     private $namespace = 'Wallets';
     private $name = 'wallets';
-    private $config_file_name = 'wallet';
+    private $config_file_name = 'wallet-domain';
 
     /**
      * Register API class.
@@ -51,6 +53,8 @@ class WalletServiceProvider extends ServiceProvider
     public function boot()
     {
 
+        $this->registerFacades();
+
         $this->registerObservers();
 
         $this->setupConfig();
@@ -80,12 +84,20 @@ class WalletServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register Facades
+     */
+    private function registerFacades()
+    {
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
+    }
+
+    /**
      * Register Commands
      */
     private function registerCommands()
     {
         $this->commands([
-            ProcessWithdrawalRequestsCommand::class
+            ProcessBTCWithdrawalRequestsCommand::class
         ]);
     }
 

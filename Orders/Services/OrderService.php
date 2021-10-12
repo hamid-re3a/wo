@@ -42,18 +42,6 @@ class OrderService implements OrdersServiceInterface
 
     }
 
-    public function getPaymentCurrencies()
-    {
-        $empty_object = new EmptyObject();
-        return $this->payment_service->getPaymentCurrencies($empty_object);
-    }
-
-    public function getPaymentTypes()
-    {
-        $empty_object = new EmptyObject();
-        return $this->payment_service->getPaymentTypes($empty_object);
-    }
-
     public function updateOrder(Order $order): Order
     {
         $order_db = \Orders\Models\Order::query()->find($order->getId());

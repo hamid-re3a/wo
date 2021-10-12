@@ -4,23 +4,22 @@
 namespace Wallets\tests\Feature;
 
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
-use Payments\Services\Grpc\PaymentCurrency;
-use Payments\Services\PaymentService;
-use Payments\Services\Processors\PaymentFacade;
+use MLM\Services\Grpc\Rank;
 use User\Models\User;
 use Wallets\Services\BankService;
+use Wallets\Services\MlmClientFacade;
 use Wallets\tests\WalletTest;
 
 class WithdrawRequestFeatureTest extends WalletTest
 {
     private function addPaymentCurrency()
     {
-        $payment_service = app(PaymentService::class);
-        $payment_currency = app(PaymentCurrency::class);
-        $payment_currency->setIsActive(true);
-        $payment_currency->setName('BTC');
-        return $payment_service->createPaymentCurrency($payment_currency);
+        return \Payments\Models\PaymentCurrency::query()->firstOrCreate([
+            'name' => 'BTC',
+            'is_active' => true,
+        ]);
     }
 
     /**
@@ -52,7 +51,7 @@ class WithdrawRequestFeatureTest extends WalletTest
         $payment_currency = $this->addPaymentCurrency();
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
             'amount' => 101,
-            'currency' => $payment_currency->getName(),
+            'currency' => $payment_currency->name,
         ]);
         $response->assertStatus(422);
         $response->assertJsonStructure([
@@ -71,13 +70,16 @@ class WithdrawRequestFeatureTest extends WalletTest
     {
         Mail::fake();
         $payment_currency = $this->addPaymentCurrency();
+        $this->mockWithdrawServices();
+
+
         $user = User::query()->where('username', '=', 'admin')->first();
         $bank_service = new BankService($user);
         $bank_service->deposit('Earning Wallet', 30000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
             'amount' => 101,
-            'currency' => $payment_currency->getName(),
+            'currency' => $payment_currency->name,
         ]);
 
         $response->assertStatus(200);
@@ -100,10 +102,11 @@ class WithdrawRequestFeatureTest extends WalletTest
     public function create_withdraw_request_insufficient_balance()
     {
         Mail::fake();
+        $this->mockWithdrawServices();
         $payment_currency = $this->addPaymentCurrency();
         $response = $this->postJson(route('wallets.customer.withdrawRequests.create'), [
             'amount' => 101,
-            'currency' => $payment_currency->getName(),
+            'currency' => $payment_currency->name,
         ]);
         $response->assertStatus(422);
         $response->assertJsonStructure([
@@ -121,6 +124,7 @@ class WithdrawRequestFeatureTest extends WalletTest
     public function create_withdraw_request_sufficient_balance()
     {
         Mail::fake();
+        $this->mockWithdrawServices();
         $payment_currency = $this->addPaymentCurrency();
         $user = User::query()->where('username', '=', 'admin')->first();
         $bank_service = new BankService($user);
@@ -128,7 +132,7 @@ class WithdrawRequestFeatureTest extends WalletTest
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.create'), [
             'amount' => 101,
-            'currency' => $payment_currency->getName(),
+            'currency' => $payment_currency->name,
         ]);
 
         $response->assertStatus(200);
@@ -153,6 +157,29 @@ class WithdrawRequestFeatureTest extends WalletTest
                 'created_at',
             ]
         ]);
+    }
+
+    private function mockWithdrawServices(): void
+    {
+        $mock_response = new class {
+            function ok()
+            {
+                return true;
+            }
+
+            function json()
+            {
+                $data['USD']['15m'] = 51000;
+                return $data;
+            }
+        };
+        Http::shouldReceive('get')->andReturn($mock_response);
+        $mock_rank = new Rank();
+        $mock_rank->setWithdrawalLimit(35000);
+        MlmClientFacade::shouldReceive('getUserRank')->andReturn($mock_rank);
+
+        $payment = \Payments\Models\PaymentCurrency::query()->firstOrCreate();
+        $payment->update(['available_services'=>[CURRENCY_SERVICE_WITHDRAW]]);
     }
 
 

@@ -16,9 +16,10 @@ class CreatePaymentCurrenciesTable extends Migration
         Schema::create('payment_currencies', function (Blueprint $table) {
             $table->id();
 
-
             $table->string('name');
             $table->boolean('is_active');
+            $table->json('available_services')->nullable();
+
 
             $table->softDeletes();
             $table->timestamps();

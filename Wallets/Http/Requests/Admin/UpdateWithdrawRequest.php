@@ -28,7 +28,7 @@ class UpdateWithdrawRequest extends FormRequest
         return [
             'id' => [
                 'required',
-                Rule::exists('wallet_withdraw_profit_requests')->where('uuid',$this->get('id'))->whereNotIn('status',[
+                Rule::exists('wallet_withdraw_profit_requests','uuid')->where('uuid',$this->get('id'))->whereNotIn('status',[
                     WITHDRAW_COMMAND_REJECT,
                     WITHDRAW_COMMAND_PROCESS
                 ])

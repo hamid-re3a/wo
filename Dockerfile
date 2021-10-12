@@ -32,14 +32,16 @@ WORKDIR /app
 
 # build
 #RUN cp .env.staging .env
-RUN composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
-RUN composer install
-RUN php artisan key:generate
-RUN php artisan vendor:publish --all
-RUN php artisan migrate:fresh
-RUN php artisan db:seed
-RUN php artisan scribe:generate
-RUN php artisan optimize:clear
+RUN chown -R application:application /app
+RUN su application -c "composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567"
+RUN su application -c "composer install"
+RUN su application -c "php artisan key:generate"
+RUN su application -c "php artisan vendor:publish --all"
+RUN su application -c "php artisan migrate:fresh"
+RUN su application -c "php artisan db:seed"
+RUN su application -c "php artisan scribe:generate"
+RUN su application -c "php artisan optimize:clear"
+RUN su application -c "php artisan queue:restart"
 
 
 # permission

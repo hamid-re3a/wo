@@ -5,6 +5,7 @@ use Payments\Http\Controllers\Admin\EmailContentController;
 use Payments\Http\Controllers\Admin\PaymentCurrencyController as AdminPaymentCurrencyController;
 use Payments\Http\Controllers\Admin\PaymentDriverController as AdminPaymentDriverController;
 use Payments\Http\Controllers\Admin\PaymentTypeController as AdminPaymentController;
+use Payments\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use Payments\Http\Controllers\Front\InvoiceController;
 use Payments\Http\Controllers\Front\PaymentCurrencyController;
 use Payments\Http\Controllers\Front\PaymentTypeController;
@@ -38,6 +39,15 @@ Route::name('payments.')->group(function(){
         Route::name('email-contents.')->prefix('email-contents')->group(function () {
             Route::get('', [EmailContentController::class, 'index'])->name('list');
             Route::patch('update', [EmailContentController::class, 'update'])->name('update');
+        });
+
+        Route::name('invoices.')->prefix("invoices")->group(function () {
+            Route::get('', [AdminInvoiceController::class, 'index'])->name('index');
+            Route::get('over-paid', [AdminInvoiceController::class, 'overPaidInvoices'])->name('overPaidInvoices');
+            Route::get('pending-order', [AdminInvoiceController::class, 'pendingOrderInvoices'])->name('pending-order-invoice');
+            Route::get('pending-wallet', [AdminInvoiceController::class, 'pendingWalletInvoices'])->name('pending-wallet-invoice');
+            Route::post('show', [AdminInvoiceController::class, 'show'])->name('show');
+            Route::post('transactions', [AdminInvoiceController::class, 'transactions'])->name('transactions');
         });
 
     });

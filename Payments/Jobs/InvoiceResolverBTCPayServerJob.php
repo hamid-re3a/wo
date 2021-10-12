@@ -122,11 +122,11 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
             case 'Invalid Paid':
             case 'Invalid Marked':
             case 'Invalid PaidOver':
-                // send admin email notification
+                //TODO send admin email notification
                 $processor->invalid();
                 break;
 
-                // send admin email notification and complete user request
+                //TODO send admin email notification and complete user request
                 break;
 
             case 'New None':

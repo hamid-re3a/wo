@@ -14,6 +14,8 @@ use Payments\Services\InvoiceService;
 
 class InvoiceController extends Controller
 {
+
+    //TODO refactor and use repository
     /**
      * Get all invoices
      * @group

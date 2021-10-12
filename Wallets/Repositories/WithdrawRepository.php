@@ -70,8 +70,8 @@ class WithdrawRepository
                     'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
                     'currency' => $request->get('currency'),
                     'pf_amount' => $request->get('amount'),
-                    'crypto_amount' => $request->get('amount') / $btc_price['USD']['15m'],
-                    'crypto_rate' => $btc_price['USD']['15m']
+                    'crypto_amount' => $request->get('amount') / $btc_price->json()['USD']['15m'],
+                    'crypto_rate' => $btc_price->json()['USD']['15m']
                 ]);
             } else {
 

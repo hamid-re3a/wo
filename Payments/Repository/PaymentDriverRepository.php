@@ -3,7 +3,6 @@ namespace Payments\Repository;
 
 
 use Payments\Models\PaymentDriver;
-use \Payments\Services\PaymentDriver as PaymentDriverObject;
 
 class PaymentDriverRepository
 {
@@ -14,31 +13,31 @@ class PaymentDriverRepository
         return $this->entity_name::all();
     }
 
-    public function create(PaymentDriverObject $payment_driver)
+    public function create( $payment_driver)
     {
         $entity = new $this->entity_name;
-        $entity->name = $payment_driver->getName();
-        $entity->is_active = $payment_driver->getIsActive();
-        $entity->save();
+        $entity->create([
+            'name' => $payment_driver->name,
+            'is_active' => $payment_driver->is_active,
+        ]);
         return $entity;
     }
 
-    public function update(PaymentDriverObject $payment_driver)
+    public function update($payment_driver)
     {
         $payment_driver_entity = new $this->entity_name;
-        $payment_driver_find = $payment_driver_entity->whereId($payment_driver->getId())->first();
-        $payment_driver_find->name = $payment_driver->getName() ? $payment_driver->getName(): $payment_driver_find->name;
-        $payment_driver_find->is_active = $payment_driver->getIsActive() ?? $payment_driver_find->is_active;
-        if (!empty($payment_driver_find->getDirty())) {
-            $payment_driver_find->save();
-        }
-        return $payment_driver_find;
+        $payment_currency_find = $payment_driver_entity->firstOrCreate(['id' => $payment_driver->id]);
+
+        $payment_currency_find->update([
+            'name' => $payment_driver->name,
+            'is_active' => $payment_driver->is_active,
+        ]);
+        return $payment_currency_find;
     }
 
-    public function delete(PaymentDriverObject $payment_driver)
+    public function delete($payment_driver)
     {
         $payment_driver_entity = new $this->entity_name;
-        $payment_driver_find = $payment_driver_entity->whereId($payment_driver->getId())->delete();
-        return $payment_driver_find;
+        return $payment_driver_entity->whereId($payment_driver->id)->delete();
     }
 }

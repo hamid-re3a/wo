@@ -47,7 +47,7 @@ Route::name('payments.')->group(function(){
             Route::get('pending-order', [AdminInvoiceController::class, 'pendingOrderInvoices'])->name('pending-order-invoice');
             Route::get('pending-wallet', [AdminInvoiceController::class, 'pendingWalletInvoices'])->name('pending-wallet-invoice');
             Route::post('show', [AdminInvoiceController::class, 'show'])->name('show');
-            Route::post('transactions', [AdminInvoiceController::class, 'transactions'])->name('transactions');
+//            Route::post('transactions', [AdminInvoiceController::class, 'transactions'])->name('transactions');
         });
 
     });

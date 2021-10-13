@@ -47,7 +47,7 @@ Route::name('payments.')->group(function(){
             Route::get('pending-order', [AdminInvoiceController::class, 'pendingOrderInvoices'])->name('pending-order-invoice');
             Route::get('pending-wallet', [AdminInvoiceController::class, 'pendingWalletInvoices'])->name('pending-wallet-invoice');
             Route::post('show', [AdminInvoiceController::class, 'show'])->name('show');
-            Route::post('transactions', [AdminInvoiceController::class, 'transactions'])->name('transactions');
+//            Route::post('transactions', [AdminInvoiceController::class, 'transactions'])->name('transactions');
         });
 
     });
@@ -59,7 +59,7 @@ Route::name('payments.')->group(function(){
             Route::get('/check-pending-wallet-invoice', [InvoiceController::class, 'pendingWalletInvoice'])->name('pendingWalletInvoice');
             Route::get('/', [InvoiceController::class, 'index'])->name('get-list');
             Route::post('/', [InvoiceController::class, 'show'])->name('get-invoice-details');
-            Route::post('transactions', [InvoiceController::class, 'transactions'])->name('transactions');
+//            Route::post('transactions', [InvoiceController::class, 'transactions'])->name('transactions');
         });
         Route::name('currency.')->prefix("currency")->group(function () {
             Route::get('', [PaymentCurrencyController::class, 'index'])->name('index');

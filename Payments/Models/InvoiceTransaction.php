@@ -3,7 +3,6 @@
 namespace Payments\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Payments\Services\PaymentTransaction;
 
 /**
  * Payments\Models\Invoice
@@ -58,24 +57,6 @@ class InvoiceTransaction extends Model
     public function invoice()
     {
         return $this->belongsTo(Invoice::class,'invoice_id','id');
-    }
-
-    /**
-     * Methods
-     */
-    public function getService()
-    {
-        $service = app(PaymentTransaction::class);
-        $service->setId($this->id);
-        $service->setInvoiceId($this->attributes['invoice_id']);
-        $service->setHash($this->attributes['hash']);
-        $service->setReceivedDate($this->attributes['received_date']);
-        $service->setValue($this->attributes['value']);
-        $service->setFee($this->attributes['fee']);
-        $service->setStatus($this->attributes['status']);
-        $service->setDestination($this->attributes['destination']);
-
-        return $service;
     }
 
 }

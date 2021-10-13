@@ -18,6 +18,7 @@ class InvoiceResource extends JsonResource
             'transaction_id' => $this->transaction_id,
             'type' => $this->type,
             'status' => $this->full_status,
+            'rate' => $this->rate,
             'amount' => $this->amount,
             'checkout_link' => $this->checkout_link,
             'is_paid' => $this->is_paid,

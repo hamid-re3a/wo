@@ -18,6 +18,7 @@ class PaymentCurrencyTableSeeder extends Seeder
                 PaymentCurrency::query()->create([
                     'name' => $setting['name'],
                     'is_active' => $setting['is_active'],
+                    'available_services' => CURRENCY_SERVICES
                 ]);
             }
         }

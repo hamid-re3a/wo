@@ -14,6 +14,7 @@ class InvoiceResource extends JsonResource
      */
     public function toArray($request)
     {
+        $transactions = $this->transactions ? InvoiceTransactionResource::collection($this->transactions) : null;
         return [
             'transaction_id' => $this->transaction_id,
             'type' => $this->type,
@@ -27,6 +28,7 @@ class InvoiceResource extends JsonResource
             'due_amount' => $this->due_amount,
             'due_amount_pf' => usdToPf($this->rate * $this->due_amount),
             'expiration_time' => $this->expiration_time->timestamp,
+            'transactions' => $transactions,
             'created_at' => $this->created_at->timestamp,
             'updated_at' => $this->updated_at->timestamp,
         ];

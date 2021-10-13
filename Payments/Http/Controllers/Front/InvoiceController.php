@@ -2,6 +2,7 @@
 
 namespace Payments\Http\Controllers\Front;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Payments\Http\Requests\Invoice\CancelInvoiceRequest;
@@ -108,8 +109,21 @@ class InvoiceController extends Controller
      */
     public function transactions(ShowOrderTransactionsRequest $request)
     {
-        $invoice = Invoice::query()->where('transaction_id',$request->get('transaction_id'))->where('user_id',$request->header('X-user-id'))->with('transactions')->first();
-        return api()->success(null,InvoiceTransactionResource::collection($invoice->transactions));
+        $invoice = Invoice::query();
+
+        if($request->has('transaction_id'))
+            $invoice->when($request->has('transaction_id'), function(Builder $subQuery) use($request) {
+                return $subQuery->where('transaction_id',$request->get('transaction_id'));
+            });
+        else
+            $invoice->when($request->has('order_id'), function(Builder $subQuery) use($request) {
+                return $subQuery->where('payable_id',$request->get('order_id'))->where('payable_type','=','Order');
+            });
+        $invoice->where('user_id',auth()->user()->id);
+
+        if(!$invoice)
+            return api()->error(null,null,404);
+        return api()->success(null,InvoiceTransactionResource::collection($invoice->with('transactions')->first()->transactions));
     }
 
     /**

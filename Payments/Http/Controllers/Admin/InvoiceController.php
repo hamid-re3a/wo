@@ -112,13 +112,14 @@ class InvoiceController extends Controller
     {
         $invoice = Invoice::query();
 
-        $invoice->when($request->has('transaction_id'), function(Builder $subQuery) use($request) {
-            return $subQuery->where('transaction_id',$request->get('transaction_id'));
-        });
-
-        $invoice->when($request->has('order_id'), function(Builder $subQuery) use($request) {
-            return $subQuery->where('payable_id',$request->get('payable_id'))->where('payable_type','=','Order');
-        });
+        if($request->has('transaction_id'))
+            $invoice->when($request->has('transaction_id'), function(Builder $subQuery) use($request) {
+                return $subQuery->where('transaction_id',$request->get('transaction_id'));
+            });
+        else
+            $invoice->when($request->has('order_id'), function(Builder $subQuery) use($request) {
+                return $subQuery->where('payable_id',$request->get('payable_id'))->where('payable_type','=','Order');
+            });
 
         return api()->success(null,InvoiceTransactionResource::collection($invoice->with('transactions')->first()->transactions));
     }

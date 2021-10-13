@@ -17,6 +17,8 @@ class InvoiceResource extends JsonResource
     {
         /**@var $user User*/
         $user = $this->user;
+        $transactions = $this->transactions()->exists() ? InvoiceTransactionResource::collection($this->transactions) : null;
+
         return [
             'user_member_id' => $user->member_id,
             'user_full_name' => $user->full_name,
@@ -28,6 +30,7 @@ class InvoiceResource extends JsonResource
             'is_paid' => $this->is_paid,
             'paid_amount' => $this->paid_amount,
             'due_amount' => $this->due_amount,
+            'transactions' => $transactions,
             'expiration_time' => $this->expiration_time->timestamp,
             'created_at' => $this->created_at->timestamp,
             'updated_at' => $this->updated_at->timestamp,

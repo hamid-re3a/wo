@@ -14,7 +14,7 @@ class InvoiceResource extends JsonResource
      */
     public function toArray($request)
     {
-        $transactions = $this->transactions ? InvoiceTransactionResource::collection($this->transactions) : null;
+        $transactions = $this->transactions()->exists() ? InvoiceTransactionResource::collection($this->transactions) : null;
         return [
             'transaction_id' => $this->transaction_id,
             'type' => $this->type,

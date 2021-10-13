@@ -109,7 +109,16 @@ class InvoiceController extends Controller
      */
     public function transactions(ShowOrderTransactionsRequest $request)
     {
-        $invoice = Invoice::query()->where('transaction_id',$request->get('transaction_id'))->with('transactions')->first();
+        $invoice = Invoice::query();
+        if($request->has('transaction_id'))
+            $invoice->where('transaction_id',$request->get('transaction_id'));
+
+        if($request->has('order_id'))
+            $invoice->where('payable_id',$request->get('payable_id'))->where('payable_type','=','Order');
+
+        $invoice->with('transactions')->first();
+
         return api()->success(null,InvoiceTransactionResource::collection($invoice->transactions));
     }
+
 }

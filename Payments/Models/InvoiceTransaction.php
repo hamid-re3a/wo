@@ -54,6 +54,10 @@ class InvoiceTransaction extends Model
     ];
     protected $table = 'payment_invoice_transactions';
 
+    protected $with = [
+        'invoice'
+    ];
+
     public function invoice()
     {
         return $this->belongsTo(Invoice::class,'invoice_id','id');

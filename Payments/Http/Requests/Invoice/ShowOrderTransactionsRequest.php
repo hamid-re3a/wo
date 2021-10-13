@@ -29,7 +29,7 @@ class ShowOrderTransactionsRequest extends FormRequest
 
         return [
             'transaction_id' => 'required_without:order_id|exists:invoices,transaction_id',
-            'order_id' => 'required_without:transaction_id|exists:invoices,payable_id',
+            'order_id' => 'required_without:transaction_id|exists:invoices,payable_id,payable_type,Order',
         ];
     }
 }

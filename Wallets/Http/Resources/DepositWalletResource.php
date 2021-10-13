@@ -36,7 +36,7 @@ class DepositWalletResource extends JsonResource
                     $query->where('wallet_id','=',$this->id);
                     $query->where('type','withdraw');
                     $query->whereHas('metaData', function(Builder $subQuery) {
-                        $subQuery->where('name','=','Transfer');
+                        $subQuery->where('name','=','Funds transferred');
                     });
                 }
             ])

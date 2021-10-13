@@ -11,7 +11,7 @@ use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController
 use Wallets\Http\Controllers\Front\WithdrawRequestController as UserWithdrawRequestController;
 
 Route::middleware('auth')->name('wallets.')->group(function(){
-    Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_SUBSCRIPTIONS_WALLET])->name('wallets.')->prefix('admin')->group(function () {
+    Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_SUBSCRIPTIONS_WALLET])->name('admin.')->prefix('admin')->group(function () {
             Route::name('users.')->prefix('users')->group(function () {
                 Route::post('all-transactions', [AdminWalletController::class, 'getAllTransactions'])->name('get-all-transactions');
                 Route::post('wallets-list', [AdminWalletController::class, 'getWalletsList'])->name('wallets-list');

@@ -66,6 +66,7 @@ class User extends Model implements WalletFloat
         'is_deactivate',
         'is_freeze',
         'block_type',
+        'gender',
     ];
 
     protected static function newFactory()
@@ -146,6 +147,7 @@ class User extends Model implements WalletFloat
         $user->setBlockType((string)$this->attributes['block_type']);
         $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
         $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
+        $user->setGender((string)$this->attributes['gender']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());

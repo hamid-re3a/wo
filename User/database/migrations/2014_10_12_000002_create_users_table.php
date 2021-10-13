@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Users extends Migration
+class CreateUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -24,6 +24,8 @@ class Users extends Migration
             $table->boolean('is_freeze')->default(FALSE)->nullable();
             $table->boolean('is_deactivate')->default(FALSE)->nullable();
             $table->unsignedBigInteger('sponsor_id')->nullable();
+            $table->unsignedBigInteger('member_id')->nullable();
+            $table->string('gender')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

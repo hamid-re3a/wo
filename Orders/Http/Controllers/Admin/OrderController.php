@@ -52,7 +52,7 @@ class OrderController extends Controller
             'list' => OrderResource::collection($list),
             'pagination' => [
                 'total' => $list->total(),
-                'perPage' => $list->perPage()
+                'per_page' => $list->perPage()
             ]
         ]);
     }

@@ -37,12 +37,12 @@ class QueueFailed extends Notification
     {
         return (new SlackMessage())
             ->to("#laravel-failed-jobs")
-            ->content("Job failed at ". config('app.name') . ' | Subscription')
+            ->content('Job failed at Subscription')
             ->attachment(function(SlackAttachment $attachment) use ($notifiable) {
                 $attachment->fields([
+                    'Job' => $this->event->job->resolveName(),
                     'Payload' => $this->event->job->getRawBody(),
-                   'Exception' => $this->event->exception->getTraceAsString(),
-                   'Job' => $this->event->job->resolveName()
+                    'Exception' => $this->event->exception->getTraceAsString(),
                ]);
             });
 

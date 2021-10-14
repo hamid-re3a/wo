@@ -16,6 +16,24 @@ class UserService
         $this->user_repository = $user_repository;
     }
 
+    public function findByIdOrFail(int $id) : \User\Models\User
+    {
+        $user = $this->user_repository->findById($id);
+        if(!is_null($user)){
+            return $user;
+        }
+        $user_grpc = updateUserFromGrpcServer($id);
+
+        if(!is_null($user_grpc) && $user_grpc->getId()){
+            $user = $this->user_repository->findById($id);
+            if(!is_null($user)){
+                return $user;
+            }
+        }
+
+        throw new \Exception('User not found => id ' . $id);
+
+    }
     public function userUpdate(User $user)
     {
         $user_updated = $this->user_repository->editOrCreate($user);

@@ -64,7 +64,7 @@ class InvoiceController extends Controller
             'list' => InvoiceResource::collection($list),
             'pagination' => [
                 'total' => $list->total(),
-                'perPage' => $list->perPage()
+                'per_page' => $list->perPage()
             ]
         ]);
     }
@@ -82,7 +82,7 @@ class InvoiceController extends Controller
             'list' => InvoiceResource::collection($list),
             'pagination' => [
                 'total' => $list->total(),
-                'perPage' => $list->perPage()
+                'per_page' => $list->perPage()
             ]
         ]);
     }

@@ -2,8 +2,7 @@
 
 namespace Payments\Jobs;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,9 +11,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Payments\Models\BPSNetworkTransactions;
-use Wallets\Models\WithdrawProfit;
-use Wallets\Services\WalletService;
 
 class ProcessBTCPayServerPayoutsJob implements ShouldQueue
 {
@@ -23,16 +19,19 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
      * @var Mailable
      */
     private $payout_requests;
+    private $dispatchType;
 
     /**
      * Create a new job instance.
      *
      * @param array $payout_requests
+     * @param string $dispatchType
      */
-    public function __construct($payout_requests)
+    public function __construct($payout_requests, $dispatchType = 'dispatch')
     {
         $this->queue = 'default';
-        $this->payout_requests = collect($payout_requests);
+        $this->payout_requests = $payout_requests instanceof Collection ? $payout_requests : collect($payout_requests);
+        $this->dispatchType = $dispatchType;
     }
 
     /**
@@ -48,12 +47,14 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
                 config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
 
         $wallet_balance = $wallet_response->json()['confirmedBalance'];
-        $total_needed_balance = $this->payout_requests->sum('crypto_amount');
+        $total_needed_balance = $this->payout_requests->sum('crypto_amount') + 0.001;
 
         if($total_needed_balance > $wallet_balance) {
             Log::error('Automatic payouts failed-insufficient wallet balance');
             //TODO Notify admin for insufficient balance
-            throw new \Exception('Automatic payouts failed-insufficient wallet balance');
+            throw new \Exception(trans('wallet.withdraw-profit-request.insufficient-bpb-wallet-balance', [
+                'amount' => $total_needed_balance . ' BTC'
+            ]));
         }
 
         $destinations = [];
@@ -75,11 +76,11 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
                 'rbf' => true
             ]);
         if($response->ok()) {
-            InsertBPSNetworkTransactionJob::dispatch($this->payout_requests->pluck('id'),$response->json());
+            InsertBPSNetworkTransactionJob::{$this->dispatchType}($this->payout_requests->pluck('id'),$response->json());
         } else {
             Log::info($response->status());
             Log::info(serialize($response->json()));
-            throw \Exception('Payout BPS payout failed');
+            throw new \Exception('Payout BPS payout failed');
             //TODO notify admin
         }
     }

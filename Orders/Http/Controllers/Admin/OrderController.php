@@ -13,6 +13,7 @@ use MLM\Services\Grpc\Acknowledge;
 use Orders\Http\Requests\Admin\Order\OrderRequest;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
 use Orders\Http\Requests\Front\Order\OrderTypeFilterRequest;
+use Orders\Http\Resources\Admin\OrderResource;
 use Orders\Http\Resources\CountDataResource;
 use Orders\Models\Order;
 use Orders\Services\MlmClientFacade;
@@ -25,6 +26,7 @@ use User\Models\User;
 
 class OrderController extends Controller
 {
+    //TODO Refactor whole controller :|
     use  ValidatesRequests;
 
     private $payment_service;
@@ -36,6 +38,23 @@ class OrderController extends Controller
         $this->payment_service = $payment_service;
         $this->package_service = $package_service;
         $this->order_service = $order_service;
+    }
+
+    /**
+     * Get orders
+     * @group
+     * Admin User > Orders
+     */
+    public function index()
+    {
+        $list = Order::query()->orderByDesc('id')->filter()->with('user')->paginate();
+        return api()->success(null,[
+            'list' => OrderResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage()
+            ]
+        ]);
     }
 
     /**

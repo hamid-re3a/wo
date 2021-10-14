@@ -20,17 +20,17 @@ use User\Models\User;
  * @property int $packages_cost_in_pf
  * @property int $registration_fee_in_pf
  * @property int $validity_in_days
- * @property string|null $is_paid_at
- * @property string|null $is_resolved_at
- * @property string|null $is_refund_at
- * @property string|null $is_commission_resolved_at
- * @property string|null $expires_at
+ * @property \Illuminate\Support\Carbon|null $is_paid_at
+ * @property \Illuminate\Support\Carbon|null $is_resolved_at
+ * @property \Illuminate\Support\Carbon|null $is_refund_at
+ * @property \Illuminate\Support\Carbon|null $is_commission_resolved_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
  * @property string $payment_type
  * @property string $package_name
  * @property string $payment_currency
  * @property string|null $payment_driver
  * @property string $plan
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()

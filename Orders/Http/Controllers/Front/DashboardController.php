@@ -66,7 +66,7 @@ class DashboardController extends Controller
     {
         /**@var $user User */
         $user = auth()->user();
-        $list = $user->orders()->filter()->paginate();
+        $list = $user->orders()->filter()->orderByDesc('id')->paginate();
         return api()->success(null, [
             'list' => OrderResource::collection($list),
             'pagination' => [

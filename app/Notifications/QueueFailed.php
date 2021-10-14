@@ -41,6 +41,7 @@ class QueueFailed extends Notification
             ->attachment(function(SlackAttachment $attachment) use ($notifiable) {
                 $attachment->fields([
                     'Job' => $this->event->job->resolveName(),
+                    'Queue' => $this->event->job->getQueue(),
                     'Payload' => $this->event->job->getRawBody(),
                     'Exception' => $this->event->exception->getTraceAsString(),
                ]);

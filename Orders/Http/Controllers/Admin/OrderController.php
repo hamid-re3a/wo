@@ -47,7 +47,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $list = Order::query()->with('user')->paginate();
+        $list = Order::query()->orderByDesc('id')->filter()->with('user')->paginate();
         return api()->success(null,[
             'list' => OrderResource::collection($list),
             'pagination' => [

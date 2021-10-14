@@ -3,6 +3,7 @@
 namespace Orders\Http\Resources\Admin;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Orders\Models\Order;
 use User\Models\User;
 
 class OrderResource extends JsonResource
@@ -15,20 +16,26 @@ class OrderResource extends JsonResource
      */
     public function toArray($request)
     {
-        /**@var $user User*/
-        $user = $this->user;
+        /**
+         * @var $user User
+         * @var $order Order
+         */
+        $order = $this;
+        $user = $order->user;
+
         return [
-            'id' => $this->id,
-            'user_member_id' => $user->member_id ,
-            'user_full_name' => $user->full_name ,
-            'total_cost_in_pf' => $this->total_cost_in_pf,
-            'package_cost_in_usd' => $this->packages_cost_in_pf,
-            'registration_fee_in_pf' => $this->registration_fee_in_pf,
-            'is_paid_at' => !empty($this->is_paid_at) ? $this->is_paid_at->timestamp : null,
-            'payment_currency' => $this->payment_currency,
-            'payment_type' => $this->payment_type,
-            'expires_at' => !empty($this->expires_at) ? $this->expires_at->timestamp : null,
-            'created_at' => !empty($this->created_at) ? $this->created_at->timestamp : null,
+            'id'                        => $order->id,
+            'user_member_id'            => $user->member_id ,
+            'user_full_name'            => $user->full_name ,
+            'package_name'              => $order->package_name,
+            'total_cost_in_pf'          => $order->total_cost_in_pf,
+            'package_cost_in_pf'        => $order->packages_cost_in_pf,
+            'registration_fee_in_pf'    => $order->registration_fee_in_pf,
+            'is_paid_at'                => !empty($order->is_paid_at) ? $order->is_paid_at->timestamp : null,
+            'payment_currency'          => $order->payment_currency,
+            'payment_type'              => $order->payment_type,
+            'expires_at'                => !empty($order->expires_at) ? $order->expires_at->timestamp : null,
+            'created_at'                => !empty($order->created_at) ? $order->created_at->timestamp : null,
         ];
     }
 }

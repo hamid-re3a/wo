@@ -10,7 +10,8 @@ Route::middleware('auth')->group(function () {
     //Admin routes
     Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_SUBSCRIPTIONS_ORDER])->prefix('admin')->name('admin.')->group(function () {
 
-        Route::name('order')->group(function () {
+        Route::name('orders')->prefix('orders')->group(function () {
+            Route::get('/', [OrderAdminController::class, "index"])->name('index');
             Route::get('/subscription_count', [OrderAdminController::class, "getCountSubscriptions"])->name('getCountSubscriptions');
             Route::get('/active_package_count', [OrderAdminController::class, 'activePackageCount'])->name('activePackageCount');
             Route::get('/deactivate_package_count', [OrderAdminController::class, 'deactivatePackageCount'])->name('deactivatePackageCount');

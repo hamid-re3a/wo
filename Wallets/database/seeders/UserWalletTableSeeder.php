@@ -33,6 +33,8 @@ class UserWalletTableSeeder extends Seeder
 
         $user = User::query()->firstOrCreate([
             'id' => 2,
+        ]);
+        $user->update([
             'member_id' => '2000',
             'email' => 'janexstaging@gmail.com',
             'first_name' => 'John',
@@ -46,6 +48,8 @@ class UserWalletTableSeeder extends Seeder
 
         $customer_user = User::query()->firstOrCreate([
             'id' => 3,
+        ]);
+        $customer_user->update([
             'member_id' => '2000',
             'email' => 'janexstaging@gmail.com',
             'first_name' => 'John',

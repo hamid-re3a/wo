@@ -2,14 +2,17 @@
 
 namespace Wallets\Http\Controllers\Admin;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse as JsonResponseAlias;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use User\Models\User;
 use Wallets\Http\Requests\Admin\GetUserWalletBalanceRequest;
 use Wallets\Http\Requests\Admin\GetUserTransfersRequest;
 use Wallets\Http\Requests\Admin\GetUserTransactionsRequest;
 use Wallets\Http\Requests\Admin\UserIdRequest;
+use Wallets\Http\Requests\Admin\GetTransactionsRequest;
 use Wallets\Http\Resources\Admin\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
@@ -52,11 +55,20 @@ class UserWalletController extends Controller
     /**
      * Get all transactions
      * @group Admin User > Wallets
+     * @param GetTransactionsRequest $request
+     * @return JsonResponseAlias
      */
-    public function getAllTransactions()
+    public function getAllTransactions(GetTransactionsRequest $request)
     {
         //Get all transactions except admin's wallet
-        $list = Transaction::query()->where('payable_id', '!=', 1)->paginate();
+        $list = Transaction::query();
+        if ($request->has('wallet_name'))
+            $list = $list->whereHas('wallet', function (Builder $query) use ($request) {
+                $query->where('name', '=', $request->get('wallet_name'));
+                $query->orWhere('slug', '=', Str::slug($request->get('wallet_name')));
+            });
+
+        $list = $list->where('payable_id', '!=', 1)->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
             'pagination' => [

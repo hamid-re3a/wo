@@ -5,6 +5,7 @@ use Payments\Http\Controllers\Admin\EmailContentController;
 use Payments\Http\Controllers\Admin\PaymentCurrencyController as AdminPaymentCurrencyController;
 use Payments\Http\Controllers\Admin\PaymentDriverController as AdminPaymentDriverController;
 use Payments\Http\Controllers\Admin\PaymentTypeController as AdminPaymentController;
+use Payments\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use Payments\Http\Controllers\Front\InvoiceController;
 use Payments\Http\Controllers\Front\PaymentCurrencyController;
 use Payments\Http\Controllers\Front\PaymentTypeController;
@@ -40,6 +41,15 @@ Route::name('payments.')->group(function(){
             Route::patch('update', [EmailContentController::class, 'update'])->name('update');
         });
 
+        Route::name('invoices.')->prefix("invoices")->group(function () {
+            Route::get('', [AdminInvoiceController::class, 'index'])->name('index');
+            Route::get('over-paid', [AdminInvoiceController::class, 'overPaidInvoices'])->name('overPaidInvoices');
+            Route::get('pending-order', [AdminInvoiceController::class, 'pendingOrderInvoices'])->name('pending-order-invoice');
+            Route::get('pending-wallet', [AdminInvoiceController::class, 'pendingWalletInvoices'])->name('pending-wallet-invoice');
+            Route::post('show', [AdminInvoiceController::class, 'show'])->name('show');
+//            Route::post('transactions', [AdminInvoiceController::class, 'transactions'])->name('transactions');
+        });
+
     });
 
     Route::middleware(['role:client'])->group(function () {
@@ -49,7 +59,7 @@ Route::name('payments.')->group(function(){
             Route::get('/check-pending-wallet-invoice', [InvoiceController::class, 'pendingWalletInvoice'])->name('pendingWalletInvoice');
             Route::get('/', [InvoiceController::class, 'index'])->name('get-list');
             Route::post('/', [InvoiceController::class, 'show'])->name('get-invoice-details');
-            Route::post('transactions', [InvoiceController::class, 'transactions'])->name('transactions');
+//            Route::post('transactions', [InvoiceController::class, 'transactions'])->name('transactions');
         });
         Route::name('currency.')->prefix("currency")->group(function () {
             Route::get('', [PaymentCurrencyController::class, 'index'])->name('index');

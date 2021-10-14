@@ -15,11 +15,12 @@ class PaymentCurrencyResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'is_active' => $this->getIsActive(),
-            'created_at' => $this->getCreatedAt(),
-            'updated_at' => $this->getUpdatedAt(),
+            'id' => $this->id,
+            'name' => $this->name,
+            'is_active' => $this->is_active,
+//            'available_services' => $this->available_services,
+//            'created_at' => $this->created_at,
+//            'updated_at' => $this->updated_at,
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Payments\Http\Resources;
+namespace Payments\Http\Resources\Admin;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,7 +23,7 @@ class InvoiceTransactionResource extends JsonResource
             'fee' => $this->fee,
             'fee_pf' => usdToPf($rate * $this->fee),
             'status' => $this->status,
-//            'destination' => $this->destination,
+            'destination' => $this->destination,
         ];
     }
 }

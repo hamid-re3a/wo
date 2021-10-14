@@ -4,6 +4,7 @@ namespace Orders\Http\Requests\Front\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Orders\Services\OrderService;
+use Payments\Services\PaymentService;
 
 class OrderRequest extends FormRequest
 {
@@ -45,18 +46,13 @@ class OrderRequest extends FormRequest
         ];
     }
 
-    /**
-     * get name of payment currency
-     * @return array
-     */
     private function getNamePaymentCurrency()
     {
-        $payment_currencies = app(OrderService::class)->getPaymentCurrencies()->getPaymentCurrencies();
-        $payment_currency_name_array = array();
-        foreach ($payment_currencies as $payment_currency) {
-            $payment_currency_name_array[] = $payment_currency->getName();
-        }
-        return $payment_currency_name_array;
+        $currencies = app(PaymentService::class)->getPaymentCurrencies(CURRENCY_SERVICE_PURCHASE);
+        if ($currencies)
+            return $currencies->pluck('name')->toArray();
+        else
+            return [];
     }
 
     /**
@@ -65,12 +61,11 @@ class OrderRequest extends FormRequest
      */
     private function getNamePaymentType()
     {
-        $payment_types = app(OrderService::class)->getPaymentTypes()->getPaymentTypes();
-        $payment_type_name_array = array();
-        foreach ($payment_types as $payment_type) {
-            $payment_type_name_array[] = $payment_type->getName();
-        }
-        return $payment_type_name_array;
+        $payment_types = app(PaymentService::class)->getActivePaymentTypes();
+        if ($payment_types)
+            return $payment_types->pluck('name')->toArray();
+        else
+            return [];
     }
 
 

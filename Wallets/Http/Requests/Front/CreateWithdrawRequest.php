@@ -4,6 +4,7 @@ namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Orders\Services\OrderService;
+use Payments\Services\PaymentService;
 use Wallets\Services\BankService;
 
 class CreateWithdrawRequest extends FormRequest
@@ -56,18 +57,14 @@ class CreateWithdrawRequest extends FormRequest
         }
     }
 
-    /**
-     * get name of payment currency
-     * @return array
-     */
+
     private function getNamePaymentCurrency()
     {
-        $payment_currencies = app(OrderService::class)->getPaymentCurrencies()->getPaymentCurrencies();
-        $payment_currency_name_array = array();
-        foreach ($payment_currencies as $payment_currency) {
-            $payment_currency_name_array[] = $payment_currency->getName();
-        }
-        return $payment_currency_name_array;
+        $currencies = app(PaymentService::class)->getPaymentCurrencies(CURRENCY_SERVICE_WITHDRAW);
+        if($currencies)
+            return $currencies->pluck('name')->toArray();
+        else
+            return [];
     }
 
 }

@@ -3,6 +3,17 @@
 use Illuminate\Support\Facades\DB;
 use Payments\Models\EmailContentSetting;
 use Payments\Models\Setting;
+
+const CURRENCY_SERVICE_PURCHASE = 'purchase';
+const CURRENCY_SERVICE_WITHDRAW = 'withdraw';
+const CURRENCY_SERVICE_DEPOSIT = 'deposit';
+const CURRENCY_SERVICES = [
+    CURRENCY_SERVICE_DEPOSIT,
+    CURRENCY_SERVICE_WITHDRAW,
+    CURRENCY_SERVICE_PURCHASE
+];
+
+
 const INVOICE_STATUS_NEW = 'New';
 const INVOICE_STATUS_EXPIRED = 'Expired';
 const INVOICE_STATUS_PAID = 'Paid';

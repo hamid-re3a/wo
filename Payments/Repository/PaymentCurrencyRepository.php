@@ -3,47 +3,49 @@ namespace Payments\Repository;
 
 
 use Payments\Models\PaymentCurrency;
-use \Payments\Services\Grpc\PaymentCurrency as PaymentCurrencyObject;
 
 class PaymentCurrencyRepository
 {
     protected $entity_name = PaymentCurrency::class;
 
-    public function getAllWithoutDriver()
+    public function getAll($filter)
     {
-        return $this->entity_name::all();
+
+        $query = $this->entity_name::query();
+        if(is_string($filter) && !empty($filter)){
+//            $query->whereJsonContains('available_services', [$filter]);
+            $query->where('available_services','like',"%$filter%");
+        }
+        return $query->get();
     }
 
-    public function getAll()
-    {
-        return $this->entity_name::with("paymentDriver")->get();
-    }
-
-    public function create(PaymentCurrencyObject $payment_currency)
+    public function create($payment_currency)
     {
         $entity = new $this->entity_name;
-        $entity->name = $payment_currency->getName();
-        $entity->is_active = $payment_currency->getIsActive();
-        $entity->save();
+        $entity->create([
+            'name' => $payment_currency->name,
+            'is_active' => $payment_currency->is_active,
+            'available_services' => $payment_currency->available_services,
+        ]);
         return $entity;
     }
 
-    public function update(PaymentCurrencyObject $payment_currency)
+    public function update($payment_currency)
     {
         $payment_currency_entity = new $this->entity_name;
-        $payment_currency_find = $payment_currency_entity->whereId($payment_currency->getId())->first();
-        $payment_currency_find->name = $payment_currency->getName() ? $payment_currency->getName(): $payment_currency_find->name;
-        $payment_currency_find->is_active = $payment_currency->getIsActive() ?? $payment_currency_find->is_active;
-        if (!empty($payment_currency_find->getDirty())) {
-            $payment_currency_find->save();
-        }
+        $payment_currency_find = $payment_currency_entity->firstOrCreate(['id' => $payment_currency->id]);
+
+        $payment_currency_find->update([
+            'name' => $payment_currency->name,
+            'is_active' => $payment_currency->is_active,
+            'available_services' => $payment_currency->available_services,
+        ]);
         return $payment_currency_find;
     }
 
-    public function delete(PaymentCurrencyObject $payment_currency)
+    public function delete($payment_currency)
     {
         $payment_currency_entity = new $this->entity_name;
-        $payment_currency_find = $payment_currency_entity->whereId($payment_currency->getId())->delete();
-        return $payment_currency_find;
+        return  $payment_currency_entity->whereId($payment_currency->id)->delete();
     }
 }

@@ -1,9 +1,10 @@
 <?php
 
-namespace Orders\Http\Resources;
+namespace Orders\Http\Resources\Admin;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Orders\Models\Order;
+use User\Models\User;
 
 class OrderResource extends JsonResource
 {
@@ -15,11 +16,17 @@ class OrderResource extends JsonResource
      */
     public function toArray($request)
     {
-        /**@var $order Order*/
+        /**
+         * @var $user User
+         * @var $order Order
+         */
         $order = $this;
+        $user = $order->user;
 
         return [
             'id'                        => $order->id,
+            'user_member_id'            => $user->member_id ,
+            'user_full_name'            => $user->full_name ,
             'package_name'              => $order->package_name,
             'total_cost_in_pf'          => $order->total_cost_in_pf,
             'package_cost_in_pf'        => $order->packages_cost_in_pf,

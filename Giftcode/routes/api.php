@@ -1,5 +1,6 @@
 <?php
 
+use Giftcode\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use Giftcode\Http\Controllers\Admin\EmailContentController;
 use Giftcode\Http\Controllers\Admin\SettingController;
 use Giftcode\Http\Controllers\Front\GiftcodeController;
@@ -10,6 +11,10 @@ Route::name('giftcodes.')->middleware('auth')->group(function () {
 
     //Admin Routes
     Route::middleware(['role:'.USER_ROLE_SUPER_ADMIN.'|' . USER_ROLE_ADMIN_SUBSCRIPTIONS_GIFTCODE])->prefix('admin')->name('admin.')->group(function () { //TODO admin role
+        Route::prefix('dashboard')->name('dashboard')->group(function(){
+            Route::get('counts',[AdminDashboardController::class,'counts'])->name('counts');
+            Route::get('',[AdminDashboardController::class,'index'])->name('index');
+        });
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('', [SettingController::class, 'index'])->name('list');
             Route::patch('update', [SettingController::class, 'update']);

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\MlmClientFacade;
 use Orders\tests\OrderTest;
+use Payments\Models\PaymentCurrency;
 use Payments\Services\Processors\PaymentFacade;
 
 class OrderFeatureTest extends OrderTest
@@ -25,7 +26,8 @@ class OrderFeatureTest extends OrderTest
         $acknowledge->setCreatedAt(now()->toDateString());
         MlmClientFacade::shouldReceive('simulateOrder')->once()->andReturn($acknowledge);
         PaymentFacade::shouldReceive('pay')->once()->andReturn([true,'']);
-
+        $payment = PaymentCurrency::query()->first();
+        $payment->update(['available_services'=>[CURRENCY_SERVICE_PURCHASE]]);
         $response = $this->post(route('customer.orders.store'), [
             'package_id' => 1,
             'plan' => ORDER_PLAN_START,

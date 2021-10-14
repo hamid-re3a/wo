@@ -57,6 +57,10 @@ class User extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>bool is_deactivate = 11;</code>
      */
     protected $is_deactivate = false;
+    /**
+     * Generated from protobuf field <code>string gender = 12;</code>
+     */
+    protected $gender = '';
 
     /**
      * Constructor.
@@ -75,6 +79,7 @@ class User extends \Google\Protobuf\Internal\Message
      *     @type string $block_type
      *     @type bool $is_freeze
      *     @type bool $is_deactivate
+     *     @type string $gender
      * }
      */
     public function __construct($data = NULL) {
@@ -320,6 +325,28 @@ class User extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->is_deactivate = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string gender = 12;</code>
+     * @return string
+     */
+    public function getGender()
+    {
+        return $this->gender;
+    }
+
+    /**
+     * Generated from protobuf field <code>string gender = 12;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setGender($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->gender = $var;
 
         return $this;
     }

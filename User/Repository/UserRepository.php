@@ -9,6 +9,14 @@ class UserRepository
 {
     private $entity_name = UserModel::class;
 
+
+    public function findById(int $id)
+    {
+
+        $user_entity = new $this->entity_name;
+        return $user_entity::find($id);
+    }
+
     public function editOrCreate(User $user)
     {
         /** @var $user_entity \User\Models\User */

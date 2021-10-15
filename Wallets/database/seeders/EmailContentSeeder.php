@@ -13,8 +13,8 @@ class EmailContentSeeder extends Seeder
             $now = now()->toDateTimeString();
             foreach(WALLET_EMAIL_CONTENTS AS $key => $email) {
 
-                if(filter_var(env('MAIL_USERNAME', $email['from']), FILTER_VALIDATE_EMAIL))
-                    $from =  env('MAIL_USERNAME', $email['from']);
+                if(filter_var(env('MAIL_FROM', $email['from']), FILTER_VALIDATE_EMAIL))
+                    $from =  env('MAIL_FROM', $email['from']);
                 else
                     $from = $email['from'];
 
@@ -22,7 +22,7 @@ class EmailContentSeeder extends Seeder
                     'key' => $key,
                     'is_active' => $email['is_active'],
                     'subject' => $email['subject'],
-                    'from' => env('MAIL_FROM',$email['from']),
+                    'from' => env('MAIL_FROM',$from),
                     'from_name' => $email['from_name'],
                     'body' => $email['body'],
                     'variables' => $email['variables'],

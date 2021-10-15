@@ -12,15 +12,15 @@ class EmailContentSeeder extends Seeder
             $now = now()->toDateTimeString();
             $emails = [];
             foreach(EMAIL_CONTENTS AS $key => $email){
-                if(filter_var(env('MAIL_USERNAME', $email['from']), FILTER_VALIDATE_EMAIL))
-                   $from =  env('MAIL_USERNAME', $email['from']);
+                if(filter_var(env('MAIL_FROM', $email['from']), FILTER_VALIDATE_EMAIL))
+                   $from =  env('MAIL_FROM', $email['from']);
                 else
                     $from = $email['from'];
                 $emails[] = [
                     'key' => $key,
                     'is_active' => $email['is_active'],
                     'subject' => $email['subject'],
-                    'from' => env('MAIL_FROM',$email['from']),
+                    'from' => $from,
                     'from_name' => $email['from_name'],
                     'body' => $email['body'],
                     'variables' => $email['variables'],

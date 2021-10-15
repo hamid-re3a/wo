@@ -21,7 +21,7 @@ class EarningWalletResource extends JsonResource
 
         return [
             'name' => $this->name,
-            'balance' => $this->balanceFloat,
+            'balance' => $this->balance / 100,
             'transactions_count' => (int) $this->transactions->where('wallet_id',$this->id)->count(),
             'transfers_count' => (int) $this->transfers->count(),
         ];

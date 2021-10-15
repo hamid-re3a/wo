@@ -55,34 +55,34 @@ class UpdateSettingRequest extends FormRequest
                     return 'required|in:fix,percentage';
                     break;
                 case 'minimum_deposit_fund_amount':
-                    return 'required|min:1|lte:' . walletGetSetting('maximum_deposit_fund_amount');
+                    return 'required|min:1|lte:' . getWalletSetting('maximum_deposit_fund_amount');
                     break;
                 case 'maximum_deposit_fund_amount':
-                    return 'required|gte:' . walletGetSetting('minimum_deposit_fund_amount');
+                    return 'required|gte:' . getWalletSetting('minimum_deposit_fund_amount');
                     break;
                 case 'minimum_transfer_fund_amount':
-                    return 'required|min:1|lte:' . walletGetSetting('maximum_transfer_fund_amount');
+                    return 'required|min:1|lte:' . getWalletSetting('maximum_transfer_fund_amount');
                     break;
                 case 'maximum_transfer_fund_amount':
-                    return 'required|gte:' . walletGetSetting('minimum_transfer_fund_amount');
+                    return 'required|gte:' . getWalletSetting('minimum_transfer_fund_amount');
                     break;
                 case 'minimum_payment_request_amount':
-                    return 'required|lte:' . walletGetSetting('maximum_payment_request_amount');
+                    return 'required|lte:' . getWalletSetting('maximum_payment_request_amount');
                     break;
                 case 'maximum_payment_request_amount':
-                    return 'required|gte:' . walletGetSetting('minimum_payment_request_amount');
+                    return 'required|gte:' . getWalletSetting('minimum_payment_request_amount');
                     break;
                 case 'minimum_transfer_from_earning_to_deposit_wallet_fund_amount':
-                    return 'required|lte:' . walletGetSetting('maximum_transfer_from_earning_to_deposit_wallet_fund_amount');
+                    return 'required|lte:' . getWalletSetting('maximum_transfer_from_earning_to_deposit_wallet_fund_amount');
                     break;
                 case 'maximum_transfer_from_earning_to_deposit_wallet_fund_amount':
-                    return 'required|gte:' . walletGetSetting('minimum_transfer_from_earning_to_deposit_wallet_fund_amount');
+                    return 'required|gte:' . getWalletSetting('minimum_transfer_from_earning_to_deposit_wallet_fund_amount');
                     break;
                 case 'minimum_withdraw_request_from_earning_wallet_amount':
-                    return 'required|lte:' . walletGetSetting('maximum_withdraw_request_from_earning_wallet_amount');
+                    return 'required|lte:' . getWalletSetting('maximum_withdraw_request_from_earning_wallet_amount');
                     break;
                 case 'maximum_withdraw_request_from_earning_wallet_amount':
-                    return 'required|gte:' . walletGetSetting('minimum_withdraw_request_from_earning_wallet_amount');
+                    return 'required|gte:' . getWalletSetting('minimum_withdraw_request_from_earning_wallet_amount');
                     break;
                 case 'withdrawal_request_is_enabled':
                 case 'auto_payout_withdrawal_request_is_enable':
@@ -98,11 +98,11 @@ class UpdateSettingRequest extends FormRequest
                     return 'required|integer';
                     break;
                 case 'withdrawal_distribution_in_btc' :
-                    $withdrawal_distribution_in_janex = (int) walletGetSetting('withdrawal_distribution_in_janex');
+                    $withdrawal_distribution_in_janex = (int) getWalletSetting('withdrawal_distribution_in_janex');
                     return 'required|min:0|max:' . (100 - $withdrawal_distribution_in_janex);
                     break;
                 case 'withdrawal_distribution_in_janex' :
-                    $withdrawal_distribution_in_btc = (int) walletGetSetting('withdrawal_distribution_in_janex');
+                    $withdrawal_distribution_in_btc = (int) getWalletSetting('withdrawal_distribution_in_janex');
                     return 'required|min:0|max:' . (100 - $withdrawal_distribution_in_btc);
                     break;
                 default:

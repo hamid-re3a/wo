@@ -247,8 +247,8 @@ class EarningWalletController extends Controller
 
     private function calculateTransferAmount($amount)
     {
-        $transfer_fee = walletGetSetting('transfer_fee');
-        $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
+        $transfer_fee = getWalletSetting('transfer_fee');
+        $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
 
         if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
             $transfer_fee = $amount * $transfer_fee / 100;

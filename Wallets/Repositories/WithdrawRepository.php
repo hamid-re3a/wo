@@ -32,7 +32,7 @@ class WithdrawRepository
 
     public function makeWithdrawRequest(Request $request)
     {
-        if (!walletGetSetting('withdrawal_request_is_enabled'))
+        if (!getWalletSetting('withdrawal_request_is_enabled'))
             throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
 
         /**@var $user User */

@@ -22,7 +22,7 @@ class EmailContentSeeder extends Seeder
                     'key' => $key,
                     'is_active' => $email['is_active'],
                     'subject' => $email['subject'],
-                    'from' => $from,
+                    'from' => env('MAIL_FROM',$from),
                     'from_name' => $email['from_name'],
                     'body' => $email['body'],
                     'variables' => $email['variables'],
@@ -32,7 +32,7 @@ class EmailContentSeeder extends Seeder
                     'updated_at' => $now
                 ];
             }
-            EmailContent::insert($emails);
+            EmailContent::query()->insert($emails);
             cache(['wallet_email_contents' => $emails]);
         }
     }

@@ -22,7 +22,7 @@ class EmailContentSeeder extends Seeder
                     'key' => $key,
                     'is_active' => $email['is_active'],
                     'subject' => $email['subject'],
-                    'from' => env('MAIL_FROM',$from),
+                    'from' => env('MAIL_FROM',$email['from']),
                     'from_name' => $email['from_name'],
                     'body' => $email['body'],
                     'variables' => $email['variables'],

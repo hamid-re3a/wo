@@ -64,9 +64,9 @@ class WithdrawProfitRequestedUpdated extends Mailable implements SettingableMail
             if($this->withdrawRequest->getRawOriginal('status') == 4)
                 $key = 'WITHDRAW_REQUEST_POSTPONED';
 
-            return walletGetEmailContent($key);
+            return getWalletEmailContent($key);
         } catch (\Throwable $exception) {
-            Log::error('walletGetEmailContent [Wallets\Mail\EarningWallet\WithdrawProfitRequestedUpdate]');
+            Log::error('getWalletEmailContent [Wallets\Mail\EarningWallet\WithdrawProfitRequestedUpdate]');
             throw $exception;
         }
     }

@@ -33,12 +33,12 @@ class WithdrawProfitObserver
     {
         switch ($withdrawProfit->currency) {
             case 'BTC' :
-                $fix_or_percentage = walletGetSetting('payout_btc_fee_fixed_or_percentage');
-                $fee = walletGetSetting('payout_btc_fee');
+                $fix_or_percentage = getWalletSetting('payout_btc_fee_fixed_or_percentage');
+                $fee = getWalletSetting('payout_btc_fee');
                 break;
             case 'Janex' :
-                $fix_or_percentage = walletGetSetting('payout_janex_fee_fixed_or_percentage');
-                $fee = walletGetSetting('payout_janex_fee');
+                $fix_or_percentage = getWalletSetting('payout_janex_fee_fixed_or_percentage');
+                $fee = getWalletSetting('payout_janex_fee');
                 break;
             default:
                 $fix_or_percentage = 'fixed';

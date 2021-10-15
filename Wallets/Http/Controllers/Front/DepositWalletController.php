@@ -36,6 +36,8 @@ class DepositWalletController extends Controller
 
     private function prepareDepositWallet()
     {
+        $this->user = auth()->user();
+
         $this->bankService = new BankService($this->user);
         $this->walletName = config('depositWallet');
         $this->walletObject = $this->bankService->getWallet($this->walletName);
@@ -95,7 +97,7 @@ class DepositWalletController extends Controller
     public function paymentRequest(AskFundRequest $request)
     {
         $user = User::query()->where('member_id', $request->get('member_id'))->first();
-        UrgentEmailJob::dispatch(new RequestFundEmail($user, auth()->user(), $request->get('amount')), $user->email);
+        UrgentEmailJob::dispatch(new RequestFundEmail($user, $this->user, $request->get('amount')), $user->email);
 
         return api()->success(null, [
             'amount' => $request->get('amount'),

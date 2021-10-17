@@ -25,8 +25,8 @@ class OrderTypeFilterRequest extends FormRequest
      */
     public function rules()
     {
-            return [
-            'type' => array('required', Rule::in(["week","month","year"])),
+        return [
+            'type' => array('required', Rule::in(["week", "month", "year"])),
         ];
     }
 

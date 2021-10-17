@@ -27,8 +27,8 @@ class OrderFeatureTest extends OrderTest
             route('admin.orders.dashboard.package-overview'),
             ['type' => 'week']
         );
-
-        dd($response->json());
+        $response->assertOk();
+//        dd($response->json());
     }
     /**
      * @test

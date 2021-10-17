@@ -43,7 +43,7 @@ class DepositWalletResource extends JsonResource
             ->first();
         return [
             'name' => $this->name,
-            'balance' => $this->balanceFloat,
+            'balance' => $this->balance / 100,
             'transactions_count' => (int) $this->transactions->where('wallet_id','=',$this->id)->count(),
             'transfers_count' => (int) $this->transfers->count(),
             'total_transfer' => $total_sum->total_transfer ?$total_sum->total_transfer / 100 : 0,

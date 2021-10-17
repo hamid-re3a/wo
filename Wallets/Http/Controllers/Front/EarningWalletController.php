@@ -2,37 +2,36 @@
 
 namespace Wallets\Http\Controllers\Front;
 
+use Bavix\Wallet\Models\Wallet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
-use Wallets\Http\Requests\Front\CreateWithdrawRequest;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
-use Wallets\Http\Resources\WithdrawProfitResource;
-use Wallets\Models\Transaction;
-use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
 
 class EarningWalletController extends Controller
 {
-    /**
-     * @var $bankService BankService
-     * @var $user User
-     */
+    /**@var $bankService BankService*/
     private $bankService;
-    private $wallet;
+    private $walletName;
+    /**@var $walletObject Wallet*/
+    private $walletObject;
 
     private function prepareEarningWallet()
     {
-        $this->bankService = new BankService(auth()->user());
-        $this->wallet = config('earningWallet');
-        $this->bankService->getWallet($this->wallet);
+        /**@var $user User*/
+        $user = auth()->user();
+
+        $this->bankService = new BankService($user);
+        $this->walletName = config('earningWallet');
+        $this->walletObject = $this->bankService->getWallet($this->walletName);
 
     }
 
@@ -45,6 +44,7 @@ class EarningWalletController extends Controller
         $this->prepareEarningWallet();
         $counts = User::query()->whereId(auth()->user()->id)
             ->withSumQuery(['transactions.amount AS binary_commissions_sum' => function (Builder $query) {
+                    $query->where('wallet_id','=', $this->walletObject->id);
                     $query->where('type', '=', 'deposit');
                     $query->whereHas('metaData', function (Builder $subQuery) {
                         $subQuery->where('name', '=', 'Binary Commissions');
@@ -52,6 +52,7 @@ class EarningWalletController extends Controller
                 }]
             )
             ->withSumQuery(['transactions.amount AS direct_commissions_sum' => function (Builder $query) {
+                    $query->where('wallet_id','=', $this->walletObject->id);
                     $query->where('type', '=', 'deposit');
                     $query->whereHas('metaData', function (Builder $subQuery) {
                         $subQuery->where('name', '=', 'Direct Commissions');
@@ -59,6 +60,7 @@ class EarningWalletController extends Controller
                 }]
             )
             ->withSumQuery(['transactions.amount AS indirect_commissions_sum' => function (Builder $query) {
+                    $query->where('wallet_id','=', $this->walletObject->id);
                     $query->where('type', '=', 'deposit');
                     $query->whereHas('metaData', function (Builder $subQuery) {
                         $subQuery->where('name', '=', 'Indirect Commissions');
@@ -66,6 +68,7 @@ class EarningWalletController extends Controller
                 }]
             )
             ->withSumQuery(['transactions.amount AS roi_sum' => function (Builder $query) {
+                    $query->where('wallet_id','=', $this->walletObject->id);
                     $query->where('type', '=', 'deposit');
                     $query->whereHas('metaData', function (Builder $subQuery) {
                         $subQuery->where('name', '=', 'ROI');
@@ -73,6 +76,7 @@ class EarningWalletController extends Controller
                 }]
             )
             ->withSumQuery(['transactions.amount AS spent_sum' => function (Builder $query) {
+                    $query->where('wallet_id','=', $this->walletObject->id);
                     $query->where('type', '=', 'withdraw');
                 }]
             )
@@ -96,7 +100,7 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        return api()->success(null, EarningWalletResource::make($this->bankService->getWallet($this->wallet)));
+        return api()->success(null, EarningWalletResource::make($this->walletObject));
 
     }
 
@@ -110,7 +114,7 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        $list = $this->bankService->getTransactions($this->wallet)->paginate();
+        $list = $this->bankService->getTransactions($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
             'pagination' => [
@@ -130,7 +134,7 @@ class EarningWalletController extends Controller
     {
 
         $this->prepareEarningWallet();
-        $list = $this->bankService->getTransfers($this->wallet)->paginate();
+        $list = $this->bankService->getTransfers($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransferResource::collection($list),
             'pagination' => [
@@ -161,7 +165,7 @@ class EarningWalletController extends Controller
                 $to_user = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
             }
-            $balance = $this->bankService->getBalance(config('earningWallet'));
+            $balance = $this->bankService->getBalance($this->walletName);
             $remain_balance = $balance - $amount;
 
             return api()->success(null, [
@@ -220,14 +224,14 @@ class EarningWalletController extends Controller
             }
 
             $transfer = $this->bankService->transfer(
-                $this->bankService->getWallet($this->wallet),
+                $this->bankService->getWallet($this->walletName),
                 $deposit_wallet,
                 $amount,
                 $description
             );
 
             if ($request->has('member_id') AND $fee > 0)
-                $this->bankService->withdraw($this->wallet, $fee, [
+                $this->bankService->withdraw($this->walletName, $fee, [
                     'transfer_id' => $transfer->id
                 ], 'Transfer fee');
 
@@ -243,8 +247,8 @@ class EarningWalletController extends Controller
 
     private function calculateTransferAmount($amount)
     {
-        $transfer_fee = walletGetSetting('transfer_fee');
-        $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
+        $transfer_fee = getWalletSetting('transfer_fee');
+        $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
 
         if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
             $transfer_fee = $amount * $transfer_fee / 100;

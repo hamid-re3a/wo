@@ -45,10 +45,10 @@ class ProcessBTCWithdrawalRequestsCommand extends Command
      */
     public function handle()
     {
-        if (!walletGetSetting('auto_payout_withdrawal_request_is_enable'))
+        if (!getWalletSetting('auto_payout_withdrawal_request_is_enable'))
             return null;
 
-        $chunk_allowed_size_setting = walletGetSetting('count_withdraw_requests_to_automatic_payout_process') ? walletGetSetting('count_withdraw_requests_to_automatic_payout_process') : 50;
+        $chunk_allowed_size_setting = getWalletSetting('count_withdraw_requests_to_automatic_payout_process') ? getWalletSetting('count_withdraw_requests_to_automatic_payout_process') : 50;
 
         $withdrawal_requests = $this->fetchWithdrawalRequestsFromDB();
 
@@ -66,7 +66,7 @@ class ProcessBTCWithdrawalRequestsCommand extends Command
      */
     public function fetchWithdrawalRequestsFromDB(): Builder
     {
-        $maximum_amount = walletGetSetting('maximum_auto_handle_withdrawals_payout');
+        $maximum_amount = getWalletSetting('maximum_auto_handle_withdrawals_payout');
         //Query withdrawal requests
         return WithdrawProfit::query()
             ->select(['wallet_hash','crypto_amount','id'])

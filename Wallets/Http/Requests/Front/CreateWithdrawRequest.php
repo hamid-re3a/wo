@@ -31,8 +31,8 @@ class CreateWithdrawRequest extends FormRequest
     public function rules()
     {
         $this->prepare();
-        $this->minimum_amount = walletGetSetting('minimum_withdraw_request_from_earning_wallet_amount');
-        $this->maximum_amount = walletGetSetting('maximum_withdraw_request_from_earning_wallet_amount');
+        $this->minimum_amount = getWalletSetting('minimum_withdraw_request_from_earning_wallet_amount');
+        $this->maximum_amount = getWalletSetting('maximum_withdraw_request_from_earning_wallet_amount');
 
         return [
             'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance,

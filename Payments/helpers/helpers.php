@@ -336,13 +336,19 @@ if (!function_exists('getPaymentEmailSetting')) {
 
     function getPaymentEmailSetting($key)
     {
+        $email = null;
         $setting = EmailContentSetting::query()->where('key', $key)->first();
         if ($setting && !empty($setting->value)) {
-            return $setting->toArray();
+            $email = $setting->toArray();
         }
 
         if (isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key])) {
-            return PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
+            $email =  PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
+        }
+
+        if($email AND is_array($email)) {
+            $email['from'] = env('MAIL_FROM', $email['from']);
+            return $email;
         }
 
         throw new Exception(trans('payment.responses.main-key-settings-is-missing'));

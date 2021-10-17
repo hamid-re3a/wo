@@ -19,7 +19,7 @@ class OrderTableSeeder extends Seeder
     public function run()
     {
         // Load local seeder
-        if (app()->environment() != 'testing') {
+//        if (app()->environment() != 'testing') {
             $data = [
                 ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],
                 ['id' => 2, 'user_id' => 2, 'position' => 'left', 'parent_id' => 1],
@@ -64,5 +64,5 @@ class OrderTableSeeder extends Seeder
         }
 
 
-    }
+//    }
 }

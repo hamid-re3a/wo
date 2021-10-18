@@ -207,6 +207,7 @@ class PaymentProcessor
             return [false,trans('payment.responses.payment-service.btc-pay-server-error')];
         }
     }
+
     private function createInvoiceModel(Invoice $invoice_request)
     {
         return \Payments\Models\Invoice::query()->create([

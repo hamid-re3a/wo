@@ -187,7 +187,7 @@ class DepositWalletController extends Controller
                 [
                     'member_id' => $request->get('member_id'),
                     'fee' => $fee,
-                    'type' => 'Transfer'
+                    'type' => 'Funds transferred'
                 ]
             );
 
@@ -242,7 +242,18 @@ class DepositWalletController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
-        return api()->success(null, $this->wallet_repository->getUserDepositWalletOverviewBalance($request->get('type'),$this->walletObject));
+        return api()->success(null, $this->wallet_repository->getUserWalletOverviewBalance($request->get('type'),$this->walletObject));
+    }
+
+    /**
+     * Investments chart
+     * @group Public User > Deposit Wallet
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function investmentsChart(ChartTypeRequest $request)
+    {
+        return api()->success(null,$this->wallet_repository->getUserWalletInvestmentChart($request->get('type'), $this->walletObject));
     }
 
     private function calculateTransferAmount($amount)

@@ -52,6 +52,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
 
             Route::prefix('charts')->name('charts')->group(function(){
                 Route::post('overall-balance',[DepositWalletController::class,'overallBalanceChart'])->name('overall-balance');
+                Route::post('investments',[DepositWalletController::class,'investmentsChart'])->name('investments');
             });
         });
 

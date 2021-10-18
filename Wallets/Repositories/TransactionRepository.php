@@ -5,6 +5,7 @@ namespace Wallets\Repositories;
 
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use Wallets\Models\Transaction;
 
@@ -12,7 +13,7 @@ class TransactionRepository
 {
     private $entity = Transaction::class;
 
-    public function getTransactionByDateCollection($date_field,$from_date,$to_date,$wallet_id = null)
+    public function getTransactionByDateCollection($date_field,$from_date,$to_date,$wallet_id = null,$type = null)
     {
         try {
 
@@ -22,6 +23,11 @@ class TransactionRepository
 
             if($wallet_id)
                 $transaction->where('wallet_id','=',$wallet_id);
+
+            if($type)
+                $transaction->whereHas('metaData', function (Builder $query) use($type) {
+                    $query->where('wallet_transaction_types.name', '=', trim($type));
+                });
 
             $from_date = Carbon::parse($from_date)->toDateTimeString();
             $to_date = Carbon::parse($to_date)->toDateTimeString();

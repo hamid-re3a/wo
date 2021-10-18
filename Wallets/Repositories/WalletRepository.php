@@ -44,7 +44,7 @@ class WalletRepository
             ->first();
     }
 
-    public function getUserDepositWalletOverviewBalance($type,Wallet $wallet)
+    public function getUserWalletOverviewBalance($type,Wallet $wallet)
     {
         $that = $this;
         $function_transaction_collection = function ($from_day, $to_day) use ($that,$wallet) {
@@ -60,6 +60,35 @@ class WalletRepository
 
         $result = [];
         $result['balance'] = chartMaker($type, $function_transaction_collection, $sub_function);
+        return $result;
+    }
+
+    public function getUserWalletInvestmentChart($type,Wallet $wallet)
+    {
+        $that = $this;
+        $function_transaction_transfer_collection = function ($from_day, $to_day) use ($that,$wallet) {
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet->id,'Funds transferred');
+        };
+
+        $function_transaction_giftcode_collection = function ($from_day, $to_day) use ($that,$wallet) {
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet->id,'Gift code created');
+        };
+
+        $function_transaction_purchase_collection = function ($from_day, $to_day) use ($that,$wallet) {
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet->id,'Package purchased');
+        };
+
+        $sub_function = function ($collection, $intervals) {
+            /**@var $collection Collection*/
+            return $collection->whereBetween('created_at', $intervals)->sum(function ($transaction){
+                return $transaction->metaData->first()->pivot->wallet_after_balance / 100;
+            });
+        };
+
+        $result = [];
+        $result['transfer'] = chartMaker($type, $function_transaction_transfer_collection, $sub_function);
+        $result['giftcode'] = chartMaker($type, $function_transaction_giftcode_collection, $sub_function);
+        $result['purchase'] = chartMaker($type, $function_transaction_purchase_collection, $sub_function);
         return $result;
     }
 }

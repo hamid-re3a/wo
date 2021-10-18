@@ -15,7 +15,7 @@ class WalletRepository
 
     public function __construct()
     {
-        $this->transaction_repository =  new Transaction();
+        $this->transaction_repository =  new TransactionRepository();
     }
 
     public function getOverAllSum(Wallet $wallet)

@@ -11,7 +11,7 @@ class OrderRepository
     public function getCountSubscriptions()
     {
         $order = new $this->entity_name;
-        return $order_package_is_paid = $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->count();
+        return $order_package_is_paid = $order->resolved()->count();
     }
 
 
@@ -19,36 +19,36 @@ class OrderRepository
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP < DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->count();
+        return $order->resolved()->active()->count();
     }
 
-    public function getCountDeactivatePackage()
+    public function getCountExpiredPackage()
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP >= DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->count();
+        return $order->resolved()->expired()->count();
     }
 
 
-    public function getCountActivePackageByDate($from,$until)
+    public function getActivePackageByDateCollection($from, $until)
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP < DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->whereBetween('created_at',[$from,$until])->get();
+        return $order->resolved()->active()->whereBetween('created_at',[$from,$until])->get();
     }
 
-    public function getCountDeactivatePackageByDate($from,$until)
+    public function getExpiredPackageByDateCollection($from, $until)
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereRaw("CURRENT_TIMESTAMP >= DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)")->whereBetween('created_at',[$from,$until])->get();
+        return $order->resolved()->expired()->whereBetween('created_at',[$from,$until])->get();
     }
 
-    public function getCountTotalPackageByDate($from,$until)
+    public function getTotalPackageByDateCollection($from, $until)
     {
         $order = new $this->entity_name;
 
-        return $order->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null]])->whereBetween('created_at',[$from,$until])->get();
+        return $order->resolved()->whereBetween('created_at',[$from,$until])->get();
     }
 
 }

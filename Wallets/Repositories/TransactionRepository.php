@@ -29,7 +29,7 @@ class TransactionRepository
             return $transaction->whereBetween($date_field,[$from_date,$to_date])->get();
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\TransactionRepository@getTransactionByDateCollection => ' . $exception->getMessage());
-            return $exception;
+            throw new \Exception(trans('wallets.responses.something-went-wrong'));
         }
     }
 }

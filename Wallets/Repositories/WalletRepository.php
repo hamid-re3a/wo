@@ -54,10 +54,12 @@ class WalletRepository
         $sub_function = function ($collection, $intervals) {
             /**@var $collection Collection*/
             return $collection->whereBetween('created_at', $intervals)->sum(function ($transaction){
-                return $transaction->metaData->first()->pivot->wallet_after_balance;
+                return $transaction->metaData->first()->pivot->wallet_after_balance / 100;
             });
         };
 
-        return chartMaker($type, $function_transaction_collection, $sub_function);
+        $result = [];
+        $result['balance'] = chartMaker($type, $function_transaction_collection, $sub_function);
+        return $result;
     }
 }

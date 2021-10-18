@@ -4,9 +4,12 @@
 namespace Wallets\Repositories;
 
 
+use Giftcode\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Payments\Services\Processors\PayoutProcessor;
 use User\Models\User;
 use User\Services\Grpc\WalletInfo;
@@ -24,10 +27,13 @@ class WithdrawRepository
     private $bankService;
     private $payout_processor;
     private $wallet;
+    /**@var $withdraw_profits WithdrawProfit */
+    private $model;
 
     public function __construct(PayoutProcessor $payout_processor)
     {
         $this->payout_processor = $payout_processor;
+        $this->model = new WithdrawProfit();
     }
 
     public function makeWithdrawRequest(Request $request)
@@ -156,6 +162,58 @@ class WithdrawRepository
         }
     }
 
+    public function getPendingAmountVsTimeChart($type,$user_id = null)
+    {
+        try {
+            $that = $this;
+            $function_pending_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WITHDRAW_COMMAND_UNDER_REVIEW,$user_id);
+            };
+
+            $sub_function = function ($collection, $intervals) {
+                /**@var $collection Collection*/
+                return $collection->whereBetween('created_at', $intervals)->sum(function($withdraw_request) {
+                    /**@var $withdraw_request WithdrawProfit*/
+                    return $withdraw_request->pf_amount;
+                });
+            };
+
+            $result = [];
+            $result['withdraw_requests'] = chartMaker($type, $function_pending_withdraw_requests, $sub_function);
+            return $result;
+
+        } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\WithdrawRepository@getPendingAmountVsTimeChart => ' . $exception->getMessage());
+            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+        }
+    }
+
+    public function getPaidAmountVsTimeChart($type,$user_id = null)
+    {
+        try {
+            $that = $this;
+            $function_pending_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WITHDRAW_COMMAND_PROCESS,$user_id);
+            };
+
+            $sub_function = function ($collection, $intervals) {
+                /**@var $collection Collection*/
+                return $collection->whereBetween('created_at', $intervals)->sum(function($withdraw_request) {
+                    /**@var $withdraw_request WithdrawProfit*/
+                    return $withdraw_request->pf_amount;
+                });
+            };
+
+            $result = [];
+            $result['withdraw_requests'] = chartMaker($type, $function_pending_withdraw_requests, $sub_function);
+            return $result;
+
+        } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\WithdrawRepository@getPendingAmountVsTimeChart => ' . $exception->getMessage());
+            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+        }
+    }
+
     public function checkBPSWalletBalance($amount)
     {
         try {
@@ -205,4 +263,24 @@ class WithdrawRepository
 
         return $reply->getAddress();
     }
+
+    private function getWithdrawRequestsByDateCollection($date_field,$from_date,$to_date,$status = null,$user_id = null)
+    {
+        try {
+            $withdraw_profit_requests = $this->model->query();
+            if($status)
+                $withdraw_profit_requests->where('status','=',WITHDRAW_COMMAND_UNDER_REVIEW);
+
+            if($user_id)
+                $withdraw_profit_requests->where('user_id',$user_id);
+
+            $from_date = Carbon::parse($from_date)->toDateTimeString();
+            $to_date = Carbon::parse($to_date)->toDateTimeString();
+            return $withdraw_profit_requests->whereBetween($date_field, [$from_date,$to_date])->get();
+        } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
+            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+        }
+    }
+
 }

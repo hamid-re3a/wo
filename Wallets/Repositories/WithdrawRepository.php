@@ -166,7 +166,7 @@ class WithdrawRepository
     {
         try {
             $that = $this;
-            $function_pending_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
+            $function_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
                 return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WITHDRAW_COMMAND_UNDER_REVIEW,$user_id);
             };
 
@@ -179,7 +179,7 @@ class WithdrawRepository
             };
 
             $result = [];
-            $result['withdraw_requests'] = chartMaker($type, $function_pending_withdraw_requests, $sub_function);
+            $result['withdraw_requests'] = chartMaker($type, $function_withdraw_requests, $sub_function);
             return $result;
 
         } catch (\Throwable $exception) {
@@ -192,7 +192,7 @@ class WithdrawRepository
     {
         try {
             $that = $this;
-            $function_pending_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
+            $function_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
                 return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WITHDRAW_COMMAND_PROCESS,$user_id);
             };
 
@@ -205,7 +205,7 @@ class WithdrawRepository
             };
 
             $result = [];
-            $result['withdraw_requests'] = chartMaker($type, $function_pending_withdraw_requests, $sub_function);
+            $result['withdraw_requests'] = chartMaker($type, $function_withdraw_requests, $sub_function);
             return $result;
 
         } catch (\Throwable $exception) {

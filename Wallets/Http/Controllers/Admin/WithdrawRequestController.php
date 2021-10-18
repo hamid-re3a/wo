@@ -167,7 +167,7 @@ class WithdrawRequestController extends Controller
     }
 
     /**
-     * Payout group withdraw requests
+     * Pending amount vs time chart
      * @group Admin User > Wallets > Withdraw Requests
      * @param ChartTypeRequest $request
      * @return JsonResponse
@@ -179,7 +179,7 @@ class WithdrawRequestController extends Controller
     }
 
     /**
-     * Payout group withdraw requests
+     * Paid amount vs time chart
      * @group Admin User > Wallets > Withdraw Requests
      * @param ChartTypeRequest $request
      * @return JsonResponse

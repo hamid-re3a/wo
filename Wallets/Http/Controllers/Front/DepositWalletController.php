@@ -242,7 +242,7 @@ class DepositWalletController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
-        return api()->success(null, $this->wallet_repository->getUserWalletOverviewBalance($request->get('type'),$this->walletObject));
+        return api()->success(null, $this->wallet_repository->getWalletOverviewBalance($request->get('type'),$this->walletObject->id));
     }
 
     /**
@@ -253,7 +253,7 @@ class DepositWalletController extends Controller
      */
     public function investmentsChart(ChartTypeRequest $request)
     {
-        return api()->success(null,$this->wallet_repository->getUserWalletInvestmentChart($request->get('type'), $this->walletObject));
+        return api()->success(null,$this->wallet_repository->getWalletInvestmentChart($request->get('type'), $this->walletObject->id));
     }
 
     private function calculateTransferAmount($amount)

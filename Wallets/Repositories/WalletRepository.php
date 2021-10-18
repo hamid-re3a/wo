@@ -55,7 +55,7 @@ class WalletRepository
         $sub_function = function ($collection, $intervals) {
             /**@var $collection Collection*/
             return $collection->whereBetween('created_at', $intervals)->sum(function ($transaction){
-                return $transaction->metaData->first()->pivot->wallet_after_balance / 100;
+                return $transaction->amount / 100;
             });
         };
 

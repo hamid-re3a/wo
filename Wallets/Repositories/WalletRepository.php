@@ -82,7 +82,7 @@ class WalletRepository
         $sub_function = function ($collection, $intervals) {
             /**@var $collection Collection*/
             return $collection->whereBetween('created_at', $intervals)->sum(function ($transaction){
-                return $transaction->amount / 100;
+                return abs($transaction->amount / 100);
             });
         };
 

@@ -73,6 +73,18 @@ class DashboardController extends Controller
         return api()->success(null, $this->order_service->packageOverviewCount($request->type));
     }
 
+    /**
+     * Get packages based on type
+     * @group
+     * Admin User > Orders Dashboard
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageTypeCount(OrderTypeFilterRequest $request)
+    {
+        return api()->success(null, $this->order_service->packageTypeCount($request->type));
+    }
+
 
 
 }

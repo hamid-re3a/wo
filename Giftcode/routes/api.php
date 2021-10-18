@@ -15,6 +15,10 @@ Route::name('giftcodes.')->middleware('auth')->group(function () {
         Route::prefix('dashboard')->name('dashboard')->group(function(){
             Route::get('counts',[AdminDashboardController::class,'counts'])->name('counts');
             Route::get('',[AdminDashboardController::class,'index'])->name('index');
+            Route::prefix('charts')->name('charts')->group(function(){
+                Route::post('giftcodes-vs-time',[AdminDashboardController::class,'giftcodesVsTimeChart'])->name('giftcode-vs-time');
+                Route::post('package-vs-time',[AdminDashboardController::class,'packageVsTimeChart'])->name('package-vs-time');
+            });
         });
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('', [SettingController::class, 'index'])->name('list');

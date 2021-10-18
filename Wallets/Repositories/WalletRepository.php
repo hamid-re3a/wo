@@ -45,11 +45,11 @@ class WalletRepository
             ->first();
     }
 
-    public function getUserWalletOverviewBalance($type,Wallet $wallet)
+    public function getWalletOverallBalance($type,int $wallet_id = null)
     {
         $that = $this;
-        $function_transaction_collection = function ($from_day, $to_day) use ($that,$wallet) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet->id);
+        $function_transaction_collection = function ($from_day, $to_day) use ($that,$wallet_id) {
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet_id);
         };
 
         $sub_function = function ($collection, $intervals) {
@@ -64,25 +64,25 @@ class WalletRepository
         return $result;
     }
 
-    public function getUserWalletInvestmentChart($type,Wallet $wallet)
+    public function getWalletInvestmentChart($type,int $wallet_id = null)
     {
         $that = $this;
-        $function_transaction_transfer_collection = function ($from_day, $to_day) use ($that,$wallet) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet->id,'Funds transferred');
+        $function_transaction_transfer_collection = function ($from_day, $to_day) use ($that,$wallet_id) {
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet_id,'Funds transferred');
         };
 
-        $function_transaction_giftcode_collection = function ($from_day, $to_day) use ($that,$wallet) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet->id,'Gift code created');
+        $function_transaction_giftcode_collection = function ($from_day, $to_day) use ($that,$wallet_id) {
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet_id,'Gift code created');
         };
 
-        $function_transaction_purchase_collection = function ($from_day, $to_day) use ($that,$wallet) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet->id,'Package purchased');
+        $function_transaction_purchase_collection = function ($from_day, $to_day) use ($that,$wallet_id) {
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet_id,'Package purchased');
         };
 
         $sub_function = function ($collection, $intervals) {
             /**@var $collection Collection*/
             return $collection->whereBetween('created_at', $intervals)->sum(function ($transaction){
-                return $transaction->metaData->first()->pivot->wallet_after_balance / 100;
+                return $transaction->amount / 100;
             });
         };
 

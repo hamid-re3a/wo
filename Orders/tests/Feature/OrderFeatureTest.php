@@ -15,7 +15,20 @@ use Payments\Services\Processors\PaymentFacade;
 
 class OrderFeatureTest extends OrderTest
 {
-
+    /**
+     * @test
+     */
+    public function dashboard_subscription_type_chart()
+    {
+        OrderConfigure::seed();
+        $this->withHeaders($this->getHeaders());
+        $response = $this->post(
+            route('admin.orders.dashboard.package-type'),
+            ['type' => 'week']
+        );
+//        dd($response->json());
+        $response->assertOk();
+    }
     /**
      * @test
      */
@@ -28,7 +41,6 @@ class OrderFeatureTest extends OrderTest
             ['type' => 'week']
         );
         $response->assertOk();
-//        dd($response->json());
     }
     /**
      * @test

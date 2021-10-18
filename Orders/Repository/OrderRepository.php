@@ -37,6 +37,12 @@ class OrderRepository
         return $order->resolved()->active()->whereBetween('created_at',[$from,$until])->get();
     }
 
+    public function getActiveOrderWithPackageByDateCollection($from, $until)
+    {
+        $order = new $this->entity_name;
+
+        return $order->resolved()->active()->whereBetween('created_at',[$from,$until])->get();
+    }
     public function getExpiredPackageByDateCollection($from, $until)
     {
         $order = new $this->entity_name;

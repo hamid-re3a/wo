@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/active_package_count', [AdminDashboardController::class, 'activePackageCount'])->name('activePackageCount');
                 Route::get('/expired_package_count', [AdminDashboardController::class, 'expiredPackageCount'])->name('expiredPackageCount');
                 Route::post('/package_count_overview', [AdminDashboardController::class, 'packageOverviewCount'])->name('package-overview');
+                Route::post('/package_type_count', [AdminDashboardController::class, 'packageTypeCount'])->name('package-type');
             });
 
 

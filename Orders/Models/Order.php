@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Orders\Services\Grpc\OrderPlans;
+use Packages\Models\Package;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use User\Models\User;

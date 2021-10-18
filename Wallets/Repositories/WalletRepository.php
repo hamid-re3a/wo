@@ -6,15 +6,16 @@ use Bavix\Wallet\Models\Wallet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use User\Models\User;
+use Wallets\Models\Transaction;
 
 class WalletRepository
 {
-
+    /**@var $transaction_repository TransactionRepository*/
     private $transaction_repository;
 
-    public function __construct(TransactionRepository $transaction_repository)
+    public function __construct()
     {
-        $this->transaction_repository =  $transaction_repository;
+        $this->transaction_repository =  new Transaction();
     }
 
     public function getOverAllSum(Wallet $wallet)

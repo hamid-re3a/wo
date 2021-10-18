@@ -85,6 +85,16 @@ class DashboardController extends Controller
         return api()->success(null, $this->order_service->packageTypeCount($request->type));
     }
 
-
+    /**
+     * Get packages percentage based on type
+     * @group
+     * Admin User > Orders Dashboard
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageTypePercentCount(OrderTypeFilterRequest $request)
+    {
+        return api()->success(null, $this->order_service->packageTypePercentageCount($request->type));
+    }
 
 }

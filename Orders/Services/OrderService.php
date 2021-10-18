@@ -142,4 +142,54 @@ class OrderService implements OrdersServiceInterface
         return $final_result;
     }
 
+    public function packageTypePercentageCount($type)
+    {
+        $that = $this;
+        $function_active_package = function ($from_day, $to_day) use ($that) {
+            return $that->order_repository->getActiveOrderWithPackageByDateCollection($from_day, $to_day);
+        };
+
+        $sub_function_B = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'B')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+        $sub_function_I = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'I')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+
+        $sub_function_A = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'A')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+
+        $sub_function_P = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'P')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+
+        $final_result = [];
+        $final_result['B'] = chartMaker($type, $function_active_package, $sub_function_B);
+        $final_result['I'] = chartMaker($type, $function_active_package, $sub_function_I);
+        $final_result['A'] = chartMaker($type, $function_active_package, $sub_function_A);
+        $final_result['P'] = chartMaker($type, $function_active_package, $sub_function_P);
+        return $final_result;
+    }
+
 }

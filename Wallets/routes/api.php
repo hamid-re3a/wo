@@ -49,6 +49,10 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::post('transfer-funds', [DepositWalletController::class, 'transferFunds'])->name('transfer-fund');
             Route::post('deposit-funds', [DepositWalletController::class, 'deposit'])->name('deposit-funds');
             Route::post('payment-request', [DepositWalletController::class, 'paymentRequest'])->name('payment-request');
+
+            Route::prefix('charts')->name('charts')->group(function(){
+                Route::post('overall-balance',[DepositWalletController::class,'overallBalanceChart'])->name('overall-balance');
+            });
         });
 
         Route::name('earning.')->prefix('earning')->group(function () {

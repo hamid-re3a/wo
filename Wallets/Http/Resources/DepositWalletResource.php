@@ -5,7 +5,6 @@ namespace Wallets\Http\Resources;
 use Bavix\Wallet\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use User\Models\User;
 use Wallets\Repositories\WalletRepository;
 
 class DepositWalletResource extends JsonResource
@@ -20,9 +19,7 @@ class DepositWalletResource extends JsonResource
     {
         /**@var $wallet Wallet*/
         $wallet = $this->resource;
-        /**@var $user User*/
-        $user = $wallet->holder;
-        $wallet_repository = new WalletRepository($user);
+        $wallet_repository = new WalletRepository();
         $total_sum = $wallet_repository->getOverAllSum($wallet);
 
         return [

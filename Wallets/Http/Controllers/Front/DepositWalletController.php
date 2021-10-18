@@ -3,7 +3,6 @@
 namespace Wallets\Http\Controllers\Front;
 
 use Bavix\Wallet\Models\Wallet;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +16,6 @@ use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Mail\DepositWallet\ReceiverFundEmail;
 use Wallets\Mail\DepositWallet\RequestFundEmail;
 use Wallets\Mail\DepositWallet\SenderFundEmail;

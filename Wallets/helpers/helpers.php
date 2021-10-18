@@ -1,6 +1,8 @@
 <?php
 
 
+use Illuminate\Support\Carbon;
+
 if (!function_exists('getWalletSetting')) {
 
     function getWalletSetting($key)
@@ -59,12 +61,69 @@ if (!function_exists('formatCurrencyFormat')) {
     }
 }
 
-
 if (!function_exists('getMLMGrpcClient')) {
     function getMLMGrpcClient()
     {
         return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL', 'staging-api-gateway.janex.org:9598'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
+    }
+}
+
+if (!function_exists('chartMaker')) {
+    function chartMaker($duration_type, $repo_function, $sub_function)
+    {
+        switch ($duration_type) {
+            default:
+            case "week":
+
+                $from_day = Carbon::now()->endOfDay()->subDays(7);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+
+                $result = [];
+                foreach (range(-1, 5) as $day) {
+
+                    $timestamp = Carbon::now()->startOfDay()->subDays($day)->timestamp;
+                    $interval = [Carbon::now()->startOfDay()->subDays($day+1), Carbon::now()->startOfDay()->subDays($day)];
+
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+
+                }
+                return $result;
+                break;
+            case "month":
+                $from_day = Carbon::now()->endOfMonth()->subMonths(12);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+                $result = [];
+                foreach (range(-1, 10) as $month) {
+                    $timestamp = Carbon::now()->startOfMonth()->subMonths($month)->timestamp;
+                    $interval = [Carbon::now()->startOfMonth()->subMonths($month+1), Carbon::now()->startOfMonth()->subMonths($month)];
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+                }
+                return $result;
+                break;
+            case "year":
+
+                $from_day = Carbon::now()->endOfYear()->subYears(3);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+                $result = [];
+                foreach (range(-1, 3) as $year) {
+                    $timestamp = Carbon::now()->startOfYear()->subYears($year)->timestamp;
+                    $interval = [Carbon::now()->startOfYear()->subYears($year+1), Carbon::now()->startOfYear()->subYears($year)];
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+                }
+                return $result;
+                break;
+        }
+
     }
 }

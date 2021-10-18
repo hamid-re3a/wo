@@ -45,7 +45,7 @@ class WalletRepository
             ->first();
     }
 
-    public function getWalletOverviewBalance($type,int $wallet_id = null)
+    public function getWalletOverallBalance($type,int $wallet_id = null)
     {
         $that = $this;
         $function_transaction_collection = function ($from_day, $to_day) use ($that,$wallet_id) {
@@ -68,7 +68,7 @@ class WalletRepository
     {
         $that = $this;
         $function_transaction_transfer_collection = function ($from_day, $to_day) use ($that,$wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet_id->id,'Funds transferred');
+            return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet_id,'Funds transferred');
         };
 
         $function_transaction_giftcode_collection = function ($from_day, $to_day) use ($that,$wallet_id) {

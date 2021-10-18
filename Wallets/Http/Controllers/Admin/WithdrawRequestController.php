@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Requests\IndexWithdrawRequest;
 use Wallets\Http\Requests\Admin\PayoutGroupWithdrawRequest;
 use Wallets\Http\Requests\Admin\UpdateWithdrawRequest;
@@ -163,6 +164,30 @@ class WithdrawRequestController extends Controller
             Log::error('Admin/WithdrawRequestController@payout_group => ' . serialize($request->all()));
             throw $exception;
         }
+    }
+
+    /**
+     * Payout group withdraw requests
+     * @group Admin User > Wallets > Withdraw Requests
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function pendingAmountVsTimeChart(ChartTypeRequest $request)
+    {
+        return api()->success(null,$this->withdraw_repository->getPendingAmountVsTimeChart($request->get('type')));
+    }
+
+    /**
+     * Payout group withdraw requests
+     * @group Admin User > Wallets > Withdraw Requests
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function paidAmountVsTimeChart(ChartTypeRequest $request)
+    {
+        return api()->success(null,$this->withdraw_repository->getPaidAmountVsTimeChart($request->get('type')));
     }
 
 

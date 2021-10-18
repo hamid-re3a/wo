@@ -34,6 +34,11 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::get('',[AdminWithdrawRequestController::class,'index'])->name('index');
                 Route::patch('',[AdminWithdrawRequestController::class,'update'])->name('update');
                 Route::patch('payout-group',[AdminWithdrawRequestController::class,'payout_group'])->name('payout_group');
+
+                Route::prefix('charts')->name('charts')->group(function(){
+                    Route::post('pending-amount-vs-time',[AdminWithdrawRequestController::class,'pendingAmountVsTimeChart'])->name('pending-amount-vs-time');
+                    Route::post('paid-amount-vs-time',[AdminWithdrawRequestController::class,'paidAmountVsTimeChart'])->name('paid-amount-vs-time');
+                });
             });
     });
 

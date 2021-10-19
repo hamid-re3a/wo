@@ -26,6 +26,7 @@ return [
         [
             'name'=>'BTC',
             'is_active'=>true,
+            'available_services' => defined('CURRENCY_SERVICES') ? CURRENCY_SERVICES : null
         ]
     ],
     'payment_drivers' => [

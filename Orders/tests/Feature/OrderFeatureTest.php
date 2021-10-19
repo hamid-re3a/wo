@@ -6,6 +6,8 @@ namespace Orders\tests\Feature;
 
 use Illuminate\Support\Facades\Mail;
 use MLM\Services\Grpc\Acknowledge;
+use Orders\Models\Order;
+use Orders\OrderConfigure;
 use Orders\Services\MlmClientFacade;
 use Orders\tests\OrderTest;
 use Payments\Models\PaymentCurrency;
@@ -13,6 +15,33 @@ use Payments\Services\Processors\PaymentFacade;
 
 class OrderFeatureTest extends OrderTest
 {
+    /**
+     * @test
+     */
+    public function dashboard_subscription_type_chart()
+    {
+        OrderConfigure::seed();
+        $this->withHeaders($this->getHeaders());
+        $response = $this->post(
+            route('admin.orders.dashboard.package-type'),
+            ['type' => 'week']
+        );
+//        dd($response->json());
+        $response->assertOk();
+    }
+    /**
+     * @test
+     */
+    public function dashboard_subscription_chart()
+    {
+        OrderConfigure::seed();
+        $this->withHeaders($this->getHeaders());
+        $response = $this->post(
+            route('admin.orders.dashboard.package-overview'),
+            ['type' => 'week']
+        );
+        $response->assertOk();
+    }
     /**
      * @test
      */

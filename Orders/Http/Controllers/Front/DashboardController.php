@@ -4,22 +4,11 @@ namespace Orders\Http\Controllers\Front;
 
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
-use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
-use Orders\Models\Order;
-use Orders\Services\MlmClientFacade;
-use Packages\Services\Grpc\Id;
-use Packages\Services\PackageService;
-use Payments\Services\Grpc\Invoice;
-use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
 
 class DashboardController extends Controller
@@ -27,7 +16,7 @@ class DashboardController extends Controller
     /**
      * Order Counts
      * @group
-     * Public User > Orders
+     * Public User > Orders Dashboard
      */
     public function counts()
     {
@@ -66,7 +55,7 @@ class DashboardController extends Controller
     {
         /**@var $user User */
         $user = auth()->user();
-        $list = $user->orders()->filter()->paginate();
+        $list = $user->orders()->filter()->orderByDesc('id')->paginate();
         return api()->success(null, [
             'list' => OrderResource::collection($list),
             'pagination' => [

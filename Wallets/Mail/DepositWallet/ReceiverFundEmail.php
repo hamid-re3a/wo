@@ -54,9 +54,9 @@ class ReceiverFundEmail extends Mailable implements SettingableMail
     public function getSetting() : array
     {
         try {
-            return walletGetEmailContent('TRANSFER_FUNDS_RECEIVER');
+            return getWalletEmailContent('TRANSFER_FUNDS_RECEIVER');
         } catch (\Throwable $exception) {
-            Log::error('walletGetEmailContent [Wallets\Mail\DepositWallet\ReceiverFundEmail]');
+            Log::error('getWalletEmailContent [Wallets\Mail\DepositWallet\ReceiverFundEmail]');
             throw $exception;
         }
     }

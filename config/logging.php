@@ -45,6 +45,7 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
+            'permission' => 0777,
         ],
 
         'daily' => [
@@ -52,6 +53,7 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
+            'permission' => 0777,
         ],
 
         'slack' => [
@@ -98,6 +100,7 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+            'permission' => 0777,
         ],
     ],
 

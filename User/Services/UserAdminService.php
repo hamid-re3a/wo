@@ -3,8 +3,6 @@
 
 namespace User\Services;
 
-
-use App\Jobs\User\UserDataJob;
 use User\Repository\RoleRepository;
 use User\Repository\UserRepository;
 
@@ -43,9 +41,6 @@ class UserAdminService
         $role_name = implode(",",$admin->getRoleNames()->toArray());
         $userObject->setRole($role_name);
         $serializeUser = serialize($userObject);
-        UserDataJob::dispatch($serializeUser)->onConnection('rabbit')->onQueue('subscriptions');
-        UserDataJob::dispatch($serializeUser)->onConnection('rabbit')->onQueue('kyc');
-        UserDataJob::dispatch($serializeUser)->onConnection('rabbit')->onQueue('mlm');
 
         return $admin;
 

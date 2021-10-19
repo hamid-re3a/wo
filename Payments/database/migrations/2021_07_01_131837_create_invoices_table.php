@@ -34,6 +34,8 @@ class CreateInvoicesTable extends Migration
             $table->unsignedDouble('due_amount')->default(0);
             $table->unsignedDouble('deposit_amount')->default(0);
 
+            $table->unsignedDouble('rate')->default(0);
+
             $table->timestamp('expiration_time')->nullable();
 
 

@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\DB;
 use Payments\Models\EmailContentSetting;
 use Payments\Models\Setting;
 
-
 const CURRENCY_SERVICE_PURCHASE = 'purchase';
 const CURRENCY_SERVICE_WITHDRAW = 'withdraw';
 const CURRENCY_SERVICE_DEPOSIT = 'deposit';
@@ -337,13 +336,19 @@ if (!function_exists('getPaymentEmailSetting')) {
 
     function getPaymentEmailSetting($key)
     {
+        $email = null;
         $setting = EmailContentSetting::query()->where('key', $key)->first();
         if ($setting && !empty($setting->value)) {
-            return $setting->toArray();
+            $email = $setting->toArray();
         }
 
         if (isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key])) {
-            return PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
+            $email =  PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
+        }
+
+        if($email AND is_array($email)) {
+            $email['from'] = env('MAIL_FROM', $email['from']);
+            return $email;
         }
 
         throw new Exception(trans('payment.responses.main-key-settings-is-missing'));

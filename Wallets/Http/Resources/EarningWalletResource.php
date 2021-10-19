@@ -2,10 +2,9 @@
 
 namespace Wallets\Http\Resources;
 
-use Illuminate\Database\Eloquent\Builder;
+use Bavix\Wallet\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use User\Models\User;
 
 class EarningWalletResource extends JsonResource
 {
@@ -17,13 +16,14 @@ class EarningWalletResource extends JsonResource
      */
     public function toArray($request)
     {
-
+        /**@var $wallet Wallet*/
+        $wallet = $this->resource;
 
         return [
-            'name' => $this->name,
-            'balance' => $this->balanceFloat,
-            'transactions_count' => (int) $this->transactions->where('wallet_id',$this->id)->count(),
-            'transfers_count' => (int) $this->transfers->count(),
+            'name' => $wallet->name,
+            'balance' => $wallet->balanceFloat,
+            'transactions_count' => (int) $wallet->transactions()->count(),
+            'transfers_count' => (int) $wallet->transfers()->count(),
         ];
     }
 }

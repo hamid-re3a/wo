@@ -33,7 +33,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get all transactions
+     * Balance vs time chart
      * @group Admin User > Wallets
      * @param ChartTypeRequest $request
      * @return JsonResponse
@@ -44,7 +44,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get all transactions
+     * Investment vs time chart
      * @group Admin User > Wallets
      * @param ChartTypeRequest $request
      * @return JsonResponse

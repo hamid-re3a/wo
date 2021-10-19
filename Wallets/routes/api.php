@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Wallets\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use Wallets\Http\Controllers\Admin\EmailContentController;
 use Wallets\Http\Controllers\Admin\SettingController;
 use Wallets\Http\Controllers\Admin\WithdrawRequestController as AdminWithdrawRequestController;
@@ -18,6 +19,11 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::post('wallet-transactions', [AdminWalletController::class, 'getWalletTransactions'])->name('wallet-transactions');
                 Route::post('wallet-transfers', [AdminWalletController::class, 'getWalletTransfers'])->name('wallet-transfers');
                 Route::post('wallet-balance', [AdminWalletController::class, 'getWalletBalance'])->name('wallet-balance');
+
+                Route::prefix('charts')->name('charts')->group(function(){
+                    Route::post('overall-balance',[AdminDashboardController::class,'overallBalanceChart'])->name('overall-balance');
+                    Route::post('investments',[AdminDashboardController::class,'investmentsChart'])->name('investments');
+                });
             });;
             Route::name('settings.')->prefix('settings')->group(function () {
                 Route::get('', [SettingController::class, 'index'])->name('list');

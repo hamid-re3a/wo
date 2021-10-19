@@ -1,11 +1,10 @@
 <?php
 
-namespace Orders\Http\Requests\Front\Order;
+namespace Wallets\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class OrderTypeFilterRequest extends FormRequest
+class ChartTypeRequest extends FormRequest
 {
 
     /**
@@ -26,7 +25,7 @@ class OrderTypeFilterRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => array('required', Rule::in(["week", "month", "year","all"])),
+            'type' => 'required|in:week,month,year,all'
         ];
     }
 

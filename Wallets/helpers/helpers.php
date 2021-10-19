@@ -1,45 +1,55 @@
 <?php
 
 
-if (!function_exists('walletGetSetting')) {
+use Illuminate\Support\Carbon;
 
-    function walletGetSetting($key)
+if (!function_exists('getWalletSetting')) {
+
+    function getWalletSetting($key)
     {
         //Check if settings are available in cache
-        if(cache()->has('wallet_settings'))
-            if($setting = collect(cache('wallet_settings'))->where('name', $key)->first())
+        if (cache()->has('wallet_settings'))
+            if ($setting = collect(cache('wallet_settings'))->where('name', $key)->first())
                 return $setting['value'];
 
-        $setting = \Wallets\Models\Setting::query()->where('name',$key)->first();
-        if($setting)
+        $setting = \Wallets\Models\Setting::query()->where('name', $key)->first();
+        if ($setting)
             return $setting->value;
 
 
-        if(defined('WALLET_SETTINGS') AND is_array(WALLET_SETTINGS) AND array_key_exists($key,WALLET_SETTINGS))
+        if (defined('WALLET_SETTINGS') AND is_array(WALLET_SETTINGS) AND array_key_exists($key, WALLET_SETTINGS))
             return WALLET_SETTINGS[$key]['value'];
 
-        \Illuminate\Support\Facades\Log::error('walletGetSetting => ' . $key);
+        \Illuminate\Support\Facades\Log::error('getWalletSetting => ' . $key);
         throw new Exception(trans('wallet.responses.setting-key-doesnt-exists'));
     }
 }
 
-if(!function_exists('walletGetEmailContent')) {
+if (!function_exists('getWalletEmailContent')) {
 
-    function walletGetEmailContent($key)
+    function getWalletEmailContent($key)
     {
+        $email = null;
         //Check if email content is available in cache
-        if(cache()->has('wallet_email_contents'))
-            if($email = collect(cache('wallet_email_contents'))->where('key', $key)->first())
-                return $email;
+        if (cache()->has('wallet_email_contents'))
+            if($check = collect(cache('wallet_email_contents'))->where('key', $key)->first())
+                $email = $check;
 
 
-        if($email = \Wallets\Models\EmailContent::where('key',$key)->first())
-            return $email->toArray();
+        if ($email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
+            $email = $email->toArray();
 
-        if(defined('WALLET_EMAIL_CONTENTS') AND is_array(WALLET_EMAIL_CONTENTS) AND array_key_exists($key,WALLET_EMAIL_CONTENTS))
-            return WALLET_EMAIL_CONTENTS[$key];
+        if (defined('WALLET_EMAIL_CONTENTS') AND
+            is_array(WALLET_EMAIL_CONTENTS) AND
+            array_key_exists($key, WALLET_EMAIL_CONTENTS))
+            $email = WALLET_EMAIL_CONTENTS[$key];
 
-        \Illuminate\Support\Facades\Log::error('walletEmailContentError => ' . $key);
+        if($email AND is_array($email)) {
+            $email['from'] = env('MAIL_FROM', $email['from']);
+            return $email;
+        }
+
+        \Illuminate\Support\Facades\Log::error('getWalletEmailContentError => ' . $key);
         throw new Exception(trans('wallet.responses.email-key-doesnt-exists'));
     }
 
@@ -49,20 +59,77 @@ if (!function_exists('formatCurrencyFormat')) {
 
     function formatCurrencyFormat($value)
     {
-        if(is_numeric($value))
-            $value = number_format($value,2);
+        if (is_numeric($value))
+            $value = number_format($value, 2);
 //            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
         return $value;
     }
 }
 
-
 if (!function_exists('getMLMGrpcClient')) {
     function getMLMGrpcClient()
     {
-        return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL','staging-api-gateway.janex.org:9598'), [
+        return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL', 'staging-api-gateway.janex.org:9598'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
+    }
+}
+
+if (!function_exists('chartMaker')) {
+    function chartMaker($duration_type, $repo_function, $sub_function)
+    {
+        switch ($duration_type) {
+            default:
+            case "week":
+
+                $from_day = Carbon::now()->endOfDay()->subDays(7);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+
+                $result = [];
+                foreach (range(-1, 5) as $day) {
+
+                    $timestamp = Carbon::now()->startOfDay()->subDays($day)->timestamp;
+                    $interval = [Carbon::now()->startOfDay()->subDays($day+1), Carbon::now()->startOfDay()->subDays($day)];
+
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+
+                }
+                return $result;
+                break;
+            case "month":
+                $from_day = Carbon::now()->endOfMonth()->subMonths(12);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+                $result = [];
+                foreach (range(-1, 10) as $month) {
+                    $timestamp = Carbon::now()->startOfMonth()->subMonths($month)->timestamp;
+                    $interval = [Carbon::now()->startOfMonth()->subMonths($month+1), Carbon::now()->startOfMonth()->subMonths($month)];
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+                }
+                return $result;
+                break;
+            case "year":
+
+                $from_day = Carbon::now()->endOfYear()->subYears(3);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+                $result = [];
+                foreach (range(-1, 3) as $year) {
+                    $timestamp = Carbon::now()->startOfYear()->subYears($year)->timestamp;
+                    $interval = [Carbon::now()->startOfYear()->subYears($year+1), Carbon::now()->startOfYear()->subYears($year)];
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+                }
+                return $result;
+                break;
+        }
+
     }
 }

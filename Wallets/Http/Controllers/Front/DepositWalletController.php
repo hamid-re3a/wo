@@ -3,12 +3,12 @@
 namespace Wallets\Http\Controllers\Front;
 
 use Bavix\Wallet\Models\Wallet;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Requests\Front\AskFundRequest;
 use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
 use Wallets\Http\Resources\DepositWalletResource;
@@ -17,10 +17,10 @@ use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Mail\DepositWallet\ReceiverFundEmail;
 use Wallets\Mail\DepositWallet\RequestFundEmail;
 use Wallets\Mail\DepositWallet\SenderFundEmail;
+use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
 use Wallets\Services\WalletService;
 
@@ -33,9 +33,19 @@ class DepositWalletController extends Controller
     private $walletObject;
     /**@var $user User*/
     private $user;
+    private $wallet_repository;
+
+    public function __construct(WalletRepository $wallet_repository)
+    {
+        if(auth()->check())
+            $this->prepareDepositWallet();
+        $this->wallet_repository = $wallet_repository;
+    }
 
     private function prepareDepositWallet()
     {
+        $this->user = auth()->user();
+
         $this->bankService = new BankService($this->user);
         $this->walletName = config('depositWallet');
         $this->walletObject = $this->bankService->getWallet($this->walletName);
@@ -47,7 +57,6 @@ class DepositWalletController extends Controller
      */
     public function index()
     {
-        $this->prepareDepositWallet();
         return api()->success(null, DepositWalletResource::make($this->bankService->getWallet($this->walletName)));
 
     }
@@ -61,7 +70,6 @@ class DepositWalletController extends Controller
     public function transactions(TransactionRequest $request)
     {
 
-        $this->prepareDepositWallet();
         $list = $this->bankService->getTransactions($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
@@ -80,7 +88,6 @@ class DepositWalletController extends Controller
     public function transfers()
     {
 
-        $this->prepareDepositWallet();
         $data = $this->bankService->getTransfers($this->walletName)->simplePaginate();
         return api()->success(null, TransferResource::collection($data)->response()->getData());
 
@@ -95,7 +102,7 @@ class DepositWalletController extends Controller
     public function paymentRequest(AskFundRequest $request)
     {
         $user = User::query()->where('member_id', $request->get('member_id'))->first();
-        UrgentEmailJob::dispatch(new RequestFundEmail($user, auth()->user(), $request->get('amount')), $user->email);
+        UrgentEmailJob::dispatch(new RequestFundEmail($user, $this->user, $request->get('amount')), $user->email);
 
         return api()->success(null, [
             'amount' => $request->get('amount'),
@@ -113,7 +120,6 @@ class DepositWalletController extends Controller
      */
     public function transferPreview(TransferFundFromDepositWallet $request)
     {
-        $this->prepareDepositWallet(); //Prepare logged in user wallet
 
         try {
             //Check logged in user balance for transfer
@@ -157,7 +163,6 @@ class DepositWalletController extends Controller
      */
     public function transferFunds(TransferFundFromDepositWallet $request)
     {
-        $this->prepareDepositWallet(); //Prepare logged in user wallet
 
         try {
             DB::beginTransaction();
@@ -182,7 +187,7 @@ class DepositWalletController extends Controller
                 [
                     'member_id' => $request->get('member_id'),
                     'fee' => $fee,
-                    'type' => 'Transfer'
+                    'type' => 'Funds transferred'
                 ]
             );
 
@@ -229,10 +234,32 @@ class DepositWalletController extends Controller
         ]);
     }
 
+    /**
+     * Overall balance chart
+     * @group Public User > Deposit Wallet
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function overallBalanceChart(ChartTypeRequest $request)
+    {
+        return api()->success(null, $this->wallet_repository->getWalletOverallBalance($request->get('type'),$this->walletObject->id));
+    }
+
+    /**
+     * Investments chart
+     * @group Public User > Deposit Wallet
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function investmentsChart(ChartTypeRequest $request)
+    {
+        return api()->success(null,$this->wallet_repository->getWalletInvestmentChart($request->get('type'), $this->walletObject->id));
+    }
+
     private function calculateTransferAmount($amount)
     {
-        $transfer_fee = walletGetSetting('transfer_fee');
-        $transaction_fee_way = walletGetSetting('transaction_fee_calculation');
+        $transfer_fee = getWalletSetting('transfer_fee');
+        $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
 
         if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
             $transfer_fee = $amount * $transfer_fee / 100;

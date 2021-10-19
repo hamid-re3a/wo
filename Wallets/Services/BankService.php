@@ -130,9 +130,7 @@ class BankService
 
         if (request()->has('type'))
             $transactionQuery->whereHas('metaData', function ($query) {
-                $query->whereHas('transactionType', function ($subQuery) {
-                    $subQuery->where('name', '=', trim(request()->get('type')));
-                });
+                    $query->where('wallet_transaction_types.name', '=', trim(request()->get('type')));
             });
 
         if (request()->has('amount'))

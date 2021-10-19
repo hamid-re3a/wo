@@ -64,7 +64,7 @@ class WithdrawResolver
 
     private function checkDistribution()
     {
-        if (!walletGetSetting('withdrawal_distribution_is_enabled'))
+        if (!getWalletSetting('withdrawal_distribution_is_enabled'))
             return [true, null];
 
         $distribution_setting = $this->getDistributionSetting();
@@ -90,9 +90,9 @@ class WithdrawResolver
     private function getDistributionSetting()
     {
         if ($this->withdrawRequest->currency == 'BTC')
-            $distribution = walletGetSetting('withdrawal_distribution_in_btc');
+            $distribution = getWalletSetting('withdrawal_distribution_in_btc');
         else
-            $distribution = walletGetSetting('withdrawal_distribution_in_janex');
+            $distribution = getWalletSetting('withdrawal_distribution_in_janex');
 
         if ($distribution > 100 OR $distribution < 0)
             throw new \Exception('Distribution error');

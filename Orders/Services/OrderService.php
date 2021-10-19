@@ -9,8 +9,8 @@ use Orders\Repository\OrderRepository;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
+use Packages\Models\Category;
 use Packages\Services\PackageService;
-use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
 
 class OrderService implements OrdersServiceInterface
@@ -66,62 +66,130 @@ class OrderService implements OrdersServiceInterface
 
     public function getCountPackageSubscriptions()
     {
-        return collect(["count" => $this->order_repository->getCountSubscriptions()]);
+        return $this->order_repository->getCountSubscriptions();
     }
 
     public function activePackageCount()
     {
-        $count = $this->order_repository->getCountActivePackage();
-        return collect(["count" => $count]);
+        return $this->order_repository->getCountActivePackage();
     }
 
-    public function deactivatePackageCount()
+    public function ExpiredPackageCount()
     {
-        $count = $this->order_repository->getCountDeactivatePackage();
-        return collect(["count" => $count]);
+        return $this->order_repository->getCountExpiredPackage();
     }
 
     public function packageOverviewCount($type)
     {
-        switch ($type) {
-            case "week":
-                $array_active = $this->order_repository->getCountActivePackageByDate(Carbon::now()->endOfDay()->subDay(7), Carbon::now());
-                $array_deactivate = $this->order_repository->getCountDeactivatePackageByDate(Carbon::now()->endOfDay()->subDay(7), Carbon::now());
-                $total = $this->order_repository->getCountTotalPackageByDate(Carbon::now()->endOfDay()->subDay(7), Carbon::now());
-                $array_count = [];
-                foreach (range(1, 7) as $day) {
-                    $array_count[] = ["time" => Carbon::now()->startOfDay()->subDay($day)->timestamp, "active" => $array_active->whereBetween('created_at', [Carbon::now()->startOfDay()->subDay($day), Carbon::now()->endOfDay()->subDay($day)])->count()];
-                    $array_count[] = ["time" => Carbon::now()->startOfDay()->subDay($day)->timestamp, "deactivate" => $array_deactivate->whereBetween('created_at', [Carbon::now()->startOfDay()->subDay($day), Carbon::now()->endOfDay()->subDay($day)])->count()];
-                    $array_count[] = ["time" => Carbon::now()->startOfDay()->subDay($day)->timestamp, "total" => $total->whereBetween('created_at', [Carbon::now()->startOfDay()->subDay($day), Carbon::now()->endOfDay()->subDay($day)])->count()];
-                }
-                return $array_count;
-                break;
-            case "month":
-                $array_active = $this->order_repository->getCountActivePackageByDate(Carbon::now()->endOfMonth()->subMonth(6), Carbon::now());
-                $array_deactivate = $this->order_repository->getCountDeactivatePackageByDate(Carbon::now()->endOfMonth()->subMonth(6), Carbon::now());
-                $total = $this->order_repository->getCountTotalPackageByDate(Carbon::now()->endOfMonth()->subMonth(6), Carbon::now());
-                $array_count = [];
-                foreach (range(6, 12) as $month) {
-                    $array_count[] = ["time" => Carbon::now()->startOfMonth()->subMonth($month)->timestamp, "active" => $array_active->whereBetween('created_at', [Carbon::now()->startOfMonth()->subMonth($month), Carbon::now()->endOfMonth()->subMonth($month)])->count()];
-                    $array_count[] = ["time" => Carbon::now()->startOfMonth()->subMonth($month)->timestamp, "deactivate" => $array_deactivate->whereBetween('created_at', [Carbon::now()->startOfMonth()->subMonth($month), Carbon::now()->endOfMonth()->subMonth($month)])->count()];
-                    $array_count[] = ["time" => Carbon::now()->startOfMonth()->subMonth($month)->timestamp, "total" => $total->whereBetween('created_at', [Carbon::now()->startOfMonth()->subMonth($month), Carbon::now()->endOfMonth()->subMonth($month)])->count()];
-                }
-                return $array_count;
-                break;
-            case "year":
-                $array_active = $this->order_repository->getCountActivePackageByDate(Carbon::now()->endOfYear()->subYear(3), Carbon::now());
-                $array_deactivate = $this->order_repository->getCountDeactivatePackageByDate(Carbon::now()->endOfYear()->subYear(3), Carbon::now());
-                $total = $this->order_repository->getCountTotalPackageByDate(Carbon::now()->endOfDay()->subYear(3), Carbon::now());
-                $array_count = [];
-                foreach (range(1, 3) as $year) {
-                    $array_count[] = ["time" => Carbon::now()->startOfYear()->subYear($year)->timestamp, "active" => $array_active->whereBetween('created_at', [Carbon::now()->startOfYear()->subYear($year), Carbon::now()->endOfYear()->subYear($year)])->count()];
-                    $array_count[] = ["time" => Carbon::now()->startOfYear()->subYear($year)->timestamp, "deactivate" => $array_deactivate->whereBetween('created_at', [Carbon::now()->startOfYear()->subYear($year), Carbon::now()->endOfYear()->subYear($year)])->count()];
-                    $array_count[] = ["time" => Carbon::now()->startOfYear()->subYear($year)->timestamp, "total" => $total->whereBetween('created_at', [Carbon::now()->startOfYear()->subYear($year), Carbon::now()->endOfYear()->subYear($year)])->count()];
-                }
-                return $array_count;
-                break;
-        }
+        $that = $this;
+        $function_active_package = function ($from_day, $to_day) use ($that) {
+            return $that->order_repository->getActivePackageByDateCollection($from_day, $to_day);
+        };
+        $function_expired_package = function ($from_day, $to_day) use ($that) {
+            return $that->order_repository->getExpiredPackageByDateCollection($from_day, $to_day);
+        };
+        $function_all_package = function ($from_day, $to_day) use ($that) {
+            return $that->order_repository->getTotalPackageByDateCollection($from_day, $to_day);
+        };
 
+
+        $sub_function = function ($collection, $intervals) {
+            return $collection->whereBetween('created_at', $intervals)->count();
+        };
+
+        $final_result = [];
+        $final_result['active'] = chartMaker($type, $function_active_package, $sub_function);
+        $final_result['expired'] = chartMaker($type, $function_expired_package, $sub_function);
+        $final_result['all'] = chartMaker($type, $function_all_package, $sub_function);
+        return $final_result;
+    }
+
+    public function packageTypeCount($type)
+    {
+        $that = $this;
+        $function_active_package = function ($from_day, $to_day) use ($that) {
+            return $that->order_repository->getActiveOrderWithPackageByDateCollection($from_day, $to_day);
+        };
+
+        $sub_function_B = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'B')->first();
+            $packages = $category->packages()->pluck('id');
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count();
+        };
+        $sub_function_I = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'I')->first();
+            $packages = $category->packages()->pluck('id');
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count();
+        };
+
+        $sub_function_A = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'A')->first();
+            $packages = $category->packages()->pluck('id');
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count();
+        };
+
+        $sub_function_P = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'P')->first();
+            $packages = $category->packages()->pluck('id');
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count();
+        };
+
+        $final_result = [];
+        $final_result['B'] = chartMaker($type, $function_active_package, $sub_function_B);
+        $final_result['I'] = chartMaker($type, $function_active_package, $sub_function_I);
+        $final_result['A'] = chartMaker($type, $function_active_package, $sub_function_A);
+        $final_result['P'] = chartMaker($type, $function_active_package, $sub_function_P);
+        return $final_result;
+    }
+
+    public function packageTypePercentageCount($type)
+    {
+        $that = $this;
+        $function_active_package = function ($from_day, $to_day) use ($that) {
+            return $that->order_repository->getActiveOrderWithPackageByDateCollection($from_day, $to_day);
+        };
+
+        $sub_function_B = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'B')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+        $sub_function_I = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'I')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+
+        $sub_function_A = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'A')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+
+        $sub_function_P = function ($collection, $intervals) {
+            $category = Category::query()->where('short_name', 'P')->first();
+            $packages = $category->packages()->pluck('id');
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+
+        $final_result = [];
+        $final_result['B'] = chartMaker($type, $function_active_package, $sub_function_B);
+        $final_result['I'] = chartMaker($type, $function_active_package, $sub_function_I);
+        $final_result['A'] = chartMaker($type, $function_active_package, $sub_function_A);
+        $final_result['P'] = chartMaker($type, $function_active_package, $sub_function_P);
+        return $final_result;
     }
 
 }

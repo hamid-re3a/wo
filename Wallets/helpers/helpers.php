@@ -29,19 +29,25 @@ if (!function_exists('getWalletEmailContent')) {
 
     function getWalletEmailContent($key)
     {
+        $email = null;
         //Check if email content is available in cache
         if (cache()->has('wallet_email_contents'))
-            if ($email = collect(cache('wallet_email_contents'))->where('key', $key)->first())
-                return $email;
+            if($check = collect(cache('wallet_email_contents'))->where('key', $key)->first())
+                $email = $check;
 
 
         if ($email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
-            return $email->toArray();
+            $email = $email->toArray();
 
         if (defined('WALLET_EMAIL_CONTENTS') AND
             is_array(WALLET_EMAIL_CONTENTS) AND
             array_key_exists($key, WALLET_EMAIL_CONTENTS))
-            return WALLET_EMAIL_CONTENTS[$key];
+            $email = WALLET_EMAIL_CONTENTS[$key];
+
+        if($email AND is_array($email)) {
+            $email['from'] = env('MAIL_FROM', $email['from']);
+            return $email;
+        }
 
         \Illuminate\Support\Facades\Log::error('getWalletEmailContentError => ' . $key);
         throw new Exception(trans('wallet.responses.email-key-doesnt-exists'));

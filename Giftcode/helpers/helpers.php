@@ -24,17 +24,23 @@ if(!function_exists('giftcodeGetEmailContent')) {
 
     function giftcodeGetEmailContent($key)
     {
+        $email = null;
         //Check if email content is available in cache
         if(cache()->has('giftcode_email_contents'))
-            if($email = collect(cache('giftcode_email_contents'))->where('key', $key)->first())
-                return $email;
+            if(collect(cache('giftcode_email_contents'))->where('key', $key)->first())
+                $email = collect(cache('giftcode_email_contents'))->where('key', $key)->first();
 
 
         if($email = \Giftcode\Models\EmailContent::where('key',$key)->first())
-            return $email->toArray();
+            $email = $email->toArray();
 
         if(defined('EMAIL_CONTENTS') AND is_array(EMAIL_CONTENTS) AND array_key_exists($key,EMAIL_CONTENTS))
-            return EMAIL_CONTENTS[$key];
+            $email = EMAIL_CONTENTS[$key];
+
+        if($email AND is_array($email)) {
+            $email['from'] = env('MAIL_FROM', $email['from']);
+            return $email;
+        }
 
         \Illuminate\Support\Facades\Log::error('giftcodeEmailContentError => ' . $key);
         throw new Exception(trans('giftcode.responses.email-key-doesnt-exists'));

@@ -2,7 +2,7 @@
 
 namespace Wallets;
 
-use Payments\Services\Processors\KycClientFacade;
+use Payments\Services\KycClientFacade;
 use Wallets\Commands\ProcessBTCWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;

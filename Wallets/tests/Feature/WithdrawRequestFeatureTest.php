@@ -6,9 +6,11 @@ namespace Wallets\tests\Feature;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Kyc\Services\Grpc\Acknowledge;
 use MLM\Services\Grpc\Rank;
 use User\Models\User;
 use Wallets\Services\BankService;
+use Wallets\Services\KycClientFacade;
 use Wallets\Services\MlmClientFacade;
 use Wallets\tests\WalletTest;
 
@@ -177,6 +179,11 @@ class WithdrawRequestFeatureTest extends WalletTest
         $mock_rank = new Rank();
         $mock_rank->setWithdrawalLimit(35000);
         MlmClientFacade::shouldReceive('getUserRank')->andReturn($mock_rank);
+
+        $mock_acknowledge = new Acknowledge();
+        $mock_acknowledge->setStatus(true);
+        $mock_acknowledge->setMessage('Its true');
+        KycClientFacade::shouldReceive('checkKYCStatus')->andReturn($mock_rank);
 
         $payment = \Payments\Models\PaymentCurrency::query()->firstOrCreate();
         $payment->update(['available_services'=>[CURRENCY_SERVICE_WITHDRAW]]);

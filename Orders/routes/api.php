@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
     //Client routes
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {
         Route::name('orders.')->group(function () {
+            Route::post('package_overview_count', [UserDashboardController::class, 'packageOverviewCount'])->name('package_overview_count');
+            Route::post('package_type_count', [UserDashboardController::class, 'packageTypeCount'])->name('package_type_count');
             Route::get('counts', [UserDashboardController::class, 'counts'])->name('counts');
             Route::post('', [UserDashboardController::class, 'index'])->name('list');
             Route::post('show', [UserDashboardController::class, 'showOrder'])->name('show');

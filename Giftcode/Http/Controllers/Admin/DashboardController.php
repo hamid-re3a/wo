@@ -3,14 +3,22 @@
 
 namespace Giftcode\Http\Controllers\Admin;
 
-
 use App\Http\Controllers\Controller;
+use Giftcode\Http\Requests\ChartTypeRequest;
 use Giftcode\Http\Resources\GiftcodeResource;
 use Giftcode\Models\Giftcode;
-use Illuminate\Database\Eloquent\Builder;
+use Giftcode\Repository\ChartRepository;
+use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
 {
+
+    private $chart_repository;
+
+    public function __construct(ChartRepository $chartRepository)
+    {
+        $this->chart_repository = $chartRepository;
+    }
 
     /**
      * Giftcode counts
@@ -51,6 +59,30 @@ class DashboardController extends Controller
                 'per_page' => $list->perPage(),
             ]
         ]);
+    }
+
+
+    /**
+     * Giftcode vs Time chart
+     * @group Admin User > Giftcode
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function giftcodesVsTimeChart(ChartTypeRequest $request)
+    {
+        return api()->success(null,$this->chart_repository->getGiftcodeVsTimeChart($request->get('type')));
+    }
+
+
+    /**
+     * Package vs Time chart
+     * @group Admin User > Giftcode
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function packageVsTimeChart(ChartTypeRequest $request)
+    {
+        return api()->success(null,$this->chart_repository->getPackageVsTimeChart($request->get('type')));
     }
 
 }

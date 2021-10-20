@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Payments\Services;
+namespace Wallets\Services;
 
 use Illuminate\Support\Facades\Facade;
 use Kyc\Services\Grpc\Acknowledge;

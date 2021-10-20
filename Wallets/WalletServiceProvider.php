@@ -2,7 +2,6 @@
 
 namespace Wallets;
 
-use Payments\Services\KycClientFacade;
 use Wallets\Commands\ProcessBTCWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;
@@ -16,6 +15,7 @@ use Illuminate\Support\ServiceProvider;
 use Wallets\Observers\TransactionObserver;
 use Wallets\Observers\TransferObserver;
 use Wallets\Observers\WithdrawProfitObserver;
+use Wallets\Services\KycClientFacade;
 use Wallets\Services\KycGrpcClientProvider;
 use Wallets\Services\MlmClientFacade;
 use Wallets\Services\MlmGrpcClientProvider;

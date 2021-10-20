@@ -68,3 +68,12 @@ if (!function_exists('getMLMGrpcClient')) {
         ]);
     }
 }
+
+if (!function_exists('getKycGrpcClient')) {
+    function getKycGrpcClient()
+    {
+        return new \Kyc\Services\Grpc\KycServiceClient(env('MLM_GRPC_URL', 'staging-api-gateway.janex.org:9597'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}

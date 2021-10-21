@@ -60,7 +60,7 @@ class OrderController extends Controller
                 "user_id" => $user_who_is_package_for->id,
                 "payment_type" => $request->get('payment_type'),
                 "payment_currency" => $request->get('payment_type') == 'purchase' ? $request->get('payment_currency') : null,
-                "payment_driver" => $request->get('payment_type') == 'purchase' ? $request->get('payment_driver') : null,
+                "payment_driver" => $request->get('payment_type') == 'purchase' ? $request->get('payment_type') : null,
                 "package_id" => $request->get('package_id'),
                 'validity_in_days' => $package->getValidityInDays(),
                 'plan' => $user_who_is_package_for->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START

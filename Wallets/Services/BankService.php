@@ -46,7 +46,7 @@ class BankService
         $balance = $this->getBalance($wallet_name);
         $data = [
             'wallet_before_balance' => $balance,
-            'wallet_after_balance' => $balance + $amount,
+            'wallet_after_balance' => (double)$balance + (double)$amount,
             'type' => $type,
             'sub_type' => $sub_type
         ];

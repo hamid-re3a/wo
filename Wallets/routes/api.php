@@ -20,6 +20,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::post('wallet-transfers', [AdminWalletController::class, 'getWalletTransfers'])->name('wallet-transfers');
                 Route::post('wallet-balance', [AdminWalletController::class, 'getWalletBalance'])->name('wallet-balance');
 
+                Route::post('counts',[AdminDashboardController::class,'count_deposit_wallets'])->name('dashboard-counts-deposit-wallets');
                 Route::prefix('charts')->name('charts')->group(function(){
                     Route::post('overall-balance',[AdminDashboardController::class,'overallBalanceChart'])->name('overall-balance');
                     Route::post('investments',[AdminDashboardController::class,'investmentsChart'])->name('investments');

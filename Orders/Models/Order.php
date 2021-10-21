@@ -114,7 +114,7 @@ class Order extends Model
     public function reCalculateCosts()
     {
         $this->refresh();
-        if (in_array($this->plan, [ORDER_PLAN_START, ORDER_PLAN_COMPANY])) {
+        if (in_array($this->plan, [ORDER_PLAN_SPECIAL, ORDER_PLAN_COMPANY])) {
             $this->packages_cost_in_pf = (float)0;
             $this->total_cost_in_pf = (float)0;
             $this->save();

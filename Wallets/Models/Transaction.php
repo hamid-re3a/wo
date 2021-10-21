@@ -24,6 +24,10 @@ class Transaction extends \Bavix\Wallet\Models\Transaction
 
     public function syncMetaData(array $data)
     {
+        /**
+         * @var $type TransactionType
+         * @var $sub_type TransactionType
+         */
         try {
             if (array_key_exists('type', $data)) {
                 $sub_type = null;

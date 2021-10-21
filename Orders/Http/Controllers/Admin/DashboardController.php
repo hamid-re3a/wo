@@ -25,6 +25,7 @@ class DashboardController extends Controller
 
     /**
      * Counts
+     * @group
      * Admin User > Orders Dashboard
      */
     public function counts()
@@ -38,7 +39,7 @@ class DashboardController extends Controller
 
 
     /**
-     * get package overview count
+     * Packages overview count chart
      * @group
      * Admin User > Orders Dashboard
      * @param OrderTypeFilterRequest $request
@@ -50,7 +51,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get packages based on type
+     * Packages based on type chart
      * @group
      * Admin User > Orders Dashboard
      * @param OrderTypeFilterRequest $request
@@ -62,7 +63,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get packages percentage based on type
+     * Packages percentage based on type chart
      * @group
      * Admin User > Orders Dashboard
      * @param OrderTypeFilterRequest $request

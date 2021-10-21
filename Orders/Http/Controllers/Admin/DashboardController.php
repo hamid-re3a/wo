@@ -23,43 +23,19 @@ class DashboardController extends Controller
         $this->order_service = $order_service;
     }
 
-
-
     /**
-     * get count subscriptions
-     * @group
+     * Counts
      * Admin User > Orders Dashboard
-     * @param ListOrderRequest $request
-     * @return JsonResponse
      */
-    public function getCountSubscriptions()
+    public function counts()
     {
-        return api()->success(null, SubscriptionCountDataResource::make($this->order_service->getCountPackageSubscriptions()));
+        return api()->success(null, [
+            'total_orders' => $this->order_service->getCountOrders(),
+            'active_orders' => $this->order_service->getActiveOrdersCount(),
+            'expired_orders' => $this->order_service->getExpiredOrders(),
+        ]);
     }
 
-    /**
-     * get count active package
-     * @group
-     * Admin User > Orders Dashboard
-     * @param ListOrderRequest $request
-     * @return JsonResponse
-     */
-    public function activePackageCount()
-    {
-        return api()->success(null, SubscriptionCountDataResource::make($this->order_service->activePackageCount()));
-    }
-
-    /**
-     * get count expired package
-     * @group
-     * Admin User > Orders Dashboard
-     * @param ListOrderRequest $request
-     * @return JsonResponse
-     */
-    public function expiredPackageCount()
-    {
-        return api()->success(null, SubscriptionCountDataResource::make($this->order_service->ExpiredPackageCount()));
-    }
 
     /**
      * get package overview count

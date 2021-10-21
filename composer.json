@@ -64,6 +64,7 @@
             "Wallets\\": "Wallets/",
             "Giftcode\\": "Giftcode/",
             "Payments\\": "Payments/",
+            "Kyc\\": "Kyc/",
             "User\\": "User/",
             "GPBMetadata\\": "GPBMetadata/"
         }

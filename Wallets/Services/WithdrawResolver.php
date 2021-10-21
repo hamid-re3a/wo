@@ -31,6 +31,11 @@ class WithdrawResolver
     public function verifyWithdrawRequest()
     {
 
+        //Check KYC for user KYC status
+        list($flag,$response) = $this->checkKycStatus();
+        if(!$flag)
+            return [$flag,$response];
+
         //Check daily limit
         list($flag, $response) = $this->checkDailyLimit();
         if (!$flag)
@@ -44,6 +49,16 @@ class WithdrawResolver
         return [true, null];
 
 
+    }
+
+    private function checkKycStatus()
+    {
+        //Check KYC for user KYC status
+        $user_kyc = KycClientFacade::checkKYCStatus($this->user_service);
+        if(!$user_kyc->getStatus())
+            return [false,$user_kyc->getMessage()];
+
+        return [true,null];
     }
 
     private function checkDailyLimit()

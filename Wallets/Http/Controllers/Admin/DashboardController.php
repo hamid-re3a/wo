@@ -2,30 +2,38 @@
 
 namespace Wallets\Http\Controllers\Admin;
 
+use Bavix\Wallet\Models\Wallet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\JsonResponse as JsonResponseAlias;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Str;
-use User\Models\User;
-use Wallets\Http\Requests\Admin\GetUserWalletBalanceRequest;
-use Wallets\Http\Requests\Admin\GetUserTransfersRequest;
-use Wallets\Http\Requests\Admin\GetUserTransactionsRequest;
-use Wallets\Http\Requests\Admin\UserIdRequest;
-use Wallets\Http\Requests\Admin\GetTransactionsRequest;
 use Wallets\Http\Requests\ChartTypeRequest;
-use Wallets\Http\Resources\Admin\TransactionResource;
-use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Models\Transaction;
 use Wallets\Repositories\WalletRepository;
-use Wallets\Services\BankService;
 
 class DashboardController extends Controller
 {
     //TODO Refactor whole controller :|
     private $wallet_repository;
+
+    /**
+     * Count for all deposit wallets
+     * @group Admin User > Wallets
+     */
+    public function count_deposit_wallets()
+    {
+        $total_transferred = Transaction::query()->where('type', '=', 'withdraw')
+            ->where('wallet_id','!=',1)
+            ->whereHas('metaData', function (Builder $subQuery) {
+                $subQuery->where('name', '=', 'Funds transferred');
+            })->sum('amount');
+
+        $current_balance = Wallet::query()->sum('balance');
+
+        return api()->success(null,[
+            'total_transferred' => $total_transferred / 100,
+            'current_balance' => $current_balance / 100
+        ]);
+    }
 
     public function __construct(WalletRepository $wallet_repository)
     {
@@ -51,7 +59,7 @@ class DashboardController extends Controller
      */
     public function investmentsChart(ChartTypeRequest $request)
     {
-        return api()->success(null,$this->wallet_repository->getWalletInvestmentChart($request->get('type')));
+        return api()->success(null, $this->wallet_repository->getWalletInvestmentChart($request->get('type')));
     }
 
 }

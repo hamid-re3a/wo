@@ -17,7 +17,7 @@ class InvoiceResource extends JsonResource
     {
         /**@var $user User*/
         $user = $this->user;
-        $transactions = $this->transactions()->exists() ? InvoiceTransactionResource::collection($this->transactions) : null;
+        $transactions = $this->resource->transactions()->exists() ? InvoiceTransactionResource::collection($this->resource->transactions()->get()) : null;
 
         return [
             'user_member_id' => $user->member_id,

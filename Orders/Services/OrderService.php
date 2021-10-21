@@ -64,19 +64,19 @@ class OrderService implements OrdersServiceInterface
         return $order;
     }
 
-    public function getCountPackageSubscriptions()
+    public function getCountOrders()
     {
-        return $this->order_repository->getCountSubscriptions();
+        return $this->order_repository->getCountOrders();
     }
 
-    public function activePackageCount()
+    public function getActiveOrdersCount()
     {
-        return $this->order_repository->getCountActivePackage();
+        return $this->order_repository->getActiveOrdersCount();
     }
 
-    public function ExpiredPackageCount()
+    public function getExpiredOrders()
     {
-        return $this->order_repository->getCountExpiredPackage();
+        return $this->order_repository->getExpiredOrders();
     }
 
     public function packageOverviewCount($type)

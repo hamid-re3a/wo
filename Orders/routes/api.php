@@ -13,12 +13,10 @@ Route::middleware('auth')->group(function () {
 
         Route::name('orders.')->prefix('orders')->group(function () {
             Route::name('dashboard.')->prefix('dashboard')->group(function () {
-                Route::get('/subscription_count', [AdminDashboardController::class, "getCountSubscriptions"])->name('getCountSubscriptions');
-                Route::get('/active_package_count', [AdminDashboardController::class, 'activePackageCount'])->name('activePackageCount');
-                Route::get('/expired_package_count', [AdminDashboardController::class, 'expiredPackageCount'])->name('expiredPackageCount');
-                Route::post('/package_count_overview', [AdminDashboardController::class, 'packageOverviewCount'])->name('package-overview');
-                Route::post('/package_type_count', [AdminDashboardController::class, 'packageTypeCount'])->name('package-type');
-                Route::post('/package_type_percentage_count', [AdminDashboardController::class, 'packageTypePercentCount'])->name('package-percentage-type');
+                Route::get('counts', [AdminDashboardController::class, 'counts'])->name('counts');
+                Route::post('package_count_overview', [AdminDashboardController::class, 'packageOverviewCount'])->name('package-overview');
+                Route::post('package_type_count', [AdminDashboardController::class, 'packageTypeCount'])->name('package-type');
+                Route::post('package_type_percentage_count', [AdminDashboardController::class, 'packageTypePercentCount'])->name('package-percentage-type');
             });
 
 

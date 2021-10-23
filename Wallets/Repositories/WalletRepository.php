@@ -93,7 +93,7 @@ class WalletRepository
         return $result;
     }
 
-    public function getCommissionsChart($type, int $wallet_id = null, $commissions = array())
+    public function getCommissionsChart($type, array $commissions,int $wallet_id = null)
     {
         $that = $this;
 

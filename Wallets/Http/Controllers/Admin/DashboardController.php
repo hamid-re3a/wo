@@ -62,4 +62,22 @@ class DashboardController extends Controller
         return api()->success(null, $this->wallet_repository->getWalletInvestmentChart($request->get('type')));
     }
 
+    /**
+     * Investment vs time chart
+     * @group Admin User > Commissions chart
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function commissionsChart(ChartTypeRequest $request)
+    {
+        $commissions = [
+            'Binary Commissions',
+            'Direct Commissions',
+            'Indirect Commissions',
+            'ROI',
+        ];
+
+        return api()->success(null, $this->wallet_repository->getCommissionsChart($request->get('type'),$commissions));
+    }
+
 }

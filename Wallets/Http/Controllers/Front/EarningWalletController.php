@@ -276,7 +276,7 @@ class EarningWalletController extends Controller
             'ROI',
         ];
 
-        return api()->success(null,$this->wallet_repository->getCommissionsChart($request->get('type'),$this->walletObject->id,$commissions));
+        return api()->success(null,$this->wallet_repository->getCommissionsChart($request->get('type'),$commissions,$this->walletObject->id));
     }
 
     private function calculateTransferAmount($amount)

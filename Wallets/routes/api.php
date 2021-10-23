@@ -24,6 +24,8 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::prefix('charts')->name('charts')->group(function(){
                     Route::post('overall-balance',[AdminDashboardController::class,'overallBalanceChart'])->name('overall-balance');
                     Route::post('investments',[AdminDashboardController::class,'investmentsChart'])->name('investments');
+                    Route::post('commissions',[AdminDashboardController::class,'commissionsChart'])->name('commissions');
+
                 });
             });;
             Route::name('settings.')->prefix('settings')->group(function () {

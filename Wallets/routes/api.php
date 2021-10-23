@@ -77,6 +77,11 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
         });
 
+        Route::prefix('charts')->name('charts')->group(function(){
+            Route::post('overall-balance',[EarningWalletController::class,'overallBalanceChart'])->name('overall-balance');
+            Route::post('commissions-chart',[EarningWalletController::class,'commissionsChart'])->name('commissions');
+        });
+
         Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){
             Route::get('counts', [UserWithdrawRequestController::class, 'counts'])->name('counts');
             Route::get('', [UserWithdrawRequestController::class, 'index'])->name('index');

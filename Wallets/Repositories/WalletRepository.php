@@ -92,4 +92,26 @@ class WalletRepository
         $result['purchase'] = chartMaker($type, $function_transaction_purchase_collection, $sub_function);
         return $result;
     }
+
+    public function getCommissionsChart($type, int $wallet_id = null, $commissions = array())
+    {
+        $that = $this;
+
+        $sub_function = function ($collection, $intervals) {
+            /**@var $collection Collection*/
+            return $collection->whereBetween('created_at', $intervals)->sum(function ($transaction){
+                return abs($transaction->amount / 100);
+            });
+        };
+
+        $result = [];
+
+        foreach($commissions AS $commission_name) {
+            $function_transactions_collection = function ($from_day, $to_day) use ($that,$wallet_id,$commission_name) {
+                return $that->transaction_repository->getTransactionByDateCollection('created_at',$from_day, $to_day,$wallet_id,$commission_name);
+            };
+            $result[$commission_name] = chartMaker($type, $function_transactions_collection, $sub_function);
+        }
+        return $result;
+    }
 }

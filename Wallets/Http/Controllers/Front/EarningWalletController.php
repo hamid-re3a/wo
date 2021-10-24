@@ -52,53 +52,14 @@ class EarningWalletController extends Controller
      */
     public function earned_commissions()
     {
-        $counts = User::query()->whereId(auth()->user()->id)
-            ->withSumQuery(['transactions.amount AS binary_commissions_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Binary Commissions');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS direct_commissions_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Direct Commissions');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS indirect_commissions_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Indirect Commissions');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS roi_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'ROI');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS spent_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'withdraw');
-                }]
-            )
-            ->first();
+        $commissions = [
+            'Binary Commissions',
+            'Direct Commissions',
+            'Indirect Commissions',
+            'ROI',
+        ];
 
-        return api()->success(null, [
-            'binary_commissions_sum' => $counts->binary_commissions_sum ? $counts->binary_commissions_sum / 100 : 0,
-            'direct_commissions_sum' => $counts->direct_commissions_sum ? $counts->direct_commissions_sum / 100 : 0,
-            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? $counts->indirect_commissions_sum / 100 : 0,
-            'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
-            'spent_sum' => $counts->spent_sum ? $counts->spent_sum : 0,
-        ]);
+        return api()->success(null, $this->wallet_repository->getTransactionSumByTypes(auth()->user->id,$commissions));
 
     }
 

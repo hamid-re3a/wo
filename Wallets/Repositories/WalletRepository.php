@@ -46,7 +46,7 @@ class WalletRepository
             ->first();
     }
 
-    public function getTransactionByTypesSum(int $user_id = null, array $types = null)
+    public function getTransactionSumByTypes(int $user_id = null, array $types = null)
     {
         $counts_query = User::query();
         $keys = [];

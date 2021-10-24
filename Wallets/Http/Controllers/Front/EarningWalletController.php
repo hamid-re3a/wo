@@ -93,9 +93,9 @@ class EarningWalletController extends Controller
             ->first();
 
         return api()->success(null, [
-            'binary_commissions_sum' => $counts->binary_commissions_sum ? $counts->binary_commissions_sum : 0,
-            'direct_commissions_sum' => $counts->direct_commissions_sum ? $counts->direct_commissions_sum : 0,
-            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? $counts->indirect_commissions_sum : 0,
+            'binary_commissions_sum' => $counts->binary_commissions_sum ? $counts->binary_commissions_sum / 100 : 0,
+            'direct_commissions_sum' => $counts->direct_commissions_sum ? $counts->direct_commissions_sum / 100 : 0,
+            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? $counts->indirect_commissions_sum / 100 : 0,
             'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
             'spent_sum' => $counts->spent_sum ? $counts->spent_sum : 0,
         ]);

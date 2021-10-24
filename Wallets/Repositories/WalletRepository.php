@@ -46,7 +46,7 @@ class WalletRepository
             ->first();
     }
 
-    public function getTypesSum(int $user_id = null, array $types = null)
+    public function getTransactionByTypesSum(int $user_id = null, array $types = null)
     {
         $counts_query = User::query();
         $keys = [];
@@ -72,7 +72,7 @@ class WalletRepository
         $results = [];
 
         foreach($keys AS $key)
-            $results[$key] = !empty($counts_query[$key]) ? $counts_query[$key] : (double)0.00;
+            $results[$key] = !empty($counts_query[$key]) ? $counts_query[$key] / 100 : (double)0.00;
 
         return $results;
     }

@@ -54,7 +54,7 @@ class DashboardController extends Controller
             'ROI',
         ];
 
-        return api()->success(null, $this->wallet_repository->getTypesSum(null,$commissions));
+        return api()->success(null, $this->wallet_repository->getTransactionByTypesSum(null,$commissions));
     }
 
     /**

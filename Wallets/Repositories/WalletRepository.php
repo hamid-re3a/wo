@@ -19,24 +19,32 @@ class WalletRepository
         $this->transaction_repository = new TransactionRepository();
     }
 
-    public function getOverAllSum(Wallet $wallet)
+    public function getOverAllSum(Wallet $wallet = null)
     {
-        return User::query()->where('id', $wallet->holder_id)->withSumQuery([
+        $sum_query = User::query();
+
+        if($wallet)
+            $sum_query->where('id',$wallet->holder_id);
+
+        return $sum_query->withSumQuery([
             'transactions.amount AS total_received' => function (Builder $query) use ($wallet) {
-                $query->where('wallet_id', '=', $wallet->id);
+                if($wallet)
+                    $query->where('wallet_id', '=', $wallet->id);
                 $query->where('type', '=', 'deposit');
             }
         ])
             ->withSumQuery([
                 'transactions.amount AS total_spent' => function (Builder $query) use ($wallet) {
-                    $query->where('wallet_id', '=', $wallet->id);
+                    if($wallet)
+                        $query->where('wallet_id', '=', $wallet->id);
                     $query->where('type', 'withdraw');
 
                 }
             ])
             ->withSumQuery([
                 'transactions.amount AS total_transfer' => function (Builder $query) use ($wallet) {
-                    $query->where('wallet_id', '=', $wallet->id);
+                    if($wallet)
+                        $query->where('wallet_id', '=', $wallet->id);
                     $query->where('type', 'withdraw');
                     $query->whereHas('metaData', function (Builder $subQuery) {
                         $subQuery->where('name', '=', 'Funds transferred');
@@ -46,7 +54,7 @@ class WalletRepository
             ->first();
     }
 
-    public function getTransactionByTypesSum(int $user_id = null, array $types = null)
+    public function getTransactionSumByTypes(int $user_id = null, array $types = null)
     {
         $counts_query = User::query();
         $keys = [];

@@ -15,6 +15,11 @@ class DashboardController extends Controller
     //TODO Refactor whole controller :|
     private $wallet_repository;
 
+    public function __construct(WalletRepository $wallet_repository)
+    {
+        $this->wallet_repository = $wallet_repository;
+    }
+
     /**
      * Count for all deposit wallets
      * @group Admin User > Wallets
@@ -35,9 +40,22 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function __construct(WalletRepository $wallet_repository)
+    /**
+     * Commissions sum
+     * @group Admin User > Wallets
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function commissionsSum(ChartTypeRequest $request)
     {
-        $this->wallet_repository = $wallet_repository;
+        $commissions = [
+            'Binary Commissions',
+            'Direct Commissions',
+            'Indirect Commissions',
+            'ROI',
+        ];
+
+        return api()->success(null, $this->wallet_repository->getTypesSum(null,$commissions));
     }
 
     /**
@@ -64,7 +82,7 @@ class DashboardController extends Controller
 
     /**
      * Investment vs time chart
-     * @group Admin User > Commissions chart
+     * @group Admin User > Wallets
      * @param ChartTypeRequest $request
      * @return JsonResponse
      */

@@ -43,10 +43,9 @@ class DashboardController extends Controller
     /**
      * Commissions sum
      * @group Admin User > Wallets
-     * @param ChartTypeRequest $request
      * @return JsonResponse
      */
-    public function commissionsSum(ChartTypeRequest $request)
+    public function commissionsSum()
     {
         $commissions = [
             'Binary Commissions',

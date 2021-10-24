@@ -72,9 +72,9 @@ class WalletRepository
         $results = [];
 
         foreach($keys AS $key)
-            $results[$key] = $counts_query[$key];
+            $results[$key] = !empty($counts_query[$key]) ? $counts_query[$key] : (double)0.00;
 
-        return api()->success(null, $results);
+        return $results;
     }
 
     public function getWalletOverallBalance($type, int $wallet_id = null)

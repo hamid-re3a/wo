@@ -21,6 +21,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::post('wallet-balance', [AdminWalletController::class, 'getWalletBalance'])->name('wallet-balance');
 
                 Route::get('counts',[AdminDashboardController::class,'count_deposit_wallets'])->name('dashboard-counts-deposit-wallets');
+                Route::post('commissions-sum',[AdminDashboardController::class,'commissionsSum'])->name('commissions-sum');
                 Route::prefix('charts')->name('charts')->group(function(){
                     Route::post('overall-balance',[AdminDashboardController::class,'overallBalanceChart'])->name('overall-balance');
                     Route::post('investments',[AdminDashboardController::class,'investmentsChart'])->name('investments');

@@ -81,7 +81,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Investment vs time chart
+     * Commissions vs time chart
      * @group Admin User > Wallets
      * @param ChartTypeRequest $request
      * @return JsonResponse

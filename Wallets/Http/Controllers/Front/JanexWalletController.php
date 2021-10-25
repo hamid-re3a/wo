@@ -3,15 +3,11 @@
 namespace Wallets\Http\Controllers\Front;
 
 use Bavix\Wallet\Models\Wallet;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Requests\Front\TransactionRequest;
-use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
@@ -42,7 +38,7 @@ class JanexWalletController extends Controller
         $this->user = auth()->user();
 
         $this->bankService = new BankService($this->user);
-        $this->walletName = config('janexWallet');
+        $this->walletName = WALLET_NAME_JANEX_WALLET;
         $this->walletObject = $this->bankService->getWallet($this->walletName);
 
     }

@@ -30,7 +30,8 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                     Route::post('commissions',[AdminDashboardController::class,'commissionsChart'])->name('commissions');
 
                 });
-            });;
+            });
+
             Route::name('settings.')->prefix('settings')->group(function () {
                 Route::get('', [SettingController::class, 'index'])->name('list');
                 Route::patch('update', [SettingController::class, 'update'])->name('update');

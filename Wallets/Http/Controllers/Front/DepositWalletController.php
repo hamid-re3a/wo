@@ -47,7 +47,7 @@ class DepositWalletController extends Controller
         $this->user = auth()->user();
 
         $this->bankService = new BankService($this->user);
-        $this->walletName = config('depositWallet');
+        $this->walletName = WALLET_NAME_DEPOSIT_WALLET;
         $this->walletObject = $this->bankService->getWallet($this->walletName);
     }
 

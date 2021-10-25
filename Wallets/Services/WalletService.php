@@ -3,11 +3,9 @@
 
 namespace Wallets\Services;
 
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Orders\Services\Grpc\Order;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
@@ -21,21 +19,6 @@ use Wallets\Services\Grpc\Withdraw;
 
 class WalletService implements WalletServiceInterface
 {
-    private $depositWallet;
-    private $earningWallet;
-    private $janexWallet;
-    private $wallets = [];
-
-    public function __construct()
-    {
-        $this->depositWallet = config('depositWallet');
-        $this->earningWallet = config('earningWallet');
-        $this->janexWallet = config('janexWallet');
-        $this->wallets[] = $this->depositWallet;
-        $this->wallets[] = $this->earningWallet;
-        $this->wallets[] = $this->janexWallet;
-    }
-
     private function walletUser($user_id)
     {
 
@@ -200,13 +183,13 @@ class WalletService implements WalletServiceInterface
     {
         switch ($walletName) {
             case WalletNames::DEPOSIT:
-                return $this->depositWallet;
+                return WALLET_NAME_DEPOSIT_WALLET;
                 break;
             case WalletNames::EARNING:
-                return $this->earningWallet;
+                return WALLET_NAME_EARNING_WALLET;
                 break;
             case WalletNames::JANEX:
-                return $this->janexWallet;
+                return WALLET_NAME_JANEX_WALLET;
                 break;
         }
     }

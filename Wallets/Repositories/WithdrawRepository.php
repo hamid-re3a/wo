@@ -44,7 +44,7 @@ class WithdrawRepository
         /**@var $user User */
         $user = auth()->user();
         $this->bankService = new BankService($user);
-        $this->wallet = config('earningWallet');
+        $this->wallet = WALLET_NAME_EARNING_WALLET;
         $this->bankService->getWallet($this->wallet);
 
         try {
@@ -121,15 +121,16 @@ class WithdrawRepository
         try {
             //Withdraw Admin deposit wallet
             $bank_service = new BankService(User::query()->first());
-            $bank_service->withdraw(config('depositWallet'), $withdraw_request->pf_amount, [
+            $bank_service->withdraw(WALLET_NAME_DEPOSIT_WALLET, $withdraw_request->pf_amount, [
                 'description' => 'Refund withdrawal request',
                 'withdrawal_request_id' => $withdraw_request->id
             ], 'Withdrawal refund');
 
             //Deposit user wallet
+            /**@var $user User*/
             $user = $withdraw_request->user()->first();
             $bank_service = new BankService($user);
-            $refund_transaction = $bank_service->deposit(config('earningWallet'), $withdraw_request->pf_amount, [
+            $refund_transaction = $bank_service->deposit(WALLET_NAME_EARNING_WALLET, $withdraw_request->pf_amount, [
                 'description' => 'Withdrawal request rejected',
                 'withdrawal_request_id' => $withdraw_request->id,
             ], true, 'Withdrawal refund');

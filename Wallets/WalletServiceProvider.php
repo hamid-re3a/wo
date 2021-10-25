@@ -65,8 +65,6 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->registerCommands();
 
-        $this->registerWalletsName();
-
         Route::prefix('v1/wallets')
             ->middleware('api')
             ->namespace($this->namespace)
@@ -147,18 +145,6 @@ class WalletServiceProvider extends ServiceProvider
         if (file_exists($helperFile = __DIR__ . '/helpers/queryMacros.php')) {
             require_once $helperFile;
         }
-    }
-
-    /**
-     * Register wallets name
-     */
-    private function registerWalletsName()
-    {
-        config([
-            'depositWallet' => 'Deposit Wallet',
-            'earningWallet' => 'Earning Wallet',
-            'janexWallet'   => 'Janex Wallet'
-        ]);
     }
 
 

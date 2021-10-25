@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
 
             Route::name('packages.')->prefix('packages')->middleware('auth')->group(function () {
                 Route::get('available-packages', [PackageController::class, 'paidPackages'])->name('paid-packages');
+                Route::get('has-paid-package', [PackageController::class, 'hasPaidPackage'])->name('has-paid-package');
                 Route::get('has-valid-package', [PackageController::class, 'hasValidPackage'])->name('has-valid-package');
             });
         });

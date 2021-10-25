@@ -7,6 +7,7 @@ namespace Orders\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use Orders\Http\Resources\PackageResource;
 use Packages\Services\PackageService;
+use User\Models\User;
 
 class PackageController extends Controller
 {
@@ -41,6 +42,27 @@ class PackageController extends Controller
         return api()->success(null, PackageResource::collection($packages));
     }
 
+
+    /**
+     * Has a paid package
+     * @group
+     * Public User > Orders
+     */
+    public function hasPaidPackage()
+    {
+        /**
+         * @var $user User
+         */
+        $user = auth()->user();
+        if($user->paidOrders()->count())
+            return api()->success(null, [
+                'has_paid_package' => true
+            ]);
+        return api()->success(null, [
+            'has_paid_package' => false
+        ]);
+    }
+
     /**
      * Has a valid package
      * @group
@@ -48,7 +70,11 @@ class PackageController extends Controller
      */
     public function hasValidPackage()
     {
-        $orders = auth()->user()->paidOrders()->get();
+        /**
+         * @var $user User
+         */
+        $user = auth()->user();
+        $orders = $user->paidOrders()->get();
         foreach ($orders AS $order) {
             $packageDetails = $this->getPackage($order->package_id);
             $packageExpireDate = $order->created_at->addDays($packageDetails->getValidityInDays());

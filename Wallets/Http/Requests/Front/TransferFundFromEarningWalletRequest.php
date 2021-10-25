@@ -4,6 +4,8 @@ namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use User\Models\User;
 use Wallets\Services\BankService;
 
 class TransferFundFromEarningWalletRequest extends FormRequest
@@ -32,8 +34,6 @@ class TransferFundFromEarningWalletRequest extends FormRequest
     public function rules()
     {
         $this->prepare();
-        $this->minimum_amount = getWalletSetting('minimum_transfer_from_earning_to_deposit_wallet_fund_amount');
-        $this->maximum_amount = getWalletSetting('maximum_transfer_from_earning_to_deposit_wallet_fund_amount');
 
         return [
             'member_id' => 'required_if:own_deposit_wallet,false|integer|exists:users,member_id|not_in:' . $this->member_id,
@@ -62,10 +62,20 @@ class TransferFundFromEarningWalletRequest extends FormRequest
 
     private function prepare()
     {
-        if(auth()->check()){
-            $bank_service = new BankService(auth()->user());
-            $this->wallet_balance = $bank_service->getBalance(config('earningWallet'));
-            $this->member_id = auth()->user()->member_id;
+        try {
+            if(auth()->check()){
+                /**@var $user User*/
+                $user = auth()->user();
+                $bank_service = new BankService($user);
+                $this->wallet_balance = $bank_service->getBalance(config('earningWallet'));
+                $this->member_id = auth()->user()->member_id;
+
+                $this->minimum_amount = getWalletSetting('minimum_transfer_from_earning_to_deposit_wallet_fund_amount');
+                $this->maximum_amount = getWalletSetting('maximum_transfer_from_earning_to_deposit_wallet_fund_amount');
+            }
+        } catch (\Throwable $exception){
+            Log::error('Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest@prepare => ' . $exception->getMessage());
+            throw new \Exception();
         }
     }
 

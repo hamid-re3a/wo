@@ -18,8 +18,8 @@ class CreateWalletTransactionMetaDataTable extends Migration
             $table->id();
             $table->foreignId('transaction_id')->constrained('transactions');
             $table->foreignId('type_id')->constrained('wallet_transaction_types');
-            $table->decimal('wallet_before_balance', 64, 0)->nullable();
-            $table->decimal('wallet_after_balance', 64, 0)->nullable();
+            $table->decimal('wallet_before_balance', 64, 2)->nullable();
+            $table->decimal('wallet_after_balance', 64, 2)->nullable();
             $table->timestamps();
         });
     }

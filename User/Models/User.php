@@ -119,6 +119,11 @@ class User extends Model implements WalletFloat
         return $this->invoices()->where('payable_type','Order');
     }
 
+    public function walletInvoices()
+    {
+        return $this->invoices()->where('payable_type','DepositWallet');
+    }
+
     public function withdrawRequests()
     {
         return $this->hasMany(WithdrawProfit::class,'user_id','id');

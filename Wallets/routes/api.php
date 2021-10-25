@@ -20,10 +20,14 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::post('wallet-transfers', [AdminWalletController::class, 'getWalletTransfers'])->name('wallet-transfers');
                 Route::post('wallet-balance', [AdminWalletController::class, 'getWalletBalance'])->name('wallet-balance');
 
-                Route::get('counts',[AdminDashboardController::class,'count_deposit_wallets'])->name('dashboard-counts-deposit-wallets');
+                Route::get('sum_deposit_wallets',[AdminDashboardController::class,'sum_deposit_wallets'])->name('dashboard-sum-deposit-wallets');
+                Route::get('sum_earning_wallets',[AdminDashboardController::class,'sum_earning_wallets'])->name('dashboard-sum-earning-wallets');
+                Route::get('commissions-sum',[AdminDashboardController::class,'commissionsSum'])->name('commissions-sum');
                 Route::prefix('charts')->name('charts')->group(function(){
                     Route::post('overall-balance',[AdminDashboardController::class,'overallBalanceChart'])->name('overall-balance');
                     Route::post('investments',[AdminDashboardController::class,'investmentsChart'])->name('investments');
+                    Route::post('commissions',[AdminDashboardController::class,'commissionsChart'])->name('commissions');
+
                 });
             });;
             Route::name('settings.')->prefix('settings')->group(function () {
@@ -75,6 +79,11 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::get('transfers', [EarningWalletController::class, 'transfers'])->name('get-transfers');
             Route::post('transfer-funds-preview', [EarningWalletController::class, 'transfer_to_deposit_wallet_preview'])->name('transfer-funds-preview');
             Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
+        });
+
+        Route::prefix('charts')->name('charts')->group(function(){
+            Route::post('overall-balance',[EarningWalletController::class,'overallBalanceChart'])->name('overall-balance');
+            Route::post('commissions-chart',[EarningWalletController::class,'commissionsChart'])->name('commissions');
         });
 
         Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){

@@ -9,11 +9,13 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
+use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
 
 class EarningWalletController extends Controller
@@ -23,7 +25,16 @@ class EarningWalletController extends Controller
     private $walletName;
     /**@var $walletObject Wallet*/
     private $walletObject;
+    /**@var $user User*/
+    private $user;
+    private $wallet_repository;
 
+    public function __construct(WalletRepository $wallet_repository)
+    {
+        if(auth()->check())
+            $this->prepareEarningWallet();
+        $this->wallet_repository = $wallet_repository;
+    }
     private function prepareEarningWallet()
     {
         /**@var $user User*/
@@ -41,54 +52,14 @@ class EarningWalletController extends Controller
      */
     public function earned_commissions()
     {
-        $this->prepareEarningWallet();
-        $counts = User::query()->whereId(auth()->user()->id)
-            ->withSumQuery(['transactions.amount AS binary_commissions_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Binary Commissions');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS direct_commissions_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Direct Commissions');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS indirect_commissions_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Indirect Commissions');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS roi_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'ROI');
-                    });
-                }]
-            )
-            ->withSumQuery(['transactions.amount AS spent_sum' => function (Builder $query) {
-                    $query->where('wallet_id','=', $this->walletObject->id);
-                    $query->where('type', '=', 'withdraw');
-                }]
-            )
-            ->first();
+        $commissions = [
+            'Binary Commissions',
+            'Direct Commissions',
+            'Indirect Commissions',
+            'ROI',
+        ];
 
-        return api()->success(null, [
-            'binary_commissions_sum' => $counts->binary_commissions_sum ? $counts->binary_commissions_sum : 0,
-            'direct_commissions_sum' => $counts->direct_commissions_sum ? $counts->direct_commissions_sum : 0,
-            'indirect_commissions_sum' => $counts->indirect_commissions_sum ? $counts->indirect_commissions_sum : 0,
-            'roi_sum' => $counts->roi_sum ? $counts->roi_sum : 0,
-            'spent_sum' => $counts->spent_sum ? $counts->spent_sum : 0,
-        ]);
+        return api()->success(null, $this->wallet_repository->getTransactionSumByTypes(auth()->user->id,$commissions));
 
     }
 
@@ -99,7 +70,6 @@ class EarningWalletController extends Controller
     public function index()
     {
 
-        $this->prepareEarningWallet();
         return api()->success(null, EarningWalletResource::make($this->walletObject));
 
     }
@@ -113,7 +83,6 @@ class EarningWalletController extends Controller
     public function transactions(TransactionRequest $request)
     {
 
-        $this->prepareEarningWallet();
         $list = $this->bankService->getTransactions($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
@@ -133,7 +102,6 @@ class EarningWalletController extends Controller
     public function transfers()
     {
 
-        $this->prepareEarningWallet();
         $list = $this->bankService->getTransfers($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransferResource::collection($list),
@@ -155,7 +123,6 @@ class EarningWalletController extends Controller
     public function transfer_to_deposit_wallet_preview(TransferFundFromEarningWalletRequest $request)
     {
 
-        $this->prepareEarningWallet();
         try {
             $to_user = null;
             $amount = $request->get('amount');
@@ -192,7 +159,6 @@ class EarningWalletController extends Controller
      */
     public function transfer_to_deposit_wallet(TransferFundFromEarningWalletRequest $request)
     {
-        $this->prepareEarningWallet();
 
         try {
             DB::beginTransaction();
@@ -243,6 +209,35 @@ class EarningWalletController extends Controller
             Log::error('Transfer funds error .' . $exception->getMessage());
             throw $exception;
         }
+    }
+
+    /**
+     * Overall balance chart
+     * @group Public User > Earning Wallet
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function overallBalanceChart(ChartTypeRequest $request)
+    {
+        return api()->success(null, $this->wallet_repository->getWalletOverallBalance($request->get('type'),$this->walletObject->id));
+    }
+
+    /**
+     * Commissions chart
+     * @group Public User > Earning Wallet
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     */
+    public function commissionsChart(ChartTypeRequest $request)
+    {
+        $commissions = [
+            'Binary Commissions',
+            'Direct Commissions',
+            'Indirect Commissions',
+            'ROI',
+        ];
+
+        return api()->success(null,$this->wallet_repository->getCommissionsChart($request->get('type'),$commissions,$this->walletObject->id));
     }
 
     private function calculateTransferAmount($amount)

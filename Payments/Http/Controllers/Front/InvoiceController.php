@@ -39,7 +39,9 @@ class InvoiceController extends Controller
                     'status' => 'confirmed'
                 ]);
 
-            return api()->error(null,null,404);
+            return api()->error(null,[
+                'has_invoice' => false
+            ],400);
         }
 
         return api()->success(null, InvoiceResource::make($pending_invoice));

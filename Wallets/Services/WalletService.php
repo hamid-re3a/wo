@@ -3,11 +3,9 @@
 
 namespace Wallets\Services;
 
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Orders\Services\Grpc\Order;
 use Payments\Services\Grpc\Invoice;
 use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
@@ -21,18 +19,6 @@ use Wallets\Services\Grpc\Withdraw;
 
 class WalletService implements WalletServiceInterface
 {
-    private $depositWallet;
-    private $earningWallet;
-    private $wallets = [];
-
-    public function __construct()
-    {
-        $this->depositWallet = config('depositWallet');
-        $this->earningWallet = config('earningWallet');
-        $this->wallets[] = $this->depositWallet;
-        $this->wallets[] = $this->earningWallet;
-    }
-
     private function walletUser($user_id)
     {
 
@@ -51,14 +37,12 @@ class WalletService implements WalletServiceInterface
                 $deposit->getAmount() > 0 AND
                 $deposit->getUserId() AND
                 !is_null($deposit->getType()) AND
-                in_array($deposit->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
+                in_array($deposit->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT,WalletNames::JANEX])
             ) {
                 $walletUser = $this->walletUser($deposit->getUserId());
                 $bankService = new BankService($walletUser);
 
-                $wallet_name = $this->earningWallet;
-                if($deposit->getWalletName() == WalletNames::DEPOSIT)
-                    $wallet_name = $this->depositWallet;
+                $wallet_name = $this->detectWallet($deposit->getWalletName());
 
                 $transaction = $bankService->deposit($wallet_name, $deposit->getAmount(), $deposit->getDescription() ?: null, true, $deposit->getType(), !empty($deposit->getSubType()) ? $deposit->getSubType() : null);
                 $deposit->setTransactionId((int)$transaction->uuid);
@@ -88,14 +72,12 @@ class WalletService implements WalletServiceInterface
                 $withdraw->getAmount() > 0 AND
                 $withdraw->getUserId() AND
                 !is_null($withdraw->getType()) AND
-                in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT])
+                in_array($withdraw->getWalletName(), [WalletNames::EARNING,WalletNames::DEPOSIT,WalletNames::JANEX])
             ) {
                 $walletUser = $this->walletUser($withdraw->getUserId());
                 $bankService = new BankService($walletUser);
 
-                $wallet_name = $this->earningWallet;
-                if($withdraw->getWalletName() == WalletNames::DEPOSIT)
-                    $wallet_name = $this->depositWallet;
+                $wallet_name = $this->detectWallet($withdraw->getWalletName());
 
                 $transaction = $bankService->withdraw($wallet_name, $withdraw->getAmount(), $withdraw->getDescription() ?: null, $withdraw->getType(),empty($withdraw->getSubType()) ? null : $withdraw->getSubType());
                 $withdraw->setTransactionId($transaction->uuid);
@@ -124,20 +106,16 @@ class WalletService implements WalletServiceInterface
                 $transfer->getFromUserId() AND
                 $transfer->getToUserId() AND
                 $transfer->getAmount() > 0 AND
-                in_array($transfer->getToWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT]) AND
-                in_array($transfer->getFromWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT])
+                in_array($transfer->getToWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT,WalletNames::JANEX]) AND
+                in_array($transfer->getFromWalletName(),[WalletNames::EARNING,WalletNames::DEPOSIT,WalletNames::JANEX])
             ) {
                 $fromUser = $this->walletUser($transfer->getFromUserId());
                 $toUser = $this->walletUser($transfer->getToUserId());
                 $fromBankService = new BankService($fromUser);
                 $toBankService = new BankService($toUser);
 
-                $fromWallet = $toWallet = $this->earningWallet;
-                if($transfer->getToWalletName() == WalletNames::DEPOSIT)
-                    $toWallet = $this->depositWallet;
-
-                if($transfer->getFromWalletName() == WalletNames::DEPOSIT)
-                    $fromWallet = $this->depositWallet;
+                $toWallet = $this->detectWallet($transfer->getToWalletName());
+                $fromWallet = $this->detectWallet($transfer->getFromWalletName());
 
                 $bank_transfer = $fromBankService->transfer($fromBankService->getWallet($fromWallet), $toBankService->getWallet($toWallet), $transfer->getAmount(), $transfer->getDescription() ?: null);
                 $transfer->setDepositTransactionId($bank_transfer->withdraw->uuid);
@@ -165,9 +143,7 @@ class WalletService implements WalletServiceInterface
             $walletUser = $this->walletUser($wallet->getUserId());
             $bankService = new BankService($walletUser);
 
-            $walletName = $this->earningWallet;
-            if($wallet->getName() == WalletNames::DEPOSIT)
-                $walletName = $this->depositWallet;
+            $walletName = $this->detectWallet($wallet->getName());
 
             $balance = $bankService->getBalance($walletName);
 
@@ -188,15 +164,34 @@ class WalletService implements WalletServiceInterface
 
     public function invoiceWallet(Request $request)
     {
+        /**
+         * @var User $user;
+        */
+        $user = auth()->user();
         $invoice_request = new Invoice();
         $invoice_request->setPfAmount(usdToPf($request->get('amount')));
         $invoice_request->setPaymentDriver('btc-pay-server');
         $invoice_request->setPaymentType('purchase');
         $invoice_request->setPaymentCurrency('BTC');
         $invoice_request->setPayableType('DepositWallet');
-        $invoice_request->setUser(auth()->user()->getUserService());
+        $invoice_request->setUser($user->getUserService());
 
         return PaymentFacade::pay($invoice_request);
+    }
+
+    private function detectWallet($walletName)
+    {
+        switch ($walletName) {
+            case WalletNames::DEPOSIT:
+                return WALLET_NAME_DEPOSIT_WALLET;
+                break;
+            case WalletNames::EARNING:
+                return WALLET_NAME_EARNING_WALLET;
+                break;
+            case WalletNames::JANEX:
+                return WALLET_NAME_JANEX_WALLET;
+                break;
+        }
     }
 
 }

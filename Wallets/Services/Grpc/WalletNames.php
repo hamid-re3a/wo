@@ -19,10 +19,15 @@ class WalletNames
      * Generated from protobuf enum <code>DEPOSIT = 1;</code>
      */
     const DEPOSIT = 1;
+    /**
+     * Generated from protobuf enum <code>JANEX = 2;</code>
+     */
+    const JANEX = 2;
 
     private static $valueToName = [
         self::EARNING => 'EARNING',
         self::DEPOSIT => 'DEPOSIT',
+        self::JANEX => 'JANEX',
     ];
 
     public static function name($value)

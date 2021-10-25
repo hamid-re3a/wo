@@ -3,7 +3,6 @@
 
 namespace Wallets\Services;
 
-
 use User\Models\User;
 use Wallets\Models\WithdrawProfit;
 

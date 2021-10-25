@@ -2,8 +2,6 @@
 
 namespace Wallets\Mail\EarningWallet;
 
-use Illuminate\Support\Facades\Http;
-use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;

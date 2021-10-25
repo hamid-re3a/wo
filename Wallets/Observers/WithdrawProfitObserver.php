@@ -3,7 +3,6 @@
 
 namespace Wallets\Observers;
 
-use Ramsey\Uuid\Uuid;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedUpdated;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedSubmitted;

@@ -3,8 +3,8 @@
 namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Orders\Services\OrderService;
 use Payments\Services\PaymentService;
+use User\Models\User;
 use Wallets\Services\BankService;
 
 class CreateWithdrawRequest extends FormRequest
@@ -12,6 +12,7 @@ class CreateWithdrawRequest extends FormRequest
     private $minimum_amount;
     private $maximum_amount;
     private $wallet_balance;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -36,7 +37,7 @@ class CreateWithdrawRequest extends FormRequest
 
         return [
             'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance,
-            'currency' => 'required|in:'. implode(',', $this->getNamePaymentCurrency()),
+            'currency' => 'required|in:' . implode(',', $this->getNamePaymentCurrency()),
         ];
     }
 
@@ -44,16 +45,20 @@ class CreateWithdrawRequest extends FormRequest
     {
         return [
             'amount.min' => 'Minimum allowed is ' . formatCurrencyFormat($this->minimum_amount) . " PF",
-            'amount.max' => 'Maximum allowed is ' . formatCurrencyFormat($this->maximum_amount) ." PF",
+            'amount.max' => 'Maximum allowed is ' . formatCurrencyFormat($this->maximum_amount) . " PF",
             'amount.lte' => 'Insufficient amount'
         ];
     }
 
     private function prepare()
     {
-        if(auth()->check()){
-            $bank_service = new BankService(auth()->user());
-            $this->wallet_balance = $bank_service->getBalance(config('earningWallet'));
+        if (auth()->check()) {
+            /**
+             * @var $user User
+             */
+            $user = auth()->user();
+            $bank_service = new BankService($user);
+            $this->wallet_balance = $bank_service->getBalance(WALLET_NAME_EARNING_WALLET);
         }
     }
 
@@ -61,7 +66,7 @@ class CreateWithdrawRequest extends FormRequest
     private function getNamePaymentCurrency()
     {
         $currencies = app(PaymentService::class)->getPaymentCurrencies(CURRENCY_SERVICE_WITHDRAW);
-        if($currencies)
+        if ($currencies)
             return $currencies->pluck('name')->toArray();
         else
             return [];

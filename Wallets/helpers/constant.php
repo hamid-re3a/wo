@@ -11,6 +11,16 @@ const WITHDRAW_COMMAND = [
     WITHDRAW_COMMAND_POSTPONE
 ];
 
+const WALLET_NAME_DEPOSIT_WALLET = 'Deposit Wallet';
+const WALLET_NAME_EARNING_WALLET = 'Earning Wallet';
+const WALLET_NAME_JANEX_WALLET = 'Janex Wallet';
+
+const WALLET_NAMES = [
+    WALLET_NAME_DEPOSIT_WALLET,
+    WALLET_NAME_EARNING_WALLET,
+    WALLET_NAME_JANEX_WALLET
+];
+
 const WALLET_SETTINGS = [
     'transfer_fee' => [
         'value' => 10,

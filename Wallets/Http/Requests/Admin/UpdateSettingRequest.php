@@ -3,7 +3,6 @@
 namespace Wallets\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Wallets\Models\Setting;
 
 class UpdateSettingRequest extends FormRequest

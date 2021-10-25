@@ -95,8 +95,8 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::get('transfers', [JanexWalletController::class, 'transfers'])->name('get-transfers');
 
             Route::prefix('charts')->name('charts')->group(function(){
-                Route::post('overall-balance',[EarningWalletController::class,'overallBalanceChart'])->name('overall-balance');
-                Route::post('commissions-chart',[EarningWalletController::class,'commissionsChart'])->name('commissions');
+                Route::post('overall-balance',[JanexWalletController::class,'overallBalanceChart'])->name('overall-balance');
+                Route::post('commissions-chart',[JanexWalletController::class,'commissionsChart'])->name('commissions');
             });
 
         });

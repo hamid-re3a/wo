@@ -231,9 +231,9 @@ class EarningWalletController extends Controller
     public function commissionsChart(ChartTypeRequest $request)
     {
         $commissions = [
-//            'Binary Commissions',
-//            'Direct Commissions',
-//            'Indirect Commissions',
+            'Binary Commissions',
+            'Direct Commissions',
+            'Indirect Commissions',
             'ROI',
         ];
 

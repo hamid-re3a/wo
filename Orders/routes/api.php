@@ -13,6 +13,7 @@ Route::middleware('auth')->group(function () {
 
         Route::name('orders.')->prefix('orders')->group(function () {
             Route::name('dashboard.')->prefix('dashboard')->group(function () {
+                Route::get('sums', [AdminDashboardController::class, 'sums'])->name('sums');
                 Route::get('counts', [AdminDashboardController::class, 'counts'])->name('counts');
                 Route::post('package_count_overview', [AdminDashboardController::class, 'packageOverviewCount'])->name('package-overview');
                 Route::post('package_type_count', [AdminDashboardController::class, 'packageTypeCount'])->name('package-type');

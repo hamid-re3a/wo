@@ -64,6 +64,16 @@ class OrderService implements OrdersServiceInterface
         return $order;
     }
 
+    public function getActiveOrdersSum()
+    {
+        return $this->order_repository->getActiveOrdersSum();
+    }
+
+    public function getPaidOrdersSum()
+    {
+        return $this->order_repository->getPaidOrdersSum();
+    }
+
     public function getCountOrders()
     {
         return $this->order_repository->getCountOrders();

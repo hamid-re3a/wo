@@ -52,10 +52,12 @@ class EarningWalletController extends Controller
     public function earned_commissions()
     {
         $commissions = [
-            'Binary Commissions',
-            'Direct Commissions',
-            'Indirect Commissions',
-            'ROI',
+            'Binary',
+            'Direct Sale',
+            'Indirect Sale',
+            'Trading Profit',
+            'Residual Bonus',
+            'Trainer Bonus',
         ];
 
         return api()->success(null, $this->wallet_repository->getTransactionSumByTypes(auth()->user->id,$commissions));
@@ -230,10 +232,12 @@ class EarningWalletController extends Controller
     public function commissionsChart(ChartTypeRequest $request)
     {
         $commissions = [
-            'Binary Commissions',
-            'Direct Commissions',
-            'Indirect Commissions',
-            'ROI',
+            'Binary',
+            'Direct Sale',
+            'Indirect Sale',
+            'Trading Profit',
+            'Residual Bonus',
+            'Trainer Bonus',
         ];
 
         return api()->success(null,$this->wallet_repository->getCommissionsChart($request->get('type'),$commissions,$this->walletObject->id));

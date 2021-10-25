@@ -10,8 +10,25 @@ class OrderRepository
 
     public function getCountOrders()
     {
+        /**@var $order Order */
         $order = new $this->entity_name;
-        return $order_package_is_paid = $order->count();
+        return $order->query()->count();
+    }
+
+    public function getActiveOrdersSum()
+    {
+        /**@var $order Order */
+        $order = new $this->entity_name;
+
+        return $order->resolved()->active()->sum('total_cost_in_pf');
+    }
+
+    public function getPaidOrdersSum()
+    {
+        /**@var $order Order */
+        $order = new $this->entity_name;
+
+        return $order->resolved()->sum('total_cost_in_pf');
     }
 
     public function getActiveOrdersCount()

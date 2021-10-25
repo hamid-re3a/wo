@@ -24,7 +24,19 @@ class DashboardController extends Controller
     }
 
     /**
-     * Counts
+     * Sums orders
+     * @group
+     * Admin User > Orders Dashboard
+     */
+    public function sums()
+    {
+        return api()->success(null, [
+            'paid_orders_sum' => $this->order_service->getPaidOrdersSum(),
+        ]);
+    }
+
+    /**
+     * Counts orders
      * @group
      * Admin User > Orders Dashboard
      */

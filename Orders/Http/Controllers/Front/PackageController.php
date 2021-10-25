@@ -44,7 +44,7 @@ class PackageController extends Controller
 
 
     /**
-     * Has a paid package
+     * Has paid package
      * @group
      * Public User > Orders
      */
@@ -64,7 +64,7 @@ class PackageController extends Controller
     }
 
     /**
-     * Has a valid package
+     * Has valid package
      * @group
      * Public User > Orders
      */

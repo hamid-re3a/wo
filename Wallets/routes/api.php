@@ -7,6 +7,7 @@ use Wallets\Http\Controllers\Admin\SettingController;
 use Wallets\Http\Controllers\Admin\WithdrawRequestController as AdminWithdrawRequestController;
 use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
+use Wallets\Http\Controllers\Front\JanexWalletController;
 use Wallets\Http\Controllers\Front\WalletController;
 use Wallets\Http\Controllers\Admin\UserWalletController AS AdminWalletController;
 use Wallets\Http\Controllers\Front\WithdrawRequestController as UserWithdrawRequestController;
@@ -79,11 +80,25 @@ Route::middleware('auth')->name('wallets.')->group(function(){
             Route::get('transfers', [EarningWalletController::class, 'transfers'])->name('get-transfers');
             Route::post('transfer-funds-preview', [EarningWalletController::class, 'transfer_to_deposit_wallet_preview'])->name('transfer-funds-preview');
             Route::post('transfer-funds', [EarningWalletController::class, 'transfer_to_deposit_wallet'])->name('transfer-funds');
+
+            Route::prefix('charts')->name('charts')->group(function(){
+                Route::post('overall-balance',[EarningWalletController::class,'overallBalanceChart'])->name('overall-balance');
+                Route::post('commissions-chart',[EarningWalletController::class,'commissionsChart'])->name('commissions');
+            });
+
         });
 
-        Route::prefix('charts')->name('charts')->group(function(){
-            Route::post('overall-balance',[EarningWalletController::class,'overallBalanceChart'])->name('overall-balance');
-            Route::post('commissions-chart',[EarningWalletController::class,'commissionsChart'])->name('commissions');
+        Route::name('janex.')->prefix('janex')->group(function () {
+            Route::get('', [JanexWalletController::class, 'index'])->name('get-wallet');
+            Route::get('earned-commissions', [JanexWalletController::class, 'earned_commissions'])->name('earned-commissions');
+            Route::get('transactions', [JanexWalletController::class, 'transactions'])->name('get-transactions');
+            Route::get('transfers', [JanexWalletController::class, 'transfers'])->name('get-transfers');
+
+            Route::prefix('charts')->name('charts')->group(function(){
+                Route::post('overall-balance',[EarningWalletController::class,'overallBalanceChart'])->name('overall-balance');
+                Route::post('commissions-chart',[EarningWalletController::class,'commissionsChart'])->name('commissions');
+            });
+
         });
 
         Route::name('withdrawRequests.')->prefix('withdraw-requests')->group(function(){

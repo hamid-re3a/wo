@@ -156,7 +156,8 @@ class WalletServiceProvider extends ServiceProvider
     {
         config([
             'depositWallet' => 'Deposit Wallet',
-            'earningWallet' => 'Earning Wallet'
+            'earningWallet' => 'Earning Wallet',
+            'janexWallet'   => 'Janex Wallet'
         ]);
     }
 

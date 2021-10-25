@@ -10,8 +10,9 @@ class OrderRepository
 
     public function getCountOrders()
     {
+        /**@var $order Order */
         $order = new $this->entity_name;
-        return $order_package_is_paid = $order->count();
+        return $order->query()->count();
     }
 
     public function getActiveOrdersSum()

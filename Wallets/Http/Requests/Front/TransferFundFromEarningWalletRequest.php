@@ -3,7 +3,6 @@
 namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Services\BankService;
@@ -67,7 +66,7 @@ class TransferFundFromEarningWalletRequest extends FormRequest
                 /**@var $user User*/
                 $user = auth()->user();
                 $bank_service = new BankService($user);
-                $this->wallet_balance = $bank_service->getBalance(config('earningWallet'));
+                $this->wallet_balance = $bank_service->getBalance(WALLET_NAME_EARNING_WALLET);
                 $this->member_id = auth()->user()->member_id;
 
                 $this->minimum_amount = getWalletSetting('minimum_transfer_from_earning_to_deposit_wallet_fund_amount');

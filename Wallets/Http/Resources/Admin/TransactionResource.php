@@ -3,7 +3,6 @@
 namespace Wallets\Http\Resources\Admin;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 class TransactionResource extends JsonResource
 {

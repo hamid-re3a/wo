@@ -13,6 +13,7 @@ Route::middleware('auth')->group(function () {
 
         Route::name('orders.')->prefix('orders')->group(function () {
             Route::name('dashboard.')->prefix('dashboard')->group(function () {
+                Route::get('sums', [AdminDashboardController::class, 'sums'])->name('sums');
                 Route::get('counts', [AdminDashboardController::class, 'counts'])->name('counts');
                 Route::post('package_count_overview', [AdminDashboardController::class, 'packageOverviewCount'])->name('package-overview');
                 Route::post('package_type_count', [AdminDashboardController::class, 'packageTypeCount'])->name('package-type');
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function () {
 
             Route::name('packages.')->prefix('packages')->middleware('auth')->group(function () {
                 Route::get('available-packages', [PackageController::class, 'paidPackages'])->name('paid-packages');
+                Route::get('has-paid-package', [PackageController::class, 'hasPaidPackage'])->name('has-paid-package');
                 Route::get('has-valid-package', [PackageController::class, 'hasValidPackage'])->name('has-valid-package');
             });
         });

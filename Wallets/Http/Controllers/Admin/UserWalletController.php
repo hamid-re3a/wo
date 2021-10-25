@@ -4,7 +4,6 @@ namespace Wallets\Http\Controllers\Admin;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse as JsonResponseAlias;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use User\Models\User;
@@ -27,8 +26,6 @@ class UserWalletController extends Controller
      */
 
     private $bankService;
-    private $depositWallet;
-    private $earningWallet;
 
     public function __construct()
     {
@@ -42,13 +39,9 @@ class UserWalletController extends Controller
         $user = User::query()->whereMemberId(request()->get('member_id'))->first();
         $this->bankService = new BankService($user);
 
-        $this->earningWallet = config('earningWallet');
-        $this->depositWallet = config('depositWallet');
-
-        if ($this->bankService->getAllWallets()->count() != 2) {
-            $this->bankService->getWallet($this->depositWallet);
-            $this->bankService->getWallet($this->earningWallet);
-        }
+        if ($this->bankService->getAllWallets()->count() != count(WALLET_NAMES))
+            foreach(WALLET_NAMES AS $wallet_name)
+                $this->bankService->getWallet($wallet_name);
 
     }
 

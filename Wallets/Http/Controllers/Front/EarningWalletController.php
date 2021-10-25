@@ -3,7 +3,6 @@
 namespace Wallets\Http\Controllers\Front;
 
 use Bavix\Wallet\Models\Wallet;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +40,7 @@ class EarningWalletController extends Controller
         $user = auth()->user();
 
         $this->bankService = new BankService($user);
-        $this->walletName = config('earningWallet');
+        $this->walletName = WALLET_NAME_EARNING_WALLET;
         $this->walletObject = $this->bankService->getWallet($this->walletName);
 
     }
@@ -53,10 +52,12 @@ class EarningWalletController extends Controller
     public function earned_commissions()
     {
         $commissions = [
-            'Binary Commissions',
-            'Direct Commissions',
-            'Indirect Commissions',
-            'ROI',
+            'Binary',
+            'Direct Sale',
+            'Indirect Sale',
+            'Trading Profit',
+            'Residual Bonus',
+            'Trainer Bonus',
         ];
 
         return api()->success(null, $this->wallet_repository->getTransactionSumByTypes(auth()->user->id,$commissions));
@@ -163,14 +164,14 @@ class EarningWalletController extends Controller
         try {
             DB::beginTransaction();
 
-            $deposit_wallet = $this->bankService->getWallet(config('depositWallet'));
+            $deposit_wallet = $this->bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
             $amount = request()->get('amount');
             $description = [];
             $fee = 0;
             if ($request->has('member_id')) {
                 $other_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 $other_member_bank_service = new BankService($other_member);
-                $deposit_wallet = $other_member_bank_service->getWallet(config('depositWallet'));
+                $deposit_wallet = $other_member_bank_service->getWallet(WALLET_NAME_DEPOSIT_WALLET);
                 list($total, $fee) = $this->calculateTransferAmount($amount);
                 $description = [
                     'member_id' => $request->get('member_id'),
@@ -178,7 +179,7 @@ class EarningWalletController extends Controller
                     'type' => 'Transfer'
                 ];
 
-                $balance = $this->bankService->getBalance(config('earningWallet'));
+                $balance = $this->bankService->getBalance(WALLET_NAME_EARNING_WALLET);
                 if ($balance < $total)
                     return api()->error(null, null, 406, [
                         'subject' => trans('wallet.responses.not-enough-balance', [
@@ -231,10 +232,12 @@ class EarningWalletController extends Controller
     public function commissionsChart(ChartTypeRequest $request)
     {
         $commissions = [
-            'Binary Commissions',
-            'Direct Commissions',
-            'Indirect Commissions',
-            'ROI',
+            'Binary',
+            'Direct Sale',
+            'Indirect Sale',
+            'Trading Profit',
+            'Residual Bonus',
+            'Trainer Bonus',
         ];
 
         return api()->success(null,$this->wallet_repository->getCommissionsChart($request->get('type'),$commissions,$this->walletObject->id));

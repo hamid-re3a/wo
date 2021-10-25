@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use User\Models\User;
-use Wallets\Models\Transaction;
 
 class WalletRepository
 {

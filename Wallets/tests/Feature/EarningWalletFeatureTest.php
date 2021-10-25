@@ -5,7 +5,6 @@ namespace Wallets\tests\Feature;
 
 
 use Illuminate\Support\Facades\Mail;
-use Payments\Services\Processors\PaymentFacade;
 use User\Models\User;
 use Wallets\Services\BankService;
 use Wallets\tests\WalletTest;

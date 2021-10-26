@@ -19,7 +19,7 @@ class WithdrawProfitResource extends JsonResource
         $withdraw_request = $this;
 
         return [
-            'id' => $withdraw_request->uuid,
+            'id' => (int)$withdraw_request->uuid,
             'user_member_id' => $withdraw_request->user->member_id,
             'user_full_name' => $withdraw_request->user->full_name,
             'withdraw_transaction_id' => $withdraw_request->withdrawTransaction->uuid,
@@ -29,10 +29,10 @@ class WithdrawProfitResource extends JsonResource
             'rejection_reason' => !empty($withdraw_request->rejection_reason) ? $withdraw_request->rejection_reason : null,
             'wallet_hash' => $withdraw_request->wallet_hash,
             'currency' => $withdraw_request->currency,
-            'crypto_rate' => $withdraw_request->crypto_rate,
-            'fee' => $withdraw_request->fee,
-            'pf_amount' => $withdraw_request->pf_amount,
-            'crypto_amount' => $withdraw_request->crypto_amount,
+            'crypto_rate' => (double)$withdraw_request->crypto_rate,
+            'fee' => (double)$withdraw_request->fee,
+            'pf_amount' => (double)$withdraw_request->pf_amount,
+            'crypto_amount' => (double)$withdraw_request->crypto_amount,
             'status' => $withdraw_request->status,
             'postponed_to' => !empty($withdraw_request->postponed_to) ? $withdraw_request->postponed_to->timestamp : null,
             'created_at' => $withdraw_request->created_at->timestamp,

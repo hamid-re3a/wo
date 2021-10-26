@@ -69,10 +69,15 @@ class InvoiceController extends Controller
     {
         try {
             DB::beginTransaction();
-            $invoice = Invoice::query()->whereTransactionId($request->get('transaction_id'))->first();
+            $invoice = Invoice::query()->whereTransactionId($request->get('id'))->first();
             $total_paid_amount_in_pf = usdToPf($invoice->paid_amount * $invoice->rate);
             $refundable_amount = $total_paid_amount_in_pf - $invoice->pf_amount;
-            $this->depositToUserWallet($invoice, $refundable_amount);
+            $this->refundToUserWallet($invoice, $refundable_amount);
+            $invoice->update([
+                'is_refund_at' => now()->toDateTimeString(),
+                'refunder_user_id' => auth()->user()->id ,
+                'deposit_amount' => $refundable_amount
+            ]);
 
             DB::commit();
 
@@ -179,7 +184,7 @@ class InvoiceController extends Controller
      * @param float $refundable_amount
      * @throws \Exception
      */
-    private function depositToUserWallet($invoice, float $refundable_amount): void
+    private function refundToUserWallet($invoice, float $refundable_amount): void
     {
         $wallet_service = app(WalletService::class);
         //Deposit Service
@@ -187,7 +192,7 @@ class InvoiceController extends Controller
         $deposit_service->setUserId($invoice->user_id);
         $deposit_service->setAmount($refundable_amount);
         $deposit_service->setType('Funds deposited');
-        $deposit_service->setDescription('Invoice #' . $invoice->transaction_id);
+        $deposit_service->setDescription('Refund Invoice #' . $invoice->transaction_id);
         $deposit_service->setWalletName(WalletNames::DEPOSIT);
 
         //Deposit transaction
@@ -197,14 +202,8 @@ class InvoiceController extends Controller
         $deposit = $wallet_service->deposit($deposit_service);
 
         //Deposit check
-        if (is_string($deposit->getTransactionId())) {
-            $invoice->update([
-                'is_refund_at' => now()->toDateTimeString(),
-                'deposit_amount' => $refundable_amount
-            ]);
-        } else {
+        if (!is_string($deposit->getTransactionId()))
             throw new \Exception('Deposit Wallet Error');
-        }
     }
 
 }

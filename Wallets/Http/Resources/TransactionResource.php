@@ -18,7 +18,7 @@ class TransactionResource extends JsonResource
         $metaData = $this->metaData->first();
 
         return [
-            'id' => (int)$this->uuid,
+            'id' => $this->uuid,
             'wallet' => $this->wallet->name,
             'type' => $metaData ? $metaData->name : null,
             'amount' => (double)$this->amountFloat,

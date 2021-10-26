@@ -19,7 +19,7 @@ class WithdrawProfitResource extends JsonResource
         $withdraw_request = $this;
 
         return [
-            'id' => (int)$withdraw_request->uuid,
+            'id' => $withdraw_request->uuid,
             'user_member_id' => $withdraw_request->user->member_id,
             'user_full_name' => $withdraw_request->user->full_name,
             'withdraw_transaction_id' => $withdraw_request->withdrawTransaction->uuid,

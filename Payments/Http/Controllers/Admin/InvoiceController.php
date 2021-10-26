@@ -47,7 +47,11 @@ class InvoiceController extends Controller
      */
     public function overPaidInvoices()
     {
-        $list = Invoice::query()->where('additional_status','=','PaidOver')->where('payable_type','=','Order')->paginate();
+        $list = Invoice::query()
+            ->where('additional_status','=','PaidOver')
+            ->where('payable_type','=','Order')
+            ->with('transactions','user')
+            ->paginate();
         return api()->success(null,[
             'list' => InvoiceResource::collection($list),
             'pagination' => [

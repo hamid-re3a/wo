@@ -15,13 +15,10 @@ class InvoiceResource extends JsonResource
      */
     public function toArray($request)
     {
-        /**@var $user User*/
-        $user = $this->user;
-        $transactions = $this->resource->transactions()->exists() ? InvoiceTransactionResource::collection($this->resource->transactions()->get()) : null;
-
+        $transactions = $this->transactions ? InvoiceTransactionResource::collection($this->transactions) : null;
         return [
-            'user_member_id' => $user->member_id,
-            'user_full_name' => $user->full_name,
+            'user_member_id' => $this->user->member_id,
+            'user_full_name' => $this->user->full_name,
             'transaction_id' => $this->transaction_id,
             'type' => $this->type,
             'status' => $this->full_status,

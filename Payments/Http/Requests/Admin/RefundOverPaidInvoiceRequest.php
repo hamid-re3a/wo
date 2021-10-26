@@ -3,6 +3,7 @@
 namespace Payments\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RefundOverPaidInvoiceRequest extends FormRequest
 {
@@ -25,7 +26,13 @@ class RefundOverPaidInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'transaction_id' => 'required|exists:invoices,transaction_id,additional_status,PaidOver,payable_type,Order,is_refund_at,null',
+            'id' => [
+                'required',
+                Rule::exists('invoices','transaction_id')
+                    ->where('additional_status','PaidOver')
+                    ->where('payable_type','Order')
+                    ->whereNull('is_refund_at')
+            ]
         ];
     }
 

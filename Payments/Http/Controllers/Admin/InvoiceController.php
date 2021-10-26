@@ -46,9 +46,9 @@ class InvoiceController extends Controller
     public function overPaidInvoices()
     {
         $list = Invoice::query()
-            ->where('additional_status','=','PaidOver')
-            ->where('payable_type','=','Order')
-            ->whereNull('is_refund_at')
+            ->orders()
+            ->paid()
+            ->paidOverNotRefunded()
             ->with('transactions','user')
             ->paginate();
         return api()->success(null,[
@@ -73,9 +73,8 @@ class InvoiceController extends Controller
         try {
             DB::beginTransaction();
             $invoice = Invoice::query()->whereTransactionId($request->get('transaction_id'))->first();
-            $total_paid_amount_in_pf = usdToPf($invoice->paid_amount * $invoice->rate);
-            $refundable_amount = $total_paid_amount_in_pf - $invoice->pf_amount;
-            $this->refundToUserWallet($invoice, $refundable_amount);
+            $refundable_amount = $this->refundToUserWallet($invoice);
+
             $invoice->update([
                 'is_refund_at' => now()->toDateTimeString(),
                 'refunder_user_id' => auth()->user()->id ,
@@ -101,10 +100,10 @@ class InvoiceController extends Controller
     public function pendingOrderInvoices()
     {
         $list = Invoice::query()
+            ->orders()
+            ->notPaid()
+            ->notExpired()
             ->with('user')
-            ->where('payable_type','Order')
-            ->where('is_paid',0)
-            ->where('expiration_time','>',now()->toDateTimeString())
             ->paginate();
 
         return api()->success(null, [
@@ -124,10 +123,10 @@ class InvoiceController extends Controller
     public function pendingWalletInvoices()
     {
         $list = Invoice::query()
+            ->depositWallets()
+            ->notPaid()
+            ->notExpired()
             ->with('user')
-            ->where('payable_type','DepositWallet')
-            ->where('is_paid',0)
-            ->where('expiration_time','>',now()->toDateTimeString())
             ->paginate();
 
         return api()->success(null, [
@@ -190,11 +189,13 @@ class InvoiceController extends Controller
 
     /**
      * @param $invoice
-     * @param float $refundable_amount
+     * @return float
      * @throws \Exception
      */
-    private function refundToUserWallet($invoice, float $refundable_amount): void
+    private function refundToUserWallet($invoice)
     {
+        $total_paid_amount_in_pf = usdToPf($invoice->paid_amount * $invoice->rate);
+        $refundable_amount = $total_paid_amount_in_pf - $invoice->pf_amount;
         $wallet_service = app(WalletService::class);
         //Deposit Service
         $deposit_service = app(Deposit::class);
@@ -213,6 +214,8 @@ class InvoiceController extends Controller
         //Deposit check
         if (!is_string($deposit->getTransactionId()))
             throw new \Exception('Deposit Wallet Error');
+
+        return $refundable_amount;
     }
 
 }

@@ -20,6 +20,15 @@ use User\Models\User;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $full_status
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice orders()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice depositWallets()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paid()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice notPaid()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOver()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOverNotRefunded()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice refunded()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice expired()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice notExpired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice query()
@@ -93,6 +102,51 @@ class Invoice extends Model
     public function user()
     {
         return $this->belongsTo(User::class,'user_id','id');
+    }
+
+    public function scopeOrders($query)
+    {
+        return $query->where('payable_type','=','Order');
+    }
+
+    public function scopeDepositWallets($query)
+    {
+        return $query->where('payable_type','=','DepositWallet');
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('is_paid','=',true);
+    }
+
+    public function scopeNotPaid($query)
+    {
+        return $query->where('is_paid','=',false);
+    }
+
+    public function scopePaidOver($query)
+    {
+        return $query->where('additional_status','=','PaidOver');
+    }
+
+    public function scopePaidOverNotRefunded($query)
+    {
+        return $query->where('additional_status','=','PaidOver')->whereNull('is_refund_at');
+    }
+
+    public function scopeRefunded($query)
+    {
+        return $query->whereNotNull('is_refund_at');
+    }
+
+    public function scopeExpired($query)
+    {
+        return $query->where('expiration_time','<',now()->toDateTimeString());
+    }
+
+    public function scopeNotExpired($query)
+    {
+        return $query->where('expiration_time','>',now()->toDateTimeString());
     }
 
     public function refunder()

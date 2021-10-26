@@ -58,7 +58,9 @@ class OrderGrpcService implements OrdersServiceInterface
                 throw new \Exception('Creating Order faced a problem', 406);
             $order_db->refreshOrder();
             Log::info('Front/OrderService@newOrder First MLM request');
-            $response = getMLMGrpcClient()->simulateOrder($order_db->getOrderService());
+            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getOrderService())->wait();
+            if ($flag->code != 0)
+                throw new \Exception('Order not see mlm', 406);
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
@@ -87,7 +89,9 @@ class OrderGrpcService implements OrdersServiceInterface
             $order_service->setIsResolvedAt($now);
 
             Log::info('Front/OrderService@newOrder Second MLM request');
-            $submit_response = getMLMGrpcClient()->submitOrder($order_service);
+            list($submit_response, $flag) = getMLMGrpcClient()->simulateOrder($order_service)->wait();
+            if ($flag->code != 0)
+                throw new \Exception('Order not see1 mlm', 406);
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);

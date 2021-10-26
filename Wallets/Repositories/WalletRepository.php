@@ -70,9 +70,9 @@ class WalletRepository
                 $sum_query->where('payable_id', '=', $user_id);
 
             $results[$key] =
-                $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
+                (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
                     $subQuery->where('wallet_transaction_meta_data.type_id', '=', $type->id);
-                })->sum('amount');
+                })->sum('amount') / 100;
 
         }
 

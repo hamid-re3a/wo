@@ -31,6 +31,7 @@ class RefundOverPaidInvoiceRequest extends FormRequest
                 Rule::exists('invoices','transaction_id')
                     ->where('additional_status','PaidOver')
                     ->where('payable_type','Order')
+                    ->where('is_paid',false)
                     ->whereNull('is_refund_at')
             ]
         ];

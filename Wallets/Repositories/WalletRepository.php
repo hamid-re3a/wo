@@ -67,7 +67,7 @@ class WalletRepository
             $counts_query->withSumQuery(['transactions.amount AS ' . $key => function (Builder $query) use ($type) {
                     $query->where('type', '=', 'deposit');
                     $query->whereHas('metaData', function (Builder $subQuery) use ($type) {
-                        $subQuery->where('name', '=', $type);
+                        $subQuery->where('name', 'LIKE', "%{$type}%");
                     });
                 }]
             );

@@ -91,7 +91,7 @@ class OrderGrpcService implements OrdersServiceInterface
             Log::info('Front/OrderService@newOrder Second MLM request');
             list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
             if ($flag->code != 0){
-                Log::error($flag);
+                Log::error($flag->metadata);
                 throw new \Exception('Order not see1 mlm', 406);
             }
 

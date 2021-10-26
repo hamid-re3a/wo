@@ -36,6 +36,7 @@ class CreateInvoicesTable extends Migration
 
             $table->unsignedDouble('rate')->default(0);
 
+            $table->timestamp('is_refund_at')->nullable();
             $table->timestamp('expiration_time')->nullable();
 
 

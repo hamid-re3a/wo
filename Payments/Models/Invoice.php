@@ -43,6 +43,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDueAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereIsPaid($value)
  * @property string|null $expiration_time
+ * @property string|null $is_refund_at
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereExpirationTime($value)
  * @property float $pf_amount
  * @property string $payment_type
@@ -69,6 +70,7 @@ class Invoice extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'expiration_time' => 'datetime',
+        'is_refund_at' => 'datetime',
         'is_paid' => 'boolean'
     ];
 

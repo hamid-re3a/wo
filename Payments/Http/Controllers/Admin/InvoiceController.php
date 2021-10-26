@@ -5,6 +5,9 @@ namespace Payments\Http\Controllers\Admin;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Payments\Http\Requests\Admin\RefundOverPaidInvoiceRequest;
 use Payments\Http\Requests\Invoice\CancelInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
@@ -12,6 +15,9 @@ use Payments\Http\Resources\Admin\InvoiceResource;
 use Payments\Http\Resources\InvoiceTransactionResource;
 use Payments\Models\Invoice;
 use Payments\Services\InvoiceService;
+use Wallets\Services\Grpc\Deposit;
+use Wallets\Services\Grpc\WalletNames;
+use Wallets\Services\WalletService;
 
 class InvoiceController extends Controller
 {
@@ -41,7 +47,7 @@ class InvoiceController extends Controller
      */
     public function overPaidInvoices()
     {
-        $list = Invoice::query()->where('additional_status','=','PaidOver')->paginate();
+        $list = Invoice::query()->where('additional_status','=','PaidOver')->where('payable_type','=','Order')->paginate();
         return api()->success(null,[
             'list' => InvoiceResource::collection($list),
             'pagination' => [
@@ -49,6 +55,34 @@ class InvoiceController extends Controller
                 'per_page' => $list->perPage(),
             ]
         ]);
+    }
+
+    /**
+     * Refund overpaid invoice
+     * @group
+     * Admin User > Payments > Invoices
+     * @param RefundOverPaidInvoiceRequest $request
+     * @return JsonResponse
+     * @throws \Throwable
+     */
+    public function refundOverPaidInvoice(RefundOverPaidInvoiceRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+            $invoice = Invoice::query()->whereTransactionId($request->get('transaction_id'))->first();
+            $total_paid_amount_in_pf = usdToPf($invoice->paid_amount * $invoice->rate);
+            $refundable_amount = $total_paid_amount_in_pf - $invoice->pf_amount;
+            $this->depositToUserWallet($invoice, $refundable_amount);
+
+            DB::commit();
+
+            return api()->success();
+        } catch (\Throwable $exception) {
+            Log::error('Payments\Http\Controllers\Admin\InvoiceController@refundOverPaidInvoice error => ' . $exception->getMessage());
+            if(isset($invoice))
+                Log::error('Payments\Http\Controllers\Admin\InvoiceController@refundOverPaidInvoice error => ' . $invoice->id);
+            throw $exception;
+        }
     }
 
     /**
@@ -138,6 +172,39 @@ class InvoiceController extends Controller
             return api()->error(null,null,404);
 
         return api()->success(null,InvoiceTransactionResource::collection($invoice->transactions));
+    }
+
+    /**
+     * @param $invoice
+     * @param float $refundable_amount
+     * @throws \Exception
+     */
+    private function depositToUserWallet($invoice, float $refundable_amount): void
+    {
+        $wallet_service = app(WalletService::class);
+        //Deposit Service
+        $deposit_service = app(Deposit::class);
+        $deposit_service->setUserId($invoice->user_id);
+        $deposit_service->setAmount($refundable_amount);
+        $deposit_service->setType('Funds deposited');
+        $deposit_service->setDescription('Invoice #' . $invoice->transaction_id);
+        $deposit_service->setWalletName(WalletNames::DEPOSIT);
+
+        //Deposit transaction
+        /**
+         * @var $deposit Deposit
+         */
+        $deposit = $wallet_service->deposit($deposit_service);
+
+        //Deposit check
+        if (is_string($deposit->getTransactionId())) {
+            $invoice->update([
+                'is_refund_at' => now()->toDateTimeString(),
+                'deposit_amount' => $refundable_amount
+            ]);
+        } else {
+            throw new \Exception('Deposit Wallet Error');
+        }
     }
 
 }

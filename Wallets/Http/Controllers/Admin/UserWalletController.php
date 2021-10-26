@@ -54,7 +54,10 @@ class UserWalletController extends Controller
     public function getAllTransactions(GetTransactionsRequest $request)
     {
         //Get all transactions except admin's wallet
-        $list = Transaction::query();
+        $list = Transaction::query()->with([
+            'payable',
+            'wallet'
+        ]);
         if ($request->has('wallet_name'))
             $list = $list->whereHas('wallet', function (Builder $query) use ($request) {
                 $query->where('name', '=', $request->get('wallet_name'));

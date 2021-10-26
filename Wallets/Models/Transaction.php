@@ -37,7 +37,8 @@ class Transaction extends \Bavix\Wallet\Models\Transaction
                 ]);
                 if (array_key_exists('sub_type',$data) AND !empty($data['sub_type'])) {
                     $sub_type = $type->subTypes()->firstOrCreate([
-                        'name' => $data['sub_type'] . ' ' . $type->name,
+//                        'name' => $data['sub_type'] . ' ' . $type->name,
+                        'name' => $data['sub_type'],
                         'parent_id' => $type->id,
                         'description' => null
                     ]);

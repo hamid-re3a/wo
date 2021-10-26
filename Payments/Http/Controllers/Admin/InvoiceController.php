@@ -99,7 +99,12 @@ class InvoiceController extends Controller
      */
     public function pendingOrderInvoices()
     {
-        $list = Invoice::query()->with('user')->where('payable_type','Order')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->paginate();
+        $list = Invoice::query()
+            ->with('user')
+            ->where('payable_type','Order')
+            ->where('is_paid',0)
+            ->where('expiration_time','>',now()->toDateTimeString())
+            ->paginate();
 
         return api()->success(null, [
             'list' => InvoiceResource::collection($list),
@@ -117,7 +122,12 @@ class InvoiceController extends Controller
      */
     public function pendingWalletInvoices()
     {
-        $list = Invoice::query()->with('user')->where('payable_type','DepositWallet')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->paginate();
+        $list = Invoice::query()
+            ->with('user')
+            ->where('payable_type','DepositWallet')
+            ->where('is_paid',0)
+            ->where('expiration_time','>',now()->toDateTimeString())
+            ->paginate();
 
         return api()->success(null, [
             'list' => InvoiceResource::collection($list),
@@ -147,11 +157,10 @@ class InvoiceController extends Controller
             $invoice->when($request->has('order_id'), function(Builder $subQuery) use($request) {
                 return $subQuery->where('payable_id',$request->get('order_id'))->where('payable_type','=','Order');
             });
-        $invoice = $invoice->first();
-        if(!$invoice)
-            return api()->error(null,null,404);
 
-        return api()->success(null, \Payments\Http\Resources\InvoiceResource::make($invoice));
+        $invoice = $invoice->first();
+
+        return api()->success(null, InvoiceResource::make($invoice));
     }
 
     /**
@@ -174,9 +183,6 @@ class InvoiceController extends Controller
                 return $subQuery->where('payable_id',$request->get('order_id'))->where('payable_type','=','Order');
             });
         $invoice = $invoice->first();
-
-        if(!$invoice)
-            return api()->error(null,null,404);
 
         return api()->success(null,InvoiceTransactionResource::collection($invoice->transactions));
     }

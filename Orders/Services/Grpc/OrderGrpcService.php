@@ -54,6 +54,8 @@ class OrderGrpcService implements OrdersServiceInterface
                 'validity_in_days' => $package->getValidityInDays(),
                 'plan' => $user_who_is_package_for->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
+            if(is_null($order_db) )
+                throw new \Exception('Creating Order faced a problem', 406);
             $order_db->refreshOrder();
 
             Log::info('Front/OrderService@newOrder First MLM request');

@@ -57,7 +57,6 @@ class OrderGrpcService implements OrdersServiceInterface
             if(is_null($order_db) )
                 throw new \Exception('Creating Order faced a problem', 406);
             $order_db->refreshOrder();
-            Log::info($order_db);
             Log::info('Front/OrderService@newOrder First MLM request');
             $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
 

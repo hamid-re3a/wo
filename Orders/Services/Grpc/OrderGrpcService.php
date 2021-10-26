@@ -72,7 +72,7 @@ class OrderGrpcService implements OrdersServiceInterface
             $invoice_request->setPfAmount((double)$order_db->total_cost_in_pf);
             $invoice_request->setPaymentType($order_db->payment_type);
             $invoice_request->setUser($user_who_pays_for_package->getUserService());
-            $invoice_request->setUserId((int)auth()->user()->id);
+            $invoice_request->setUserId((int)$user_who_pays_for_package->id);
 
             list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getOrderService());
 

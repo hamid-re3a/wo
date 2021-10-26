@@ -42,7 +42,9 @@ class OrderGrpcService implements OrdersServiceInterface
             $user_who_pays_for_package = $this->user_service->findByIdOrFail($order->getFromUserId());
             $user_who_is_package_for = $this->user_service->findByIdOrFail($order->getUserId());
 
-
+            if(is_null($user_who_pays_for_package) || is_null($user_who_is_package_for) )
+                throw new \Exception('User not found', 406);
+            
             DB::beginTransaction();
             $order_db = OrderModel::query()->create([
                 "from_user_id" => $user_who_pays_for_package->id,

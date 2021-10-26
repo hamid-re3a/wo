@@ -18,6 +18,8 @@ class GiftcodeResource extends JsonResource
 
         return [
             'id' => $this->uuid,
+            'user_member_id' => $this->user->member_id,
+            'user_full_name' => $this->user->full_name,
             'package_name' => $this->package_name,
             'code' => $this->code,
             'expiration_date' => $this->expiration_date,

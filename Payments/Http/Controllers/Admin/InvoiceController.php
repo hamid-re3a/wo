@@ -48,6 +48,7 @@ class InvoiceController extends Controller
         $list = Invoice::query()
             ->where('additional_status','=','PaidOver')
             ->where('payable_type','=','Order')
+            ->whereNull('is_refund_at')
             ->with('transactions','user')
             ->paginate();
         return api()->success(null,[
@@ -199,7 +200,7 @@ class InvoiceController extends Controller
         $deposit_service = app(Deposit::class);
         $deposit_service->setUserId($invoice->user_id);
         $deposit_service->setAmount($refundable_amount);
-        $deposit_service->setType('Funds deposited');
+        $deposit_service->setType('Refund overpaid invoice');
         $deposit_service->setDescription('Refund Invoice #' . $invoice->transaction_id);
         $deposit_service->setWalletName(WalletNames::DEPOSIT);
 

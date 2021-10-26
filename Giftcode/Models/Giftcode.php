@@ -120,22 +120,6 @@ class Giftcode extends Model
         return $name;
     }
 
-    public function getRedeemerFullNameAttribute()
-    {
-        if ($this->redeemer()->exists() AND !is_null($this->redeemer->first_name))
-            return $this->redeemer->full_name;
-
-        return null;
-    }
-
-    public function getCreatorFullNameAttribute()
-    {
-        if ($this->creator()->exists() AND !is_null($this->creator->first_name))
-            return $this->creator->full_name;
-
-        return null;
-    }
-
     public function getStatusAttribute()
     {
         if (isset($this->attributes['redeem_user_id']))

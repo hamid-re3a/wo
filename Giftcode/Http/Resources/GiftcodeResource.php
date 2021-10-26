@@ -27,7 +27,7 @@ class GiftcodeResource extends JsonResource
             'registration_fee_in_pf' => $this->registration_fee_in_pf,
             'total_cost_in_pf' => $this->total_cost_in_pf,
             'redeem_date' => $this->redeem_date ? $this->redeem_date->timestamp : null,
-            'redeem_user_full_name' => $this->redeemer_full_name,
+            'redeem_user_full_name' => $this->redeemer->full_name,
             'created_at' => $this->created_at->timestamp,
             'status' => $this->status,
         ];

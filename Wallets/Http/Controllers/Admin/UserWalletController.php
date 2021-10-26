@@ -64,7 +64,7 @@ class UserWalletController extends Controller
                 $query->orWhere('slug', '=', Str::slug($request->get('wallet_name')));
             });
 
-        $list = $list->where('payable_id', '!=', 1)->paginate();
+        $list = $list->where('payable_id', '!=', 1)->orderByDesc('id')->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
             'pagination' => [
@@ -109,7 +109,7 @@ class UserWalletController extends Controller
      */
     public function getWalletTransactions(GetUserTransactionsRequest $request)
     {
-        $list = $this->bankService->getTransactions($request->get('wallet_name'))->paginate();
+        $list = $this->bankService->getTransactions($request->get('wallet_name'))->orderByDesc('id')->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
             'pagination' => [
@@ -128,7 +128,7 @@ class UserWalletController extends Controller
      */
     public function getWalletTransfers(GetUserTransfersRequest $request)
     {
-        $list = $this->bankService->getTransfers($request->get('wallet_name'))->paginate();
+        $list = $this->bankService->getTransfers($request->get('wallet_name'))->orderByDesc('id')->paginate();
         return api()->success(null, [
             'list' => TransferResource::collection($list),
             'pagination' => [

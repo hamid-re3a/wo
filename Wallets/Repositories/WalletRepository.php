@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use User\Models\User;
+use Wallets\Models\Transaction;
+use Wallets\Models\TransactionType;
 
 class WalletRepository
 {
@@ -22,19 +24,19 @@ class WalletRepository
     {
         $sum_query = User::query();
 
-        if($wallet)
-            $sum_query->where('id',$wallet->holder_id);
+        if ($wallet)
+            $sum_query->where('id', $wallet->holder_id);
 
         return $sum_query->withSumQuery([
             'transactions.amount AS total_received' => function (Builder $query) use ($wallet) {
-                if($wallet)
+                if ($wallet)
                     $query->where('wallet_id', '=', $wallet->id);
                 $query->where('type', '=', 'deposit');
             }
         ])
             ->withSumQuery([
                 'transactions.amount AS total_spent' => function (Builder $query) use ($wallet) {
-                    if($wallet)
+                    if ($wallet)
                         $query->where('wallet_id', '=', $wallet->id);
                     $query->where('type', 'withdraw');
 
@@ -42,7 +44,7 @@ class WalletRepository
             ])
             ->withSumQuery([
                 'transactions.amount AS total_transfer' => function (Builder $query) use ($wallet) {
-                    if($wallet)
+                    if ($wallet)
                         $query->where('wallet_id', '=', $wallet->id);
                     $query->where('type', 'withdraw');
                     $query->whereHas('metaData', function (Builder $subQuery) {
@@ -55,31 +57,24 @@ class WalletRepository
 
     public function getTransactionSumByTypes(int $user_id = null, array $types = null)
     {
-        $counts_query = User::query();
-        $keys = [];
-        if (!empty($user_id))
-            $counts_query->whereId($user_id);
-
-        foreach ($types AS $type) {
-            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
-            $keys[] = $key;
-
-            $counts_query->withSumQuery(['transactions.amount AS ' . $key => function (Builder $query) use ($type) {
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) use ($type) {
-                        $subQuery->where('name', '=', $type);
-                    });
-                }]
-            );
-
-        }
-
-        $counts_query = $counts_query->first()->toArray();
-
         $results = [];
 
-        foreach($keys AS $key)
-            $results[$key] = !empty($counts_query[$key]) ? $counts_query[$key] / 100 : (double)0.00;
+        $types_collection = TransactionType::query()->whereIn('name', $types)->select(['id', 'name'])->get();
+
+        foreach ($types_collection AS $type) {
+            $key = Str::replace(' ', '_', Str::lower($type->name)) . '_sum';
+            $sum_query = null;
+            $sum_query = Transaction::query();
+
+            if (!empty($user_id))
+                $sum_query->where('payable_id', '=', $user_id);
+
+            $results[$key] =
+                $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
+                    $subQuery->where('wallet_transaction_meta_data.type_id', '=', $type->id);
+                })->sum('amount');
+
+        }
 
         return $results;
     }

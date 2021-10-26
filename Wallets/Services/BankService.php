@@ -37,7 +37,7 @@ class BankService
 
     public function getAllWallets()
     {
-        return $this->owner->wallets()->get();
+        return $this->owner->wallets()->orderByDesc('id')->get();
     }
 
     public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit', $sub_type = null)

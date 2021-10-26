@@ -89,12 +89,12 @@ class OrderGrpcService implements OrdersServiceInterface
             $order_service->setIsResolvedAt($now);
 
             Log::info('Front/OrderService@newOrder Second MLM request');
-            list($submit_response, $flag) = getMLMGrpcClient()->simulateOrder($order_service)->wait();
+            list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
             if ($flag->code != 0)
                 throw new \Exception('Order not see1 mlm', 406);
 
-            if (!$response->getStatus()) {
-                throw new \Exception($response->getMessage(), 406);
+            if (!$submit_response->getStatus()) {
+                throw new \Exception($submit_response->getMessage(), 406);
             }
 
             $order_db->update([

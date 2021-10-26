@@ -82,7 +82,7 @@ class OrderGrpcService implements OrdersServiceInterface
                 throw new \Exception($payment_response, 406);
 
 
-            $now = now()->toDateTimeString();
+            $now = date('Y-m-d H:i:s');
 
             $order_service = $order_db->fresh()->getOrderService();
             $order_service->setIsPaidAt($now);

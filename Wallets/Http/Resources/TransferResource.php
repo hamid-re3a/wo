@@ -19,7 +19,7 @@ class TransferResource extends JsonResource
             $fee = $this->withdraw->meta['fee'];
 
         return [
-            'id' => (int)$this->uuid,
+            'id' => $this->uuid,
             'to_member_id' => (int)$this->deposit->payable->member_id,
             'from' => [
                 'transaction_id' => (int)$this->deposit->uuid,

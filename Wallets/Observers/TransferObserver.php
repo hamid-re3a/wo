@@ -13,9 +13,9 @@ class TransferObserver
         //UUID field
         /**@var $user User*/
         $user = $transfer->from;
-        $uuid = $user->member_id .  time() . mt_rand(100,999);
+        $uuid = $user->member_id .  mt_rand(1000,9999) .time();
         while(Transfer::query()->where('uuid', $uuid)->exists())
-            $uuid = $user->member_id .  time() . mt_rand(100,999);
+            $uuid = $user->member_id . mt_rand(1000,9999) . time();
         $transfer->uuid = $uuid;
     }
 

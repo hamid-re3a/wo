@@ -13,7 +13,10 @@ class WithdrawProfitObserver
     public function creating(WithdrawProfit $withdrawProfit)
     {
         $withdrawProfit = $this->calculateFee($withdrawProfit);
-        $withdrawProfit->uuid = $withdrawProfit->user->member_id . mt_rand(10, 9999) . time();
+        $uuid = $withdrawProfit->user->member_id . mt_rand(1000,9999) . time();
+        while(WithdrawProfit::query()->where('uuid',$uuid)->exists())
+            $uuid = $withdrawProfit->user->member_id . mt_rand(1000,9999) . time();
+        $withdrawProfit->uuid = $uuid;
 
     }
 

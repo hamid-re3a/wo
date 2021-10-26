@@ -10,8 +10,6 @@ use Payments\Http\Requests\Invoice\ShowInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
 use Payments\Http\Resources\InvoiceResource;
 use Payments\Http\Resources\InvoiceTransactionResource;
-use Payments\Models\Invoice;
-use Payments\Models\InvoiceTransaction;
 use Payments\Services\InvoiceService;
 use User\Models\User;
 

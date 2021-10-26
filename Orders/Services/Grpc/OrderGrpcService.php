@@ -104,6 +104,7 @@ class OrderGrpcService implements OrdersServiceInterface
             DB::rollBack();
             Log::error('OrderService@newOrder => ' . $exception->getMessage());
             $acknowledge->setStatus(false);
+            $acknowledge->setMessage($exception->getMessage());
             return $acknowledge;
         }
     }

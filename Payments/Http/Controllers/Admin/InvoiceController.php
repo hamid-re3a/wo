@@ -71,7 +71,7 @@ class InvoiceController extends Controller
     {
         try {
             DB::beginTransaction();
-            $invoice = Invoice::query()->whereTransactionId($request->get('id'))->first();
+            $invoice = Invoice::query()->whereTransactionId($request->get('transaction_id'))->first();
             $total_paid_amount_in_pf = usdToPf($invoice->paid_amount * $invoice->rate);
             $refundable_amount = $total_paid_amount_in_pf - $invoice->pf_amount;
             $this->refundToUserWallet($invoice, $refundable_amount);

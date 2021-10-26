@@ -26,7 +26,7 @@ class RefundOverPaidInvoiceRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => [
+            'transaction_id' => [
                 'required',
                 Rule::exists('invoices','transaction_id')
                     ->where('additional_status','PaidOver')

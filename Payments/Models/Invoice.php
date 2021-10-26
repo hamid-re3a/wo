@@ -43,6 +43,7 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereIsPaid($value)
  * @property string|null $expiration_time
  * @property string|null $is_refund_at
+ * @property int|null $refunder_user_id
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereExpirationTime($value)
  * @property float $pf_amount
  * @property string $payment_type
@@ -56,6 +57,7 @@ use User\Models\User;
  * @property int|null $user_id
  * @property-read \Illuminate\Database\Eloquent\Collection|\Payments\Models\InvoiceTransaction[] $transactions
  * @property-read \User\Models\User[] $user
+ * @property-read \User\Models\User[] $refunder
  * @property-read int|null $transactions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableType($value)
@@ -91,6 +93,11 @@ class Invoice extends Model
     public function user()
     {
         return $this->belongsTo(User::class,'user_id','id');
+    }
+
+    public function refunder()
+    {
+        return $this->belongsTo(User::class,'refunder_user_id','id');
     }
 
     /**

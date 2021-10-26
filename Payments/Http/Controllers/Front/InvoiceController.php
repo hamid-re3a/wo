@@ -10,21 +10,19 @@ use Payments\Http\Requests\Invoice\ShowInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
 use Payments\Http\Resources\InvoiceResource;
 use Payments\Http\Resources\InvoiceTransactionResource;
-use Payments\Models\Invoice;
-use Payments\Models\InvoiceTransaction;
 use Payments\Services\InvoiceService;
 use User\Models\User;
 
 class InvoiceController extends Controller
 {
     private $invoice_service;
-    /**@var $user User*/
+    /**@var $user User */
     private $user;
 
     public function __construct(InvoiceService $invoice_service)
     {
         $this->invoice_service = $invoice_service;
-        if(auth()->check())
+        if (auth()->check())
             $this->user = auth()->user();
     }
 
@@ -36,10 +34,17 @@ class InvoiceController extends Controller
     public function pendingOrderInvoice()
     {
 
-        $pending_invoice = $this->user->orderInvoices()->where('is_paid', 0)->where('expiration_time', '>', now()->toDateTimeString())->first();
+        $pending_invoice = $this->user->orderInvoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ])
+            ->where('is_paid', 0)
+            ->where('expiration_time', '>', now()->toDateTimeString())
+            ->first();
 
         if (!$pending_invoice) {
-            $paid_invoice =  $this->user->orderInvoices()->where('is_paid', 1)->count();
+            $paid_invoice = $this->user->orderInvoices()->where('is_paid', 1)->count();
             if ($paid_invoice)
                 return api()->success(null, [
                     'status' => 'confirmed'
@@ -60,10 +65,17 @@ class InvoiceController extends Controller
      */
     public function pendingWalletInvoice()
     {
-        $pending_invoice =  $this->user->walletInvoices()->where('is_paid', 0)->where('expiration_time', '>', now()->toDateTimeString())->first();
+        $pending_invoice = $this->user->walletInvoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ])
+            ->where('is_paid', 0)
+            ->where('expiration_time', '>', now()->toDateTimeString())
+            ->first();
 
         if (!$pending_invoice) {
-            $paid_invoice =  $this->user->walletInvoices()->where('is_paid', 1)->count();
+            $paid_invoice = $this->user->walletInvoices()->where('is_paid', 1)->count();
             if ($paid_invoice)
                 return api()->success(null, [
                     'status' => 'confirmed'
@@ -82,7 +94,12 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $list =  $this->user->invoices()->paginate();
+        $list = $this->user->invoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ])
+            ->paginate();
 
         return api()->success(null, [
             'list' => InvoiceResource::collection($list),
@@ -102,7 +119,11 @@ class InvoiceController extends Controller
      */
     public function show(ShowInvoiceRequest $request)
     {
-        $invoice =  $this->user->invoices()->with('transactions');
+        $invoice = $this->user->invoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ]);
 
         if ($request->has('transaction_id'))
             $invoice->when($request->has('transaction_id'), function (Builder $subQuery) use ($request) {
@@ -129,7 +150,11 @@ class InvoiceController extends Controller
      */
     public function transactions(ShowOrderTransactionsRequest $request)
     {
-        $invoice =  $this->user->invoices()->with('transactions');
+        $invoice = $this->user->invoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ]);
 
         if ($request->has('transaction_id'))
             $invoice->when($request->has('transaction_id'), function (Builder $subQuery) use ($request) {

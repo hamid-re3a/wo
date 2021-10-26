@@ -2,10 +2,9 @@
 
 namespace Payments\Models;
 
-use GPBMetadata\User;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use User\Models\User;
 
 /**
  * Payments\Models\Invoice
@@ -56,6 +55,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDepositAmount($value)
  * @property int|null $user_id
  * @property-read \Illuminate\Database\Eloquent\Collection|\Payments\Models\InvoiceTransaction[] $transactions
+ * @property-read \User\Models\User[] $user
  * @property-read int|null $transactions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableType($value)
@@ -90,7 +90,7 @@ class Invoice extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id','id');
     }
 
     /**

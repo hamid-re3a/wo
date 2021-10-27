@@ -13,17 +13,18 @@ require './vendor/autoload.php';
 //print_r($status);
 //
 //print_r("\n \n \n");
-$client = new \Packages\Services\Grpc\PackagesServiceClient('staging-subscription.janex.org:9596', [
+//$client = new \Packages\Services\Grpc\PackagesServiceClient('staging-subscription.janex.org:9596', [
+$client = new \Packages\Services\Grpc\PackagesServiceClient('127.0.0.1:9596', [
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);
 $request = new \Packages\Services\Grpc\Id();
-$request->setId((int)24);
+$request->setId((int)1);
 
 list($reply, $status) = $client->packageById($request)->wait();
 
-print_r($reply);
-print_r($status);
-//print_r($reply->getBalance());
+var_dump($status);
+var_dump($reply->getId());
+var_dump($reply->getName());
 
 
 

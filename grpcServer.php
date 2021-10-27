@@ -10,13 +10,20 @@ $grpc->register(\Wallets\Services\WalletGrpcService::class);
 $grpc->register(\Packages\Services\Grpc\PackageGrpcService::class);
 $grpc->register(\Orders\Services\Grpc\OrderGrpcService::class);
 
-Swoole\Coroutine\run(function () use ($grpc) {
-    $server = new Swoole\Coroutine\Http\Server('0.0.0.0', 9596, false);
-    $server->handle('/', $grpc->handler());
-    $server->set([
-        'open_http2_protocol' => true,
-        'http_compression' => false,
-        'worker_num' => 4,
-    ]);
-    $server->start();
-});
+//Swoole\Coroutine\run(function () use ($grpc) {
+//    $server = new Swoole\Coroutine\Http\Server('0.0.0.0', 9596, false);
+//    $server->handle('/', $grpc->handler());
+//    $server->set([
+//        'open_http2_protocol' => true,
+//        'http_compression' => false,
+//    ]);
+//    $server->start();
+//});
+$http = new Swoole\Http\Server('0.0.0.0', 9596);
+$http->on('Request', $grpc->handler());
+$http->set([
+    'worker_num' => 10,
+    'open_http2_protocol' => true,
+    'http_compression' => false,
+]);
+$http->start();

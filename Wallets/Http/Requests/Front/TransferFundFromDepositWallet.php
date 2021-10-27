@@ -41,9 +41,10 @@ class TransferFundFromDepositWallet extends FormRequest
     public function messages()
     {
         return [
-            'amount.min' => 'Minimum allowed transfer is ' . formatCurrencyFormat($this->minimum_amount) . " PF",
-            'amount.max' => 'Maximum allowed transfer is ' . formatCurrencyFormat($this->maximum_amount) ." PF",
-            'member_id.not_in' => 'You are not allowed transfer PF to your account .'
+            'amount.min' => 'Minimum allowed transfer is ' . formatCurrencyFormat($this->minimum_amount) . " PF .",
+            'amount.max' => 'Maximum allowed transfer is ' . formatCurrencyFormat($this->maximum_amount) ." PF .",
+            'member_id.not_in' => 'You are not allowed transfer PF to your account .',
+            'member_id.exists' => 'Invalid membership ID .',
         ];
     }
 

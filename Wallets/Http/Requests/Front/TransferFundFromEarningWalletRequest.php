@@ -55,7 +55,8 @@ class TransferFundFromEarningWalletRequest extends FormRequest
             'amount.min' => 'Minimum allowed is ' . formatCurrencyFormat($this->minimum_amount) . " PF",
             'amount.max' => 'Maximum allowed is ' . formatCurrencyFormat($this->maximum_amount) ." PF",
             'member_id.not_in' => 'You are not allowed transfer PF to your account .',
-            'amount.lte' => 'Insufficient amount'
+            'amount.lte' => 'Insufficient amount',
+            'member_id.exists' => 'Invalid membership ID .',
         ];
     }
 

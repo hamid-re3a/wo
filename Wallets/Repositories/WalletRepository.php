@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use User\Models\User;
+use Wallets\Models\Transaction;
+use Wallets\Models\TransactionType;
 
 class WalletRepository
 {
@@ -22,19 +24,19 @@ class WalletRepository
     {
         $sum_query = User::query();
 
-        if($wallet)
-            $sum_query->where('id',$wallet->holder_id);
+        if ($wallet)
+            $sum_query->where('id', $wallet->holder_id);
 
         return $sum_query->withSumQuery([
             'transactions.amount AS total_received' => function (Builder $query) use ($wallet) {
-                if($wallet)
+                if ($wallet)
                     $query->where('wallet_id', '=', $wallet->id);
                 $query->where('type', '=', 'deposit');
             }
         ])
             ->withSumQuery([
                 'transactions.amount AS total_spent' => function (Builder $query) use ($wallet) {
-                    if($wallet)
+                    if ($wallet)
                         $query->where('wallet_id', '=', $wallet->id);
                     $query->where('type', 'withdraw');
 
@@ -42,7 +44,7 @@ class WalletRepository
             ])
             ->withSumQuery([
                 'transactions.amount AS total_transfer' => function (Builder $query) use ($wallet) {
-                    if($wallet)
+                    if ($wallet)
                         $query->where('wallet_id', '=', $wallet->id);
                     $query->where('type', 'withdraw');
                     $query->whereHas('metaData', function (Builder $subQuery) {
@@ -53,42 +55,35 @@ class WalletRepository
             ->first();
     }
 
-    public function getTransactionSumByTypes(int $user_id = null, array $types = null)
+    public function getTransactionsSumByTypes(int $user_id = null, array $types = null)
     {
-        $counts_query = User::query();
-        $keys = [];
-        if (!empty($user_id))
-            $counts_query->whereId($user_id);
-
-        foreach ($types AS $type) {
-            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
-            $keys[] = $key;
-
-            $counts_query->withSumQuery(['transactions.amount AS ' . $key => function (Builder $query) use ($type) {
-                    $query->where('type', '=', 'deposit');
-                    $query->whereHas('metaData', function (Builder $subQuery) use ($type) {
-                        $subQuery->where('name', '=', $type);
-                    });
-                }]
-            );
-
-        }
-
-        $counts_query = $counts_query->first()->toArray();
-
         $results = [];
 
-        foreach($keys AS $key)
-            $results[$key] = !empty($counts_query[$key]) ? $counts_query[$key] / 100 : (double)0.00;
+        $types_collection = TransactionType::query()->whereIn('name', $types)->select(['id', 'name'])->get();
+
+        foreach ($types_collection AS $type) {
+            $key = Str::replace(' ', '_', Str::lower($type->name)) . '_sum';
+            $sum_query = null;
+            $sum_query = Transaction::query();
+
+            if (!empty($user_id))
+                $sum_query->where('payable_id', '=', $user_id);
+
+            $results[$key] =
+                (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
+                    $subQuery->where('wallet_transaction_meta_data.type_id', '=', $type->id);
+                })->sum('amount') / 100;
+
+        }
 
         return $results;
     }
 
-    public function getWalletOverallBalance($type, int $wallet_id = null)
+    public function getWalletOverallBalanceChart($type, int $wallet_id = null,$wallet_name = null)
     {
         $that = $this;
-        $function_transaction_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id);
+        $function_transaction_collection = function ($from_day, $to_day) use ($that, $wallet_id, $wallet_name) {
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, $type = null, $wallet_name);
         };
 
         $sub_function = function ($collection, $intervals) {
@@ -103,19 +98,19 @@ class WalletRepository
         return $result;
     }
 
-    public function getWalletInvestmentChart($type, int $wallet_id = null)
+    public function getWalletTransactionsByTypeChart($type, int $wallet_id = null, $wallet_name = null)
     {
         $that = $this;
         $function_transaction_transfer_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, 'Funds transferred');
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, 'Funds transferred');
         };
 
         $function_transaction_giftcode_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, 'Gift code created');
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, 'Gift code created');
         };
 
         $function_transaction_purchase_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, 'Package purchased');
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, 'Package purchased');
         };
 
         $sub_function = function ($collection, $intervals) {
@@ -147,7 +142,7 @@ class WalletRepository
 
         foreach ($commissions AS $commission_name) {
             $function_transactions_collection = function ($from_day, $to_day) use ($that, $wallet_id, $commission_name) {
-                return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, $commission_name);
+                return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, $commission_name);
             };
             $result[$commission_name] = chartMaker($type, $function_transactions_collection, $sub_function);
         }

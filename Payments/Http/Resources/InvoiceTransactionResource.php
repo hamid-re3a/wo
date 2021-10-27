@@ -18,12 +18,12 @@ class InvoiceTransactionResource extends JsonResource
         return [
             'hash' => $this->hash,
             'received_date' => $this->received_date->timestamp,
-            'value' => $this->value,
-            'value_pf' => usdToPf($rate * $this->value),
-            'fee' => $this->fee,
-            'fee_pf' => usdToPf($rate * $this->fee),
+            'value' => (double)$this->value,
+            'value_pf' => (double)usdToPf($rate * $this->value),
+            'fee' => (double)$this->fee,
+            'fee_pf' => (double)usdToPf($rate * $this->fee),
             'status' => $this->status,
-//            'destination' => $this->destination,
+            'destination' => $this->destination,
         ];
     }
 }

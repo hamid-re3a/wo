@@ -20,19 +20,22 @@ class TransferResource extends JsonResource
 
         return [
             'id' => $this->uuid,
-            'to_member_id' => $this->deposit->payable->member_id,
+            'from_user_full_name' => (int)$this->deposit->payable->member_id,
+            'from_user_member_id' => (int)$this->deposit->payable->member_id,
             'from' => [
-                'transaction_id' => $this->deposit->uuid,
+                'transaction_id' => (int)$this->deposit->uuid,
                 'wallet' => $this->from->name,
 //                'confirmed' => $this->deposit->confirmed
             ],
+            'to_user_full_name' => (int)$this->withdraw->payable->member_id,
+            'to_user_member_id' => (int)$this->withdraw->payable->member_id,
             'to' => [
-                'transaction_id' => $this->withdraw->uuid,
+                'transaction_id' => (int)$this->withdraw->uuid,
                 'wallet' => $this->to->name,
 //                'confirmed' => $this->withdraw->confirmed
             ],
-            'amount' => $this->deposit->amountFloat,
-            'fee' =>  $fee,
+            'amount' => (double)$this->deposit->amountFloat,
+            'fee' =>  (double)$fee,
             'created_at' => $this->created_at->timestamp
         ];
     }

@@ -19,12 +19,14 @@ class TransactionResource extends JsonResource
 
         return [
             'id' => $this->uuid,
+            'user_full_name' => $this->payable->full_name,
+            'user_member_id' => $this->payable->member_id,
             'wallet' => $this->wallet->name,
             'type' => $metaData ? $metaData->name : null,
-            'amount' => $this->amountFloat,
-            'before_balance' => $metaData ? $metaData->pivot->wallet_before_balance : 0,
-            'after_balance' => $metaData ? $metaData->pivot->wallet_after_balance : 0,
-            'description' => $this->meta AND array_key_exists('description',$this->meta) ? $this->meta['description'] : null,
+            'amount' => (double)$this->amountFloat,
+            'before_balance' => $metaData ? (double)$metaData->pivot->wallet_before_balance : 0,
+            'after_balance' => $metaData ? (double)$metaData->pivot->wallet_after_balance : 0,
+            'description' => array_key_exists('description',$this->meta) ? $this->meta['description'] : null,
 //            'confirmed' => $this->confirmed,
             'created_at' => $this->created_at->timestamp,
         ];

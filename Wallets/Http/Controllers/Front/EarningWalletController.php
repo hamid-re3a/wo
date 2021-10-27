@@ -60,7 +60,7 @@ class EarningWalletController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->wallet_repository->getTransactionSumByTypes(auth()->user->id,$commissions));
+        return api()->success(null, $this->wallet_repository->getTransactionsSumByTypes(auth()->user->id,$commissions));
 
     }
 
@@ -220,7 +220,7 @@ class EarningWalletController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
-        return api()->success(null, $this->wallet_repository->getWalletOverallBalance($request->get('type'),$this->walletObject->id));
+        return api()->success(null, $this->wallet_repository->getWalletOverallBalanceChart($request->get('type'),$this->walletObject->id));
     }
 
     /**

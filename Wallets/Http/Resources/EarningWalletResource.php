@@ -21,7 +21,7 @@ class EarningWalletResource extends JsonResource
 
         return [
             'name' => $wallet->name,
-            'balance' => $wallet->balanceFloat,
+            'balance' => (double)$wallet->balanceFloat,
             'transactions_count' => (int) $wallet->transactions()->count(),
             'transfers_count' => (int) $wallet->transfers()->count(),
         ];

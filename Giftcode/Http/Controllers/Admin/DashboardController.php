@@ -50,7 +50,9 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $list = Giftcode::query()->orderBy('created_at', 'DESC')->paginate();
+        $list = Giftcode::query()
+            ->orderBy('created_at', 'DESC')
+            ->paginate();
 
         return api()->success(null, [
             'list' => GiftcodeResource::collection($list),

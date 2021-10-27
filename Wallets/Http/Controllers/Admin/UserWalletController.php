@@ -12,7 +12,7 @@ use Wallets\Http\Requests\Admin\GetUserTransfersRequest;
 use Wallets\Http\Requests\Admin\GetUserTransactionsRequest;
 use Wallets\Http\Requests\Admin\UserIdRequest;
 use Wallets\Http\Requests\Admin\GetTransactionsRequest;
-use Wallets\Http\Resources\Admin\TransactionResource;
+use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Models\Transaction;

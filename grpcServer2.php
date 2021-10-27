@@ -11,7 +11,7 @@ $grpc->register(\Packages\Services\Grpc\PackageGrpcService::class);
 $grpc->register(\Orders\Services\Grpc\OrderGrpcService::class);
 
 Swoole\Coroutine\run(function () use ($grpc) {
-    $server = new Swoole\Coroutine\Http\Server('0.0.0.0', 9596, false);
+    $server = new Swoole\Coroutine\Http\Server('0.0.0.0', 9696, false);
     $server->handle('/', $grpc->handler());
     $server->set([
         'open_http2_protocol' => true,

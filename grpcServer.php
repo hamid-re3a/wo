@@ -16,6 +16,7 @@ Swoole\Coroutine\run(function () use ($grpc) {
     $server->set([
         'open_http2_protocol' => true,
         'http_compression' => false,
+        'worker_num' => 4,
     ]);
     $server->start();
 });

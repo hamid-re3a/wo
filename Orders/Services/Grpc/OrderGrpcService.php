@@ -89,6 +89,7 @@ class OrderGrpcService implements OrdersServiceInterface
             $order_service->setIsResolvedAt($now);
 
             Log::info('Front/OrderService@newOrder Second MLM request');
+            Log::info($order_service);
             list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
             if ($flag->code != 0){
                 Log::error($flag->metadata);

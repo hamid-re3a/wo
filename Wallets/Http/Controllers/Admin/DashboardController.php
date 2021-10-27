@@ -27,7 +27,7 @@ class DashboardController extends Controller
     public function sum_deposit_wallets()
     {
         $total_transferred = Transaction::query()->where('type', '=', 'withdraw')
-            ->where('wallet_id','!=',1)
+            ->where('wallet_id','<>',1)
             ->whereHas('wallet', function(Builder $walletQuery) {
                 $walletQuery->where('name','=',WALLET_NAME_DEPOSIT_WALLET);
             })
@@ -35,7 +35,7 @@ class DashboardController extends Controller
                 $subQuery->where('name', '=', 'Funds transferred');
             })->sum('amount');
 
-        $current_balance = Wallet::query()->where('name','=',WALLET_NAME_DEPOSIT_WALLET)->sum('balance');
+        $current_balance = Wallet::query()->where('name','=',WALLET_NAME_DEPOSIT_WALLET)->where('id','<>',1)->sum('balance');
 
         return api()->success(null,[
             'total_transferred' => $total_transferred / 100,
@@ -50,7 +50,7 @@ class DashboardController extends Controller
     public function sum_earning_wallets()
     {
         $total_transferred = Transaction::query()->where('type', '=', 'withdraw')
-            ->where('wallet_id','!=',1)
+            ->where('wallet_id','<>',1)
             ->whereHas('wallet', function(Builder $walletQuery){
                 $walletQuery->where('name','=',WALLET_NAME_EARNING_WALLET);
             })
@@ -58,7 +58,7 @@ class DashboardController extends Controller
                 $subQuery->where('name', '=', 'Funds transferred');
             })->sum('amount');
 
-        $current_balance = Wallet::query()->where('name','=',WALLET_NAME_EARNING_WALLET)->sum('balance');
+        $current_balance = Wallet::query()->where('name','=',WALLET_NAME_EARNING_WALLET)->where('id','<>',1)->sum('balance');
 
         return api()->success(null,[
             'total_transferred' => $total_transferred / 100,

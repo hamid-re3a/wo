@@ -111,7 +111,7 @@ class Invoice extends Model
 
     public function scopeNotCanceled($query)
     {
-        return $query->where('status','=!','user_cancel');
+        return $query->where('status','<>','user_cancel');
     }
 
     public function scopeDepositWallets($query)

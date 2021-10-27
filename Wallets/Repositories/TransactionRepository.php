@@ -20,10 +20,10 @@ class TransactionRepository
             $transaction = new $this->entity;
             $transaction = $transaction->query();
 
-            if($wallet_id)
+            if(!empty($wallet_id))
                 $transaction->where('wallet_id','=',$wallet_id);
             else
-                $transaction->where('wallet_id','=!', 1);
+                $transaction->where('wallet_id','<>', 1);
 
             if($type)
                 $transaction->whereHas('metaData', function (Builder $query) use($type) {

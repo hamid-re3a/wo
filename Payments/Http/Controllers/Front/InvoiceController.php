@@ -73,6 +73,7 @@ class InvoiceController extends Controller
                 'refunder'
             ])
             ->notPaid()
+            ->notCanceled()
             ->notExpired()
             ->first();
 

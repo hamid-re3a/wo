@@ -26,7 +26,7 @@ class DashboardController extends Controller
      */
     public function sum_deposit_wallets()
     {
-        $total_transferred = Transaction::query()->where('type', '=', 'withdraw')
+        $total_transferred = Transaction::query()
             ->where('wallet_id','<>',1)
             ->whereHas('wallet', function(Builder $walletQuery) {
                 $walletQuery->where('name','=',WALLET_NAME_DEPOSIT_WALLET);
@@ -49,7 +49,7 @@ class DashboardController extends Controller
      */
     public function sum_earning_wallets()
     {
-        $total_transferred = Transaction::query()->where('type', '=', 'withdraw')
+        $total_transferred = Transaction::query()
             ->where('wallet_id','<>',1)
             ->whereHas('wallet', function(Builder $walletQuery){
                 $walletQuery->where('name','=',WALLET_NAME_EARNING_WALLET);
@@ -82,7 +82,7 @@ class DashboardController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->wallet_repository->getTransactionSumByTypes(null,$commissions));
+        return api()->success(null, $this->wallet_repository->getTransactionsSumByTypes(null,$commissions));
     }
 
     /**
@@ -93,7 +93,7 @@ class DashboardController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
-        return api()->success(null, $this->wallet_repository->getWalletOverallBalance($request->get('type')));
+        return api()->success(null, $this->wallet_repository->getWalletOverallBalanceChart($request->get('type'),null,WALLET_NAME_DEPOSIT_WALLET));
     }
 
     /**
@@ -104,7 +104,7 @@ class DashboardController extends Controller
      */
     public function investmentsChart(ChartTypeRequest $request)
     {
-        return api()->success(null, $this->wallet_repository->getWalletInvestmentChart($request->get('type')));
+        return api()->success(null, $this->wallet_repository->getWalletTransactionsByTypeChart($request->get('type'),null));
     }
 
     /**

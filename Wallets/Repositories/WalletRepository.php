@@ -55,7 +55,7 @@ class WalletRepository
             ->first();
     }
 
-    public function getTransactionSumByTypes(int $user_id = null, array $types = null)
+    public function getTransactionsSumByTypes(int $user_id = null, array $types = null)
     {
         $results = [];
 
@@ -79,11 +79,11 @@ class WalletRepository
         return $results;
     }
 
-    public function getWalletOverallBalance($type, int $wallet_id = null)
+    public function getWalletOverallBalanceChart($type, int $wallet_id = null,$wallet_name = null)
     {
         $that = $this;
-        $function_transaction_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id);
+        $function_transaction_collection = function ($from_day, $to_day) use ($that, $wallet_id, $wallet_name) {
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, $type = null, $wallet_name);
         };
 
         $sub_function = function ($collection, $intervals) {
@@ -98,19 +98,19 @@ class WalletRepository
         return $result;
     }
 
-    public function getWalletInvestmentChart($type, int $wallet_id = null)
+    public function getWalletTransactionsByTypeChart($type, int $wallet_id = null, $wallet_name = null)
     {
         $that = $this;
         $function_transaction_transfer_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, 'Funds transferred');
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, 'Funds transferred');
         };
 
         $function_transaction_giftcode_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, 'Gift code created');
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, 'Gift code created');
         };
 
         $function_transaction_purchase_collection = function ($from_day, $to_day) use ($that, $wallet_id) {
-            return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, 'Package purchased');
+            return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, 'Package purchased');
         };
 
         $sub_function = function ($collection, $intervals) {
@@ -142,7 +142,7 @@ class WalletRepository
 
         foreach ($commissions AS $commission_name) {
             $function_transactions_collection = function ($from_day, $to_day) use ($that, $wallet_id, $commission_name) {
-                return $that->transaction_repository->getTransactionByDateCollection('created_at', $from_day, $to_day, $wallet_id, $commission_name);
+                return $that->transaction_repository->getTransactionsByDateAndTypeCollection('created_at', $from_day, $to_day, $wallet_id, $commission_name);
             };
             $result[$commission_name] = chartMaker($type, $function_transactions_collection, $sub_function);
         }

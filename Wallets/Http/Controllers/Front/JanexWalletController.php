@@ -101,7 +101,7 @@ class JanexWalletController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
-        return api()->success(null, $this->wallet_repository->getWalletOverallBalance($request->get('type'),$this->walletObject->id));
+        return api()->success(null, $this->wallet_repository->getWalletOverallBalanceChart($request->get('type'),$this->walletObject->id));
     }
 
     /**

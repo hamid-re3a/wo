@@ -8,7 +8,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use User\Models\User;
 use Wallets\Models\Transaction;
-use Wallets\Models\TransactionType;
 
 class WalletRepository
 {
@@ -59,10 +58,8 @@ class WalletRepository
     {
         $results = [];
 
-        $types_collection = TransactionType::query()->whereIn('name', $types)->select(['id', 'name'])->get();
-
-        foreach ($types_collection AS $type) {
-            $key = Str::replace(' ', '_', Str::lower($type->name)) . '_sum';
+        foreach ($types AS $type) {
+            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
             $sum_query = null;
             $sum_query = Transaction::query();
 
@@ -71,7 +68,7 @@ class WalletRepository
 
             $results[$key] =
                 (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
-                    $subQuery->where('wallet_transaction_meta_data.type_id', '=', $type->id);
+                    $subQuery->where('wallet_transaction_types.name', '=', $type);
                 })->sum('amount') / 100;
 
         }

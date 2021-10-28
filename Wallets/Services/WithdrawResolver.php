@@ -3,6 +3,7 @@
 
 namespace Wallets\Services;
 
+use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Models\WithdrawProfit;
 
@@ -70,6 +71,7 @@ class WithdrawResolver
 
         //Get user rank from MLM service
         $user_rank = MlmClientFacade::getUserRank($this->user_service);
+        Log::info('Withdrawal rank check => ' . $db_sum . ' - ' . $this->withdrawRequest->pf_amount . ' - ' . $user_rank->getWithdrawalLimit());
         if (( $db_sum + $this->withdrawRequest->pf_amount ) > $user_rank->getWithdrawalLimit())
             return [false, trans('wallet.responses.withdraw-profit-request.withdraw_rank_limit', ['amount' => $user_rank->getWithdrawalLimit() - $db_sum])];
 

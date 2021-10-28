@@ -38,7 +38,7 @@ class UpdateWithdrawRequest extends FormRequest
                     WITHDRAW_COMMAND_PROCESS,
                     WITHDRAW_COMMAND_POSTPONE
                 ]),
-            'rejection_reason' => 'required_if:status,2|string',
+            'act_reason' => 'required_if:status,2|string',
             'postponed_to' => 'required_if:status,4|date|date_format:Y/m/d|after:today'
         ];
 
@@ -47,7 +47,7 @@ class UpdateWithdrawRequest extends FormRequest
     public function messages()
     {
         return [
-            'rejection_reason.required_if' => 'The rejection reason field is required when status is rejected',
+            'act_reason.required_if' => 'The rejection reason field is required when status is rejected',
             'postponed_to.required_if' => 'The postponed date field is required when status is postponed',
         ];
     }

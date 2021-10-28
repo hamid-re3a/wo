@@ -8,7 +8,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use User\Models\User;
 use Wallets\Models\Transaction;
-use Wallets\Models\TransactionType;
 
 class WalletRepository
 {

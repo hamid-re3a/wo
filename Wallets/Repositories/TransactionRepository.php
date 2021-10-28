@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use Wallets\Models\Transaction;
-use Wallets\Models\TransactionType;
 
 class TransactionRepository
 {

@@ -21,8 +21,6 @@ class TransactionRepository
             $transaction = new $this->entity;
             $transactions = $transaction->query();
 
-            $type_db = TransactionType::query()->where('name','=',$type)->first();
-
             if(!empty($wallet_id))
                 $transactions->where('wallet_id','=',$wallet_id);
             else
@@ -34,8 +32,8 @@ class TransactionRepository
                 });
 
             if($type)
-                $transactions->whereHas('metaData', function (Builder $query) use($type_db) {
-                    $query->where('type_id', '=', $type_db->id);
+                $transactions->whereHas('metaData', function (Builder $query) use($type) {
+                    $query->where('wallet_transaction_types.name', '=', $type);
                 });
 
             $from_date = Carbon::parse($from_date)->startOfDay()->toDateTimeString();

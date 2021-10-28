@@ -63,6 +63,7 @@ class InvoiceController extends Controller
             'checkout_link' => $pending_invoice['checkout_link'],
             'transaction_id' => $pending_invoice['transaction_id'],
             'expiration_time' => $pending_invoice['expiration_time'],
+            'due_amount' => $pending_invoice['due_amount'],
         ]);
     }
 

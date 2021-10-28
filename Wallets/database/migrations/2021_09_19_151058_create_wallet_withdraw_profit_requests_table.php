@@ -31,7 +31,7 @@ class CreateWalletWithdrawProfitRequestsTable extends Migration
             $table->unsignedDouble('fee')->default(0);
 
             $table->foreignId('actor_id')->nullable()->constrained('users');
-            $table->tinyText('rejection_reason')->nullable();
+            $table->tinyText('act_reason')->nullable();
 
             $table->time('postponed_to')->nullable();
             $table->timestamps();

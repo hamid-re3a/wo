@@ -2,21 +2,28 @@
 
 namespace Wallets\Repositories;
 
+use Bavix\Wallet\Models\Transfer;
 use Bavix\Wallet\Models\Wallet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use User\Models\User;
 use Wallets\Models\Transaction;
+use Wallets\Services\BankService;
 
 class WalletRepository
 {
     /**@var $transaction_repository TransactionRepository */
     private $transaction_repository;
+    private $bank_service;
 
     public function __construct()
     {
+        /***@var $user User */
+        $user = auth()->user();
         $this->transaction_repository = new TransactionRepository();
+        $this->bank_service = new BankService($user);
+
     }
 
     public function getOverAllSum(Wallet $wallet = null)
@@ -144,5 +151,16 @@ class WalletRepository
             $result[$commission_name] = chartMaker($type, $function_transactions_collection, $sub_function);
         }
         return $result;
+    }
+
+    public function transferFunds(Wallet $from_wallet,Wallet $to_wallet,$amount, $description = null) : Transfer
+    {
+        return $this->bank_service->transfer(
+            $from_wallet,
+            $to_wallet,
+            $amount,
+            $description
+        );
+
     }
 }

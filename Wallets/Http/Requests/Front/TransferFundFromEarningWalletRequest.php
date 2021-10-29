@@ -33,6 +33,8 @@ class TransferFundFromEarningWalletRequest extends FormRequest
     public function rules()
     {
         $this->prepare();
+        list($total, $fee) = $this->request->has('amount') ? calculateTransferAmount($this->request->get('amount')) : 0;
+        $this->request->set('amount', (double) $this->request->get('amount') + $fee);
 
         return [
             'member_id' => 'required_if:own_deposit_wallet,false|integer|exists:users,member_id|not_in:' . $this->member_id,

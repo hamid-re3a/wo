@@ -20,7 +20,7 @@ return [
     ],
 
     'transfer_funds' => [
-        'user-has-not-valid-package' => 'Receiver user has not a valid package.',
+        'user-has-not-valid-package' => 'No package is associated with this account.',
     ]
 ];
 

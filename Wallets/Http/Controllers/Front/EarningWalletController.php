@@ -16,6 +16,7 @@ use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
+use Wallets\Services\TransferFundResolver;
 
 class EarningWalletController extends Controller
 {
@@ -164,38 +165,30 @@ class EarningWalletController extends Controller
         try {
             DB::beginTransaction();
 
-            $deposit_wallet = $this->bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
+            $from_wallet = $this->bankService->getWallet($this->walletName);
+            $to_wallet = $this->bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
             $amount = request()->get('amount');
             $description = [];
             $fee = 0;
             if ($request->has('member_id')) {
                 $other_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 $other_member_bank_service = new BankService($other_member);
-                $deposit_wallet = $other_member_bank_service->getWallet(WALLET_NAME_DEPOSIT_WALLET);
-                list($total, $fee) = $this->calculateTransferAmount($amount);
+                $to_wallet = $other_member_bank_service->getWallet(WALLET_NAME_DEPOSIT_WALLET);
+                list($total, $fee) = calculateTransferAmount($amount);
+
                 $description = [
                     'member_id' => $request->get('member_id'),
                     'fee' => $fee,
                     'type' => 'Transfer'
                 ];
-
-                $balance = $this->bankService->getBalance(WALLET_NAME_EARNING_WALLET);
-                if ($balance < $total)
-                    return api()->error(null, null, 406, [
-                        'subject' => trans('wallet.responses.not-enough-balance', [
-                            'amount' => $amount,
-                            'fee' => $fee
-                        ])
-                    ]);
-
             }
 
-            $transfer = $this->bankService->transfer(
-                $this->bankService->getWallet($this->walletName),
-                $deposit_wallet,
-                $amount,
-                $description
-            );
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(float) $request->get('amount') - $fee,$description);
+            $transfer_resolver = new TransferFundResolver($transfer);
+
+            list($flag,$response) = $transfer_resolver->resolve();
+            if(!$flag)
+                throw new \Exception($response);
 
             if ($request->has('member_id') AND $fee > 0)
                 $this->bankService->withdraw($this->walletName, $fee, [
@@ -243,18 +236,4 @@ class EarningWalletController extends Controller
         return api()->success(null,$this->wallet_repository->getCommissionsChart($request->get('type'),$commissions,$this->walletObject->id));
     }
 
-    private function calculateTransferAmount($amount)
-    {
-        $transfer_fee = getWalletSetting('transfer_fee');
-        $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
-
-        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
-            $transfer_fee = $amount * $transfer_fee / 100;
-
-        if (empty($transfer_fee) OR $transfer_fee <= 0)
-            $transfer_fee = 10;
-
-        $total = $amount + $transfer_fee;
-        return [$total, $transfer_fee];
-    }
 }

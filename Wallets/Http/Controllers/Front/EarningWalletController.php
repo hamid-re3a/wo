@@ -132,7 +132,7 @@ class EarningWalletController extends Controller
 
             if ($request->has('member_id')) {
                 $to_user = User::query()->where('member_id', '=', $request->get('member_id'))->first();
-                list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
+                list($amount, $fee) = calculateTransferAmount($request->get('amount'));
             }
             $balance = $this->bankService->getBalance($this->walletName);
             $remain_balance = $balance - $amount;

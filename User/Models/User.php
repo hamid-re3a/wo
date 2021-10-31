@@ -142,7 +142,6 @@ class User extends Model implements WalletFloat
     {
         $this->fresh();
         $user = new \User\Services\Grpc\User();
-        Log::info('getUserService() called for => ' . $this->attributes['id']);
         $user->setId((int)$this->attributes['id']);
         $user->setFirstName((string)$this->attributes['first_name']);
         $user->setLastName((string)$this->attributes['last_name']);

@@ -46,5 +46,8 @@ RUN su application -c "php artisan optimize:clear"
 RUN su application -c "php artisan queue:restart"
 
 
+
+# ENV
+ENV PHP_MEMORY_LIMIT 1024M
 # permission
 RUN chown -R application:application /app

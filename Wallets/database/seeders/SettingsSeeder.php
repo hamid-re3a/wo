@@ -20,16 +20,7 @@ class SettingsSeeder extends Seeder
         if (defined('WALLET_SETTINGS') AND is_array(WALLET_SETTINGS)) {
             $settings = [];
             $now = now()->toDateTimeString();
-            foreach (WALLET_SETTINGS AS $key => $setting) {
-                Setting::query()->firstOrCreate(
-                    ['name' => $key],
-                    [
-                        'value' => $setting['value'],
-                        'title' => $setting['title'],
-                        'description' => $setting['description'],
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ]);
+            foreach (WALLET_SETTINGS AS $key => $setting)
                 $settings[] = [
                     'name' => $key,
                     'value' => $setting['value'],
@@ -38,8 +29,7 @@ class SettingsSeeder extends Seeder
                     'created_at' => $now,
                     'updated_at' => $now
                 ];
-            }
-//            Setting::insert($settings);
+            Setting::query()->upsert($settings,['name']);
             cache(['wallet_settings' => $settings]);
         }
 

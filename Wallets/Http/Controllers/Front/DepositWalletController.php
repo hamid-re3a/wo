@@ -162,7 +162,7 @@ class DepositWalletController extends Controller
         try {
             DB::beginTransaction();
 
-            list($amount, $fee) = calculateTransferAmount($request->get('amount'));
+            list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
             $receiver_bank_service = new BankService($to_user);
@@ -174,7 +174,7 @@ class DepositWalletController extends Controller
                 'type' => 'Funds transferred'
             ];
 
-            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double) $request->get('amount') - $fee,$description);
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double) $request->get('amount_new') - $fee,$description);
             $transfer_resolver = new TransferFundResolver($transfer);
 
             list($flag,$response) = $transfer_resolver->resolve();

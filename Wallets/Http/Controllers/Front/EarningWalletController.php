@@ -167,14 +167,13 @@ class EarningWalletController extends Controller
 
             $from_wallet = $this->bankService->getWallet($this->walletName);
             $to_wallet = $this->bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
-            $amount = request()->get('amount');
             $description = [];
             $fee = 0;
             if ($request->has('member_id')) {
                 $other_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 $other_member_bank_service = new BankService($other_member);
                 $to_wallet = $other_member_bank_service->getWallet(WALLET_NAME_DEPOSIT_WALLET);
-                list($total, $fee) = calculateTransferAmount($amount);
+                list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
 
                 $description = [
                     'member_id' => $request->get('member_id'),
@@ -183,7 +182,7 @@ class EarningWalletController extends Controller
                 ];
             }
 
-            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(float) $request->get('amount') - $fee,$description);
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,$request->get('amount_new') - $fee,$description);
             $transfer_resolver = new TransferFundResolver($transfer);
 
             list($flag,$response) = $transfer_resolver->resolve();

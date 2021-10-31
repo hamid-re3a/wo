@@ -34,8 +34,8 @@ class InvoiceController extends Controller
      */
     public function pendingOrderInvoice()
     {
-        /**@var $pending_invoice Invoice*/
-        $pending_invoice =  $this->user->invoices()
+        /**@var $pending_invoice Invoice */
+        $pending_invoice = $this->user->invoices()
             ->with([
                 'transactions',
                 'refunder'
@@ -57,7 +57,14 @@ class InvoiceController extends Controller
             ], 400);
         }
 
-        return api()->success(null, InvoiceResource::make($pending_invoice));
+        return api()->success(null, [
+            'payment_currency' => $pending_invoice['payment_currency'],
+            'amount' => $pending_invoice['amount'],
+            'checkout_link' => $pending_invoice['checkout_link'],
+            'transaction_id' => $pending_invoice['transaction_id'],
+            'expiration_time' => $pending_invoice['expiration_time'],
+            'due_amount' => $pending_invoice['due_amount'],
+        ]);
     }
 
     /**

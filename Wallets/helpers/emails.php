@@ -112,20 +112,20 @@ CONST WALLET_EMAIL_CONTENTS = [
                 <p>Amount in BTC : {{amount_in_btc}}</p>
                 <p>Request date : {{created_at}}</p>
                 <p>Update date : {{updated_at}}</p>
-                <p>Rejection reason : {{rejection_reason}}</p>
+                <p>Rejection reason : {{act_reason}}</p>
                 <p>Refund transaction ID : {{refund_transaction_uuid}}</p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables' => 'full_name,amount_in_pf,amount_in_btc,created_at,refund_transaction_uuid,rejection_reason',
+        'variables' => 'full_name,amount_in_pf,amount_in_btc,created_at,refund_transaction_uuid,act_reason',
         'variables_description' => '
                 full_name user full name,
                 amount_in_pf withdraw request amount in pf,
                 amount_in_btc withdraw request in BTC
                 amount_in_btc withdraw request in BTC,
                 created_at withdraw request date,
-                rejection_reason Rejection reason,
+                act_reason Rejection reason,
                 refund_transaction_uuid refund transaction id in our system,
 
                 ',

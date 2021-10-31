@@ -30,6 +30,9 @@ COPY . /app
 
 WORKDIR /app
 
+# ENV
+ENV PHP_MEMORY_LIMIT 1024M
+
 # build
 #RUN cp .env.staging .env
 RUN chown -R application:application /app
@@ -42,6 +45,7 @@ RUN su application -c "php artisan db:seed"
 RUN su application -c "php artisan scribe:generate"
 RUN su application -c "php artisan optimize:clear"
 RUN su application -c "php artisan queue:restart"
+
 
 
 # permission

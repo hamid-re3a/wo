@@ -2,22 +2,29 @@
 
 namespace Wallets\Repositories;
 
+use Bavix\Wallet\Models\Transfer;
 use Bavix\Wallet\Models\Wallet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use User\Models\User;
 use Wallets\Models\Transaction;
-use Wallets\Models\TransactionType;
+use Wallets\Services\BankService;
 
 class WalletRepository
 {
     /**@var $transaction_repository TransactionRepository */
     private $transaction_repository;
+    private $bank_service;
 
     public function __construct()
     {
-        $this->transaction_repository = new TransactionRepository();
+        if(auth()->check()) {
+            /***@var $user User */
+            $user = auth()->user();
+            $this->transaction_repository = new TransactionRepository();
+            $this->bank_service = new BankService($user);
+        }
     }
 
     public function getOverAllSum(Wallet $wallet = null)
@@ -59,10 +66,8 @@ class WalletRepository
     {
         $results = [];
 
-        $types_collection = TransactionType::query()->whereIn('name', $types)->select(['id', 'name'])->get();
-
-        foreach ($types_collection AS $type) {
-            $key = Str::replace(' ', '_', Str::lower($type->name)) . '_sum';
+        foreach ($types AS $type) {
+            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
             $sum_query = null;
             $sum_query = Transaction::query();
 
@@ -71,7 +76,7 @@ class WalletRepository
 
             $results[$key] =
                 (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
-                    $subQuery->where('wallet_transaction_meta_data.type_id', '=', $type->id);
+                    $subQuery->where('wallet_transaction_types.name', '=', $type);
                 })->sum('amount') / 100;
 
         }
@@ -147,5 +152,16 @@ class WalletRepository
             $result[$commission_name] = chartMaker($type, $function_transactions_collection, $sub_function);
         }
         return $result;
+    }
+
+    public function transferFunds(Wallet $from_wallet,Wallet $to_wallet,$amount, $description = null) : Transfer
+    {
+        return $this->bank_service->transfer(
+            $from_wallet,
+            $to_wallet,
+            $amount,
+            $description
+        );
+
     }
 }

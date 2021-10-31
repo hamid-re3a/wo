@@ -68,7 +68,7 @@ class WithdrawRepository
 
             if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
 
-                $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'), null, 'Withdraw request', null);
+                $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'), null, 'Withdrawal request', null);
                 return WithdrawProfit::query()->create([
                     'user_id' => auth()->user()->id,
                     'withdraw_transaction_id' => $withdraw_transaction->id,
@@ -76,7 +76,7 @@ class WithdrawRepository
                     'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
                     'currency' => $request->get('currency'),
                     'pf_amount' => $request->get('amount'),
-                    'crypto_amount' => $request->get('amount') / $btc_price->json()['USD']['15m'],
+                    'crypto_amount' => pfToUsd($request->get('amount')) / $btc_price->json()['USD']['15m'],
                     'crypto_rate' => $btc_price->json()['USD']['15m']
                 ]);
             } else {
@@ -138,8 +138,6 @@ class WithdrawRepository
 
             $this->update([
                 'status' => $request->get('status'),
-                'rejection_reason' => $request->has('rejection_reason') ? $request->get('rejection_reason') : $withdraw_request->rejection_reason,
-                'actor_id' => auth()->user()->id,
                 'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
             ], $withdraw_request);
         } catch (\Throwable $exception) {
@@ -259,7 +257,8 @@ class WithdrawRepository
         list($reply, $status) = $client->getUserWalletInfo($req)->wait();
         if (!$status OR $status->code != 0 OR !$reply->getAddress())
             throw new \Exception(trans('wallet.withdraw-profit-request.cant-find-wallet-address', [
-                'name' => WalletType::name(\User\Services\Grpc\WalletType::BTC)
+                'name' => 'bitcoin'
+//                'name' => WalletType::name(\User\Services\Grpc\WalletType::BTC)
             ]));
 
         return $reply->getAddress();

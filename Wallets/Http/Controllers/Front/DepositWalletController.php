@@ -22,6 +22,7 @@ use Wallets\Mail\DepositWallet\RequestFundEmail;
 use Wallets\Mail\DepositWallet\SenderFundEmail;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
+use Wallets\Services\TransferFundResolver;
 use Wallets\Services\WalletService;
 
 class DepositWalletController extends Controller
@@ -124,16 +125,10 @@ class DepositWalletController extends Controller
         try {
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->walletName);
-            list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
-
-            if ($balance < $amount)
-                return api()->error(null, null, 406, [
-                    'subject' => trans('wallet.responses.not-enough-balance')
-                ]);
+            list($total, $fee) = calculateTransferAmount($request->get('amount'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
-            list($total, $fee) = $this->calculateTransferAmount($request->get('amount'));
 
             $remain_balance = $balance - $total;
 
@@ -166,36 +161,32 @@ class DepositWalletController extends Controller
 
         try {
             DB::beginTransaction();
-            //Check logged in user balance for transfer
-            $balance = $this->bankService->getBalance($this->walletName);
-            list($amount, $fee) = $this->calculateTransferAmount($request->get('amount'));
 
-            if ($balance < $amount)
-                return api()->error(null, null, 406, [
-                    'subject' => trans('wallet.responses.not-enough-balance')
-                ]);
-
+            list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
             $receiver_bank_service = new BankService($to_user);
+            $to_wallet = $receiver_bank_service->getWallet($this->walletName);
+            $from_wallet = $this->bankService->getWallet($this->walletName);
+            $description = [
+                'member_id' => $request->get('member_id'),
+                'fee' => $fee,
+                'type' => 'Funds transferred'
+            ];
 
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double) $request->get('amount_new') - $fee,$description);
+            $transfer_resolver = new TransferFundResolver($transfer);
 
-            $transfer = $this->bankService->transfer(
-                $this->bankService->getWallet($this->walletName),
-                $receiver_bank_service->getWallet($this->walletName),
-                $request->get('amount'),
-                [
-                    'member_id' => $request->get('member_id'),
-                    'fee' => $fee,
-                    'type' => 'Funds transferred'
-                ]
-            );
+            list($flag,$response) = $transfer_resolver->resolve();
+            if(!$flag)
+                throw new \Exception($response);
 
+            //Charger user wallet for transfer fee
             $this->bankService->withdraw($this->walletName, $fee, [
                 'transfer_id' => $transfer->id
             ], 'Transfer fee');
 
-            UrgentEmailJob::dispatch(new SenderFundEmail(auth()->user(), $transfer), auth()->user()->email);
+            UrgentEmailJob::dispatch(new SenderFundEmail($this->user, $transfer), $this->user->email);
             UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user, $transfer), $to_user->email);
 
             DB::commit();
@@ -256,18 +247,4 @@ class DepositWalletController extends Controller
         return api()->success(null,$this->wallet_repository->getWalletTransactionsByTypeChart($request->get('type'), $this->walletObject->id));
     }
 
-    private function calculateTransferAmount($amount)
-    {
-        $transfer_fee = getWalletSetting('transfer_fee');
-        $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
-
-        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
-            $transfer_fee = $amount * $transfer_fee / 100;
-
-        if (empty($transfer_fee) OR $transfer_fee <= 0)
-            $transfer_fee = 10;
-
-        $total = $amount + $transfer_fee;
-        return [$total, $transfer_fee];
-    }
 }

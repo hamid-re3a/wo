@@ -46,7 +46,7 @@ class WithdrawProfitRequestedUpdated extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{updated_at}}',empty($this->withdrawRequest->postponed_to) ? 'Unknown': $this->withdrawRequest->postponed_to,$setting['body']);
         $setting['body'] = str_replace('{{withdraw_transaction_uuid}}',empty($this->withdrawRequest->withdraw_transaction_id) ? 'Unknown': $this->withdrawRequest->withdrawTransaction->uuid ,$setting['body']);
         $setting['body'] = str_replace('{{refund_transaction_uuid}}',empty($this->withdrawRequest->refund_transaction_id) ? 'Unknown': $this->withdrawRequest->refundTransaction->uuid ,$setting['body']);
-        $setting['body'] = str_replace('{{rejection_reason}}',empty($this->withdrawRequest->rejection_reason) ? 'Unknown': $this->withdrawRequest->rejection_reason ,$setting['body']);
+        $setting['body'] = str_replace('{{act_reason}}',empty($this->withdrawRequest->act_reason) ? 'Unknown': $this->withdrawRequest->act_reason ,$setting['body']);
         $setting['body'] = str_replace('{{network_hash}}',empty(($this->withdrawRequest->network_transaction_id)) ? 'Unknown': $this->withdrawRequest->networkTransaction->transaction_hash ,$setting['body']);
 
         return $this

@@ -26,7 +26,7 @@ class WithdrawProfitResource extends JsonResource
             'refund_transaction_id' => !empty($withdraw_request->refund_transaction_id) ? $withdraw_request->refundTransaction->uuid : null,
             'network_transaction_hash' => !empty($withdraw_request->network_transaction_id) ? $withdraw_request->networkTransaction->transaction_hash : null,
             'actor_full_name' => !empty($withdraw_request->actor_id) ? $withdraw_request->actor->full_name : null,
-            'rejection_reason' => !empty($withdraw_request->rejection_reason) ? $withdraw_request->rejection_reason : null,
+            'act_reason' => !empty($withdraw_request->act_reason) ? $withdraw_request->act_reason : null,
             'wallet_hash' => $withdraw_request->wallet_hash,
             'currency' => $withdraw_request->currency,
             'crypto_rate' => (double)$withdraw_request->crypto_rate,

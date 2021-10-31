@@ -84,6 +84,7 @@ if (!function_exists('getKycGrpcClient')) {
         ]);
     }
 }
+
 if (!function_exists('chartMaker')) {
     function chartMaker($duration_type, $repo_function, $sub_function)
     {
@@ -141,3 +142,21 @@ if (!function_exists('chartMaker')) {
 
     }
 }
+
+if(!function_exists('calculateTransferAmount')) {
+    function calculateTransferAmount($amount)
+    {
+        $transfer_fee = getWalletSetting('transfer_fee');
+        $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
+
+        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
+            $transfer_fee = $amount * $transfer_fee / 100;
+
+        if (empty($transfer_fee) OR $transfer_fee <= 0)
+            $transfer_fee = 10;
+
+        $total = $amount + $transfer_fee;
+        return [$total, $transfer_fee];
+    }
+}
+

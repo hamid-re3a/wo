@@ -19,6 +19,8 @@ class TransactionResource extends JsonResource
 
         return [
             'id' => $this->uuid,
+            'user_full_name' => $this->payable->full_name,
+            'user_member_id' => $this->payable->member_id,
             'wallet' => $this->wallet->name,
             'type' => $metaData ? $metaData->name : null,
             'amount' => (double)$this->amountFloat,

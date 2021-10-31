@@ -33,6 +33,9 @@ class TransferFundFromEarningWalletRequest extends FormRequest
     public function rules()
     {
         $this->prepare();
+        list($total, $fee) = $this->request->has('amount') ? calculateTransferAmount($this->request->get('amount')) : [0,0];
+        $this->request->set('amount_new', (double) $this->request->get('amount'));
+        $this->request->set('amount', (double) $this->request->get('amount') + $fee);
 
         return [
             'member_id' => 'required_if:own_deposit_wallet,false|integer|exists:users,member_id|not_in:' . $this->member_id,
@@ -55,7 +58,8 @@ class TransferFundFromEarningWalletRequest extends FormRequest
             'amount.min' => 'Minimum allowed is ' . formatCurrencyFormat($this->minimum_amount) . " PF",
             'amount.max' => 'Maximum allowed is ' . formatCurrencyFormat($this->maximum_amount) ." PF",
             'member_id.not_in' => 'You are not allowed transfer PF to your account .',
-            'amount.lte' => 'Insufficient amount'
+            'amount.lte' => 'Insufficient amount',
+            'member_id.exists' => 'Invalid membership ID .',
         ];
     }
 

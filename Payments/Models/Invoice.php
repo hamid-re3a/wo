@@ -109,6 +109,11 @@ class Invoice extends Model
         return $query->where('payable_type','=','Order');
     }
 
+    public function scopeNotCanceled($query)
+    {
+        return $query->where('status','<>','user_cancel');
+    }
+
     public function scopeDepositWallets($query)
     {
         return $query->where('payable_type','=','DepositWallet');

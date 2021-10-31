@@ -19,7 +19,7 @@ use User\Models\User;
  * @property int $network_transaction_id
  * @property string $status
  * @property int $actor_id
- * @property string|null $rejection_reason
+ * @property string|null $act_reason
  * @property boolean $is_update_email_sent
  * @property string $payout_service
  * @property string $currency
@@ -50,7 +50,7 @@ class WithdrawProfit extends Model
         'network_transaction_id',
         'status',
         'actor_id',
-        'rejection_reason',
+        'act_reason',
         'is_update_email_sent',
         'payout_service',
         'currency',

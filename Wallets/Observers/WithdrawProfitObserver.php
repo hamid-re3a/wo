@@ -25,6 +25,13 @@ class WithdrawProfitObserver
         UrgentEmailJob::dispatch(new WithdrawProfitRequestedSubmitted($withdrawProfit), $withdrawProfit->user->email);
     }
 
+    public function updating(WithdrawProfit $withdrawProfit)
+    {
+        $withdrawProfit->actor_id = auth()->user()->id;
+        if(request()->has('act_reason'))
+            $withdrawProfit->act_reason = request()->get('act_reason');
+    }
+
 
     public function updated(WithdrawProfit $withdrawProfit)
     {

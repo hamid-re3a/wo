@@ -148,7 +148,7 @@ class WithdrawRequestFeatureTest extends WalletTest
                 'withdraw_transaction_id',
                 'refund_transaction_id',
                 'actor_full_name',
-                'rejection_reason',
+                'act_reason',
                 'wallet_hash',
                 'currency',
                 'crypto_rate',

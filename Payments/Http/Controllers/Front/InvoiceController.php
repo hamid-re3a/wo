@@ -10,6 +10,7 @@ use Payments\Http\Requests\Invoice\ShowInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
 use Payments\Http\Resources\InvoiceResource;
 use Payments\Http\Resources\InvoiceTransactionResource;
+use Payments\Models\Invoice;
 use Payments\Services\InvoiceService;
 use User\Models\User;
 
@@ -33,18 +34,19 @@ class InvoiceController extends Controller
      */
     public function pendingOrderInvoice()
     {
-
-        $pending_invoice = $this->user->orderInvoices()
+        /**@var $pending_invoice Invoice */
+        $pending_invoice = $this->user->invoices()
             ->with([
                 'transactions',
                 'refunder'
             ])
-            ->where('is_paid', 0)
-            ->where('expiration_time', '>', now()->toDateTimeString())
+            ->notPaid()
+            ->notCanceled()
+            ->notExpired()
             ->first();
 
         if (!$pending_invoice) {
-            $paid_invoice = $this->user->orderInvoices()->where('is_paid', 1)->count();
+            $paid_invoice = $this->user->invoices()->paid()->count();
             if ($paid_invoice)
                 return api()->success(null, [
                     'status' => 'confirmed'
@@ -55,7 +57,14 @@ class InvoiceController extends Controller
             ], 400);
         }
 
-        return api()->success(null, InvoiceResource::make($pending_invoice));
+        return api()->success(null, [
+            'payment_currency' => $pending_invoice['payment_currency'],
+            'amount' => $pending_invoice['amount'],
+            'checkout_link' => $pending_invoice['checkout_link'],
+            'transaction_id' => $pending_invoice['transaction_id'],
+            'expiration_time' => $pending_invoice['expiration_time'],
+            'due_amount' => $pending_invoice['due_amount'],
+        ]);
     }
 
     /**
@@ -65,17 +74,18 @@ class InvoiceController extends Controller
      */
     public function pendingWalletInvoice()
     {
-        $pending_invoice = $this->user->walletInvoices()
+        $pending_invoice = $this->user->invoices()->depositWallets()
             ->with([
                 'transactions',
                 'refunder'
             ])
-            ->where('is_paid', 0)
-            ->where('expiration_time', '>', now()->toDateTimeString())
+            ->notPaid()
+            ->notCanceled()
+            ->notExpired()
             ->first();
 
         if (!$pending_invoice) {
-            $paid_invoice = $this->user->walletInvoices()->where('is_paid', 1)->count();
+            $paid_invoice = $this->user->invoices()->depositWallets()->paid()->count();
             if ($paid_invoice)
                 return api()->success(null, [
                     'status' => 'confirmed'

@@ -257,7 +257,8 @@ class WithdrawRepository
         list($reply, $status) = $client->getUserWalletInfo($req)->wait();
         if (!$status OR $status->code != 0 OR !$reply->getAddress())
             throw new \Exception(trans('wallet.withdraw-profit-request.cant-find-wallet-address', [
-                'name' => WalletType::name(\User\Services\Grpc\WalletType::BTC)
+                'name' => 'bitcoin'
+//                'name' => WalletType::name(\User\Services\Grpc\WalletType::BTC)
             ]));
 
         return $reply->getAddress();

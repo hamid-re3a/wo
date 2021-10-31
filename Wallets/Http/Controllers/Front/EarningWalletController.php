@@ -29,8 +29,6 @@ class EarningWalletController extends Controller
 
     public function __construct(WalletRepository $wallet_repository)
     {
-        if(auth()->check())
-            $this->prepareEarningWallet();
         $this->wallet_repository = $wallet_repository;
     }
     private function prepareEarningWallet()
@@ -50,6 +48,7 @@ class EarningWalletController extends Controller
      */
     public function earned_commissions()
     {
+        $this->prepareEarningWallet();
         $commissions = [
             'Binary',
             'Direct Sale',
@@ -69,7 +68,7 @@ class EarningWalletController extends Controller
      */
     public function index()
     {
-
+        $this->prepareEarningWallet();
         return api()->success(null, EarningWalletResource::make($this->walletObject));
 
     }
@@ -82,7 +81,7 @@ class EarningWalletController extends Controller
      */
     public function transactions(TransactionRequest $request)
     {
-
+        $this->prepareEarningWallet();
         $list = $this->bankService->getTransactions($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
@@ -101,7 +100,7 @@ class EarningWalletController extends Controller
      */
     public function transfers()
     {
-
+        $this->prepareEarningWallet();
         $list = $this->bankService->getTransfers($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransferResource::collection($list),
@@ -122,7 +121,7 @@ class EarningWalletController extends Controller
      */
     public function transfer_to_deposit_wallet_preview(TransferFundFromEarningWalletRequest $request)
     {
-
+        $this->prepareEarningWallet();
         try {
             $to_user = null;
             $amount = $request->get('amount');
@@ -159,7 +158,7 @@ class EarningWalletController extends Controller
      */
     public function transfer_to_deposit_wallet(TransferFundFromEarningWalletRequest $request)
     {
-
+        $this->prepareEarningWallet();
         try {
             DB::beginTransaction();
 
@@ -210,6 +209,7 @@ class EarningWalletController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
+        $this->prepareEarningWallet();
         return api()->success(null, $this->wallet_repository->getWalletOverallBalanceChart($request->get('type'),$this->walletObject->id));
     }
 
@@ -221,6 +221,7 @@ class EarningWalletController extends Controller
      */
     public function commissionsChart(ChartTypeRequest $request)
     {
+        $this->prepareEarningWallet();
         $commissions = [
             'Binary',
             'Direct Sale',

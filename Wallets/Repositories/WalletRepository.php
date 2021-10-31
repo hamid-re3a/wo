@@ -19,6 +19,11 @@ class WalletRepository
 
     public function __construct()
     {
+        $this->transaction_repository = new TransactionRepository();
+    }
+
+    private function prepare()
+    {
         if(auth()->check()) {
             /***@var $user User */
             $user = auth()->user();
@@ -156,6 +161,7 @@ class WalletRepository
 
     public function transferFunds(Wallet $from_wallet,Wallet $to_wallet,$amount, $description = null) : Transfer
     {
+        $this->prepare();
         return $this->bank_service->transfer(
             $from_wallet,
             $to_wallet,

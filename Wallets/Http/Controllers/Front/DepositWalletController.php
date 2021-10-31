@@ -38,8 +38,6 @@ class DepositWalletController extends Controller
 
     public function __construct(WalletRepository $wallet_repository)
     {
-        if(auth()->check())
-            $this->prepareDepositWallet();
         $this->wallet_repository = $wallet_repository;
     }
 
@@ -58,6 +56,7 @@ class DepositWalletController extends Controller
      */
     public function index()
     {
+        $this->prepareDepositWallet();
         return api()->success(null, DepositWalletResource::make($this->bankService->getWallet($this->walletName)));
 
     }
@@ -70,7 +69,7 @@ class DepositWalletController extends Controller
      */
     public function transactions(TransactionRequest $request)
     {
-
+        $this->prepareDepositWallet();
         $list = $this->bankService->getTransactions($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
@@ -88,7 +87,7 @@ class DepositWalletController extends Controller
      */
     public function transfers()
     {
-
+        $this->prepareDepositWallet();
         $data = $this->bankService->getTransfers($this->walletName)->simplePaginate();
         return api()->success(null, TransferResource::collection($data)->response()->getData());
 
@@ -102,6 +101,7 @@ class DepositWalletController extends Controller
      */
     public function paymentRequest(AskFundRequest $request)
     {
+        $this->prepareDepositWallet();
         $user = User::query()->where('member_id', $request->get('member_id'))->first();
         UrgentEmailJob::dispatch(new RequestFundEmail($user, $this->user, $request->get('amount')), $user->email);
 
@@ -121,7 +121,7 @@ class DepositWalletController extends Controller
      */
     public function transferPreview(TransferFundFromDepositWallet $request)
     {
-
+        $this->prepareDepositWallet();
         try {
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->walletName);
@@ -158,7 +158,7 @@ class DepositWalletController extends Controller
      */
     public function transferFunds(TransferFundFromDepositWallet $request)
     {
-
+        $this->prepareDepositWallet();
         try {
             DB::beginTransaction();
 
@@ -233,6 +233,7 @@ class DepositWalletController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
+        $this->prepareDepositWallet();
         return api()->success(null, $this->wallet_repository->getWalletOverallBalanceChart($request->get('type'),$this->walletObject->id));
     }
 
@@ -244,6 +245,7 @@ class DepositWalletController extends Controller
      */
     public function investmentsChart(ChartTypeRequest $request)
     {
+        $this->prepareDepositWallet();
         return api()->success(null,$this->wallet_repository->getWalletTransactionsByTypeChart($request->get('type'), $this->walletObject->id));
     }
 

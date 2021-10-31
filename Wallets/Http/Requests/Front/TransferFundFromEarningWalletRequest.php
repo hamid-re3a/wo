@@ -33,7 +33,7 @@ class TransferFundFromEarningWalletRequest extends FormRequest
     public function rules()
     {
         $this->prepare();
-        list($total, $fee) = $this->request->has('amount') ? calculateTransferAmount($this->request->get('amount')) : 0;
+        list($total, $fee) = $this->request->has('amount') ? calculateTransferAmount($this->request->get('amount')) : [0,0];
         $this->request->set('amount_new', (double) $this->request->get('amount'));
         $this->request->set('amount', (double) $this->request->get('amount') + $fee);
 

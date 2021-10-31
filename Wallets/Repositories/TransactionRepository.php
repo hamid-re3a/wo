@@ -6,6 +6,7 @@ namespace Wallets\Repositories;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Wallets\Models\Transaction;
 
 class TransactionRepository
@@ -40,8 +41,32 @@ class TransactionRepository
 
             return $transactions->whereBetween($date_field,[$from_date,$to_date])->get();
         } catch (\Throwable $exception) {
-            Log::error('Wallets\Repositories\TransactionRepository@getTransactionByDateCollection => ' . $exception->getMessage());
+            Log::error('Wallets\Repositories\TransactionRepository@getTransactionsByDateAndTypeCollection => ' . $exception->getMessage());
             throw new \Exception(trans('wallets.responses.something-went-wrong'),500);
         }
+    }
+
+    public function getTransactionsSumByTypes(int $user_id = null, array $types = null)
+    {
+        $results = [];
+
+        foreach ($types AS $type) {
+            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
+            $sum_query = null;
+            /**@var $transaction Transaction*/
+            $transaction = new $this->entity;
+            $sum_query = $transaction->query();
+
+            if (!empty($user_id))
+                $sum_query->where('payable_id', '=', $user_id);
+
+            $results[$key] =
+                (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
+                    $subQuery->where('wallet_transaction_types.name', '=', $type);
+                })->sum('amount') / 100;
+
+        }
+
+        return $results;
     }
 }

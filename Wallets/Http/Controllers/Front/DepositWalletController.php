@@ -36,9 +36,9 @@ class DepositWalletController extends Controller
     private $user;
     private $wallet_repository;
 
-    public function __construct(WalletRepository $wallet_repository)
+    public function __construct()
     {
-        $this->wallet_repository = $wallet_repository;
+        $this->wallet_repository = new WalletRepository();
     }
 
     private function prepareDepositWallet()

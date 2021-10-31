@@ -14,6 +14,7 @@ use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Repositories\TransactionRepository;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
 use Wallets\Services\TransferFundResolver;
@@ -26,10 +27,12 @@ class EarningWalletController extends Controller
     /**@var $walletObject Wallet*/
     private $walletObject;
     private $wallet_repository;
+    private $transaction_repository;
 
-    public function __construct(WalletRepository $wallet_repository)
+    public function __construct(WalletRepository $wallet_repository,TransactionRepository $transaction_repository)
     {
         $this->wallet_repository = $wallet_repository;
+        $this->transaction_repository = $transaction_repository;
     }
     private function prepareEarningWallet()
     {
@@ -58,7 +61,7 @@ class EarningWalletController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->wallet_repository->getTransactionsSumByTypes(auth()->user()->id,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByTypes(auth()->user()->id,$commissions));
 
     }
 

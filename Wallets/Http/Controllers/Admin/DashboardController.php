@@ -8,16 +8,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Models\Transaction;
+use Wallets\Repositories\TransactionRepository;
 use Wallets\Repositories\WalletRepository;
 
 class DashboardController extends Controller
 {
     //TODO Refactor whole controller :|
     private $wallet_repository;
+    private $transaction_repository;
 
-    public function __construct(WalletRepository $wallet_repository)
+    public function __construct(WalletRepository $wallet_repository,TransactionRepository $transaction_repository)
     {
         $this->wallet_repository = $wallet_repository;
+        $this->transaction_repository = $transaction_repository;
     }
 
     /**
@@ -82,7 +85,7 @@ class DashboardController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->wallet_repository->getTransactionsSumByTypes(null,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByTypes(null,$commissions));
     }
 
     /**

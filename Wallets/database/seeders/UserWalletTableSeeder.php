@@ -22,7 +22,7 @@ class UserWalletTableSeeder extends Seeder
         $bankService = new BankService($user);
         $bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
         $bankService->getWallet(WALLET_NAME_EARNING_WALLET);
-//        $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET,10000000);
+        $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET,10000000);
 //
 //        /**
 //         *

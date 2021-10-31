@@ -35,6 +35,7 @@ ENV PHP_MEMORY_LIMIT 1024M
 
 # build
 #RUN cp .env.staging .env
+RUN git checkout 777773caa1fabf623f67f7e0c65a92ab112f32cb
 RUN chown -R application:application /app
 RUN su application -c "composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567"
 RUN su application -c "composer install"

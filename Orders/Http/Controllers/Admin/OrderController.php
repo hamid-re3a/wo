@@ -87,7 +87,7 @@ class OrderController extends Controller
             $order_service->setIsPaidAt($now);
             $order_service->setIsResolvedAt($now);
 
-            $submit_response = MlmClientFacade::submitOrder($order_db->getOrderService());
+            $submit_response = MlmClientFacade::submitOrder($order_service);
             $order_db->update([
                 'is_paid_at' => $now,
                 'is_resolved_at' => $now,

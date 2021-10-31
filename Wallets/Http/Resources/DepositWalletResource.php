@@ -20,16 +20,16 @@ class DepositWalletResource extends JsonResource
         /**@var $wallet Wallet*/
         $wallet = $this->resource;
         $wallet_repository = new WalletRepository();
-        $total_sum = $wallet_repository->getOverAllSum($wallet);
+        list($total_transfer,$total_received,$total_spent) = $wallet_repository->getOverAllSum($wallet->id);
 
         return [
             'name' => $wallet->name,
             'balance' => (double)$wallet->balanceFloat,
             'transactions_count' => (int) $wallet->transactions()->count(),
             'transfers_count' => (int) $wallet->transfers()->count(),
-            'total_transfer' => $total_sum->total_transfer ?$total_sum->total_transfer / 100 : 0,
-            'total_received' => $total_sum->total_received ? $total_sum->total_received / 100 : 0,
-            'total_spent' => $total_sum->total_spent ? $total_sum->total_spent / 100 : 0
+            'total_transfer' => (double)$total_transfer,
+            'total_received' => (double)$total_received,
+            'total_spent' => (double)$total_spent
         ];
     }
 }

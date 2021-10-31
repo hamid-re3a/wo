@@ -25,8 +25,6 @@ class EarningWalletController extends Controller
     private $walletName;
     /**@var $walletObject Wallet*/
     private $walletObject;
-    /**@var $user User*/
-    private $user;
     private $wallet_repository;
 
     public function __construct(WalletRepository $wallet_repository)
@@ -37,9 +35,10 @@ class EarningWalletController extends Controller
     }
     private function prepareEarningWallet()
     {
-        $this->user = auth()->user();
+        /**@var $user User*/
+        $user = auth()->user();
 
-        $this->bankService = new BankService($this->user);
+        $this->bankService = new BankService($user);
         $this->walletName = WALLET_NAME_EARNING_WALLET;
         $this->walletObject = $this->bankService->getWallet($this->walletName);
 
@@ -60,7 +59,7 @@ class EarningWalletController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->wallet_repository->getTransactionsSumByTypes($this->user->id,$commissions));
+        return api()->success(null, $this->wallet_repository->getTransactionsSumByTypes(auth()->user()->id,$commissions));
 
     }
 

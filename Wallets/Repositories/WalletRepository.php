@@ -19,11 +19,12 @@ class WalletRepository
 
     public function __construct()
     {
-        /***@var $user User */
-        $user = auth()->user();
-        $this->transaction_repository = new TransactionRepository();
-        $this->bank_service = new BankService($user);
-
+        if(auth()->check()) {
+            /***@var $user User */
+            $user = auth()->user();
+            $this->transaction_repository = new TransactionRepository();
+            $this->bank_service = new BankService($user);
+        }
     }
 
     public function getOverAllSum(Wallet $wallet = null)

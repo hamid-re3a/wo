@@ -53,7 +53,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'body' => <<<EOT
                 <div>
                 <p>Hello <b>{{full_name}}</b>,</p>
-                <p>{{request_full_name}}, has asked you for {{amount}} PF</p>
+                <p>{{request_full_name}} ({{request_member_id}}), has asked you for {{amount}} PF</p>
                 <p></p>
                 <p>You can transfer this amount by going to the deposit wallet of your {{app_name}} account.</p>
                 <p>Cheers,</p>

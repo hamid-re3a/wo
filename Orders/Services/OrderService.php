@@ -36,7 +36,7 @@ class OrderService implements OrdersServiceInterface
         $order = \Orders\Models\Order::query()->find($request->getId());
 
         if ($order)
-            return $order->getOrderService();
+            return $order->getGrpcMessage();
 
         return $response;
 

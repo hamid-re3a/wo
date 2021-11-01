@@ -68,7 +68,7 @@ class OrderController extends Controller
             $order_db->refreshOrder();
 
             Log::info('Front/OrderController@newOrder First MLM request');
-            $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
+            $response = MlmClientFacade::simulateOrder($order_db->getGrpcMessage());
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
@@ -82,10 +82,10 @@ class OrderController extends Controller
             $invoice_request->setPaymentDriver($order_db->payment_driver);
             $invoice_request->setPaymentType($order_db->payment_type);
             $invoice_request->setPaymentCurrency($order_db->payment_currency);
-            $invoice_request->setUser($user_who_pays_for_package->getUserService());
+            $invoice_request->setUser($user_who_pays_for_package->getGrpcMessage());
             $invoice_request->setUserId((int)auth()->user()->id);
 
-            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getOrderService());
+            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getGrpcMessage());
 
 
             if (!$payment_flag)
@@ -95,7 +95,7 @@ class OrderController extends Controller
 
                 $now = now()->toDateTimeString();
 
-                $order_service = $order_db->fresh()->getOrderService();
+                $order_service = $order_db->fresh()->getGrpcMessage();
                 $order_service->setIsPaidAt($now);
                 $order_service->setIsResolvedAt($now);
 

@@ -32,7 +32,7 @@ class TransferFundResolver
 
     private function checkHasValidOrExpiredPackage(User $user)
     {
-        $mlm_grpc = MlmClientFacade::hasValidPackage($user->getUserService());
+        $mlm_grpc = MlmClientFacade::hasValidPackage($user->getGrpcMessage());
         return $mlm_grpc->getStatus();
     }
 

@@ -8,6 +8,7 @@ use Packages\Services\PackageService;
 
 class PackageGrpcService implements \Packages\Services\Grpc\PackagesServiceInterface
 {
+    /**@var $package_service PackageService*/
     private $package_service;
 
     public function __construct()

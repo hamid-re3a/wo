@@ -75,7 +75,7 @@ class OrderController extends Controller
             ]);
             $order_db->refreshOrder();
 
-            $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
+            $response = MlmClientFacade::simulateOrder($order_db->getGrpcMessage());
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
@@ -83,11 +83,11 @@ class OrderController extends Controller
 
             $now = now()->toDateTimeString();
 
-            $order_service = $order_db->fresh()->getOrderService();
+            $order_service = $order_db->fresh()->getGrpcMessage();
             $order_service->setIsPaidAt($now);
             $order_service->setIsResolvedAt($now);
 
-            $submit_response = MlmClientFacade::submitOrder($order_db->getOrderService());
+            $submit_response = MlmClientFacade::submitOrder($order_db->getGrpcMessage());
             $order_db->update([
                 'is_paid_at' => $now,
                 'is_resolved_at' => $now,

@@ -5,7 +5,7 @@ namespace Payments\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Wallets\Http\Requests\Admin\UpdateEmailContentRequest;
+use Payments\Http\Requests\Admin\UpdateEmailContentRequest;
 use Payments\Http\Resources\Admin\EmailContentResource;
 use Payments\Models\EmailContentSetting;
 

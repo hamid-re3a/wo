@@ -138,7 +138,7 @@ class User extends Model implements WalletFloat
     /**
      * Methods
      */
-    public function getUserService()
+    public function getGrpcMessage()
     {
         $this->fresh();
         $user = new \User\Services\Grpc\User();

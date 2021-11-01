@@ -17,7 +17,7 @@ class WithdrawResolver
         $this->withdrawRequest = $withdrawRequest;
         /**@var $user_db User */
         $user_db = $this->withdrawRequest->user()->first();
-        $this->user_service = $user_db->getUserService();
+        $this->user_service = $user_db->getGrpcMessage();
 
     }
 

@@ -39,9 +39,9 @@ class Package extends Model
     /**
      * Methods
      */
-    public function getPackageService()
+    public function getGrpcMessage()
     {
-        $package_service = new \Giftcode\Services\Package();
+        $package_service = new \Giftcode\Services\Grpc\Package();
         $package_service->setId($this->attributes['id']);
         $package_service->setName($this->attributes['name']);
         $package_service->setShortName($this->attributes['short_name']);

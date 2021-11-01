@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use User\Models\User;
 use Wallets\Services\BankService;
 
-class TransferFundFromDepositWallet extends FormRequest
+class TransferFundFromDepositWalletRequest extends FormRequest
 {
     private $minimum_amount;
     private $maximum_amount;

@@ -218,7 +218,7 @@ class GiftcodeRepository
     {
         $giftcode_service = new \Giftcode\Services\Grpc\Giftcode();
         if($giftcode instanceof Giftcode AND !empty($giftcode->id))
-            return $giftcode->getGiftcodeService();
+            return $giftcode->getGrpcMessage();
 
         return $giftcode_service;
     }

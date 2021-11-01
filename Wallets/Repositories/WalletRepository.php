@@ -51,10 +51,11 @@ class WalletRepository
                 }
             ])
             ->first();
+
         return [
-            $sum_query->total_received > 0 ? $sum_query->total_received / 100 : 0.00,
-            $sum_query->total_spent > 0 ? $sum_query->total_spent / 100 : 0.00,
-            $sum_query->total_transfer > 0 ? $sum_query->total_transfer / 100 : 0.00,
+            $sum_query->total_received > 0 ? (double) $sum_query->total_received / 100 : 0.00,
+            $sum_query->total_spent > 0 ? (double) $sum_query->total_spent / 100 : 0.00,
+            $sum_query->total_transfer > 0 ? (double) $sum_query->total_transfer / 100 : 0.00,
         ];
     }
 

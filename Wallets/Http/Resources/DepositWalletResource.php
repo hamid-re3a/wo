@@ -20,7 +20,7 @@ class DepositWalletResource extends JsonResource
         /**@var $wallet Wallet*/
         $wallet = $this->resource;
         $wallet_repository = new WalletRepository();
-        list($total_transfer,$total_received,$total_spent) = $wallet_repository->getOverAllSum($wallet->id);
+        list($total_received,$total_spent,$total_transfer) = $wallet_repository->getOverAllSum($wallet->id);
 
         return [
             'name' => $wallet->name,

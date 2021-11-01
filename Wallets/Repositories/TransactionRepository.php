@@ -46,12 +46,12 @@ class TransactionRepository
         }
     }
 
-    public function getTransactionsSumByTypes(int $user_id = null, array $types = null)
+    public function getTransactionsSumByPivotTypes(int $user_id = null,int $wallet_id = null, array $types = null)
     {
         $results = [];
 
         foreach ($types AS $type) {
-            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
+            $key = str_replace(' ', '_', Str::lower($type)) . '_sum';
             $sum_query = null;
             /**@var $transaction Transaction*/
             $transaction = new $this->entity;
@@ -60,10 +60,38 @@ class TransactionRepository
             if (!empty($user_id))
                 $sum_query->where('payable_id', '=', $user_id);
 
+            if (!empty($wallet_id))
+                $sum_query->where('wallet_id', '=', $wallet_id);
+
             $results[$key] =
                 (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
                     $subQuery->where('wallet_transaction_types.name', '=', $type);
                 })->sum('amount') / 100;
+
+        }
+
+        return $results;
+    }
+
+    public function getTransactionsSumByMainTypes(int $user_id = null,int $wallet_id = null, array $types = null)
+    {
+        $results = [];
+
+        foreach ($types AS $type) {
+            $key = str_replace(' ', '_', Str::lower($type)) . '_sum';
+            $sum_query = null;
+            /**@var $transaction Transaction*/
+            $transaction = new $this->entity;
+            $sum_query = $transaction->query();
+
+            if (!empty($user_id))
+                $sum_query->where('payable_id', '=', $user_id);
+
+            if(!empty($wallet_id))
+                $sum_query->where('wallet_id','=',$wallet_id);
+
+            $results[$key] =
+                (float) $sum_query->where('type','=', $type)->sum('amount') / 100;
 
         }
 

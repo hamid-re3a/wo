@@ -36,10 +36,10 @@ if (!function_exists('getWalletEmailContent')) {
                 $email = $check;
 
 
-        if ($email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
+        if (empty($email) AND $email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
             $email = $email->toArray();
 
-        if (defined('WALLET_EMAIL_CONTENTS') AND
+        if (empty($email) AND defined('WALLET_EMAIL_CONTENTS') AND
             is_array(WALLET_EMAIL_CONTENTS) AND
             array_key_exists($key, WALLET_EMAIL_CONTENTS))
             $email = WALLET_EMAIL_CONTENTS[$key];

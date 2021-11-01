@@ -31,10 +31,10 @@ if(!function_exists('giftcodeGetEmailContent')) {
                 $email = collect(cache('giftcode_email_contents'))->where('key', $key)->first();
 
 
-        if($email = \Giftcode\Models\EmailContent::where('key',$key)->first())
+        if(empty($email) AND $email = \Giftcode\Models\EmailContent::where('key',$key)->first())
             $email = $email->toArray();
 
-        if(defined('EMAIL_CONTENTS') AND is_array(EMAIL_CONTENTS) AND array_key_exists($key,EMAIL_CONTENTS))
+        if(empty($email) AND defined('EMAIL_CONTENTS') AND is_array(EMAIL_CONTENTS) AND array_key_exists($key,EMAIL_CONTENTS))
             $email = EMAIL_CONTENTS[$key];
 
         if($email AND is_array($email)) {

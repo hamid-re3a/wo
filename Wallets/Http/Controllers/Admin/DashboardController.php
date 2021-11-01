@@ -29,19 +29,20 @@ class DashboardController extends Controller
      */
     public function sum_deposit_wallets()
     {
-        $total_transferred = Transaction::query()
-            ->where('wallet_id','<>',1)
-            ->whereHas('wallet', function(Builder $walletQuery) {
-                $walletQuery->where('name','=',WALLET_NAME_DEPOSIT_WALLET);
-            })
-            ->whereHas('metaData', function (Builder $subQuery) {
-                $subQuery->where('name', '=', 'Funds transferred');
-            })->sum('amount');
+//        $total_transferred = Transaction::query()
+//            ->where('wallet_id','<>',1)
+//            ->whereHas('wallet', function(Builder $walletQuery) {
+//                $walletQuery->where('name','=',WALLET_NAME_DEPOSIT_WALLET);
+//            })
+//            ->whereHas('metaData', function (Builder $subQuery) {
+//                $subQuery->where('name', '=', 'Funds transferred');
+//            })->sum('amount');
 
+        $total_transferred = $this->transaction_repository->getTransactionsSumByPivotTypes(null,null,['Funds transferred']);
         $current_balance = Wallet::query()->where('name','=',WALLET_NAME_DEPOSIT_WALLET)->where('id','<>',1)->sum('balance');
 
         return api()->success(null,[
-            'total_transferred' => $total_transferred / 100,
+            'total_transferred' => $total_transferred['funds_transferred_sum'],
             'current_balance' => $current_balance / 100
         ]);
     }

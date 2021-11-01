@@ -16,7 +16,7 @@
         "grpc/grpc": "^1.39",
         "mix/grpc": "^3.0",
         "guzzlehttp/guzzle": "7.0.1",
-        "laravel/framework": "8.12.0",
+        "laravel/framework": "8.41.0",
         "laravel/tinker": "2.5",
         "rap2hpoutre/laravel-log-viewer": "1.7",
         "laravel/slack-notification-channel": "2.3",

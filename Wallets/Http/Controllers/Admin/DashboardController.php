@@ -85,7 +85,7 @@ class DashboardController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->transaction_repository->getTransactionsSumByTypes(null,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes(null,null,$commissions));
     }
 
     /**

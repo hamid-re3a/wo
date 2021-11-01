@@ -5,7 +5,7 @@ namespace Giftcode\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Wallets\Http\Requests\Admin\UpdateEmailContentRequest;
+use Giftcode\Http\Requests\Admin\UpdateEmailContentRequest;
 use Giftcode\Http\Resources\Admin\EmailContentResource;
 use Giftcode\Models\EmailContent;
 

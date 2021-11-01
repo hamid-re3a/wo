@@ -208,7 +208,7 @@ class Invoice extends Model
         $invoice_service->setCreatedAt((string)$this->attributes['created_at']);
         $invoice_service->setUpdatedAt((string)$this->attributes['updated_at']);
 
-        $invoice_service->setUser($this->user->getUserService());
+        $invoice_service->setUser($this->user->getGrpcMessage());
         return $invoice_service;
 
     }

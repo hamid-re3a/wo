@@ -67,10 +67,13 @@ class WithdrawResolver
         //get user today's withdraw sum
         $db_sum = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
                 ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
+                ->where('id','<>',$this->withdrawRequest->id)
                 ->sum('pf_amount');
 
         //Get user rank from MLM service
         $user_rank = MlmClientFacade::getUserRank($this->user_service);
+        Log::info('getUserService() called for => ' . $this->user_service->getId());
+        Log::info('MlmClientFacade::getUserRank() => ' . $user_rank->getRankName());
         Log::info('Withdrawal rank check => ' . $db_sum . ' - ' . $this->withdrawRequest->pf_amount . ' - ' . $user_rank->getWithdrawalLimit());
         if (( $db_sum + $this->withdrawRequest->pf_amount ) > $user_rank->getWithdrawalLimit())
             return [false, trans('wallet.responses.withdraw-profit-request.withdraw_rank_limit', ['amount' => $user_rank->getWithdrawalLimit() - $db_sum])];

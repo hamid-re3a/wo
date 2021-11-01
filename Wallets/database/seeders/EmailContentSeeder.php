@@ -32,7 +32,7 @@ class EmailContentSeeder extends Seeder
                     'updated_at' => $now
                 ];
             }
-            EmailContent::query()->insert($emails);
+            EmailContent::query()->upsert($emails,['key']);
             cache(['wallet_email_contents' => $emails]);
         }
     }

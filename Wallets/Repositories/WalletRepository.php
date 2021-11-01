@@ -15,44 +15,35 @@ class WalletRepository
 {
     /**@var $transaction_repository TransactionRepository */
     private $transaction_repository;
-    private $bank_service;
 
     public function __construct()
     {
-        if(auth()->check()) {
-            /***@var $user User */
-            $user = auth()->user();
-            $this->transaction_repository = new TransactionRepository();
-            $this->bank_service = new BankService($user);
-        }
+        $this->transaction_repository = new TransactionRepository();
     }
 
-    public function getOverAllSum(Wallet $wallet = null)
+    public function getOverAllSum(int $wallet_id = null): array
     {
         $sum_query = User::query();
 
-        if ($wallet)
-            $sum_query->where('id', $wallet->holder_id);
-
-        return $sum_query->withSumQuery([
-            'transactions.amount AS total_received' => function (Builder $query) use ($wallet) {
-                if ($wallet)
-                    $query->where('wallet_id', '=', $wallet->id);
+        $sum_query = $sum_query->withSumQuery([
+            'transactions.amount AS total_received' => function (Builder $query) use ($wallet_id) {
+                if ($wallet_id)
+                    $query->where('wallet_id', '=', $wallet_id);
                 $query->where('type', '=', 'deposit');
             }
         ])
             ->withSumQuery([
-                'transactions.amount AS total_spent' => function (Builder $query) use ($wallet) {
-                    if ($wallet)
-                        $query->where('wallet_id', '=', $wallet->id);
+                'transactions.amount AS total_spent' => function (Builder $query) use ($wallet_id) {
+                    if ($wallet_id)
+                        $query->where('wallet_id', '=', $wallet_id);
                     $query->where('type', 'withdraw');
 
                 }
             ])
             ->withSumQuery([
-                'transactions.amount AS total_transfer' => function (Builder $query) use ($wallet) {
-                    if ($wallet)
-                        $query->where('wallet_id', '=', $wallet->id);
+                'transactions.amount AS total_transfer' => function (Builder $query) use ($wallet_id) {
+                    if ($wallet_id)
+                        $query->where('wallet_id', '=', $wallet_id);
                     $query->where('type', 'withdraw');
                     $query->whereHas('metaData', function (Builder $subQuery) {
                         $subQuery->where('name', '=', 'Funds transferred');
@@ -60,28 +51,11 @@ class WalletRepository
                 }
             ])
             ->first();
-    }
-
-    public function getTransactionsSumByTypes(int $user_id = null, array $types = null)
-    {
-        $results = [];
-
-        foreach ($types AS $type) {
-            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
-            $sum_query = null;
-            $sum_query = Transaction::query();
-
-            if (!empty($user_id))
-                $sum_query->where('payable_id', '=', $user_id);
-
-            $results[$key] =
-                (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
-                    $subQuery->where('wallet_transaction_types.name', '=', $type);
-                })->sum('amount') / 100;
-
-        }
-
-        return $results;
+        return [
+            $sum_query->total_received > 0 ? $sum_query->total_received / 100 : 0.00,
+            $sum_query->total_spent > 0 ? $sum_query->total_spent / 100 : 0.00,
+            $sum_query->total_transfer > 0 ? $sum_query->total_transfer / 100 : 0.00,
+        ];
     }
 
     public function getWalletOverallBalanceChart($type, int $wallet_id = null,$wallet_name = null)
@@ -156,7 +130,10 @@ class WalletRepository
 
     public function transferFunds(Wallet $from_wallet,Wallet $to_wallet,$amount, $description = null) : Transfer
     {
-        return $this->bank_service->transfer(
+        /**@var $user User*/
+        $user = $from_wallet->holder;
+        $bank_service = new BankService($user);
+        return $bank_service->transfer(
             $from_wallet,
             $to_wallet,
             $amount,

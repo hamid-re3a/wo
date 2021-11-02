@@ -64,6 +64,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
                 'amount' => $req['crypto_amount']
             ];
         }
+        Log::info('Payments\Jobs\ProcessBTCPayServerPayoutsJob $destinations => ' . serialize($destinations));
         $response =  Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->post(
                 config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
@@ -80,7 +81,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
         } else {
             Log::info($response->status());
             Log::info(serialize($response->json()));
-            throw new \Exception('Payout BPS payout failed');
+            throw new \Exception('Payout BPS failed');
             //TODO notify admin
         }
     }

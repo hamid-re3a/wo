@@ -45,7 +45,7 @@ class UserTest extends \Tests\TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $hash = Hash::make(serialize($user->getUserService()));
+        $hash = Hash::make(serialize($user->getGrpcMessage()));
         return [
             'X-user-id' => '1',
             'X-user-hash' => $hash,

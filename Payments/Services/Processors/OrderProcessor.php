@@ -53,7 +53,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'partial_paid');
 
         // send email notification for due amount
-        EmailJob::dispatch(new EmailInvoicePaidPartial($this->user->getUserService(), $this->invoice_db, $this->order_service), $this->user->email);
+        EmailJob::dispatch(new EmailInvoicePaidPartial($this->user->getGrpcMessage(), $this->invoice_db, $this->order_service), $this->user->email);
 
 
     }
@@ -65,7 +65,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
 
 
-        EmailJob::dispatch(new EmailInvoicePaid($this->user->getUserService(), $this->invoice_db), $this->user->email);
+        EmailJob::dispatch(new EmailInvoicePaid($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
 
     }
 
@@ -98,7 +98,7 @@ class OrderProcessor extends ProcessorAbstract
             $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
 
             // send thank you email notification
-            EmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getUserService(), $this->invoice_db), $this->user->email);
+            EmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
         }
 
     }
@@ -110,7 +110,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'expired');
 
         // send email to user to regenerate new invoice for due amount
-        EmailJob::dispatch(new EmailInvoiceExpired($this->user->getUserService(), $this->invoice_db), $this->user->email);
+        EmailJob::dispatch(new EmailInvoiceExpired($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
 
     }
 

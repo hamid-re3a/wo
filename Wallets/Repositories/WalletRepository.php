@@ -4,11 +4,8 @@ namespace Wallets\Repositories;
 
 use Bavix\Wallet\Models\Transfer;
 use Bavix\Wallet\Models\Wallet;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use User\Models\User;
-use Wallets\Models\Transaction;
 use Wallets\Services\BankService;
 
 class WalletRepository
@@ -21,40 +18,15 @@ class WalletRepository
         $this->transaction_repository = new TransactionRepository();
     }
 
-    public function getOverAllSum(int $wallet_id = null): array
+    public function getOverAllSum(int $wallet_id = null, int $user_id = null): array
     {
-        $sum_query = User::query();
+        $main_types_sum = $this->transaction_repository->getTransactionsSumByMainTypes($user_id,$wallet_id,['deposit','withdraw']);
+        $pivot_types_sum = $this->transaction_repository->getTransactionsSumByPivotTypes($user_id,$wallet_id,['Funds transferred']);
 
-        $sum_query = $sum_query->withSumQuery([
-            'transactions.amount AS total_received' => function (Builder $query) use ($wallet_id) {
-                if ($wallet_id)
-                    $query->where('wallet_id', '=', $wallet_id);
-                $query->where('type', '=', 'deposit');
-            }
-        ])
-            ->withSumQuery([
-                'transactions.amount AS total_spent' => function (Builder $query) use ($wallet_id) {
-                    if ($wallet_id)
-                        $query->where('wallet_id', '=', $wallet_id);
-                    $query->where('type', 'withdraw');
-
-                }
-            ])
-            ->withSumQuery([
-                'transactions.amount AS total_transfer' => function (Builder $query) use ($wallet_id) {
-                    if ($wallet_id)
-                        $query->where('wallet_id', '=', $wallet_id);
-                    $query->where('type', 'withdraw');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Funds transferred');
-                    });
-                }
-            ])
-            ->first();
         return [
-            $sum_query->total_received > 0 ? $sum_query->total_received / 100 : 0.00,
-            $sum_query->total_spent > 0 ? $sum_query->total_spent / 100 : 0.00,
-            $sum_query->total_transfer > 0 ? $sum_query->total_transfer / 100 : 0.00,
+            (double) $main_types_sum['deposit_sum'],
+            (double) $main_types_sum['withdraw_sum'],
+            (double) $pivot_types_sum['funds_transferred_sum']
         ];
     }
 

@@ -14,7 +14,7 @@ use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
 use Wallets\Http\Resources\DepositWalletResource;
 use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
-use Wallets\Http\Requests\Front\TransferFundFromDepositWallet;
+use Wallets\Http\Requests\Front\TransferFundFromDepositWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Mail\DepositWallet\ReceiverFundEmail;
@@ -115,17 +115,17 @@ class DepositWalletController extends Controller
     /**
      * Transfer funds preview
      * @group Public User > Deposit Wallet
-     * @param TransferFundFromDepositWallet $request
+     * @param TransferFundFromDepositWalletRequest $request
      * @return JsonResponse
      * @throws \Throwable
      */
-    public function transferPreview(TransferFundFromDepositWallet $request)
+    public function transferPreview(TransferFundFromDepositWalletRequest $request)
     {
         $this->prepareDepositWallet();
         try {
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->walletName);
-            list($total, $fee) = calculateTransferAmount($request->get('amount'));
+            list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -136,10 +136,10 @@ class DepositWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
-                'received_amount' => $request->get('amount'),
-                'transfer_fee' => $fee,
-                'current_balance' => $balance,
-                'balance_after_transfer' => $remain_balance
+                'received_amount' => (double) $request->get('amount_new'),
+                'transfer_fee' => (double) $fee,
+                'current_balance' => (double) $balance,
+                'balance_after_transfer' => (double) $remain_balance
             ]);
 
         } catch (\Throwable $exception) {
@@ -152,11 +152,11 @@ class DepositWalletController extends Controller
     /**
      * Transfer Funds
      * @group Public User > Deposit Wallet
-     * @param TransferFundFromDepositWallet $request
+     * @param TransferFundFromDepositWalletRequest $request
      * @return JsonResponse
      * @throws \Throwable
      */
-    public function transferFunds(TransferFundFromDepositWallet $request)
+    public function transferFunds(TransferFundFromDepositWalletRequest $request)
     {
         $this->prepareDepositWallet();
         try {
@@ -170,11 +170,11 @@ class DepositWalletController extends Controller
             $from_wallet = $this->bankService->getWallet($this->walletName);
             $description = [
                 'member_id' => $request->get('member_id'),
-                'fee' => $fee,
+                'fee' => (double) $fee,
                 'type' => 'Funds transferred'
             ];
 
-            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double) $request->get('amount_new') - $fee,$description);
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double) $request->get('amount_new'),$description);
             $transfer_resolver = new TransferFundResolver($transfer);
 
             list($flag,$response) = $transfer_resolver->resolve();
@@ -182,7 +182,7 @@ class DepositWalletController extends Controller
                 throw new \Exception($response);
 
             //Charger user wallet for transfer fee
-            $this->bankService->withdraw($this->walletName, $fee, [
+            $this->bankService->withdraw($this->walletName, (double)$fee, [
                 'transfer_id' => $transfer->id
             ], 'Transfer fee');
 

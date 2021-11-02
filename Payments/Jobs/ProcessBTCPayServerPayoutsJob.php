@@ -47,7 +47,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
                 config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
 
         $wallet_balance = $wallet_response->json()['confirmedBalance'];
-        $total_needed_balance = $this->payout_requests->sum('crypto_amount') + 0.001;
+        $total_needed_balance = $this->payout_requests->sum('crypto_amount') + 0.001; // Add 0.001 for checking BTCPayServer balance for fee and other stuff
 
         if($total_needed_balance > $wallet_balance) {
             Log::error('Automatic payouts failed-insufficient wallet balance');
@@ -64,6 +64,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
                 'amount' => $req['crypto_amount']
             ];
         }
+        Log::info('Payments\Jobs\ProcessBTCPayServerPayoutsJob $destinations => ' . serialize($destinations));
         $response =  Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
             ->post(
                 config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
@@ -80,7 +81,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
         } else {
             Log::info($response->status());
             Log::info(serialize($response->json()));
-            throw new \Exception('Payout BPS payout failed');
+            throw new \Exception('Payout BPS failed');
             //TODO notify admin
         }
     }

@@ -269,7 +269,7 @@ class WithdrawRepository
         try {
             $withdraw_profit_requests = $this->model->query();
             if($status)
-                $withdraw_profit_requests->where('status','=',WITHDRAW_COMMAND_UNDER_REVIEW);
+                $withdraw_profit_requests->where('status','=',$status);
 
             if($user_id)
                 $withdraw_profit_requests->where('user_id',$user_id);

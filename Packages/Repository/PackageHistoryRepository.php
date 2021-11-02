@@ -3,16 +3,14 @@
 
 namespace Packages\Repository;
 
-use Packages\Models\Package;
 use Packages\Models\PackageHistory;
-use Packages\Services\Grpc\Id;
-use Packages\Services\Grpc\Package as PackageData;
+use Packages\Services\Grpc\Package;
 
 class PackageHistoryRepository
 {
     protected $entity_name = PackageHistory::class;
 
-    public function create(PackageData $package)
+    public function create(Package $package) : PackageHistory
     {
         $package_history_entity = new $this->entity_name;
         $package_history_entity->legacy_id = $package->getId();

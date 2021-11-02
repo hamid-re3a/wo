@@ -17,7 +17,7 @@ class WithdrawResolver
         $this->withdrawRequest = $withdrawRequest;
         /**@var $user_db User */
         $user_db = $this->withdrawRequest->user()->first();
-        $this->user_service = $user_db->getUserService();
+        $this->user_service = $user_db->getGrpcMessage();
 
     }
 
@@ -72,7 +72,7 @@ class WithdrawResolver
 
         //Get user rank from MLM service
         $user_rank = MlmClientFacade::getUserRank($this->user_service);
-        Log::info('getUserService() called for => ' . $this->user_service->getId());
+        Log::info('getGrpcMessage() called for => ' . $this->user_service->getId());
         Log::info('MlmClientFacade::getUserRank() => ' . $user_rank->getRankName());
         Log::info('Withdrawal rank check => ' . $db_sum . ' - ' . $this->withdrawRequest->pf_amount . ' - ' . $user_rank->getWithdrawalLimit());
         if (( $db_sum + $this->withdrawRequest->pf_amount ) > $user_rank->getWithdrawalLimit())

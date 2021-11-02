@@ -98,25 +98,11 @@ class GiftcodeController extends Controller
     }
 
     /**
-     * Get giftcode detail
-     * @group Public User > Giftcode
-     */
-    public function show()
-    {
-        $giftcode = $this->giftcode_repository->getByUuid(request()->route()->parameters['uuid']);
-
-        if (!$giftcode OR $giftcode->user_id != request()->header('X-user-id'))
-            return api()->error(null, null, 404);
-
-        return api()->success(null, GiftcodeResource::make($giftcode));
-
-    }
-
-    /**
      * Cancel Giftcode
      * @group Public User > Giftcode
      * @param CancelGiftcodeRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function cancel(CancelGiftcodeRequest $request)
     {

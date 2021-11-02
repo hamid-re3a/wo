@@ -69,6 +69,7 @@ class Giftcode extends Model
     ];
 
     protected $with = [
+        'creator',
         'user',
         'package',
         'redeemer'
@@ -160,7 +161,7 @@ class Giftcode extends Model
     }
 
 
-    public function getGiftcodeService()
+    public function getGrpcMessage()
     {
         $giftcode_service = new \Giftcode\Services\Grpc\Giftcode();
         $giftcode_service->setId((int)$this->attributes['id']);

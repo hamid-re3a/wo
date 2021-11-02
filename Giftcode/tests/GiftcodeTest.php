@@ -53,7 +53,7 @@ class GiftcodeTest extends TestCase
     {
 
         $user = User::query()->first();
-        $hash = md5(serialize($user->getUserService()));
+        $hash = md5(serialize($user->getGrpcMessage()));
         return [
             'X-user-id' => '1',
             'X-user-hash' => $hash,

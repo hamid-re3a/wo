@@ -58,7 +58,7 @@ class OrderGrpcService implements OrdersServiceInterface
                 throw new \Exception('Creating Order faced a problem', 406);
             $order_db->refreshOrder();
             Log::info('Front/OrderService@newOrder First MLM request');
-            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getOrderService())->wait();
+            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getGrpcMessage())->wait();
             if ($flag->code != 0)
                 throw new \Exception('Order not see mlm', 406);
 
@@ -72,10 +72,10 @@ class OrderGrpcService implements OrdersServiceInterface
             $invoice_request->setPayableType('Order');
             $invoice_request->setPfAmount((double)$order_db->total_cost_in_pf);
             $invoice_request->setPaymentType($order_db->payment_type);
-            $invoice_request->setUser($user_who_pays_for_package->getUserService());
+            $invoice_request->setUser($user_who_pays_for_package->getGrpcMessage());
             $invoice_request->setUserId((int)$user_who_pays_for_package->id);
 
-            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getOrderService());
+            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getGrpcMessage());
 
 
             if (!$payment_flag)
@@ -84,7 +84,7 @@ class OrderGrpcService implements OrdersServiceInterface
 
             $now = date('Y-m-d H:i:s');
 
-            $order_service = $order_db->fresh()->getOrderService();
+            $order_service = $order_db->fresh()->getGrpcMessage();
             $order_service->setIsPaidAt($now);
             $order_service->setIsResolvedAt($now);
 

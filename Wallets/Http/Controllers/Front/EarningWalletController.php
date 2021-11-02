@@ -183,7 +183,7 @@ class EarningWalletController extends Controller
                 ];
             }
 
-            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double)$request->get('amount_new') - $fee,$description);
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double)$request->get('amount_new'),$description);
             $transfer_resolver = new TransferFundResolver($transfer);
 
             list($flag,$response) = $transfer_resolver->resolve();

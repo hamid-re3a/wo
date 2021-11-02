@@ -37,7 +37,7 @@ class GiftcodeService
         return new Giftcode();
     }
 
-    public function redeemGiftcode(Giftcode $giftcode,User $user)
+    public function redeemGiftcode(Giftcode $giftcode,User $user) : Giftcode
     {
         try {
             $giftcode_model = $this->giftcode_repository->getById($giftcode->getId());
@@ -49,7 +49,7 @@ class GiftcodeService
                     'user' => \User\Models\User::query()->find($user->getId()),
                     'order_id' => $giftcode->getOrderId()
                 ]);
-                $this->giftcode_repository->redeem($request);
+                $this->giftcode_repository->redeem($giftcode_model,$user->getId(),$giftcode->getOrderId());
             return $this->giftcode_repository->getGiftcodeServiceByUuid($giftcode->getUuid());
 
         } catch (\Throwable $exception) {

@@ -38,7 +38,6 @@ Route::name('giftcodes.')->middleware('auth')->group(function () {
         Route::post('create', [GiftcodeController::class, 'store'])->name('create');
         Route::get('show/{uuid}', [GiftcodeController::class, 'show'])->name('show');
         Route::post('cancel', [GiftcodeController::class, 'cancel'])->name('cancel');
-        Route::post('redeem', [GiftcodeController::class, 'redeem'])->name('redeem');
         Route::prefix('charts')->name('charts')->group(function(){
             Route::post('giftcodes-vs-time',[UserDashboardController::class,'giftcodesVsTimeChart'])->name('giftcode-vs-time');
             Route::post('package-vs-time',[UserDashboardController::class,'packageVsTimeChart'])->name('package-vs-time');

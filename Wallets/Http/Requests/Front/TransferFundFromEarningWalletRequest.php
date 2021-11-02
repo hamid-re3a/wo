@@ -47,7 +47,7 @@ class TransferFundFromEarningWalletRequest extends FormRequest
                         return $fail('This field must be true if you may not send funds to another member deposit wallet');
                 }
             ],
-            'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance
+            'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance
         ];
 
     }

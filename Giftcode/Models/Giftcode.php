@@ -69,6 +69,7 @@ class Giftcode extends Model
     ];
 
     protected $with = [
+        'creator',
         'user',
         'package',
         'redeemer'

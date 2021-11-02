@@ -42,7 +42,7 @@ class RedeemedGiftcodeRedeemerEmail extends Mailable implements SettingableMail
 
         $setting['body'] = str_replace('{{full_name}}',(is_null($this->user->full_name) || empty($this->user->full_name)) ? 'Unknown': $this->user->full_name,$setting['body']);
         $setting['body'] = str_replace('{{code}}',(is_null($this->giftcode->code) ) ? 'Unknown': $this->giftcode->code,$setting['body']);
-        $setting['body'] = str_replace('{{creator_full_name}}',(is_null($this->giftcode->user_id)) ? 'Unknown': $this->giftcode->creator_full_name,$setting['body']);
+        $setting['body'] = str_replace('{{creator_full_name}}',(is_null($this->giftcode->user_id)) ? 'Unknown': $this->giftcode->creator->full_name,$setting['body']);
         $setting['body'] = str_replace('{{package_name}}',(is_null($this->giftcode->package_name)) ? 'Unknown': $this->giftcode->package_name,$setting['body']);
         $setting['body'] = str_replace('{{redeem_date}}',(is_null($this->giftcode->redeem_date)) ? 'Unknown': $this->giftcode->redeem_date,$setting['body']);
 

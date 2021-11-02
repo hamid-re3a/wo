@@ -65,13 +65,16 @@ class OrderController extends Controller
             $user = auth()->user();
 
             DB::beginTransaction();
+            $now = now()->toDateTimeString();
             $order_db = Order::query()->create([
                 "from_user_id" => $user->id,
                 "user_id" => $request->get('user_id'),
                 "payment_type" => 'admin',
                 "package_id" => $request->get('package_id'),
                 'validity_in_days' => $package->getValidityInDays(),
-                'plan' => $request->get('plan')
+                'is_paid_at' => $now,
+                'is_resolved_at' => $now,
+                'plan' => $request->get('plan'),
             ]);
             $order_db->refreshOrder();
 
@@ -81,16 +84,12 @@ class OrderController extends Controller
                 throw new \Exception($response->getMessage(), 406);
             }
 
-            $now = now()->toDateTimeString();
-
             $order_service = $order_db->fresh()->getGrpcMessage();
             $order_service->setIsPaidAt($now);
             $order_service->setIsResolvedAt($now);
 
             $submit_response = MlmClientFacade::submitOrder($order_db->getGrpcMessage());
             $order_db->update([
-                'is_paid_at' => $now,
-                'is_resolved_at' => $now,
                 'is_commission_resolved_at' => $submit_response->getCreatedAt()
             ]);
 

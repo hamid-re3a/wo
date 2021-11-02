@@ -9,6 +9,8 @@ use Giftcode\Jobs\UrgentEmailJob;
 use Giftcode\Mail\User\GiftcodeCanceledEmail;
 use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Mail\User\GiftcodeExpiredEmail;
+use Giftcode\Mail\User\RedeemedGiftcodeCreatorEmail;
+use Giftcode\Mail\User\RedeemedGiftcodeRedeemerEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -169,6 +171,7 @@ class GiftcodeRepository
     {
         try {
             DB::beginTransaction();
+            /**@var $giftcode Giftcode*/
             $giftcode = $this->getByUuid($request->get('id'));
 
             if($giftcode->is_canceled === true)
@@ -187,6 +190,9 @@ class GiftcodeRepository
                 'redeem_date' => now()->toDateTimeString(),
                 'order_id' => $request->get('order_id')
             ]);
+            UrgentEmailJob::dispatch(new RedeemedGiftcodeCreatorEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
+            if($giftcode->user_id != $giftcode->redeem_user_id)
+                UrgentEmailJob::dispatch(new RedeemedGiftcodeRedeemerEmail($giftcode->redeemer,$giftcode),$giftcode->redeemer->email);
             DB::commit();
             return $giftcode->fresh();
         } catch (\Throwable $exception) {

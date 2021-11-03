@@ -9,7 +9,7 @@ return [
             'expired' => 'Gift code is expired.',
             'used' => 'Gift code is already used.',
             'wrong-package' => 'Gift code is created for another package.',
-            'canceled' => 'Gift code is canceled .',
+            'canceled' => 'Gift code is canceled.',
             'giftcode-not-included-registration-fee' => 'Gift code doesn\'t include registration fee .',
             'done' => 'Done .',
         ],

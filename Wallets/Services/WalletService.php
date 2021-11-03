@@ -174,7 +174,7 @@ class WalletService implements WalletServiceInterface
         $invoice_request->setPaymentType('purchase');
         $invoice_request->setPaymentCurrency('BTC');
         $invoice_request->setPayableType('DepositWallet');
-        $invoice_request->setUser($user->getUserService());
+        $invoice_request->setUser($user->getGrpcMessage());
 
         return PaymentFacade::pay($invoice_request);
     }

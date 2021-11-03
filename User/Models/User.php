@@ -10,6 +10,7 @@ use Giftcode\Models\Giftcode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Log;
 use Orders\Models\Order;
 use Payments\Models\Invoice;
 use Spatie\Permission\Traits\HasRoles;
@@ -137,7 +138,7 @@ class User extends Model implements WalletFloat
     /**
      * Methods
      */
-    public function getUserService()
+    public function getGrpcMessage()
     {
         $this->fresh();
         $user = new \User\Services\Grpc\User();

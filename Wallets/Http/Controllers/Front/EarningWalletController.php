@@ -14,6 +14,7 @@ use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
 use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Repositories\TransactionRepository;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
 use Wallets\Services\TransferFundResolver;
@@ -26,12 +27,12 @@ class EarningWalletController extends Controller
     /**@var $walletObject Wallet*/
     private $walletObject;
     private $wallet_repository;
+    private $transaction_repository;
 
-    public function __construct(WalletRepository $wallet_repository)
+    public function __construct(WalletRepository $wallet_repository,TransactionRepository $transaction_repository)
     {
-        if(auth()->check())
-            $this->prepareEarningWallet();
         $this->wallet_repository = $wallet_repository;
+        $this->transaction_repository = $transaction_repository;
     }
     private function prepareEarningWallet()
     {
@@ -50,6 +51,7 @@ class EarningWalletController extends Controller
      */
     public function earned_commissions()
     {
+        $this->prepareEarningWallet();
         $commissions = [
             'Binary',
             'Direct Sale',
@@ -59,7 +61,7 @@ class EarningWalletController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->wallet_repository->getTransactionsSumByTypes(auth()->user()->id,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes(auth()->user()->id,null,$commissions));
 
     }
 
@@ -69,7 +71,7 @@ class EarningWalletController extends Controller
      */
     public function index()
     {
-
+        $this->prepareEarningWallet();
         return api()->success(null, EarningWalletResource::make($this->walletObject));
 
     }
@@ -82,7 +84,7 @@ class EarningWalletController extends Controller
      */
     public function transactions(TransactionRequest $request)
     {
-
+        $this->prepareEarningWallet();
         $list = $this->bankService->getTransactions($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransactionResource::collection($list),
@@ -101,7 +103,7 @@ class EarningWalletController extends Controller
      */
     public function transfers()
     {
-
+        $this->prepareEarningWallet();
         $list = $this->bankService->getTransfers($this->walletName)->paginate();
         return api()->success(null, [
             'list' => TransferResource::collection($list),
@@ -122,26 +124,27 @@ class EarningWalletController extends Controller
      */
     public function transfer_to_deposit_wallet_preview(TransferFundFromEarningWalletRequest $request)
     {
-
+        $this->prepareEarningWallet();
         try {
             $to_user = null;
-            $amount = $request->get('amount');
+            $amount = $request->get('amount_new');
             $fee = 0;
 
             if ($request->has('member_id')) {
                 $to_user = User::query()->where('member_id', '=', $request->get('member_id'))->first();
-                list($amount, $fee) = calculateTransferAmount($request->get('amount'));
+                list($amount, $fee) = calculateTransferAmount($request->get('amount_new'));
             }
-            $balance = $this->bankService->getBalance($this->walletName);
-            $remain_balance = $balance - $amount;
+
+            $balance = (double)$this->bankService->getBalance($this->walletName);
+            $remain_balance = (double)$balance - (double)$amount;
 
             return api()->success(null, [
                 'receiver_member_id' => $to_user ? $to_user->member_id : null,
                 'receiver_full_name' => $to_user ? $to_user->full_name : null,
-                'received_amount' => $request->get('amount'),
-                'transfer_fee' => $fee,
-                'current_balance' => $balance,
-                'balance_after_transfer' => $remain_balance
+                'received_amount' => (double) $request->get('amount_new'),
+                'transfer_fee' => (double)$fee,
+                'current_balance' => (double)$balance,
+                'balance_after_transfer' => (double)$remain_balance
             ]);
 
         } catch (\Throwable $exception) {
@@ -159,7 +162,7 @@ class EarningWalletController extends Controller
      */
     public function transfer_to_deposit_wallet(TransferFundFromEarningWalletRequest $request)
     {
-
+        $this->prepareEarningWallet();
         try {
             DB::beginTransaction();
 
@@ -175,12 +178,12 @@ class EarningWalletController extends Controller
 
                 $description = [
                     'member_id' => $request->get('member_id'),
-                    'fee' => $fee,
+                    'fee' => (double) $fee,
                     'type' => 'Transfer'
                 ];
             }
 
-            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,$request->get('amount_new') - $fee,$description);
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double)$request->get('amount_new'),$description);
             $transfer_resolver = new TransferFundResolver($transfer);
 
             list($flag,$response) = $transfer_resolver->resolve();
@@ -188,7 +191,7 @@ class EarningWalletController extends Controller
                 throw new \Exception($response);
 
             if ($request->has('member_id') AND $fee > 0)
-                $this->bankService->withdraw($this->walletName, $fee, [
+                $this->bankService->withdraw($this->walletName, (double)$fee, [
                     'transfer_id' => $transfer->id
                 ], 'Transfer fee');
 
@@ -210,6 +213,7 @@ class EarningWalletController extends Controller
      */
     public function overallBalanceChart(ChartTypeRequest $request)
     {
+        $this->prepareEarningWallet();
         return api()->success(null, $this->wallet_repository->getWalletOverallBalanceChart($request->get('type'),$this->walletObject->id));
     }
 
@@ -221,6 +225,7 @@ class EarningWalletController extends Controller
      */
     public function commissionsChart(ChartTypeRequest $request)
     {
+        $this->prepareEarningWallet();
         $commissions = [
             'Binary',
             'Direct Sale',

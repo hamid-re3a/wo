@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use User\Models\User;
 use Wallets\Services\BankService;
 
-class TransferFundFromDepositWallet extends FormRequest
+class TransferFundFromDepositWalletRequest extends FormRequest
 {
     private $minimum_amount;
     private $maximum_amount;
@@ -40,7 +40,7 @@ class TransferFundFromDepositWallet extends FormRequest
 
         return [
             'member_id' => 'required|integer|exists:users,member_id|not_in:' . $this->member_id,
-            'amount' => "required|integer|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:{$this->wallet_balance}",
+            'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:{$this->wallet_balance}",
         ];
 
     }

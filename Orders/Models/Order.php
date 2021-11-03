@@ -169,7 +169,7 @@ class Order extends Model
     /*
      * Methods
      */
-    public function getOrderService()
+    public function getGrpcMessage()
     {
         $order_service = new \Orders\Services\Grpc\Order();
         $order_service->setId((int)$this->attributes['id']);

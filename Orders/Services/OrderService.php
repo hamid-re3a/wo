@@ -36,7 +36,7 @@ class OrderService implements OrdersServiceInterface
         $order = \Orders\Models\Order::query()->find($request->getId());
 
         if ($order)
-            return $order->getOrderService();
+            return $order->getGrpcMessage();
 
         return $response;
 
@@ -89,7 +89,7 @@ class OrderService implements OrdersServiceInterface
         return $this->order_repository->getExpiredOrders();
     }
 
-    public function packageOverviewCount($type)
+    public function packageOverviewCountChart($type)
     {
         $that = $this;
         $function_active_package = function ($from_day, $to_day) use ($that) {
@@ -138,7 +138,7 @@ class OrderService implements OrdersServiceInterface
         $final_result['all'] = chartMaker($type, $function_all_package, $sub_function);
         return $final_result;
     }
-    public function packageTypeCount($type)
+    public function packageTypeCountChart($type)
     {
         $that = $this;
         $function_active_package = function ($from_day, $to_day) use ($that) {
@@ -214,7 +214,7 @@ class OrderService implements OrdersServiceInterface
         return $final_result;
     }
 
-    public function packageTypePercentageCount($type)
+    public function packageTypePercentageCountChart($type)
     {
         $that = $this;
         $function_active_package = function ($from_day, $to_day) use ($that) {

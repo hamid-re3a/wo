@@ -68,7 +68,7 @@ class UserServiceProvider extends ServiceProvider
                     $user = User::query()->whereId($request->header('X-user-id'))->first();
                 }
 
-                $hash_user_service = md5(serialize($user->getUserService()));
+                $hash_user_service = md5(serialize($user->getGrpcMessage()));
                 /**
                  * if there is not update data user. get data user complete from api gateway
                  * error code 471 is for data user not update log for development

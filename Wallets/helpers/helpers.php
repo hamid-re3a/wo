@@ -36,10 +36,10 @@ if (!function_exists('getWalletEmailContent')) {
                 $email = $check;
 
 
-        if ($email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
+        if (empty($email) AND $email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
             $email = $email->toArray();
 
-        if (defined('WALLET_EMAIL_CONTENTS') AND
+        if (empty($email) AND defined('WALLET_EMAIL_CONTENTS') AND
             is_array(WALLET_EMAIL_CONTENTS) AND
             array_key_exists($key, WALLET_EMAIL_CONTENTS))
             $email = WALLET_EMAIL_CONTENTS[$key];
@@ -146,17 +146,17 @@ if (!function_exists('chartMaker')) {
 if(!function_exists('calculateTransferAmount')) {
     function calculateTransferAmount($amount)
     {
-        $transfer_fee = getWalletSetting('transfer_fee');
+        $transfer_fee = (double)getWalletSetting('transfer_fee');
         $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
 
         if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
-            $transfer_fee = $amount * $transfer_fee / 100;
+            $transfer_fee = (double)$amount * (double)($transfer_fee / 100);
 
         if (empty($transfer_fee) OR $transfer_fee <= 0)
-            $transfer_fee = 10;
+            $transfer_fee = (double)10;
 
-        $total = $amount + $transfer_fee;
-        return [$total, $transfer_fee];
+        $total = (double)$amount + (double)$transfer_fee;
+        return [(double)$total, (double)$transfer_fee];
     }
 }
 

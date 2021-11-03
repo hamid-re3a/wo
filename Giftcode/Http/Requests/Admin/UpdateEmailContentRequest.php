@@ -1,6 +1,6 @@
 <?php
 
-namespace Wallets\Http\Requests\Admin;
+namespace Giftcode\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,10 +25,10 @@ class UpdateEmailContentRequest extends FormRequest
     public function rules()
     {
         return [
-            'key' => 'required|string|exists:wallet_email_contents,key',
+            'key' => 'required|string|exists:giftcode_email_contents,key',
             'is_active' => 'required|boolean',
             'subject' => 'required|string',
-//            'from' => 'required|email',C
+//            'from' => 'required|email',
 //            'from_name' => 'required|string',
             'body' => 'required|string',
 //            'variables' => 'required|string',

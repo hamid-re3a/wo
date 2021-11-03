@@ -98,7 +98,7 @@ class BankService
         $depositMeta = [
             'wallet_before_balance' => $to_wallet->balanceFloat,
             'wallet_after_balance' => $to_wallet->balanceFloat + $amount,
-            'type' => 'Funds transferred'
+            'type' => 'Funds received'
         ];
 
         $transfer = $from_wallet->transferFloat($to_wallet, $amount, $this->createMeta($description));
@@ -111,7 +111,7 @@ class BankService
     {
         $wallet = $this->getWallet($wallet_name);
         $wallet->refreshBalance();
-        return $wallet->balanceFloat;
+        return (double)$wallet->balanceFloat;
     }
 
     public function getTransaction($uuid)

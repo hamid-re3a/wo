@@ -4,84 +4,30 @@ namespace Wallets\Repositories;
 
 use Bavix\Wallet\Models\Transfer;
 use Bavix\Wallet\Models\Wallet;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use User\Models\User;
-use Wallets\Models\Transaction;
 use Wallets\Services\BankService;
 
 class WalletRepository
 {
     /**@var $transaction_repository TransactionRepository */
     private $transaction_repository;
-    private $bank_service;
 
     public function __construct()
     {
-        if(auth()->check()) {
-            /***@var $user User */
-            $user = auth()->user();
-            $this->transaction_repository = new TransactionRepository();
-            $this->bank_service = new BankService($user);
-        }
+        $this->transaction_repository = new TransactionRepository();
     }
 
-    public function getOverAllSum(Wallet $wallet = null)
+    public function getOverAllSum(int $wallet_id = null, int $user_id = null): array
     {
-        $sum_query = User::query();
+        $main_types_sum = $this->transaction_repository->getTransactionsSumByMainTypes($user_id,$wallet_id,['deposit','withdraw']);
+        $pivot_types_sum = $this->transaction_repository->getTransactionsSumByPivotTypes($user_id,$wallet_id,['Funds transferred']);
 
-        if ($wallet)
-            $sum_query->where('id', $wallet->holder_id);
-
-        return $sum_query->withSumQuery([
-            'transactions.amount AS total_received' => function (Builder $query) use ($wallet) {
-                if ($wallet)
-                    $query->where('wallet_id', '=', $wallet->id);
-                $query->where('type', '=', 'deposit');
-            }
-        ])
-            ->withSumQuery([
-                'transactions.amount AS total_spent' => function (Builder $query) use ($wallet) {
-                    if ($wallet)
-                        $query->where('wallet_id', '=', $wallet->id);
-                    $query->where('type', 'withdraw');
-
-                }
-            ])
-            ->withSumQuery([
-                'transactions.amount AS total_transfer' => function (Builder $query) use ($wallet) {
-                    if ($wallet)
-                        $query->where('wallet_id', '=', $wallet->id);
-                    $query->where('type', 'withdraw');
-                    $query->whereHas('metaData', function (Builder $subQuery) {
-                        $subQuery->where('name', '=', 'Funds transferred');
-                    });
-                }
-            ])
-            ->first();
-    }
-
-    public function getTransactionsSumByTypes(int $user_id = null, array $types = null)
-    {
-        $results = [];
-
-        foreach ($types AS $type) {
-            $key = Str::replace(' ', '_', Str::lower($type)) . '_sum';
-            $sum_query = null;
-            $sum_query = Transaction::query();
-
-            if (!empty($user_id))
-                $sum_query->where('payable_id', '=', $user_id);
-
-            $results[$key] =
-                (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
-                    $subQuery->where('wallet_transaction_types.name', '=', $type);
-                })->sum('amount') / 100;
-
-        }
-
-        return $results;
+        return [
+            (double) $main_types_sum['deposit_sum'],
+            (double) $main_types_sum['withdraw_sum'],
+            (double) $pivot_types_sum['funds_transferred_sum']
+        ];
     }
 
     public function getWalletOverallBalanceChart($type, int $wallet_id = null,$wallet_name = null)
@@ -156,7 +102,10 @@ class WalletRepository
 
     public function transferFunds(Wallet $from_wallet,Wallet $to_wallet,$amount, $description = null) : Transfer
     {
-        return $this->bank_service->transfer(
+        /**@var $user User*/
+        $user = $from_wallet->holder;
+        $bank_service = new BankService($user);
+        return $bank_service->transfer(
             $from_wallet,
             $to_wallet,
             $amount,

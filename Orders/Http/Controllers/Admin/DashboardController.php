@@ -59,7 +59,7 @@ class DashboardController extends Controller
      */
     public function packageOverviewCount(OrderTypeFilterRequest $request)
     {
-        return api()->success(null, $this->order_service->packageOverviewCount($request->type));
+        return api()->success(null, $this->order_service->packageOverviewCountChart($request->type));
     }
 
     /**
@@ -71,7 +71,7 @@ class DashboardController extends Controller
      */
     public function packageTypeCount(OrderTypeFilterRequest $request)
     {
-        return api()->success(null, $this->order_service->packageTypeCount($request->type));
+        return api()->success(null, $this->order_service->packageTypeCountChart($request->type));
     }
 
     /**
@@ -83,7 +83,7 @@ class DashboardController extends Controller
      */
     public function packageTypePercentCount(OrderTypeFilterRequest $request)
     {
-        return api()->success(null, $this->order_service->packageTypePercentageCount($request->type));
+        return api()->success(null, $this->order_service->packageTypePercentageCountChart($request->type));
     }
 
 }

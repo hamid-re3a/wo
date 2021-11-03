@@ -21,7 +21,7 @@ class GiftcodeService
     public function getGiftcodeByCode(Giftcode $giftcode)
     {
         $giftcode_model = $this->giftcode_repository->getByCode($giftcode->getCode());
-        if($giftcode_model)
+        if($giftcode_model instanceof \Giftcode\Models\Giftcode)
             return $this->giftcode_repository->getGiftcodeService($giftcode_model);
 
         return new Giftcode();

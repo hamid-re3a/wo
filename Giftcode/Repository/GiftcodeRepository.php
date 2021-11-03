@@ -67,7 +67,7 @@ class GiftcodeRepository
         }
     }
 
-    public function getById($id) : Giftcode
+    public function getById($id) : ?Giftcode
     {
         /**@var $giftcode Giftcode*/
         $giftcode = $this->model->query()->find($id);
@@ -79,7 +79,7 @@ class GiftcodeRepository
         return $this->model->query()->where('uuid',$uuid)->first();
     }
 
-    public function getByCode($code) : Giftcode
+    public function getByCode($code) : ?Giftcode
     {
         /**@var $giftcode Giftcode*/
         $giftcode = $this->model->query()->where('code','=',$code)->first();
@@ -218,7 +218,7 @@ class GiftcodeRepository
         return null;
     }
 
-    public function getGiftcodeServiceByUuid($uuid) : \Giftcode\Services\Grpc\Giftcode
+    public function getGiftcodeServiceByUuid($uuid) : ?\Giftcode\Services\Grpc\Giftcode
     {
         $giftcode = $this->model->query()->where('uuid',$uuid)->first();
         if($giftcode)

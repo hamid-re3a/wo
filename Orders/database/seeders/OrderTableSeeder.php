@@ -58,9 +58,9 @@ class OrderTableSeeder extends Seeder
             }
             Order::query()->create([
                 'user_id' => $item['user_id'],
-                'total_cost_in_pf' => 120,
-                'packages_cost_in_pf' => 100,
-                'registration_fee_in_pf' => 20,
+                'total_cost_in_pf' => 118.99,
+                'packages_cost_in_pf' => 99,
+                'registration_fee_in_pf' => 19.99,
                 'is_paid_at' => now()->toDateString(),
                 'is_resolved_at' => now()->toDateString(),
                 'is_commission_resolved_at' => now()->toDateString(),

@@ -46,12 +46,15 @@ class OrderGrpcService implements OrdersServiceInterface
                 throw new \Exception('User not found', 406);
 
             DB::beginTransaction();
+            $now = now()->toDateTimeString();
             $order_db = OrderModel::query()->create([
                 "from_user_id" => $user_who_pays_for_package->id,
                 "user_id" => $user_who_is_package_for->id,
                 "payment_type" => 'deposit',
                 "package_id" => $order->getPackageId(),
                 'validity_in_days' => $package->getValidityInDays(),
+                "is_paid_at" => $now,
+                "is_resolved_at" => $now,
                 'plan' => $user_who_is_package_for->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             if(is_null($order_db) )
@@ -82,11 +85,7 @@ class OrderGrpcService implements OrdersServiceInterface
                 throw new \Exception($payment_response, 406);
 
 
-            $now = date('Y-m-d H:i:s');
-
             $order_service = $order_db->fresh()->getGrpcMessage();
-            $order_service->setIsPaidAt($now);
-            $order_service->setIsResolvedAt($now);
 
             Log::info('Front/OrderService@newOrder Second MLM request');
             Log::info($order_service->getPackageId());

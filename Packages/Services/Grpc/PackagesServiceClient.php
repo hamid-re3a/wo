@@ -30,4 +30,18 @@ class PackagesServiceClient extends \Grpc\BaseStub {
         $metadata, $options);
     }
 
+    /**
+     * @param \Packages\Services\Grpc\PackageCheck $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \Packages\Services\Grpc\Acknowledge
+     */
+    public function packageIsInBiggestPackageCategory(\Packages\Services\Grpc\PackageCheck $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/packages.services.grpc.PackagesService/packageIsInBiggestPackageCategory',
+        $argument,
+        ['\Packages\Services\Grpc\Acknowledge', 'decode'],
+        $metadata, $options);
+    }
+
 }

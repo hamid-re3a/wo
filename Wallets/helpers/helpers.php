@@ -143,8 +143,8 @@ if (!function_exists('chartMaker')) {
     }
 }
 
-if(!function_exists('calculateTransferAmount')) {
-    function calculateTransferAmount($amount)
+if(!function_exists('calculateTransferFee')) {
+    function calculateTransferFee($amount)
     {
         $transfer_fee = (double)getWalletSetting('transfer_fee');
         $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
@@ -157,6 +157,28 @@ if(!function_exists('calculateTransferAmount')) {
 
         $total = (double)$amount + (double)$transfer_fee;
         return [(double)$total, (double)$transfer_fee];
+    }
+}
+if(!function_exists('calculateWithdrawalFee')) {
+    function calculateWithdrawalFee($amount,$currency): array
+    {
+        switch ($currency) {
+            case 'BTC' :
+                $fix_or_percentage = getWalletSetting('payout_btc_fee_fixed_or_percentage');
+                $fee = getWalletSetting('payout_btc_fee');
+                break;
+            case 'Janex' :
+                $fix_or_percentage = getWalletSetting('payout_janex_fee_fixed_or_percentage');
+                $fee = getWalletSetting('payout_janex_fee');
+                break;
+            default:
+                $fix_or_percentage = 'fixed';
+                $fee = 0;
+                break;
+        }
+        $fee = $fix_or_percentage == 'fixed' ? (double)$fee : ((double)$amount * (double)$fee / 100);
+
+        return [(double)($fee+$amount),(double)$fee];
     }
 }
 

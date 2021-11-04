@@ -34,7 +34,7 @@ class TransferFundFromDepositWalletRequest extends FormRequest
         $this->prepare();
         $this->minimum_amount = getWalletSetting('minimum_transfer_fund_amount');
         $this->maximum_amount = getWalletSetting('maximum_transfer_fund_amount');
-        list($total, $fee) = $this->request->has('amount') ? calculateTransferAmount($this->request->get('amount')) : [0,0];
+        list($total, $fee) = $this->request->has('amount') ? calculateTransferFee($this->request->get('amount')) : [0,0];
         $this->request->set('amount_new', (double) $this->request->get('amount'));
         $this->request->set('amount', (double) $this->request->get('amount') + $fee);
 

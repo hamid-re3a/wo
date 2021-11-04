@@ -100,6 +100,14 @@ class WithdrawProfit extends Model
         return $this->belongsTo(BPSNetworkTransactions::class,'network_transaction_id','id');
     }
 
+    /*
+     * Methods
+     */
+    public function getTotalAmount()
+    {
+        return (double)($this->attributes['pf_amount'] + $this->attributes['fee']);
+    }
+
 
     /*
      * Mutators

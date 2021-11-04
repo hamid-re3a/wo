@@ -16,7 +16,7 @@ class CreateWalletWithdrawProfitRequestsHistoryTable extends Migration
         Schema::create('wallet_withdraw_profit_requests_history', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('withdraw_profit_id');
-            $table->uuid('uuid')->unique();
+            $table->uuid('uuid');
             $table->mediumText('wallet_hash');
             $table->foreignId('user_id')->constrained('users');
             $table->unsignedBigInteger('withdraw_transaction_id');

@@ -132,7 +132,7 @@ class EarningWalletController extends Controller
 
             if ($request->has('member_id')) {
                 $to_user = User::query()->where('member_id', '=', $request->get('member_id'))->first();
-                list($amount, $fee) = calculateTransferAmount($request->get('amount_new'));
+                list($amount, $fee) = calculateTransferFee($request->get('amount_new'));
             }
 
             $balance = (double)$this->bankService->getBalance($this->walletName);
@@ -174,7 +174,7 @@ class EarningWalletController extends Controller
                 $other_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 $other_member_bank_service = new BankService($other_member);
                 $to_wallet = $other_member_bank_service->getWallet(WALLET_NAME_DEPOSIT_WALLET);
-                list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
+                list($total, $fee) = calculateTransferFee($request->get('amount_new'));
 
                 $description = [
                     'member_id' => $request->get('member_id'),

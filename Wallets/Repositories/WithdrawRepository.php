@@ -26,7 +26,7 @@ class WithdrawRepository
      */
     private $bankService;
     private $payout_processor;
-    private $wallet;
+    private $user_wallet;
     /**@var $withdraw_profits WithdrawProfit */
     private $model;
 
@@ -44,8 +44,8 @@ class WithdrawRepository
         /**@var $user User */
         $user = auth()->user();
         $this->bankService = new BankService($user);
-        $this->wallet = WALLET_NAME_EARNING_WALLET;
-        $this->bankService->getWallet($this->wallet);
+        $this->user_wallet = WALLET_NAME_EARNING_WALLET;
+        $this->bankService->getWallet($this->user_wallet);
 
         try {
             switch ($request->get('currency')) {
@@ -68,15 +68,19 @@ class WithdrawRepository
 
             if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
 
-                $withdraw_transaction = $this->bankService->withdraw($this->wallet, $request->get('amount'), null, 'Withdrawal request', null);
+                list($total,$fee) = calculateWithdrawalFee($request->get('amount_original'),$request->get('currency'));
+                $withdraw_transaction = $this->bankService->withdraw($this->user_wallet, $request->get('amount_original'), null, 'Withdrawal request', null,true,false);
+                $withdraw_fee = $this->bankService->withdraw($this->user_wallet, $fee, null, 'Withdrawal request fee', null);
+
                 return WithdrawProfit::query()->create([
                     'user_id' => auth()->user()->id,
                     'withdraw_transaction_id' => $withdraw_transaction->id,
                     'wallet_hash' => $this->getUserBTCWalletHash(),
                     'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
                     'currency' => $request->get('currency'),
-                    'pf_amount' => $request->get('amount'),
-                    'crypto_amount' => pfToUsd($request->get('amount')) / $btc_price->json()['USD']['15m'],
+                    'pf_amount' => $request->get('amount_original'),
+                    'fee' => (double)$fee,
+                    'crypto_amount' => pfToUsd((double)$request->get('amount_original')) / $btc_price->json()['USD']['15m'],
                     'crypto_rate' => $btc_price->json()['USD']['15m']
                 ]);
             } else {
@@ -121,8 +125,8 @@ class WithdrawRepository
         try {
             //Withdraw Admin deposit wallet
             $bank_service = new BankService(User::query()->first());
-            $bank_service->withdraw(WALLET_NAME_DEPOSIT_WALLET, $withdraw_request->pf_amount, [
-                'description' => 'Refund withdrawal request',
+            $bank_service->withdraw(WALLET_NAME_DEPOSIT_WALLET, $withdraw_request->fee , [
+                'description' => 'Refund withdrawal request fee',
                 'withdrawal_request_id' => $withdraw_request->id
             ], 'Withdrawal refund');
 
@@ -130,10 +134,19 @@ class WithdrawRepository
             /**@var $user User*/
             $user = $withdraw_request->user()->first();
             $bank_service = new BankService($user);
-            $refund_transaction = $bank_service->deposit(WALLET_NAME_EARNING_WALLET, $withdraw_request->pf_amount, [
+
+            //Refund Withdrawal amount
+            $refund_transaction = $bank_service->deposit($this->user_wallet, $withdraw_request->pf_amount, [
                 'description' => 'Withdrawal request rejected',
                 'withdrawal_request_id' => $withdraw_request->id,
             ], true, 'Withdrawal refund');
+
+
+            //Refund Withdrawal FEE amount
+            $refund_fee_transaction = $bank_service->deposit($this->user_wallet, $withdraw_request->fee, [
+                'description' => 'Withdrawal request rejected',
+                'withdrawal_request_id' => $withdraw_request->id,
+            ], true, 'Withdrawal fee refund');
 
 
             $this->update([

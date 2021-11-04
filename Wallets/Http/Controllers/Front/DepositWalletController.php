@@ -125,7 +125,7 @@ class DepositWalletController extends Controller
         try {
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->walletName);
-            list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
+            list($total, $fee) = calculateTransferFee($request->get('amount_new'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -162,7 +162,7 @@ class DepositWalletController extends Controller
         try {
             DB::beginTransaction();
 
-            list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
+            list($total, $fee) = calculateTransferFee($request->get('amount_new'));
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
             $receiver_bank_service = new BankService($to_user);

@@ -29,7 +29,7 @@ class SettingsSeeder extends Seeder
                     'created_at' => $now,
                     'updated_at' => $now
                 ];
-            Setting::query()->upsert($settings,['name']);
+            Setting::query()->upsert($settings,'name');
             cache(['wallet_settings' => $settings]);
         }
 

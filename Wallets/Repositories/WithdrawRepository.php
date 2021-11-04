@@ -33,6 +33,7 @@ class WithdrawRepository
     public function __construct(PayoutProcessor $payout_processor)
     {
         $this->payout_processor = $payout_processor;
+        $this->user_wallet = WALLET_NAME_EARNING_WALLET;
         $this->model = new WithdrawProfit();
     }
 
@@ -44,7 +45,6 @@ class WithdrawRepository
         /**@var $user User */
         $user = auth()->user();
         $this->bankService = new BankService($user);
-        $this->user_wallet = WALLET_NAME_EARNING_WALLET;
         $this->bankService->getWallet($this->user_wallet);
 
         try {

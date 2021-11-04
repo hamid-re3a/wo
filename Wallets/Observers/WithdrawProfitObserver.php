@@ -7,6 +7,7 @@ use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedUpdated;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedSubmitted;
 use Wallets\Models\WithdrawProfit;
+use Wallets\Models\WithdrawProfitHistory;
 
 class WithdrawProfitObserver
 {
@@ -30,6 +31,10 @@ class WithdrawProfitObserver
             $withdrawProfit->actor_id = auth()->user()->id;
             if(request()->has('act_reason'))
                 $withdrawProfit->act_reason = request()->get('act_reason');
+
+            WithdrawProfitHistory::query()->insert(array_merge($withdrawProfit->toArray(),[
+                'withdraw_profit_id' => $withdrawProfit->id
+            ]));
         }
     }
 

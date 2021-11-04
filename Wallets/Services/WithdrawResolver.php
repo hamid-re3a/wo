@@ -68,6 +68,7 @@ class WithdrawResolver
         $db_sum = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
                 ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
                 ->where('id','<>',$this->withdrawRequest->id)
+                ->whereIn('status',[1,3,4])
                 ->sum('pf_amount');
 
         //Get user rank from MLM service

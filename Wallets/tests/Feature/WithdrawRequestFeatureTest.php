@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Kyc\Services\Grpc\Acknowledge;
 use MLM\Services\Grpc\Rank;
 use User\Models\User;
+use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
 use Wallets\Services\KycClientFacade;
 use Wallets\Services\MlmClientFacade;
@@ -83,7 +84,6 @@ class WithdrawRequestFeatureTest extends WalletTest
             'amount' => 101,
             'currency' => $payment_currency->name,
         ]);
-        dd($response->json());
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'status',
@@ -159,6 +159,21 @@ class WithdrawRequestFeatureTest extends WalletTest
                 'created_at',
             ]
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function reject_withdraw_request()
+    {
+        $this->create_withdraw_request_sufficient_balance();
+        $withdraw_request = WithdrawProfit::query()->first();
+        $response = $this->patch(route('wallets.admin.withdraw-requests.update'),[
+            'id' => $withdraw_request->uuid,
+            'status' => WITHDRAW_COMMAND_REJECT,
+            'act_reason' => 'Nothing to say',
+        ]);
+        $response->assertStatus(200);
     }
 
     private function mockWithdrawServices(): void

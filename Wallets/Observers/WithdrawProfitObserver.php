@@ -31,10 +31,6 @@ class WithdrawProfitObserver
             $withdrawProfit->actor_id = auth()->user()->id;
             if(request()->has('act_reason'))
                 $withdrawProfit->act_reason = request()->get('act_reason');
-
-            WithdrawProfitHistory::query()->insert(array_merge($withdrawProfit->toArray(),[
-                'withdraw_profit_id' => $withdrawProfit->id
-            ]));
         }
     }
 
@@ -42,5 +38,32 @@ class WithdrawProfitObserver
     public function updated(WithdrawProfit $withdrawProfit)
     {
         UrgentEmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+        $this->createHistory($withdrawProfit);
+    }
+
+    /**
+     * @param WithdrawProfit $withdrawProfit
+     */
+    private function createHistory(WithdrawProfit $withdrawProfit): void
+    {
+        WithdrawProfitHistory::query()->insert([
+            'withdraw_profit_id' => $withdrawProfit->id,
+            'uuid' => $withdrawProfit->uuid,
+            'wallet_hash' => $withdrawProfit->wallet_hash,
+            'user_id' => $withdrawProfit->user_id,
+            'withdraw_transaction_id' => $withdrawProfit->withdraw_transaction_id,
+            'refund_transaction_id' => $withdrawProfit->refund_transaction_id,
+            'network_transaction_id' => $withdrawProfit->network_transaction_id,
+            'status' => $withdrawProfit->status,
+            'payout_service' => $withdrawProfit->payout_service,
+            'currency' => $withdrawProfit->currency,
+            'pf_amount' => $withdrawProfit->pf_amount,
+            'crypto_amount' => $withdrawProfit->crypto_amount,
+            'crypto_rate' => $withdrawProfit->crypto_rate,
+            'fee' => $withdrawProfit->fee,
+            'actor_id' => $withdrawProfit->actor_id,
+            'act_reason' => $withdrawProfit->act_reason,
+            'postponed_to' => $withdrawProfit->postponed_to,
+        ]);
     }
 }

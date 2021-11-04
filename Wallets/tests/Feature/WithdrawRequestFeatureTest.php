@@ -191,6 +191,7 @@ class WithdrawRequestFeatureTest extends WalletTest
             }
         };
         Http::shouldReceive('get')->andReturn($mock_response);
+
         $mock_rank = new Rank();
         $mock_rank->setWithdrawalLimit(35000);
         MlmClientFacade::shouldReceive('getUserRank')->andReturn($mock_rank);

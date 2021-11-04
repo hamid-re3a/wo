@@ -19,8 +19,8 @@ class CreateWalletWithdrawProfitRequestsHistoryTable extends Migration
             $table->uuid('uuid')->unique();
             $table->mediumText('wallet_hash');
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('withdraw_transaction_id')->constrained('transactions');
-            $table->foreignId('refund_transaction_id')->nullable()->constrained('transactions');
+            $table->unsignedBigInteger('withdraw_transaction_id');
+            $table->unsignedBigInteger('refund_transaction_id')->nullable();
             $table->unsignedBigInteger('network_transaction_id')->nullable();
             $table->tinyInteger('status')->default('1')->comment('Possible values(integer) : 1 = Under review, 2 = Rejected, 3 = Processed, 4 = Postponed');
             $table->boolean('is_update_email_sent')->default(false);

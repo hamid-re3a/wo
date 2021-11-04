@@ -5,7 +5,7 @@ namespace Packages;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Packages\Models\Package;
-use Packages\Observer\PackageHistoryObserver;
+use Packages\Observer\PackageObserver;
 
 class PackageServiceProvider extends ServiceProvider
 {
@@ -107,7 +107,7 @@ class PackageServiceProvider extends ServiceProvider
      */
     private function obServers()
     {
-        Package::observe(PackageHistoryObserver::class);
+        Package::observe(PackageObserver::class);
     }
 
 }

@@ -77,13 +77,13 @@ class WithdrawRequestFeatureTest extends WalletTest
 
         $user = User::query()->where('username', '=', 'admin')->first();
         $bank_service = new BankService($user);
-        $bank_service->deposit('Earning Wallet', 30000);
+        $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 30000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
             'amount' => 101,
             'currency' => $payment_currency->name,
         ]);
-
+        dd($response->json());
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'status',
@@ -183,7 +183,7 @@ class WithdrawRequestFeatureTest extends WalletTest
         $mock_acknowledge = new Acknowledge();
         $mock_acknowledge->setStatus(true);
         $mock_acknowledge->setMessage('Its true');
-        KycClientFacade::shouldReceive('checkKYCStatus')->andReturn($mock_rank);
+        KycClientFacade::shouldReceive('checkKYCStatus')->andReturn($mock_acknowledge);
 
         $payment = \Payments\Models\PaymentCurrency::query()->firstOrCreate();
         $payment->update(['available_services'=>[CURRENCY_SERVICE_WITHDRAW]]);

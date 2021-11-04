@@ -15,7 +15,7 @@ class CreateWalletEmailContentsTable extends Migration
     {
         Schema::create('wallet_email_contents', function (Blueprint $table) {
             $table->id();
-            $table->string('key');
+            $table->string('key')->unique();
             $table->boolean('is_active')->default(true);
             $table->string('subject');
             $table->string('from');

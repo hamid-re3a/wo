@@ -33,7 +33,7 @@ class WithdrawProfitObserver
                 $withdrawProfit->act_reason = request()->get('act_reason');
 
             WithdrawProfitHistory::query()->insert(array_merge($withdrawProfit->toArray(),[
-                'main_id' => $withdrawProfit->id
+                'withdraw_profit_id' => $withdrawProfit->id
             ]));
         }
     }

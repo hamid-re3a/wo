@@ -11,7 +11,7 @@ use User\Models\User;
  * Wallets/Models/WithdrawProfit
  *
  * @property int $id
- * @property int $main_id
+ * @property int $withdraw_profit_id
  * @property string $uuid
  * @property string $wallet_hash
  * @property int $user_id
@@ -43,7 +43,7 @@ class WithdrawProfitHistory extends Model
     protected $table = 'wallet_withdraw_profit_requests_history';
 
     protected $fillable = [
-        'main_id',
+        'withdraw_profit_id',
         'uuid',
         'wallet_hash',
         'user_id',

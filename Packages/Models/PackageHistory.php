@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * Packages\Models\PackageHistory
  *
  * @property int $id
- * @property int $legacy_id
+ * @property int $package_id
  * @property string $name
  * @property string $short_name
  * @property int|null $validity_in_days
@@ -45,27 +45,4 @@ class PackageHistory extends Model
 {
     use HasFactory;
     protected $guarded = [];
-
-    /**
-     * Methods
-     */
-    public function getGrpcMessage()
-    {
-        $package_service = new \Packages\Services\Grpc\Package();
-        $package_service->setId($this->attributes['id']);
-        $package_service->setName($this->attributes['name']);
-        $package_service->setShortName($this->attributes['short_name']);
-        $package_service->setValidityInDays($this->attributes['validity_in_days']);
-        $package_service->setPrice($this->attributes['price']);
-        $package_service->setRoiPercentage($this->attributes['roi_percentage']);
-        $package_service->setDirectPercentage($this->attributes['direct_percentage']);
-        $package_service->setBinaryPercentage($this->attributes['binary_percentage']);
-        $package_service->setCategoryId($this->attributes['category_id']);
-        $package_service->setDeletedAt($this->attributes['deleted_at']);
-        $package_service->setCreatedAt($this->attributes['created_at']);
-        $package_service->setUpdatedAt($this->attributes['updated_at']);
-
-        return $package_service;
-
-    }
 }

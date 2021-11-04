@@ -54,7 +54,7 @@ class WithdrawProfitObserver
             'withdraw_transaction_id' => $withdrawProfit->withdraw_transaction_id,
             'refund_transaction_id' => $withdrawProfit->refund_transaction_id,
             'network_transaction_id' => $withdrawProfit->network_transaction_id,
-            'status' => $withdrawProfit->status,
+            'status' => $withdrawProfit->getRawOriginal('status'),
             'payout_service' => $withdrawProfit->payout_service,
             'currency' => $withdrawProfit->currency,
             'pf_amount' => $withdrawProfit->pf_amount,

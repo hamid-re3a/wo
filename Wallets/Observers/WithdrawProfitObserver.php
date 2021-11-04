@@ -26,9 +26,11 @@ class WithdrawProfitObserver
 
     public function updating(WithdrawProfit $withdrawProfit)
     {
-        $withdrawProfit->actor_id = auth()->user()->id;
-        if(request()->has('act_reason'))
-            $withdrawProfit->act_reason = request()->get('act_reason');
+        if(auth()->check()) { //Check WithdrawRequest is updating with QUEUE or logged-in user
+            $withdrawProfit->actor_id = auth()->user()->id;
+            if(request()->has('act_reason'))
+                $withdrawProfit->act_reason = request()->get('act_reason');
+        }
     }
 
 

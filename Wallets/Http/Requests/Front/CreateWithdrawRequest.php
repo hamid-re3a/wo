@@ -41,7 +41,16 @@ class CreateWithdrawRequest extends FormRequest
     {
 
         return [
-            'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}",
+            'amount' => [
+                'required',
+                'numeric',
+                'min:' . $this->minimum_amount,
+                'max:' . $this->maximum_amount,
+                function($attribute,$value,$fail){
+                    if(($value + $this->fee) > $this->wallet_balance)
+                        return $fail('Insufficient amount .');
+                }
+            ],
             'currency' => 'required|in:' . implode(',', $this->getNamePaymentCurrency()),
         ];
     }
@@ -75,7 +84,6 @@ class CreateWithdrawRequest extends FormRequest
 
     }
 
-
     private function getNamePaymentCurrency()
     {
 
@@ -85,22 +93,6 @@ class CreateWithdrawRequest extends FormRequest
         else
             return [];
 
-    }
-
-    /**
-     * Configure the validator instance.
-     *
-     * @param \Illuminate\Validation\Validator $validator
-     * @return void
-     */
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator){
-            if ($this->request->has('amount')) {
-                if ($this->request->get('amount') + $this->fee > $this->wallet_balance)
-                    $validator->errors()->add('amount', 'Insufficient amount');
-            }
-        });
     }
 
 }

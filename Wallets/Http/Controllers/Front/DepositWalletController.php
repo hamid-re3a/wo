@@ -125,7 +125,7 @@ class DepositWalletController extends Controller
         try {
             //Check logged in user balance for transfer
             $balance = $this->bankService->getBalance($this->walletName);
-            list($total, $fee) = calculateTransferFee($request->get('amount_new'));
+            list($total, $fee) = calculateTransferFee($request->get('amount'));
 
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
@@ -136,7 +136,7 @@ class DepositWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user->member_id,
                 'receiver_full_name' => $to_user->full_name,
-                'received_amount' => (double) $request->get('amount_new'),
+                'received_amount' => (double) $request->get('amount'),
                 'transfer_fee' => (double) $fee,
                 'current_balance' => (double) $balance,
                 'balance_after_transfer' => (double) $remain_balance
@@ -162,7 +162,7 @@ class DepositWalletController extends Controller
         try {
             DB::beginTransaction();
 
-            list($total, $fee) = calculateTransferFee($request->get('amount_new'));
+            list($total, $fee) = calculateTransferFee($request->get('amount'));
 
             $to_user = User::query()->where('member_id', $request->get('member_id'))->get()->first();
             $receiver_bank_service = new BankService($to_user);
@@ -174,7 +174,7 @@ class DepositWalletController extends Controller
                 'type' => 'Funds transferred'
             ];
 
-            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double) $request->get('amount_new'),$description);
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double) $request->get('amount'),$description);
             $transfer_resolver = new TransferFundResolver($transfer);
 
             list($flag,$response) = $transfer_resolver->resolve();

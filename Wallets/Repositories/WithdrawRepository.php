@@ -68,8 +68,8 @@ class WithdrawRepository
 
             if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
 
-                list($total,$fee) = calculateWithdrawalFee($request->get('amount_original'),$request->get('currency'));
-                $withdraw_transaction = $this->bankService->withdraw($this->user_wallet, $request->get('amount_original'), null, 'Withdrawal request', null,true,false);
+                list($total,$fee) = calculateWithdrawalFee($request->get('amount'),$request->get('currency'));
+                $withdraw_transaction = $this->bankService->withdraw($this->user_wallet, $request->get('amount'), null, 'Withdrawal request', null,true,false);
                 $withdraw_fee = $this->bankService->withdraw($this->user_wallet, $fee, null, 'Withdrawal request fee', null);
 
                 return WithdrawProfit::query()->create([
@@ -78,9 +78,9 @@ class WithdrawRepository
                     'wallet_hash' => $this->getUserBTCWalletHash(),
                     'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
                     'currency' => $request->get('currency'),
-                    'pf_amount' => $request->get('amount_original'),
+                    'pf_amount' => $request->get('amount'),
                     'fee' => (double)$fee,
-                    'crypto_amount' => pfToUsd((double)$request->get('amount_original')) / $btc_price->json()['USD']['15m'],
+                    'crypto_amount' => pfToUsd((double)$request->get('amount')) / $btc_price->json()['USD']['15m'],
                     'crypto_rate' => $btc_price->json()['USD']['15m']
                 ]);
             } else {

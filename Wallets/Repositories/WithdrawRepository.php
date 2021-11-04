@@ -8,6 +8,7 @@ use Giftcode\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Payments\Services\Processors\PayoutProcessor;
@@ -116,6 +117,19 @@ class WithdrawRepository
             $this->checkBPSWalletBalance($amount);
             $this->payout_processor->pay($currency, $withdrawProfits,$dispatchType);
         } catch (\Throwable $exception) {
+            throw $exception;
+        }
+    }
+
+    public function payoutGroup(array $ids)
+    {
+        try {
+            DB::beginTransaction();
+            $withdrawals_requests = $this->model->query()->where('status', '=', 1)->whereIn('uuid', $ids)->get();
+            $this->pay($withdrawals_requests);
+            DB::commit();
+        } catch (\Throwable $exception) {
+            DB::rollBack();
             throw $exception;
         }
     }

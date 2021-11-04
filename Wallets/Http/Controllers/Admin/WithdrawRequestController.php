@@ -151,18 +151,15 @@ class WithdrawRequestController extends Controller
     {
 
         try {
-            DB::beginTransaction();
-            /**@var $first_request WithdrawProfit */
-            $withdraw_requests = WithdrawProfit::query()->where('status', '=', 1)->whereIn('uuid', $request->get('ids'))->get();
 
-            $this->withdraw_repository->pay($withdraw_requests);
-
-            DB::commit();
+            $this->withdraw_repository->payoutGroup($request->get('ids'));
             return api()->success(null, null);
+
         } catch (\Throwable $exception) {
-            DB::rollback();
+
             Log::error('Admin/WithdrawRequestController@payout_group => ' . serialize($request->all()));
             throw $exception;
+
         }
     }
 

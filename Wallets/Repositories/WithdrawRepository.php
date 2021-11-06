@@ -17,6 +17,7 @@ use User\Services\Grpc\WalletInfo;
 use User\Services\Grpc\WalletType;
 use Wallets\Models\Transaction;
 use Wallets\Models\WithdrawProfit;
+use Wallets\Models\WithdrawProfitHistory;
 use Wallets\Services\BankService;
 
 class WithdrawRepository
@@ -28,14 +29,15 @@ class WithdrawRepository
     private $bankService;
     private $payout_processor;
     private $user_wallet;
-    /**@var $withdraw_profits WithdrawProfit */
     private $model;
+    private $model_history;
 
     public function __construct(PayoutProcessor $payout_processor)
     {
         $this->payout_processor = $payout_processor;
         $this->user_wallet = WALLET_NAME_EARNING_WALLET;
         $this->model = new WithdrawProfit();
+        $this->model_history = new WithdrawProfitHistory();
     }
 
     public function makeWithdrawRequest(Request $request)
@@ -193,7 +195,7 @@ class WithdrawRepository
         try {
             $that = $this;
             $function_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
-                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WITHDRAW_COMMAND_UNDER_REVIEW,$user_id);
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,null,$user_id);
             };
 
             $sub_function = function ($collection, $intervals) {
@@ -219,7 +221,7 @@ class WithdrawRepository
         try {
             $that = $this;
             $function_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
-                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WITHDRAW_COMMAND_PROCESS,$user_id);
+                return $that->getWithdrawRequestsByDateCollection('updated_at',$from_date,$to_date,WITHDRAW_COMMAND_PROCESS,$user_id);
             };
 
             $sub_function = function ($collection, $intervals) {
@@ -295,6 +297,25 @@ class WithdrawRepository
     {
         try {
             $withdraw_profit_requests = $this->model->query();
+            if($status)
+                $withdraw_profit_requests->where('status','=',$status);
+
+            if($user_id)
+                $withdraw_profit_requests->where('user_id',$user_id);
+
+            $from_date = Carbon::parse($from_date)->toDateTimeString();
+            $to_date = Carbon::parse($to_date)->toDateTimeString();
+            return $withdraw_profit_requests->whereBetween($date_field, [$from_date,$to_date])->get();
+        } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
+            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+        }
+    }
+
+    private function getWithdrawRequestsHistoryByDateCollection($date_field,$from_date,$to_date,$status = null,$user_id = null)
+    {
+        try {
+            $withdraw_profit_requests = $this->model_history->query();
             if($status)
                 $withdraw_profit_requests->where('status','=',$status);
 

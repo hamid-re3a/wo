@@ -56,12 +56,16 @@ class OrderRepository
         return $order->resolved()->active()->whereBetween('created_at', [$from, $until])->get();
     }
 
-    public function getActiveOrderWithPackageByDateCollection($from, $until)
+    public function getActiveOrderWithPackageByDateCollection($from, $until,$id = null)
     {
         /**@var $order Order */
         $order = new $this->entity_name;
 
-        return $order->resolved()->active()->whereBetween('created_at', [$from, $until])->get();
+
+        if(is_null($id))
+            return $order->resolved()->active()->whereBetween('created_at', [$from, $until])->get();
+        else
+            return $order->resolved()->active()->whereBetween('created_at', [$from, $until])->where('user_id',$id)->get();
     }
 
     public function getActiveOrderWithPackageByDateForUserCollection($from, $until, $user)

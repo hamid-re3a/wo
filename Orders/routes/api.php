@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
             Route::get('counts', [UserDashboardController::class, 'counts'])->name('counts');
             Route::post('', [UserDashboardController::class, 'index'])->name('list');
             Route::post('show', [UserDashboardController::class, 'showOrder'])->name('show');
+            Route::post('package_type_percent_count', [UserDashboardController::class, 'packageTypePercentCount'])->name('package_type_percent_count');
             Route::post('store', [OrderController::class, 'newOrder'])->name('store');
 
             Route::name('packages.')->prefix('packages')->middleware('auth')->group(function () {

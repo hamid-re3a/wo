@@ -114,17 +114,17 @@ class OrderService implements OrdersServiceInterface
         return $final_result;
     }
 
-    public function packageOverviewCountForUser($type,$user)
+    public function packageOverviewCountForUser($type, $user)
     {
         $that = $this;
-        $function_active_package = function ($from_day, $to_day) use ($that,$user) {
-            return $that->order_repository->getExpiredPackageByDateForUserCollection($from_day, $to_day,$user);
+        $function_active_package = function ($from_day, $to_day) use ($that, $user) {
+            return $that->order_repository->getExpiredPackageByDateForUserCollection($from_day, $to_day, $user);
         };
-        $function_expired_package = function ($from_day, $to_day) use ($that,$user) {
-            return $that->order_repository->getExpiredPackageByDateForUserCollection($from_day, $to_day,$user);
+        $function_expired_package = function ($from_day, $to_day) use ($that, $user) {
+            return $that->order_repository->getExpiredPackageByDateForUserCollection($from_day, $to_day, $user);
         };
-        $function_all_package = function ($from_day, $to_day) use ($that,$user) {
-            return $that->order_repository->getExpiredPackageByDateForUserCollection($from_day, $to_day,$user);
+        $function_all_package = function ($from_day, $to_day) use ($that, $user) {
+            return $that->order_repository->getExpiredPackageByDateForUserCollection($from_day, $to_day, $user);
         };
 
 
@@ -138,6 +138,7 @@ class OrderService implements OrdersServiceInterface
         $final_result['all'] = chartMaker($type, $function_all_package, $sub_function);
         return $final_result;
     }
+
     public function packageTypeCountChart($type)
     {
         $that = $this;
@@ -176,11 +177,11 @@ class OrderService implements OrdersServiceInterface
         return $final_result;
     }
 
-    public function packageTypeCountForUser($type,$user)
+    public function packageTypeCountForUser($type, $user)
     {
         $that = $this;
-        $function_active_package = function ($from_day, $to_day) use ($that,$user) {
-            return $that->order_repository->getActiveOrderWithPackageByDateForUserCollection($from_day, $to_day,$user);
+        $function_active_package = function ($from_day, $to_day) use ($that, $user) {
+            return $that->order_repository->getActiveOrderWithPackageByDateForUserCollection($from_day, $to_day, $user);
         };
 
         $sub_function_B = function ($collection, $intervals) {
@@ -214,11 +215,11 @@ class OrderService implements OrdersServiceInterface
         return $final_result;
     }
 
-    public function packageTypePercentageCountChart($type)
+    public function packageTypePercentageCountChart($type, $id = null)
     {
         $that = $this;
-        $function_active_package = function ($from_day, $to_day) use ($that) {
-            return $that->order_repository->getActiveOrderWithPackageByDateCollection($from_day, $to_day);
+        $function_active_package = function ($from_day, $to_day) use ($that, $id) {
+            return $that->order_repository->getActiveOrderWithPackageByDateCollection($from_day, $to_day, $id);
         };
 
         $sub_function_B = function ($collection, $intervals) {

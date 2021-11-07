@@ -13,6 +13,13 @@ class TransferFundFromEarningWalletRequest extends FormRequest
     private $maximum_amount;
     private $wallet_balance;
     private $member_id;
+    private $fee;
+
+    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
+    {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+        $this->prepare();
+    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -32,10 +39,6 @@ class TransferFundFromEarningWalletRequest extends FormRequest
      */
     public function rules()
     {
-        $this->prepare();
-        list($total, $fee) = $this->request->has('amount') ? calculateTransferAmount($this->request->get('amount')) : [0,0];
-        $this->request->set('amount_new', (double) $this->request->get('amount'));
-        $this->request->set('amount', (double) $this->request->get('amount') + $fee);
 
         return [
             'member_id' => 'required_if:own_deposit_wallet,false|integer|exists:users,member_id|not_in:' . $this->member_id,
@@ -47,7 +50,16 @@ class TransferFundFromEarningWalletRequest extends FormRequest
                         return $fail('This field must be true if you may not send funds to another member deposit wallet');
                 }
             ],
-            'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}|lte:" . $this->wallet_balance
+            'amount' => [
+                'required',
+                'numeric',
+                'min:' . $this->minimum_amount,
+                'max:' . $this->maximum_amount,
+                function($attribute,$value,$fail){
+                    if(($value + $this->fee) > $this->wallet_balance)
+                        return $fail('Insufficient amount .');
+                }
+            ],
         ];
 
     }
@@ -58,7 +70,6 @@ class TransferFundFromEarningWalletRequest extends FormRequest
             'amount.min' => 'Minimum allowed is ' . formatCurrencyFormat($this->minimum_amount) . " PF",
             'amount.max' => 'Maximum allowed is ' . formatCurrencyFormat($this->maximum_amount) ." PF",
             'member_id.not_in' => 'You are not allowed transfer PF to your account .',
-            'amount.lte' => 'Insufficient amount',
             'member_id.exists' => 'Invalid membership ID .',
         ];
     }
@@ -75,6 +86,9 @@ class TransferFundFromEarningWalletRequest extends FormRequest
 
                 $this->minimum_amount = getWalletSetting('minimum_transfer_from_earning_to_deposit_wallet_fund_amount');
                 $this->maximum_amount = getWalletSetting('maximum_transfer_from_earning_to_deposit_wallet_fund_amount');
+
+                list($total, $fee) = $this->request->has('amount') ? calculateTransferFee($this->request->get('amount')) : [0,0];
+                $this->fee = $fee;
             }
         } catch (\Throwable $exception){
             Log::error('Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest@prepare => ' . $exception->getMessage());

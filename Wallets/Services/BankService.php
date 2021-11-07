@@ -56,7 +56,7 @@ class BankService
         return $transaction;
     }
 
-    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true)
+    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true,$to_admin_wallet = true)
     {
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
             throw new \Exception();
@@ -69,7 +69,7 @@ class BankService
             'sub_type' => $sub_type
         ];
         $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description), $confirmed);
-        if ($this->owner->id != 1)
+        if ($this->owner->id != 1 AND $to_admin_wallet)
             $this->toAdminDepositWallet($transaction, $amount, $description, $type);
         $transaction->syncMetaData($data);
         return $transaction;

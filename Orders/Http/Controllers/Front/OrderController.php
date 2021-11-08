@@ -56,6 +56,7 @@ class OrderController extends Controller
 
             DB::beginTransaction();
             $now = now()->toDateTimeString();
+
             $order_db = Order::query()->create([
                 "from_user_id" => $user_who_pays_for_package->id,
                 "user_id" => $user_who_is_package_for->id,
@@ -63,15 +64,17 @@ class OrderController extends Controller
                 "payment_currency" => $request->get('payment_type') == 'purchase' ? $request->get('payment_currency') : null,
                 "payment_driver" => $request->get('payment_type') == 'purchase' ? $request->get('payment_driver') : null,
                 "package_id" => $request->get('package_id'),
-                "is_paid_at" => $now,
-                "is_resolved_at" => $now,
                 'validity_in_days' => $package->getValidityInDays(),
                 'plan' => $user_who_is_package_for->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             $order_db->refreshOrder();
 
+            $order_service = $order_db->fresh()->getGrpcMessage();
+            $order_service->setIsPaidAt($now);
+            $order_service->setIsResolvedAt($now);
+
             Log::info('Front/OrderController@newOrder First MLM request');
-            $response = MlmClientFacade::simulateOrder($order_db->getGrpcMessage());
+            $response = MlmClientFacade::simulateOrder($order_service);
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
@@ -96,7 +99,10 @@ class OrderController extends Controller
 
             if ($request->get('payment_type') != 'purchase') {
 
+
                 $order_service = $order_db->fresh()->getGrpcMessage();
+                $order_service->setIsPaidAt($now);
+                $order_service->setIsResolvedAt($now);
 
                 Log::info('Front/OrderController@newOrder Second MLM request');
                 $submit_response = MlmClientFacade::submitOrder($order_service);

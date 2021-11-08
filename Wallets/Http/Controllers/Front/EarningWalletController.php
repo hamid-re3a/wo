@@ -127,12 +127,12 @@ class EarningWalletController extends Controller
         $this->prepareEarningWallet();
         try {
             $to_user = null;
-            $amount = $request->get('amount_new');
+            $amount = $request->get('amount');
             $fee = 0;
 
             if ($request->has('member_id')) {
                 $to_user = User::query()->where('member_id', '=', $request->get('member_id'))->first();
-                list($amount, $fee) = calculateTransferAmount($request->get('amount_new'));
+                list($amount, $fee) = calculateTransferFee($request->get('amount'));
             }
 
             $balance = (double)$this->bankService->getBalance($this->walletName);
@@ -141,7 +141,7 @@ class EarningWalletController extends Controller
             return api()->success(null, [
                 'receiver_member_id' => $to_user ? $to_user->member_id : null,
                 'receiver_full_name' => $to_user ? $to_user->full_name : null,
-                'received_amount' => (double) $request->get('amount_new'),
+                'received_amount' => (double) $request->get('amount'),
                 'transfer_fee' => (double)$fee,
                 'current_balance' => (double)$balance,
                 'balance_after_transfer' => (double)$remain_balance
@@ -174,7 +174,7 @@ class EarningWalletController extends Controller
                 $other_member = User::query()->where('member_id', '=', $request->get('member_id'))->first();
                 $other_member_bank_service = new BankService($other_member);
                 $to_wallet = $other_member_bank_service->getWallet(WALLET_NAME_DEPOSIT_WALLET);
-                list($total, $fee) = calculateTransferAmount($request->get('amount_new'));
+                list($total, $fee) = calculateTransferFee($request->get('amount'));
 
                 $description = [
                     'member_id' => $request->get('member_id'),
@@ -183,7 +183,7 @@ class EarningWalletController extends Controller
                 ];
             }
 
-            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double)$request->get('amount_new'),$description);
+            $transfer = $this->wallet_repository->transferFunds($from_wallet,$to_wallet,(double)$request->get('amount'),$description);
             $transfer_resolver = new TransferFundResolver($transfer);
 
             list($flag,$response) = $transfer_resolver->resolve();

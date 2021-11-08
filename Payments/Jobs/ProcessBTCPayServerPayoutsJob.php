@@ -11,6 +11,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Wallets\Jobs\HandleWithdrawUnsentEmails;
 
 class ProcessBTCPayServerPayoutsJob implements ShouldQueue
 {
@@ -78,6 +79,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
             ]);
         if($response->ok()) {
             InsertBPSNetworkTransactionJob::{$this->dispatchType}($this->payout_requests->pluck('id'),$response->json());
+            HandleWithdrawUnsentEmails::dispatch();
         } else {
             Log::info($response->status());
             Log::info(serialize($response->json()));

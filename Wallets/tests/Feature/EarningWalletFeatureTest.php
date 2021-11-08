@@ -169,11 +169,14 @@ class EarningWalletFeatureTest extends WalletTest
                 'message',
                 'data' => [
                     'id',
-                    'to_member_id',
+                    'from_user_full_name',
+                    'from_user_member_id',
                     'from' => [
                         'transaction_id',
                         'wallet'
                     ],
+                    'to_user_full_name',
+                    'to_user_member_id',
                     'to' => [
                         'transaction_id',
                         'wallet'

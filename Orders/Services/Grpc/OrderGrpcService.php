@@ -53,15 +53,18 @@ class OrderGrpcService implements OrdersServiceInterface
                 "payment_type" => 'deposit',
                 "package_id" => $order->getPackageId(),
                 'validity_in_days' => $package->getValidityInDays(),
-                "is_paid_at" => $now,
-                "is_resolved_at" => $now,
                 'plan' => $user_who_is_package_for->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START
             ]);
             if(is_null($order_db) )
                 throw new \Exception('Creating Order faced a problem', 406);
             $order_db->refreshOrder();
+
+            $order_service = $order_db->fresh()->getGrpcMessage();
+            $order_service->setIsPaidAt($now);
+            $order_service->setIsResolvedAt($now);
+
             Log::info('Front/OrderService@newOrder First MLM request');
-            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_db->getGrpcMessage())->wait();
+            list($response, $flag) = getMLMGrpcClient()->simulateOrder($order_service)->wait();
             if ($flag->code != 0)
                 throw new \Exception('Order not see mlm', 406);
 
@@ -86,6 +89,8 @@ class OrderGrpcService implements OrdersServiceInterface
 
 
             $order_service = $order_db->fresh()->getGrpcMessage();
+            $order_service->setIsPaidAt($now);
+            $order_service->setIsResolvedAt($now);
 
             Log::info('Front/OrderService@newOrder Second MLM request');
             Log::info($order_service->getPackageId());

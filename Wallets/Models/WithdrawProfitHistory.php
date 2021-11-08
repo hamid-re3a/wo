@@ -11,6 +11,7 @@ use User\Models\User;
  * Wallets/Models/WithdrawProfit
  *
  * @property int $id
+ * @property int $withdraw_profit_id
  * @property string $uuid
  * @property string $wallet_hash
  * @property int $user_id
@@ -37,11 +38,12 @@ use User\Models\User;
  * @property-read BPSNetworkTransactions $networkTransaction
  * @mixin \Eloquent
  */
-class WithdrawProfit extends Model
+class WithdrawProfitHistory extends Model
 {
-    protected $table = 'wallet_withdraw_profit_requests';
+    protected $table = 'wallet_withdraw_profit_requests_history';
 
     protected $fillable = [
+        'withdraw_profit_id',
         'uuid',
         'wallet_hash',
         'user_id',

@@ -84,11 +84,8 @@ class OrderController extends Controller
                 throw new \Exception($response->getMessage(), 406);
             }
 
-            $order_service = $order_db->fresh()->getGrpcMessage();
-            $order_service->setIsPaidAt($now);
-            $order_service->setIsResolvedAt($now);
 
-            $submit_response = MlmClientFacade::submitOrder($order_db->getGrpcMessage());
+            $submit_response = MlmClientFacade::submitOrder($order_db->fresh()->getGrpcMessage());
             $order_db->update([
                 'is_commission_resolved_at' => $submit_response->getCreatedAt()
             ]);

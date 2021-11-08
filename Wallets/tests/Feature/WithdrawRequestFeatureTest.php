@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Kyc\Services\Grpc\Acknowledge;
 use MLM\Services\Grpc\Rank;
 use User\Models\User;
+use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
 use Wallets\Services\KycClientFacade;
 use Wallets\Services\MlmClientFacade;
@@ -77,13 +78,12 @@ class WithdrawRequestFeatureTest extends WalletTest
 
         $user = User::query()->where('username', '=', 'admin')->first();
         $bank_service = new BankService($user);
-        $bank_service->deposit('Earning Wallet', 30000);
+        $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 30000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
             'amount' => 101,
             'currency' => $payment_currency->name,
         ]);
-
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'status',
@@ -161,6 +161,21 @@ class WithdrawRequestFeatureTest extends WalletTest
         ]);
     }
 
+    /**
+     * @test
+     */
+    public function reject_withdraw_request()
+    {
+        $this->create_withdraw_request_sufficient_balance();
+        $withdraw_request = WithdrawProfit::query()->first();
+        $response = $this->patch(route('wallets.admin.withdraw-requests.update'),[
+            'id' => $withdraw_request->uuid,
+            'status' => WITHDRAW_COMMAND_REJECT,
+            'act_reason' => 'Nothing to say',
+        ]);
+        $response->assertStatus(200);
+    }
+
     private function mockWithdrawServices(): void
     {
         $mock_response = new class {
@@ -176,6 +191,7 @@ class WithdrawRequestFeatureTest extends WalletTest
             }
         };
         Http::shouldReceive('get')->andReturn($mock_response);
+
         $mock_rank = new Rank();
         $mock_rank->setWithdrawalLimit(35000);
         MlmClientFacade::shouldReceive('getUserRank')->andReturn($mock_rank);
@@ -183,7 +199,7 @@ class WithdrawRequestFeatureTest extends WalletTest
         $mock_acknowledge = new Acknowledge();
         $mock_acknowledge->setStatus(true);
         $mock_acknowledge->setMessage('Its true');
-        KycClientFacade::shouldReceive('checkKYCStatus')->andReturn($mock_rank);
+        KycClientFacade::shouldReceive('checkKYCStatus')->andReturn($mock_acknowledge);
 
         $payment = \Payments\Models\PaymentCurrency::query()->firstOrCreate();
         $payment->update(['available_services'=>[CURRENCY_SERVICE_WITHDRAW]]);

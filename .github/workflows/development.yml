@@ -36,10 +36,10 @@ jobs:
         shopt -s dotglob
         rm -rf .env
         cp .env.development .env
-        sudo docker build --network=mysql_wo_r2f -t subscription:1 .
+        sudo docker build -f devops/Dockerfiles/Dockerfile-development --network=mysql_wo_r2f -t development-subscription:1 .
+        sudo docker tag development-subscription:1 staging-reg.dreamcometrue.ai/development-subscription:1
+        sudo docker push staging-reg.dreamcometrue.ai/development-subscription:1
     - name: deploy docker-compose
       run: | 
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml stop subscription
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml rm -f subscription
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml up -d subscription
-
+        sudo docker-compose -f devops/docker-compose-files/docker-compose-development.yml -p subscription down
+        sudo docker-compose -f devops/docker-compose-files/docker-compose-development.yml -p subscription up -d

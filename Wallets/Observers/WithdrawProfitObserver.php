@@ -37,7 +37,9 @@ class WithdrawProfitObserver
 
     public function updated(WithdrawProfit $withdrawProfit)
     {
-        UrgentEmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+        if(!$withdrawProfit->is_update_email_sent)
+            UrgentEmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+
         $this->createHistory($withdrawProfit);
     }
 

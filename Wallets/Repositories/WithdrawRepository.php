@@ -67,80 +67,78 @@ class WithdrawRepository
 
     public function withdrawBTC(array $request): WithdrawProfit
     {
+
+
         try {
-            $btc_price = Http::get('https://blockchain.info/ticker');
-
-            if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
-
-                list($total, $fee) = calculateWithdrawalFee($request['amount'], $request['currency']);
-
-                //Check user balance again
-                if ($this->bankService->getBalance($this->user_wallet) < $total)
-                    throw new \Exception(trans('wallet.responses.not-enough-balance'),406);
-
-                $withdraw_transaction = $this->bankService->withdraw($this->user_wallet, $request['amount'], null, 'Withdrawal request', null, true, false);
-                $withdraw_fee = $this->bankService->withdraw($this->user_wallet, $fee, null, 'Withdrawal request fee', null);
-
-                list($flag, $response) = $this->getUserBTCWalletHash($request['user_id']);
-                if (!$flag) {
-                    Log::error('Wallets\Repositories\WithdrawRepository@withdrawBTC =>' . $response);
-                    throw new \Exception($response,406);
-                }
-
-                return WithdrawProfit::create([
-                    'user_id' => $request['user_id'],
-                    'withdraw_transaction_id' => $withdraw_transaction->id,
-                    'wallet_hash' => $response,
-                    'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
-                    'currency' => $request['currency'],
-                    'pf_amount' => $request['amount'],
-                    'fee' => (double)$fee,
-                    'crypto_amount' => pfToUsd((double)$request['amount']) / $btc_price->json()['USD']['15m'],
-                    'crypto_rate' => $btc_price->json()['USD']['15m']
-                ]);
-
+            $wallet_hash = null;
+            //Check if request is revert or NOT
+            if (array_key_exists('is_revert', $request) AND isset($request['is_revert'])) {
+                $crypto_rate = $request['crypto_rate'];
+                $wallet_hash = $request['wallet_hash'];
             } else {
-
-                throw new \Exception(trans('wallet.withdraw-profit-request.external-resource-error', [
-                    'server' => 'BlockChain.info'
-                ]), 500);
-
+                $crypto_rate = $this->getBtcPrice();
             }
+
+            list($total, $fee) = calculateWithdrawalFee($request['amount'], $request['currency']);
+
+            //Check user balance again
+            if ($this->bankService->getBalance($this->user_wallet) < $total)
+                throw new \Exception(trans('wallet.responses.not-enough-balance'), 406);
+
+            $withdraw_transaction = $this->bankService->withdraw($this->user_wallet, $request['amount'], null, 'Withdrawal request', null, true, false);
+            $withdraw_fee = $this->bankService->withdraw($this->user_wallet, $fee, null, 'Withdrawal request fee', null);
+
+            if (!$wallet_hash) {
+                list($flag, $wallet_hash) = $this->getUserBTCWalletHash($request['user_id']);
+                if (!$flag) {
+                    Log::error('Wallets\Repositories\WithdrawRepository@withdrawBTC =>' . $wallet_hash);
+                    throw new \Exception($wallet_hash, 406);
+                }
+            }
+
+            return WithdrawProfit::create([
+                'user_id' => $request['user_id'],
+                'withdraw_transaction_id' => $withdraw_transaction->id,
+                'wallet_hash' => $wallet_hash,
+                'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
+                'currency' => $request['currency'],
+                'pf_amount' => $request['amount'],
+                'fee' => (double)$fee,
+                'crypto_amount' => pfToUsd((double)$request['amount']) / $crypto_rate,
+                'crypto_rate' => $crypto_rate
+            ]);
+
         } catch (\Throwable $exception) {
             throw $exception;
         }
+
     }
 
-    public function update(array $validated_request, WithdrawProfit $withdrawProfit)
+    public function update(array $validated_request, Collection $withdrawProfitRequests)
     {
         switch ($validated_request['status']) {
             case WALLET_WITHDRAW_COMMAND_PROCESS :
-                $this->pay($withdrawProfit->toArray());
+                $this->pay($withdrawProfitRequests->where('status', '=', WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING));
                 break;
             case WALLET_WITHDRAW_COMMAND_REJECT :
-                $this->rejectWithdrawRequest($validated_request, $withdrawProfit);
+                $this->rejectWithdrawRequest($validated_request, $withdrawProfitRequests);
                 break;
             case WALLET_WITHDRAW_COMMAND_REVERT :
-                //Check if request is marked as rejected
-                if($withdrawProfit->getRawOriginal('status') != WALLET_WITHDRAW_COMMAND_REJECT)
-                    throw new Exception(trans('wallet.withdraw-profit-request.you-can-revert-a-rejected-request'),406);
-
-                //Make a fresh withdraw request
-                $this->makeWithdrawRequest([
-                    'amount' => $withdrawProfit->pf_amount,
-                    'currency' => $withdrawProfit->currency,
-                    'user_id' => $withdrawProfit->user_id
-                ]);
-
-                $withdrawProfit->update([
-                    'status' => WALLET_WITHDRAW_COMMAND_REVERT
-                ]);
+                $this->revertWithdrawRequests($withdrawProfitRequests);
                 break;
             case WALLET_WITHDRAW_COMMAND_POSTPONE:
-            default:
-                $withdrawProfit->update($validated_request);
+                $this->updateModel($withdrawProfitRequests->where('status',WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING)->pluck('id')->toArray(), [
+                    'status' => WALLET_WITHDRAW_COMMAND_POSTPONE,
+                    'postponed_to' => Carbon::parse($validated_request['postponed_to'])->toDateTimeString(),
+                    'act_reason' => isset($validated_request['act_reason']) ? $validated_request['act_reason'] : null
+                ]);
                 break;
         }
+    }
+
+    public function updateModel(array $ids, array $validated_data)
+    {
+        $this->model->query()->whereIn('id', $ids)->update($validated_data);
     }
 
     public function pay($withdrawProfits, $dispatchType = 'dispatchSync')
@@ -162,45 +160,33 @@ class WithdrawRepository
         }
     }
 
-    public function payoutGroup(array $ids)
+    public function rejectWithdrawRequest(array $request, Collection $withdraw_requests)
     {
-        try {
-            DB::beginTransaction();
-            $withdrawals_requests = $this->model->query()->where('status', '=', 1)->whereIn('uuid', $ids)->get();
-            $this->pay($withdrawals_requests);
-            DB::commit();
-        } catch (\Throwable $exception) {
-            DB::rollBack();
-            throw $exception;
-        }
-    }
+        foreach ($withdraw_requests AS $withdraw_request) {
+            $admin_bank_service = new BankService(User::query()->find(1));
+            $admin_balance = $admin_bank_service->getBalance(WALLET_NAME_DEPOSIT_WALLET);
+            if ($admin_balance < $withdraw_request->fee) {
+                //TODO Notify admin
+                Log::error('Wallets\Repositories\WithdrawRepository@rejectWithdrawRequest => Insufficient PF in admin Deposit Wallet');
+                Log::error('Admin Balance => ' . $admin_balance . ' | Fee => ' . $withdraw_request->fee . ' | WithdrawalID => ' . $withdraw_request->id);
+                throw new \Exception(trans('wallet.responses.something-went-wrong'), 500);
+            }
 
-    public function rejectWithdrawRequest(array $request, WithdrawProfit $withdraw_request)
-    {
-        $admin_bank_service = new BankService(User::query()->find(1));
-        $admin_balance = $admin_bank_service->getBalance(WALLET_NAME_DEPOSIT_WALLET);
-        if($admin_balance < $withdraw_request->fee) {
-            //TODO Notify admin
-            Log::error('Wallets\Repositories\WithdrawRepository@rejectWithdrawRequest => Insufficient PF in admin Deposit Wallet');
-            Log::error('Admin Balance => ' . $admin_balance . ' | Fee => ' . $withdraw_request->fee . ' | WithdrawalID => ' . $withdraw_request->id);
-            throw new \Exception(trans('wallet.responses.something-went-wrong'),500);
-        }
+            try {
+                //Charge Admin deposit wallet for withdrawal fee
+                $admin_bank_service->withdraw(WALLET_NAME_DEPOSIT_WALLET, $withdraw_request->fee, [
+                    'description' => 'Refund withdrawal request fee',
+                    'withdrawal_request_id' => $withdraw_request->id
+                ], 'Withdrawal refund', null);
 
-        try {
-            //Charge Admin deposit wallet for withdrawal fee
-            $admin_bank_service->withdraw(WALLET_NAME_DEPOSIT_WALLET, $withdraw_request->fee, [
-                'description' => 'Refund withdrawal request fee',
-                'withdrawal_request_id' => $withdraw_request->id
-            ], 'Withdrawal refund', null);
+                //Deposit user wallet
+                $user_bank_service = new BankService($withdraw_request->user);
 
-            //Deposit user wallet
-            $user_bank_service = new BankService($withdraw_request->user);
-
-            //Refund Withdrawal amount
-            $refund_transaction = $user_bank_service->deposit($this->user_wallet, $withdraw_request->getTotalAmount(), [
-                'description' => 'Withdrawal request rejected',
-                'withdrawal_request_id' => $withdraw_request->id,
-            ], true, 'Withdrawal refund');
+                //Refund Withdrawal amount
+                $refund_transaction = $user_bank_service->deposit($this->user_wallet, $withdraw_request->getTotalAmount(), [
+                    'description' => 'Withdrawal request rejected',
+                    'withdrawal_request_id' => $withdraw_request->id,
+                ], true, 'Withdrawal refund');
 
 //            //Refund Withdrawal FEE amount
 //            $refund_fee_transaction = $bank_service->deposit($this->user_wallet, $withdraw_request->fee, [
@@ -208,17 +194,39 @@ class WithdrawRepository
 //                'withdrawal_request_id' => $withdraw_request->id,
 //            ], true, 'Withdrawal fee refund');
 
-            $withdraw_request->update([
-                'status' => $request['status'],
-                'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
-            ]);
-        } catch (\Throwable $exception) {
-            throw $exception;
+                $withdraw_request->update([
+                    'status' => $request['status'],
+                    'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
+                ]);
+
+            } catch (\Throwable $exception) {
+                throw $exception;
+            }
         }
     }
 
-    public function revertWithdrawRequest(WithdrawProfit $withdrawProfit)
+    public function revertWithdrawRequests(Collection $withdrawProfitRequests)
     {
+        $records_have_to_update = [];
+        foreach ($withdrawProfitRequests AS $withdrawProfitRequest) {
+            //Check if request is marked as rejected
+            if ($withdrawProfitRequest->getRawOriginal('status') != WALLET_WITHDRAW_COMMAND_REJECT)
+                throw new Exception(trans('wallet.withdraw-profit-request.you-can-revert-a-rejected-request', [
+                    'uuid' => $withdrawProfitRequest->uuid
+                ]), 406);
+
+            //Make a fresh withdraw request
+            $request = $withdrawProfitRequest->toArray();
+            $request['is_revert'] = true;
+            $request['amount'] = $request['pf_amount'];
+            $this->makeWithdrawRequest($request);
+            $records_have_to_update[] = $withdrawProfitRequest->id;
+        }
+
+        $this->updateModel($records_have_to_update, [
+            'status' => WALLET_WITHDRAW_COMMAND_REVERT,
+            'is_update_email_sent' => true //Ignore sending update email
+        ]);
 
     }
 
@@ -341,7 +349,7 @@ class WithdrawRepository
 
             return [true, $reply->getAddress()];
         } catch (\Throwable $exception) {
-            Log::error('Wallets\Repositories\WithdrawRepository@getUserBTCWalletHash => ' . $exception->getMessage() );
+            Log::error('Wallets\Repositories\WithdrawRepository@getUserBTCWalletHash => ' . $exception->getMessage());
             throw $exception;
         }
     }
@@ -382,6 +390,23 @@ class WithdrawRepository
             Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
             throw new \Exception(trans('wallet.responses.something-went-wrong'));
         }
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    private function getBtcPrice()
+    {
+        $btc_price = Http::get('https://blockchain.info/ticker');
+        if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
+            $crypto_rate = $btc_price->json()['USD']['15m'];
+        } else {
+            throw new \Exception(trans('wallet.withdraw-profit-request.external-resource-error', [
+                'server' => 'BlockChain.info'
+            ]), 500);
+        }
+        return $crypto_rate;
     }
 
 }

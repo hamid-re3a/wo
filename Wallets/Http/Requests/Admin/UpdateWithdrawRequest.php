@@ -26,21 +26,24 @@ class UpdateWithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => [
-                'required',
-                Rule::exists('wallet_withdraw_profit_requests','uuid')->where('uuid',$this->get('id'))->whereNotIn('status',[
+            'ids' => 'required|array|max:30',
+            'ids.*' => [
+                Rule::exists('wallet_withdraw_profit_requests','uuid')->whereNotIn('status',[
 //                    WALLET_WITHDRAW_COMMAND_REJECT,
                     WALLET_WITHDRAW_COMMAND_PROCESS
                 ])
             ],
-            'status' => 'required|in:' . implode(',', [
+            'status' => [
+                'required',
+                'in:' . implode(',', [
                     WALLET_WITHDRAW_COMMAND_REJECT,
                     WALLET_WITHDRAW_COMMAND_PROCESS,
                     WALLET_WITHDRAW_COMMAND_POSTPONE,
                     WALLET_WITHDRAW_COMMAND_REVERT
-                ]),
+                ])
+            ],
             'act_reason' => 'required_if:status,'. WALLET_WITHDRAW_COMMAND_REJECT .'|string',
-            'postponed_to' => 'required_if:status,' .WALLET_WITHDRAW_COMMAND_POSTPONE. '|date|date_format:Y/m/d|after:today'
+            'postponed_to' => 'required_if:status,' .WALLET_WITHDRAW_COMMAND_POSTPONE. '|date|date_format:Y/m/d H:i:s|after:today'
         ];
 
     }

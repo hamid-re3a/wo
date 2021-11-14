@@ -64,6 +64,7 @@ class UpdateSettingRequest extends FormRequest
                 return 'boolean';
                 break;
             case 'cancellation_fee':
+                return 'integer|gte:0';
             case 'registration_fee':
             case 'expiration_fee':
             case 'giftcode_lifetime':

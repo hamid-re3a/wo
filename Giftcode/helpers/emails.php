@@ -3,7 +3,7 @@
 CONST EMAIL_CONTENTS = [
     'GIFT_CODE_CREATED' => [
         'is_active' => true,
-        'subject'=>'Gift code created successfully',
+        'subject'=>'Gift code created is created',
         'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT

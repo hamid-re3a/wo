@@ -44,8 +44,8 @@ class CreateWithdrawRequest extends FormRequest
             'amount' => [
                 'required',
                 'numeric',
-                'min:' . $this->minimum_amount,
-                'max:' . $this->maximum_amount,
+//                'min:' . $this->minimum_amount,
+//                'max:' . $this->maximum_amount,
                 function($attribute,$value,$fail){
                     if(($value + $this->fee) > $this->wallet_balance)
                         return $fail('Insufficient amount .');
@@ -55,13 +55,13 @@ class CreateWithdrawRequest extends FormRequest
         ];
     }
 
-    public function messages()
-    {
-        return [
-            'amount.min' => 'Minimum allowed is ' . formatCurrencyFormat($this->minimum_amount) . " PF",
-            'amount.max' => 'Maximum allowed is ' . formatCurrencyFormat($this->maximum_amount) . " PF"
-        ];
-    }
+//    public function messages()
+//    {
+//        return [
+//            'amount.min' => 'Minimum allowed is ' . formatCurrencyFormat($this->minimum_amount) . " PF",
+//            'amount.max' => 'Maximum allowed is ' . formatCurrencyFormat($this->maximum_amount) . " PF"
+//        ];
+//    }
 
     private function prepare()
     {
@@ -74,9 +74,9 @@ class CreateWithdrawRequest extends FormRequest
             $bank_service = new BankService($user);
             $this->wallet_balance = $bank_service->getBalance(WALLET_NAME_EARNING_WALLET);
 
-            $this->minimum_amount = getWalletSetting('minimum_withdraw_request_from_earning_wallet_amount');
-            $this->maximum_amount = getWalletSetting('maximum_withdraw_request_from_earning_wallet_amount');
-            Log::info('Withdrawal limits => ' . $this->minimum_amount . ' , ' . $this->maximum_amount);
+//            $this->minimum_amount = getWalletSetting('minimum_withdraw_request_from_earning_wallet_amount');
+//            $this->maximum_amount = getWalletSetting('maximum_withdraw_request_from_earning_wallet_amount');
+//            Log::info('Withdrawal limits => ' . $this->minimum_amount . ' , ' . $this->maximum_amount);
 
             list($total, $fee) = $this->request->has('amount') AND $this->request->has('currency') ? calculateWithdrawalFee($this->request->get('amount'), $this->request->get('currency')) : [0, 0];
             $this->fee = $fee;

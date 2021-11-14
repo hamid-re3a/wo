@@ -31,14 +31,4 @@ class IndexWithdrawRequest extends FormRequest
 
     }
 
-    public function bodyParameters()
-    {
-        return [
-            'status' => [
-                'description' => 'Query param to filter withdraw requests',
-                'type' => 'Query parameter'
-            ]
-        ];
-    }
-
 }

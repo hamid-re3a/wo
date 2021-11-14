@@ -116,45 +116,16 @@ class WithdrawRequestController extends Controller
     {
         try {
             DB::beginTransaction();
-            /**
-             * @var $withdraw_request WithdrawProfit
-             * @var $user User
-             */
-            $withdraw_request = WithdrawProfit::query()->where('uuid', '=', $request->get('id'))->first();
 
-            $this->withdraw_repository->update($request->validated(), $withdraw_request);
-
-            $withdraw_request->refresh();
+            $withdraw_requests = WithdrawProfit::query()->whereIn('uuid', $request->get('ids'))->get();
+            $this->withdraw_repository->update($request->validated(), $withdraw_requests);
 
             DB::commit();
-            return api()->success(null, WithdrawProfitResource::make($withdraw_request));
+            return api()->success();
         } catch (\Throwable $exception) {
             DB::rollback();
             Log::error('Admin/WithdrawRequestController@update => ' . serialize($request->all()));
             throw $exception;
-        }
-    }
-
-    /**
-     * Payout group withdraw requests
-     * @group Admin User > Wallets > Withdraw Requests
-     * @param PayoutGroupWithdrawRequest $request
-     * @return JsonResponse
-     * @throws \Throwable
-     */
-    public function payout_group(PayoutGroupWithdrawRequest $request)
-    {
-
-        try {
-
-            $this->withdraw_repository->payoutGroup($request->get('ids'));
-            return api()->success(null, null);
-
-        } catch (\Throwable $exception) {
-
-            Log::error('Admin/WithdrawRequestController@payout_group => ' . serialize($request->all()));
-            throw $exception;
-
         }
     }
 

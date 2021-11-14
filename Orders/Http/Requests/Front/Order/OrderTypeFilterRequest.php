@@ -4,8 +4,6 @@ namespace Orders\Http\Requests\Front\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Orders\Services\OrderService;
-use Payments\Services\Grpc\PaymentCurrency;
 
 class OrderTypeFilterRequest extends FormRequest
 {
@@ -27,8 +25,8 @@ class OrderTypeFilterRequest extends FormRequest
      */
     public function rules()
     {
-            return [
-            'type' => array('required', Rule::in(["week","month","year"])),
+        return [
+            'type' => array('required', Rule::in(["week", "month", "year","all"])),
         ];
     }
 

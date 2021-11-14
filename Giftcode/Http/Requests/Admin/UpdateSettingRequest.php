@@ -69,6 +69,11 @@ class UpdateSettingRequest extends FormRequest
             case 'giftcode_lifetime':
                 return 'integer|min:1';
                 break;
+            case 'cancellation_fee_type':
+            case 'expiration_fee_type':
+                return 'string|in:fixed,percentage';
+                break;
+
         }
     }
 

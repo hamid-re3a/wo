@@ -3,6 +3,7 @@
 namespace Wallets\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateWithdrawRequest extends FormRequest
 {
@@ -25,10 +26,20 @@ class UpdateWithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|integer|exists:wallet_withdraw_profit_requests,uuid,status,!2',
-            'status' => 'required|in:2,3,4', // 2=Rejected, 3=Processed, 4=Postponed
-            'rejection_reason' => 'required_if:status,2|string',
-            'postponed_to' => 'required_if:status,4|datetime|after:today'
+            'id' => [
+                'required',
+                Rule::exists('wallet_withdraw_profit_requests','uuid')->where('uuid',$this->get('id'))->whereNotIn('status',[
+                    WITHDRAW_COMMAND_REJECT,
+                    WITHDRAW_COMMAND_PROCESS
+                ])
+            ],
+            'status' => 'required|in:' . implode(',', [
+                    WITHDRAW_COMMAND_REJECT,
+                    WITHDRAW_COMMAND_PROCESS,
+                    WITHDRAW_COMMAND_POSTPONE
+                ]),
+            'act_reason' => 'required_if:status,2|string',
+            'postponed_to' => 'required_if:status,4|date|date_format:Y/m/d|after:today'
         ];
 
     }
@@ -36,7 +47,7 @@ class UpdateWithdrawRequest extends FormRequest
     public function messages()
     {
         return [
-            'rejection_reason.required_if' => 'The rejection reason field is required when status is rejected',
+            'act_reason.required_if' => 'The rejection reason field is required when status is rejected',
             'postponed_to.required_if' => 'The postponed date field is required when status is postponed',
         ];
     }

@@ -2,10 +2,10 @@
 
 namespace Wallets\Http\Resources;
 
-use Illuminate\Database\Eloquent\Builder;
+use Bavix\Wallet\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use User\Models\User;
+use Wallets\Repositories\WalletRepository;
 
 class DepositWalletResource extends JsonResource
 {
@@ -17,38 +17,20 @@ class DepositWalletResource extends JsonResource
      */
     public function toArray($request)
     {
-        $total_sum = User::query()->where('id','=',auth()->user()->id)
-            ->withSumQuery([
-                'transactions.amount AS total_received' => function (Builder $query) {
-                    $query->where('wallet_id','=',$this->id);
-                    $query->where('type', '=', 'deposit');
-                }
-            ])
-            ->withSumQuery([
-                'transactions.amount AS total_spent' => function (Builder $query) {
-                    $query->where('wallet_id','=',$this->id);
-                    $query->where('type', 'withdraw');
+        /**@var $wallet Wallet*/
+        $wallet = $this->resource;
+        $wallet->refreshBalance();
+        $wallet_repository = new WalletRepository();
+        list($total_received,$total_spent,$total_transfer) = $wallet_repository->getOverAllSum($wallet->id,$wallet->holder_id);
 
-                }
-            ])
-            ->withSumQuery([
-                'transactions.amount AS total_transfer' => function (Builder $query) {
-                    $query->where('wallet_id','=',$this->id);
-                    $query->where('type','withdraw');
-                    $query->whereHas('metaData', function(Builder $subQuery) {
-                        $subQuery->where('name','=','Transfer');
-                    });
-                }
-            ])
-            ->first();
         return [
-            'name' => $this->name,
-            'balance' => formatCurrencyFormat($this->balanceFloat),
-            'transactions_count' => (int) $this->transactions->where('wallet_id','=',$this->id)->count(),
-            'transfers_count' => (int) $this->transfers->count(),
-            'total_transfer' => $total_sum->total_transfer ? formatCurrencyFormat($total_sum->total_transfer / 100) : 0,
-            'total_received' => $total_sum->total_received ? formatCurrencyFormat($total_sum->total_received / 100) : 0,
-            'total_spent' => $total_sum->total_spent ? formatCurrencyFormat($total_sum->total_spent / 100) : 0
+            'name' => $wallet->name,
+            'balance' => (double)$wallet->balanceFloat,
+            'transactions_count' => (int) $wallet->transactions()->where('wallet_id','=', $wallet->id)->count(),
+            'transfers_count' => (int) $wallet->transfers()->where('from_id','=', $wallet->id)->count(),
+            'total_transfer' => (double)$total_transfer,
+            'total_received' => (double)$total_received,
+            'total_spent' => (double)$total_spent
         ];
     }
 }

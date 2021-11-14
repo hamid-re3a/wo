@@ -26,7 +26,7 @@ class PackageService implements PackagesServiceInterface
         $package = $this->package_repository->getById($id);
         if (is_null($package))
             return new Package();
-        return $this->setPackage($package);
+        return $package->getGrpcMessage();
     }
 
     /**
@@ -50,65 +50,8 @@ class PackageService implements PackagesServiceInterface
         if (empty($package->binary_percentage))
             $package->binary_percentage = $package->category->binary_percentage;
 
-        return $this->setFullPackage($package);
+        return $package->getGrpcMessage();
     }
-
-
-    /**
-     * @param $packeage
-     * @return Package
-     */
-    private function setPackage($packeage): Package
-    {
-        $response_package = new Package();
-        $response_package->setId($packeage->id);
-        $response_package->setName($packeage->name);
-        $response_package->setShortName($packeage->short_name);
-        $response_package->setValidityInDays((int)$packeage->validity_in_days);
-        $response_package->setPrice((double)$packeage->price);
-        $response_package->setRoiPercentage((int)$packeage->roi_percentage);
-        $response_package->setDirectPercentage((int)$packeage->direct_percentage);
-        $response_package->setBinaryPercentage((int)$packeage->binary_percentage);
-        $response_package->setCategoryId((int)$packeage->category_id);
-        return $response_package;
-    }
-
-    /**
-     * @param $packeage
-     * @return Package
-     */
-    private function setFullPackage(\Packages\Models\Package $packeage): Package
-    {
-        $response_package = new Package();
-        $response_package->setId($packeage->id);
-        $response_package->setName($packeage->name);
-        $response_package->setShortName($packeage->short_name);
-        $response_package->setValidityInDays((int)$packeage->validity_in_days);
-        $response_package->setPrice((double)$packeage->price);
-        $response_package->setRoiPercentage((int)$packeage->roi_percentage);
-        $response_package->setDirectPercentage((int)$packeage->direct_percentage);
-        $response_package->setBinaryPercentage((int)$packeage->binary_percentage);
-        $response_package->setCategoryId((int)$packeage->category_id);
-        $response_package->setIndirectCommission($this->mapIndirectCommissions($packeage));
-        return $response_package;
-    }
-
-    private function mapIndirectCommissions(\Packages\Models\Package $package)
-    {
-        if ($package->packageIndirectCommission->count() > 0) {
-            $indirect_commissions = $package->packageIndirectCommission;
-        } else {
-            $indirect_commissions = $package->category->categoryIndirectCommission;
-        }
-        $data_array = $indirect_commissions->map(function ($item) {
-            $indirect_commission = new IndirectCommission();
-            $indirect_commission->setLevel($item->level);
-            $indirect_commission->setPercentage($item->percentage);
-            return $indirect_commission;
-        });
-        return $data_array->toArray();
-    }
-
 
     public function editPackage(Id $id, Package $package): \Packages\Models\Package
     {

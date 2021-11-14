@@ -20,6 +20,7 @@ class PackageController extends Controller
      * @group
      * Public User > Packages
      * @unauthenticated
+     * @queryParam package_exactly optional bool
      */
     public function index()
     {

@@ -4,30 +4,53 @@ namespace Orders\Http\Controllers\Front;
 
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
-use Orders\Http\Requests\Front\Order\OrderRequest;
+use Orders\Http\Requests\Front\Order\OrderTypeFilterRequest;
 use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
-use Orders\Models\Order;
-use Orders\Services\MlmClientFacade;
-use Packages\Services\Grpc\Id;
-use Packages\Services\PackageService;
-use Payments\Services\Grpc\Invoice;
-use Payments\Services\Processors\PaymentFacade;
+use Orders\Services\OrderService;
 use User\Models\User;
 
 class DashboardController extends Controller
 {
+
+    private $order_service;
+
+    public function __construct(OrderService $order_service)
+    {
+        $this->order_service = $order_service;
+    }
+
+    /**
+     * get package overview count
+     * @group
+     * Public User > Orders Dashboard
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageOverviewCount(OrderTypeFilterRequest $request)
+    {
+        return api()->success(null, $this->order_service->packageOverviewCountForUser($request->type, auth()->user()));
+    }
+
+    /**
+     * Get packages based on type
+     * @group
+     * Public User > Orders Dashboard
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageTypeCount(OrderTypeFilterRequest $request)
+    {
+        return api()->success(null, $this->order_service->packageTypeCountForUser($request->type, auth()->user()));
+    }
+
     /**
      * Order Counts
      * @group
-     * Public User > Orders
+     * Public User > Orders Dashboard
      */
     public function counts()
     {
@@ -64,8 +87,16 @@ class DashboardController extends Controller
      */
     public function index(ListOrderRequest $request)
     {
-        $orders = auth()->user()->orders()->filter()->simplePaginate();
-        return api()->success(null, OrderResource::collection($orders)->response()->getData());
+        /**@var $user User */
+        $user = auth()->user();
+        $list = $user->orders()->filter()->orderByDesc('id')->paginate();
+        return api()->success(null, [
+            'list' => OrderResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
     }
 
     /**
@@ -80,6 +111,17 @@ class DashboardController extends Controller
         $order = auth()->user()->orders()->find($request->get('id'))->first();
         return api()->success(null, OrderResource::make($order));
     }
+    /**
+     * Packages percentage based on type chart
+     * @group
+     * Public User > Orders
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageTypePercentCount(OrderTypeFilterRequest $request)
+    {
 
+        return api()->success(null, $this->order_service->packageTypePercentageCountChart($request->type,auth()->user()->id));
+    }
 
 }

@@ -2,8 +2,6 @@
 
 namespace Wallets\Mail\EarningWallet;
 
-use Illuminate\Support\Facades\Http;
-use Wallets\Jobs\UrgentEmailJob;
 use Wallets\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -54,9 +52,9 @@ class WithdrawProfitRequestedSubmitted extends Mailable implements SettingableMa
     public function getSetting() : array
     {
         try {
-            return walletGetEmailContent('WITHDRAW_REQUEST_SUBMITTED');
+            return getWalletEmailContent('WITHDRAW_REQUEST_SUBMITTED');
         } catch (\Throwable $exception) {
-            Log::error('walletGetEmailContent [Wallets\Mail\EarningWallet\WithdrawProfitRequestedSubmitted]');
+            Log::error('getWalletEmailContent [Wallets\Mail\EarningWallet\WithdrawProfitRequestedSubmitted]');
             throw $exception;
         }
     }

@@ -4,8 +4,6 @@ namespace Payments\Http\Controllers\Front;
 
 use Illuminate\Routing\Controller;
 use Payments\Http\Resources\PaymentCurrencyResource;
-use Payments\Models\PaymentCurrency;
-use Payments\Services\Grpc\EmptyObject;
 use Payments\Services\PaymentService;
 
 class PaymentCurrencyController extends Controller
@@ -25,7 +23,8 @@ class PaymentCurrencyController extends Controller
      */
     public function index()
     {
-
-        return api()->success('payment.successfully-fetched-all-payment-currencies',PaymentCurrencyResource::collection(collect($this->payment_service->getPaymentCurrencies( new EmptyObject())->getPaymentCurrencies())));
+        return api()->success('payment.successfully-fetched-all-payment-currencies',
+            PaymentCurrencyResource::collection($this->payment_service->getPaymentCurrencies(CURRENCY_SERVICE_PURCHASE))
+        );
     }
 }

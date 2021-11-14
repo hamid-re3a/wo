@@ -14,10 +14,14 @@ class PackageResource extends JsonResource
      */
     public function toArray($request)
     {
-        if ($this->packageIndirectCommission->count() > 0) {
+        if ($request->has('package_exactly')) {
             $indirect = PackageIndirectSettingResource::collection($this->packageIndirectCommission);
         } else {
-            $indirect = CategoryIndirectSettingResource::collection($this->category->categoryIndirectCommission);
+            if ($this->packageIndirectCommission->count() > 0) {
+                $indirect = PackageIndirectSettingResource::collection($this->packageIndirectCommission);
+            } else {
+                $indirect = CategoryIndirectSettingResource::collection($this->category->categoryIndirectCommission);
+            }
         }
         return [
             'id' => $this->id,
@@ -28,7 +32,7 @@ class PackageResource extends JsonResource
             'roi_percentage' => is_null($this->roi_percentage) ? $this->category->roi_percentage : $this->roi_percentage,
             'direct_percentage' => is_null($this->direct_percentage) ? $this->category->direct_percentage : $this->direct_percentage,
             'binary_percentage' => is_null($this->binary_percentage) ? $this->category->binary_percentage : $this->binary_percentage,
-            'category' => CategoryResource::make($this->category) ,
+            'category' => CategoryResource::make($this->category),
             'indirect_percentages' => $indirect ? $indirect : null
         ];
     }

@@ -3,7 +3,7 @@
 namespace Wallets\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
+use Wallets\Models\WithdrawProfit;
 
 class WithdrawProfitResource extends JsonResource
 {
@@ -15,23 +15,28 @@ class WithdrawProfitResource extends JsonResource
      */
     public function toArray($request)
     {
+        /**@var $withdraw_request WithdrawProfit*/
+        $withdraw_request = $this;
 
         return [
-            'id' => $this->uuid,
-            'user_member_id' => $this->user->member_id,
-            'user_full_name' => $this->user->full_name,
-            'withdraw_transaction_id' => $this->withdrawTransaction->uuid,
-            'refund_transaction_id' => !empty($this->refund_transaction_id) ? $this->refundTransaction->uuid : null,
-            'actor_full_name' => !empty($this->actor_id) ? $this->actor->full_name : null,
-            'rejection_reason' => !empty($this->rejection_reason) ? $this->rejection_reason : null,
-            'wallet_hash' => $this->wallet_hash,
-            'currency' => $this->currency,
-            'crypto_rate' => $this->crypto_rate,
-            'fee' => formatCurrencyFormat($this->fee),
-            'pf_amount' => formatCurrencyFormat($this->pf_amount),
-            'crypto_amount' => $this->crypto_amount,
-            'status' => $this->status,
-            'created_at' => $this->created_at->timestamp
+            'id' => $withdraw_request->uuid,
+            'user_member_id' => $withdraw_request->user->member_id,
+            'user_full_name' => $withdraw_request->user->full_name,
+            'withdraw_transaction_id' => $withdraw_request->withdrawTransaction->uuid,
+            'refund_transaction_id' => !empty($withdraw_request->refund_transaction_id) ? $withdraw_request->refundTransaction->uuid : null,
+            'network_transaction_hash' => !empty($withdraw_request->network_transaction_id) ? $withdraw_request->networkTransaction->transaction_hash : null,
+            'actor_full_name' => !empty($withdraw_request->actor_id) ? $withdraw_request->actor->full_name : null,
+            'act_reason' => !empty($withdraw_request->act_reason) ? $withdraw_request->act_reason : null,
+            'wallet_hash' => $withdraw_request->wallet_hash,
+            'currency' => $withdraw_request->currency,
+            'crypto_rate' => (double)$withdraw_request->crypto_rate,
+            'fee' => (double)$withdraw_request->fee,
+            'pf_amount' => (double)$withdraw_request->pf_amount,
+            'crypto_amount' => (double)$withdraw_request->crypto_amount,
+            'status' => $withdraw_request->status,
+            'postponed_to' => !empty($withdraw_request->postponed_to) ? $withdraw_request->postponed_to->timestamp : null,
+            'created_at' => $withdraw_request->created_at->timestamp,
+            'updated_at' => $withdraw_request->updated_at->timestamp,
         ];
     }
 }

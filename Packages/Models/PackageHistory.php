@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * Packages\Models\PackageHistory
  *
  * @property int $id
- * @property int $legacy_id
+ * @property int $package_id
  * @property string $name
  * @property string $short_name
  * @property int|null $validity_in_days

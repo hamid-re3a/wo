@@ -3,7 +3,6 @@
 namespace Wallets\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Wallets\Models\Setting;
 
 class UpdateSettingRequest extends FormRequest
@@ -55,37 +54,38 @@ class UpdateSettingRequest extends FormRequest
                     return 'required|in:fix,percentage';
                     break;
                 case 'minimum_deposit_fund_amount':
-                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_deposit_fund_amount')->pluck('value')['0'];
+                    return 'required|min:1|lte:' . getWalletSetting('maximum_deposit_fund_amount');
                     break;
                 case 'maximum_deposit_fund_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_deposit_fund_amount')->pluck('value')['0'];
+                    return 'required|gte:' . getWalletSetting('minimum_deposit_fund_amount');
                     break;
                 case 'minimum_transfer_fund_amount':
-                    return 'required|min:1|lte:' . $settings->where('name', '=', 'maximum_transfer_fund_amount')->pluck('value')['0'];
+                    return 'required|min:1|lte:' . getWalletSetting('maximum_transfer_fund_amount');
                     break;
                 case 'maximum_transfer_fund_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_transfer_fund_amount')->pluck('value')['0'];
+                    return 'required|gte:' . getWalletSetting('minimum_transfer_fund_amount');
                     break;
                 case 'minimum_payment_request_amount':
-                    return 'required|lte:' . $settings->where('name', '=', 'maximum_payment_request_amount')->pluck('value')['0'];
+                    return 'required|lte:' . getWalletSetting('maximum_payment_request_amount');
                     break;
                 case 'maximum_payment_request_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_payment_request_amount')->pluck('value')['0'];
+                    return 'required|gte:' . getWalletSetting('minimum_payment_request_amount');
                     break;
                 case 'minimum_transfer_from_earning_to_deposit_wallet_fund_amount':
-                    return 'required|lte:' . $settings->where('name', '=', 'maximum_transfer_from_earning_to_deposit_wallet_fund_amount')->pluck('value')['0'];
+                    return 'required|lte:' . getWalletSetting('maximum_transfer_from_earning_to_deposit_wallet_fund_amount');
                     break;
                 case 'maximum_transfer_from_earning_to_deposit_wallet_fund_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_transfer_from_earning_to_deposit_wallet_fund_amount')->pluck('value')['0'];
+                    return 'required|gte:' . getWalletSetting('minimum_transfer_from_earning_to_deposit_wallet_fund_amount');
                     break;
                 case 'minimum_withdraw_request_from_earning_wallet_amount':
-                    return 'required|lte:' . $settings->where('name', '=', 'maximum_withdraw_request_from_earning_wallet_amount')->pluck('value')['0'];
+                    return 'required|lte:' . getWalletSetting('maximum_withdraw_request_from_earning_wallet_amount');
                     break;
                 case 'maximum_withdraw_request_from_earning_wallet_amount':
-                    return 'required|gte:' . $settings->where('name', '=', 'minimum_withdraw_request_from_earning_wallet_amount')->pluck('value')['0'];
+                    return 'required|gte:' . getWalletSetting('minimum_withdraw_request_from_earning_wallet_amount');
                     break;
                 case 'withdrawal_request_is_enabled':
                 case 'auto_payout_withdrawal_request_is_enable':
+                case 'withdrawal_distribution_is_enabled':
                     return 'required|boolean';
                     break;
                 case 'payout_btc_fee_fixed_or_percentage':
@@ -95,6 +95,14 @@ class UpdateSettingRequest extends FormRequest
                 case 'payout_btc_fee':
                 case 'payout_janex_fee':
                     return 'required|integer';
+                    break;
+                case 'withdrawal_distribution_in_btc' :
+                    $withdrawal_distribution_in_janex = (int) getWalletSetting('withdrawal_distribution_in_janex');
+                    return 'required|min:0|max:' . (100 - $withdrawal_distribution_in_janex);
+                    break;
+                case 'withdrawal_distribution_in_janex' :
+                    $withdrawal_distribution_in_btc = (int) getWalletSetting('withdrawal_distribution_in_janex');
+                    return 'required|min:0|max:' . (100 - $withdrawal_distribution_in_btc);
                     break;
                 default:
                     return 'required';

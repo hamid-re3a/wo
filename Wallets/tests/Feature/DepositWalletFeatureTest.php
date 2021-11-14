@@ -46,9 +46,8 @@ class DepositWalletFeatureTest extends WalletTest
             'status',
             'message',
             'data' => [
-                'data',
-                'links',
-                'meta'
+                'list',
+                'pagination',
             ],
         ]);
     }
@@ -66,7 +65,6 @@ class DepositWalletFeatureTest extends WalletTest
             'data' => [
                 'data',
                 'links',
-                'meta'
             ],
         ]);
     }
@@ -78,17 +76,16 @@ class DepositWalletFeatureTest extends WalletTest
     {
         $user_2 = User::factory()->create();
         $response = $this->postJson(route('wallets.customer.deposit.transfer-fund-preview'), [
-            'amount' => 101,
+            'amount' => 10000000000000000000000000,
             'member_id' => $user_2->member_id
         ]);
-        $response->assertStatus(406);
+        $response->assertStatus(422);
         $response->assertJsonStructure([
             'status',
             'message',
-            'data',
-            'errors' => [
-                'subject'
-            ]
+            'data' => [
+                'amount'
+            ],
         ]);
     }
 
@@ -124,17 +121,16 @@ class DepositWalletFeatureTest extends WalletTest
 
         $user_2 = User::factory()->create();
         $response = $this->postJson(route('wallets.customer.deposit.transfer-fund'), [
-            'amount' => 101,
+            'amount' => 1010000000000000,
             'member_id' => $user_2->member_id
         ]);
-        $response->assertStatus(406);
+        $response->assertStatus(422);
         $response->assertJsonStructure([
             'status',
             'message',
-            'data',
-            'errors' => [
-                'subject'
-            ]
+            'data' => [
+                'amount'
+            ],
         ]);
     }
 

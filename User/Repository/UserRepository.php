@@ -9,6 +9,14 @@ class UserRepository
 {
     private $entity_name = UserModel::class;
 
+
+    public function findById(int $id)
+    {
+
+        $user_entity = new $this->entity_name;
+        return $user_entity::find($id);
+    }
+
     public function editOrCreate(User $user)
     {
         /** @var $user_entity \User\Models\User */
@@ -22,6 +30,7 @@ class UserRepository
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'member_id' => $user->getMemberId(),
+            'gender' => $user->getGender(),
             'block_type' => empty($user->getBlockType()) ? null : $user->getBlockType(),
             'is_deactivate' => empty($user->getIsDeactivate()) ? false : $user->getIsDeactivate(),
             'is_freeze' => empty($user->getIsFreeze()) ? false : $user->getIsFreeze(),

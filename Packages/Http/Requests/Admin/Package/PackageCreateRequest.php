@@ -24,6 +24,7 @@ class PackageCreateRequest extends FormRequest
     public function rules()
     {
         return [
+            'package_exactly' => 'sometimes|boolean',
             'name' => 'required|string',
             'short_name' => 'required|string',
             'validity_in_days' => 'required|numeric',

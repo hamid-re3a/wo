@@ -11,11 +11,11 @@ class PayoutProcessor
      * pay by every payment Driver
      * @inheritDoc
      */
-    public function pay($method,array $address_amounts,array $ids = []): array
+    public function pay($currency,$payout_requests,$dispatchType = 'dispatch'): array
     {
-        switch ($method) {
-            case 'btc-pay-server':
-                return $this->payoutBtcPayServer($address_amounts,$ids);
+        switch ($currency) {
+            case 'BTC':
+                return $this->payoutBtc($payout_requests,$dispatchType);
             default:
                 break;
         }
@@ -24,9 +24,9 @@ class PayoutProcessor
 
     }
 
-    private function payoutBtcPayServer($address_amounts,$ids)
+    private function payoutBtc($payout_requests,$dispatchType)
     {
-        ProcessBTCPayServerPayoutsJob::dispatch($address_amounts,$ids);
+        ProcessBTCPayServerPayoutsJob::$dispatchType($payout_requests,$dispatchType);
         return [true,null];
     }
 

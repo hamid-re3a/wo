@@ -46,6 +46,7 @@ class RequestFundEmail extends Mailable implements SettingableMail
         $setting['body'] = str_replace('{{full_name}}',(is_null($this->user->full_name) || empty($this->user->full_name)) ? 'Unknown': $this->user->full_name,$setting['body']);
         $setting['body'] = str_replace('{{amount}}',(is_null($this->amount) ) ? 'Unknown': number_format($this->amount,2),$setting['body']);
         $setting['body'] = str_replace('{{request_full_name}}',(is_null($this->friend_user->full_name) ) ? 'Unknown': $this->friend_user->full_name,$setting['body']);
+        $setting['body'] = str_replace('{{request_member_id}}',(is_null($this->friend_user->member_id) ) ? 'Unknown': $this->friend_user->member_id,$setting['body']);
         $setting['body'] = str_replace('{{app_name}}',config('APP_NAME','R2F'),$setting['body']);
         $subject = str_replace('{{request_first_name}}', (is_null($this->friend_user->first_name) ) ? 'Unknown': $this->friend_user->first_name, $setting['subject']);
 
@@ -58,9 +59,9 @@ class RequestFundEmail extends Mailable implements SettingableMail
     public function getSetting() : array
     {
         try {
-            return walletGetEmailContent('PAYMENT_REQUEST');
+            return getWalletEmailContent('PAYMENT_REQUEST');
         } catch (\Throwable $exception) {
-            Log::error('walletGetEmailContent [Wallets\Mail\DepositWallet\RequestFundEmail]');
+            Log::error('getWalletEmailContent [Wallets\Mail\DepositWallet\RequestFundEmail]');
             throw $exception;
         }
     }

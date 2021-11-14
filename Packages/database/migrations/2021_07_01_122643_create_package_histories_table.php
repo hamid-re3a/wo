@@ -15,7 +15,8 @@ class CreatePackageHistoriesTable extends Migration
     {
         Schema::create('package_histories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('legacy_id');
+            $table->foreignId('package_id')->constrained('packages');
+            $table->foreignId('actor_id')->constrained('users');
 
             $table->string('name');
             $table->string('short_name',20);
@@ -26,7 +27,7 @@ class CreatePackageHistoriesTable extends Migration
             $table->integer('direct_percentage')->nullable();
             $table->integer('binary_percentage')->nullable();
 
-            $table->unsignedBigInteger('category_id');
+            $table->foreignId('category_id')->constrained('categories');
 
             $table->softDeletes();
             $table->timestamps();

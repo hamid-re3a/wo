@@ -6,6 +6,7 @@ namespace Wallets\tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Payments\PaymentConfigure;
 use Spatie\Permission\Models\Role;
 use User\Models\User;
 use Wallets\WalletConfigure;
@@ -23,6 +24,8 @@ class WalletTest extends TestCase
         $this->app->setLocale('en');
         $this->withHeaders($this->getHeaders());
         WalletConfigure::seed();
+
+        PaymentConfigure::seed();
     }
 
     public function hasMethod($class, $method)
@@ -48,9 +51,9 @@ class WalletTest extends TestCase
             foreach (USER_ROLES as $role)
                 Role::query()->firstOrCreate(['name' => $role]);
         $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_SUPER_ADMIN]);
-        $hash = md5(serialize($user->getUserService()));
+        $hash = md5(serialize($user->getGrpcMessage()));
         return [
-            'X-user-id' => '1',
+            'X-user-id' => $user->id,
             'X-user-hash' => $hash,
         ];
     }

@@ -2,23 +2,29 @@
 
 namespace Wallets;
 
-use Wallets\Commands\ProcessWithdrawalRequestsCommand;
+use Wallets\Commands\ProcessBTCWithdrawalRequestsCommand;
 use Wallets\Models\EmailContent;
 use Wallets\Models\Setting;
 use Wallets\Models\Transaction;
+use Wallets\Models\Transfer;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Observers\EmailContentObserver;
 use Wallets\Observers\SettingObserver;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Wallets\Observers\TransactionObserver;
+use Wallets\Observers\TransferObserver;
 use Wallets\Observers\WithdrawProfitObserver;
+use Wallets\Services\KycClientFacade;
+use Wallets\Services\KycGrpcClientProvider;
+use Wallets\Services\MlmClientFacade;
+use Wallets\Services\MlmGrpcClientProvider;
 
 class WalletServiceProvider extends ServiceProvider
 {
     private $namespace = 'Wallets';
     private $name = 'wallets';
-    private $config_file_name = 'wallet';
+    private $config_file_name = 'wallet-domain';
 
     /**
      * Register API class.
@@ -49,6 +55,8 @@ class WalletServiceProvider extends ServiceProvider
     public function boot()
     {
 
+        $this->registerFacades();
+
         $this->registerObservers();
 
         $this->setupConfig();
@@ -56,8 +64,6 @@ class WalletServiceProvider extends ServiceProvider
         $this->registerHelpers();
 
         $this->registerCommands();
-
-        $this->registerWalletsName();
 
         Route::prefix('v1/wallets')
             ->middleware('api')
@@ -70,11 +76,20 @@ class WalletServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
-        ], 'api-response');
+        ], 'wallet-config');
 
         $this->publishes([
             __DIR__ . '/resources/lang' => resource_path('lang'),
-        ], 'user-resources');
+        ], 'wallet-resources');
+    }
+
+    /**
+     * Register Facades
+     */
+    private function registerFacades()
+    {
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
+        KycClientFacade::shouldProxyTo(KycGrpcClientProvider::class);
     }
 
     /**
@@ -83,7 +98,7 @@ class WalletServiceProvider extends ServiceProvider
     private function registerCommands()
     {
         $this->commands([
-            ProcessWithdrawalRequestsCommand::class
+            ProcessBTCWithdrawalRequestsCommand::class
         ]);
     }
 
@@ -96,6 +111,7 @@ class WalletServiceProvider extends ServiceProvider
         EmailContent::observe(EmailContentObserver::class);
         WithdrawProfit::observe(WithdrawProfitObserver::class);
         Transaction::observe(TransactionObserver::class);
+        Transfer::observe(TransferObserver::class);
     }
 
 
@@ -129,17 +145,6 @@ class WalletServiceProvider extends ServiceProvider
         if (file_exists($helperFile = __DIR__ . '/helpers/queryMacros.php')) {
             require_once $helperFile;
         }
-    }
-
-    /**
-     * Register wallets name
-     */
-    private function registerWalletsName()
-    {
-        config([
-            'depositWallet' => 'Deposit Wallet',
-            'earningWallet' => 'Earning Wallet'
-        ]);
     }
 
 

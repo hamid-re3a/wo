@@ -45,8 +45,8 @@ class PackageTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $user->assignRole(USER_ROLE_CLIENT);
-        $hash = md5(serialize($user->getUserService()));
+        $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_ADMIN_SUBSCRIPTIONS_PACKAGE]);
+        $hash = md5(serialize($user->getGrpcMessage()));
         return [
             'X-user-id' => '1',
             'X-user-hash' => $hash,

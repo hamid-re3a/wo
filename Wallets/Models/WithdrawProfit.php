@@ -27,6 +27,7 @@ use User\Models\User;
  * @property double $crypto_amount
  * @property double $crypto_rate
  * @property double $fee
+ * @property double $total
  * @property Carbon $postponed_to
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -122,17 +123,20 @@ class WithdrawProfit extends Model
     {
         switch ($this->attributes['status']) {
             case 1:
-                return 'Under review';
+                return WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING;
                 break;
 
             case 2:
-                return 'Rejected';
+                return WALLET_WITHDRAW_REQUEST_STATUS_REJECT_STRING;
                 break;
             case 3:
-                return 'Processed';
+                return WALLET_WITHDRAW_REQUEST_STATUS_PROCESS_STRING;
                 break;
             case 4:
-                return 'Postponed';
+                return WALLET_WITHDRAW_REQUEST_STATUS_POSTPONE_STRING;
+                break;
+            case 5:
+                return WALLET_WITHDRAW_REQUEST_STATUS_REVERT_STRING;
                 break;
             default:
                 return 'Unknown';

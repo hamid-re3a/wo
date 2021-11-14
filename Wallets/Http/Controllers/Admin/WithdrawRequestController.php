@@ -122,12 +122,7 @@ class WithdrawRequestController extends Controller
              */
             $withdraw_request = WithdrawProfit::query()->where('uuid', '=', $request->get('id'))->first();
 
-            if ($request->get('status') == WITHDRAW_COMMAND_PROCESS)
-                $this->withdraw_repository->pay($withdraw_request->toArray());
-            else if ($request->get('status') == WITHDRAW_COMMAND_REJECT)
-                $this->withdraw_repository->rejectWithdrawRequest($request, $withdraw_request);
-            else if ($request->get('status') == WITHDRAW_COMMAND_POSTPONE)
-                $this->withdraw_repository->update($request->validated(), $withdraw_request);
+            $this->withdraw_repository->update($request->validated(), $withdraw_request);
 
             $withdraw_request->refresh();
 
@@ -172,7 +167,7 @@ class WithdrawRequestController extends Controller
      */
     public function pendingAmountVsTimeChart(ChartTypeRequest $request)
     {
-        return api()->success(null,$this->withdraw_repository->getPendingAmountVsTimeChart($request->get('type')));
+        return api()->success(null, $this->withdraw_repository->getPendingAmountVsTimeChart($request->get('type')));
     }
 
     /**
@@ -184,7 +179,7 @@ class WithdrawRequestController extends Controller
      */
     public function paidAmountVsTimeChart(ChartTypeRequest $request)
     {
-        return api()->success(null,$this->withdraw_repository->getPaidAmountVsTimeChart($request->get('type')));
+        return api()->success(null, $this->withdraw_repository->getPaidAmountVsTimeChart($request->get('type')));
     }
 
 

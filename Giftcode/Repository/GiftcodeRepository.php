@@ -151,10 +151,10 @@ class GiftcodeRepository
 
 
             /**
-             * Refund Giftcode total paid - cancelation fee
+             * Refund Gift code total paid - cancellation fee
              */
-            //Refund giftcode pay fee
-            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid,'Gift code cancelled');
+            //Refund gift code pay fee
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Gift code #' . $giftcode->uuid,'Gift code cancelled');
 
             //Wallet transaction failed [Server error]
             if(!is_string($finalTransaction->getTransactionId()))

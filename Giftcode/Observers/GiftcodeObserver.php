@@ -23,8 +23,13 @@ class GiftcodeObserver
             Log::error('GiftcodeObserver Line 22, user_id is null');
             throw new Exception(trans('giftcode.responses.global-error'),500);
         }
+
         $user = User::query()->find($giftcode->user_id);
-        $giftcode->uuid = $user->member_id . mt_rand(1,100) . time();
+        $uuid = $user->member_id . mt_rand(1000,9999) . time();
+        while(Giftcode::query()->where('uuid','=',$uuid)->exists())
+            $uuid = $user->member_id . mt_rand(1000,9999) . time();
+
+        $giftcode->uuid = $uuid;
 
         //Giftcode costs
         if(empty($giftcode->package_id)) {

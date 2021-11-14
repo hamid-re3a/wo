@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Giftcode\Http\Controllers\User;
+namespace Giftcode\Http\Controllers\Front;
 
 
 use App\Http\Controllers\Controller;
@@ -9,6 +9,7 @@ use Giftcode\Http\Requests\User\CancelGiftcodeRequest;
 use Giftcode\Http\Requests\User\CreateGiftcodeRequest;
 use Giftcode\Http\Resources\GiftcodeResource;
 use Giftcode\Jobs\UpdatePackages;
+use Giftcode\Models\Giftcode;
 use Giftcode\Repository\GiftcodeRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -59,8 +60,17 @@ class GiftcodeController extends Controller
      */
     public function index()
     {
-        $giftcodes = auth()->user()->giftcodes()->orderBy('created_at', 'DESC')->simplePaginate();
-        return api()->success(null, GiftcodeResource::collection($giftcodes)->response()->getData());
+        /**@var $user User*/
+        $user = auth()->user();
+        $list = $user->giftcodes()->orderBy('created_at', 'DESC')->paginate();
+
+        return api()->success(null, [
+            'list' => GiftcodeResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
     }
 
     /**
@@ -88,25 +98,11 @@ class GiftcodeController extends Controller
     }
 
     /**
-     * Get giftcode detail
-     * @group Public User > Giftcode
-     */
-    public function show()
-    {
-        $giftcode = $this->giftcode_repository->getByUuid(request()->route()->parameters['uuid']);
-
-        if (!$giftcode OR $giftcode->user_id != request()->header('X-user-id'))
-            return api()->error(null, null, 404);
-
-        return api()->success(null, GiftcodeResource::make($giftcode));
-
-    }
-
-    /**
      * Cancel Giftcode
      * @group Public User > Giftcode
      * @param CancelGiftcodeRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function cancel(CancelGiftcodeRequest $request)
     {

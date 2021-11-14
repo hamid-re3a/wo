@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Orders\Models\Order;
+use Packages\Services\Grpc\IndirectCommission;
 
 /**
  * Packages\Models\Package
@@ -75,23 +76,40 @@ class Package extends Model
     /**
      * Methods
      */
-    public function getPackageService()
+    public function getGrpcMessage()
     {
         $package_service = new \Packages\Services\Grpc\Package();
-        $package_service->setId($this->attributes['id']);
-        $package_service->setName($this->attributes['name']);
-        $package_service->setShortName($this->attributes['short_name']);
-        $package_service->setValidityInDays($this->attributes['validity_in_days']);
-        $package_service->setPrice($this->attributes['price']);
-        $package_service->setRoiPercentage($this->attributes['roi_percentage']);
-        $package_service->setDirectPercentage($this->attributes['direct_percentage']);
-        $package_service->setBinaryPercentage($this->attributes['binary_percentage']);
-        $package_service->setCategoryId($this->attributes['category_id']);
-        $package_service->setDeletedAt($this->attributes['deleted_at']);
-        $package_service->setCreatedAt($this->attributes['created_at']);
-        $package_service->setUpdatedAt($this->attributes['updated_at']);
+        $package_service->setId((int)$this->attributes['id']);
+        $package_service->setName((string)$this->attributes['name']);
+        $package_service->setShortName((string)$this->attributes['short_name']);
+        $package_service->setValidityInDays((int)$this->attributes['validity_in_days']);
+        $package_service->setPrice((float)$this->attributes['price']);
+        $package_service->setRoiPercentage((float)$this->attributes['roi_percentage']);
+        $package_service->setDirectPercentage((float)$this->attributes['direct_percentage']);
+        $package_service->setBinaryPercentage((float)$this->attributes['binary_percentage']);
+        $package_service->setCategoryId((int)$this->attributes['category_id']);
+        $package_service->setDeletedAt((string)$this->attributes['deleted_at']);
+        $package_service->setCreatedAt((string)$this->attributes['created_at']);
+        $package_service->setUpdatedAt((string)$this->attributes['updated_at']);
+        $package_service->setIndirectCommission($this->mapIndirectCommissions());
 
         return $package_service;
 
+    }
+
+    private function mapIndirectCommissions()
+    {
+        if ($this->packageIndirectCommission->count() > 0) {
+            $indirect_commissions = $this->packageIndirectCommission;
+        } else {
+            $indirect_commissions = $this->category->categoryIndirectCommission;
+        }
+        $data_array = $indirect_commissions->map(function ($item) {
+            $indirect_commission = new IndirectCommission();
+            $indirect_commission->setLevel($item->level);
+            $indirect_commission->setPercentage($item->percentage);
+            return $indirect_commission;
+        });
+        return $data_array->toArray();
     }
 }

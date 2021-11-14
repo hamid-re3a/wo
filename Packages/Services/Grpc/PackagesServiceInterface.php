@@ -20,4 +20,13 @@ interface PackagesServiceInterface extends Grpc\ServiceInterface
     * @throws Grpc\Exception\InvokeException
     */
     public function packageById(Context $context, Id $request): Package;
+
+    /**
+    * @param Context $context
+    * @param PackageCheck $request
+    * @return Acknowledge
+    *
+    * @throws Grpc\Exception\InvokeException
+    */
+    public function packageIsInBiggestPackageCategory(Context $context, PackageCheck $request): Acknowledge;
 }

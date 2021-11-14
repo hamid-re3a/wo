@@ -1,3 +1,18 @@
-Order Feature (Orders\tests\Feature\OrderFeature)
- [x] Submit order with email
+Package Feature (Packages\tests\Feature\PackageFeature)
+ [x] Return package list green
+ [x] Package commission edit
+
+Payment Admin Feature (Payments\tests\Feature\PaymentAdminFeature)
+ [x] Get payment type admin
+ [x] Edit payment type admin
+ [x] Edit payment currency admin
+ [x] Delete payment type admin
+ [x] Create payment type admin
+
+Payment Feature (Payments\tests\Feature\PaymentFeature)
+ [x] Get payment types
+ [x] Get payment currencies
+
+Deposit Wallet Feature (Wallets\tests\Feature\DepositWalletFeature)
+ [ ] Get deposit wallet
 

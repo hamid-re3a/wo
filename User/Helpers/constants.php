@@ -38,7 +38,7 @@ if (!function_exists('updateUserFromGrpcServer')) {
     {
         if(!is_numeric($input_id))
             return null;
-        $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
+        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
         $id = new \User\Services\Grpc\Id();
@@ -64,7 +64,7 @@ if (!function_exists('updateUserFromGrpcServerByMemberId')) {
     {
         if(!is_numeric($input_id))
             return null;
-        $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
+        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
         $id = new \User\Services\Grpc\Id();
@@ -73,6 +73,7 @@ if (!function_exists('updateUserFromGrpcServerByMemberId')) {
             /** @var $user \User\Services\Grpc\User */
             list($user, $status) = $client->getUserByMemberId($id)->wait();
             if ($status->code == 0 && $user->getId()) {
+                \Illuminate\Support\Facades\Log::info('User Updated by GRPC/MemberID => ' . $user->getId());
                 app(UserService::class)->userUpdate($user);
                 return $user;
             }

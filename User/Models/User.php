@@ -7,10 +7,10 @@ use Bavix\Wallet\Traits\CanConfirm;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Log;
 use Orders\Models\Order;
 use Payments\Models\Invoice;
 use Spatie\Permission\Traits\HasRoles;
@@ -39,6 +39,7 @@ use Wallets\Models\WithdrawProfit;
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereMemberId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereFirstName($value)
@@ -65,6 +66,7 @@ class User extends Model implements WalletFloat
         'is_deactivate',
         'is_freeze',
         'block_type',
+        'gender',
     ];
 
     protected static function newFactory()
@@ -117,6 +119,11 @@ class User extends Model implements WalletFloat
         return $this->invoices()->where('payable_type','Order');
     }
 
+    public function walletInvoices()
+    {
+        return $this->invoices()->where('payable_type','DepositWallet');
+    }
+
     public function withdrawRequests()
     {
         return $this->hasMany(WithdrawProfit::class,'user_id','id');
@@ -131,7 +138,7 @@ class User extends Model implements WalletFloat
     /**
      * Methods
      */
-    public function getUserService()
+    public function getGrpcMessage()
     {
         $this->fresh();
         $user = new \User\Services\Grpc\User();
@@ -145,6 +152,7 @@ class User extends Model implements WalletFloat
         $user->setBlockType((string)$this->attributes['block_type']);
         $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
         $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
+        $user->setGender((string)$this->attributes['gender']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());

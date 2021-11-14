@@ -14,11 +14,14 @@ class InvoiceTransactionResource extends JsonResource
      */
     public function toArray($request)
     {
+        $rate = $this->invoice->rate;
         return [
             'hash' => $this->hash,
             'received_date' => $this->received_date->timestamp,
-            'value' => $this->value,
-            'fee' => $this->fee,
+            'value' => (double)$this->value,
+            'value_pf' => (double)usdToPf($rate * $this->value),
+            'fee' => (double)$this->fee,
+            'fee_pf' => (double)usdToPf($rate * $this->fee),
             'status' => $this->status,
             'destination' => $this->destination,
         ];

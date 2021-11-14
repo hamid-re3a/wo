@@ -62,9 +62,14 @@ class GiftcodeServiceProvider extends ServiceProvider
             $this->seed();
         }
 
+
+        $this->publishes([
+            __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
+        ], 'giftcode-config');
+
         $this->publishes([
             __DIR__ . '/resources/lang' => resource_path('lang'),
-        ], 'user-resources');
+        ], 'giftcode-resources');
 
         $this->publishes([
             __DIR__ . '/config/' => config_path(),
@@ -124,6 +129,7 @@ class GiftcodeServiceProvider extends ServiceProvider
     {
         return GiftCodeConfigure::$runsMigrations;
     }
+
     private function seed()
     {
         if (isset($_SERVER['argv']))

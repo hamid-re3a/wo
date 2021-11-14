@@ -2,7 +2,6 @@
 
 namespace Orders;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Orders\Services\MlmClientFacade;
@@ -26,7 +25,6 @@ class OrderServiceProvider extends ServiceProvider
          * related Facades
          */
 
-        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
 
         if (!$this->app->runningInConsole()) {
             return;
@@ -51,6 +49,7 @@ class OrderServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
 
         $this->setupConfig();
 

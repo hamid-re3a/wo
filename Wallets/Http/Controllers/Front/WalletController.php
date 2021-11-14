@@ -4,6 +4,7 @@ namespace Wallets\Http\Controllers\Front;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use User\Models\User;
 use Wallets\Http\Requests\Front\GetTransactionRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\EarningWalletResource;
@@ -11,19 +12,22 @@ use Wallets\Services\BankService;
 
 class WalletController extends Controller
 {
+    /**
+     * @var $bankService BankService
+     */
     private $bankService;
-    private $depositWallet;
-    private $earningWallet;
 
     public function readyBankService()
     {
-        $this->bankService = new BankService(auth()->user());
-        $this->earningWallet = config('earningWallet');
-        $this->depositWallet = config('depositWallet');
-        if($this->bankService->getAllWallets()->count() == 0) {
-            $this->bankService->getWallet($this->depositWallet);
-            $this->bankService->getWallet($this->earningWallet);
-        }
+        /**
+         * @var $user User
+         * @var $bankService BankService
+         */
+        $user = auth()->user();
+        $this->bankService = new BankService($user);
+        if($this->bankService->getAllWallets()->count() != count(WALLET_NAMES))
+            foreach(WALLET_NAMES AS $wallet_name)
+                $this->bankService->getWallet($wallet_name);
     }
     /**
      * Wallets list

@@ -24,11 +24,9 @@ class GetUserWalletBalanceRequest extends FormRequest
      */
     public function rules()
     {
-        $depositWallet = config('depositWallet');
-        $earningWallet = config('earningWallet');
         return [
-            'user_id' => 'required|exists:wallet_users,user_id',
-            'wallet_name' => "required|in:{$depositWallet},{$earningWallet}",
+            'member_id' => 'required|exists:users,member_id',
+            'wallet_name' => 'required|in:' . implode(',',WALLET_NAMES),
         ];
 
     }

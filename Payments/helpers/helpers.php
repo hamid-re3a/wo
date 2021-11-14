@@ -3,6 +3,17 @@
 use Illuminate\Support\Facades\DB;
 use Payments\Models\EmailContentSetting;
 use Payments\Models\Setting;
+
+const CURRENCY_SERVICE_PURCHASE = 'purchase';
+const CURRENCY_SERVICE_WITHDRAW = 'withdraw';
+const CURRENCY_SERVICE_DEPOSIT = 'deposit';
+const CURRENCY_SERVICES = [
+    CURRENCY_SERVICE_DEPOSIT,
+    CURRENCY_SERVICE_WITHDRAW,
+    CURRENCY_SERVICE_PURCHASE
+];
+
+
 const INVOICE_STATUS_NEW = 'New';
 const INVOICE_STATUS_EXPIRED = 'Expired';
 const INVOICE_STATUS_PAID = 'Paid';
@@ -76,12 +87,12 @@ const SETTINGS = [
  */
 
 const PAYMENT_EMAIL_CONTENT_SETTINGS = [
-    'INVOICE_CREATED_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'New Invoice',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'INVOICE_CREATED_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'New Invoice',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
                 <p>We are contacting you in regard to a new invoice #{{invoice_no}} that has been created on your account. Please pay the invoice by either logging into the system or copy the below payment address to your crypto wallet.</p>
@@ -123,9 +134,9 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,expiry_date',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
     'INVOICE_PARTIAL_PAID_EMAIL' => [
         'is_active' => true,
@@ -142,16 +153,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,due_amount,amount_in_usd,expiry_date',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,due_amount,amount_in_usd,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
-    'INVOICE_PAID_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'Payment Received',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'INVOICE_PAID_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Payment Received',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hi {{full_name}}</p>
                 <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
@@ -161,16 +172,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
-    'INVOICE_COMPLETE_PAID_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'Payment Received',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'INVOICE_COMPLETE_PAID_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Payment Received',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hi {{full_name}}</p>
                 <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
@@ -180,16 +191,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
-    'INVOICE_EXPIRED_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'Invoice expired',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'INVOICE_EXPIRED_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Invoice expired',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
                 <p>The invoice #{{invoice_no}} for {{usd_amount}} was due at {{expiry_date}}. But we don't have any record of payment</p>
@@ -199,18 +210,18 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,invoice_no,expiry_date',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,invoice_no,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
 
 
-    'WALLET_INVOICE_CREATED_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'Pay invoice on time',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'WALLET_INVOICE_CREATED_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Pay invoice on time',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
                 <p>Thank you for creating the invoice for the sum of {{usd_amount}} USD. Please pay the invoice on time. As we receive your payment, we will directly credit your deposit wallet.</p>
@@ -222,9 +233,9 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,expiry_date',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,package_name,usd_amount,due_amount,crypto,payment_address,current_time,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
     'WALLET_INVOICE_PARTIAL_PAID_EMAIL' => [
         'is_active' => true,
@@ -241,16 +252,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,due_amount,amount_in_usd,expiry_date',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,due_amount,amount_in_usd,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
-    'WALLET_INVOICE_PAID_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'Deposit fund payment received',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'WALLET_INVOICE_PAID_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Deposit fund payment received',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hi {{full_name}}</p>
                 <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
@@ -260,16 +271,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
-    'WALLET_INVOICE_COMPLETE_PAID_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'Deposit fund payment received',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'WALLET_INVOICE_COMPLETE_PAID_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Deposit fund payment received',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hi {{full_name}}</p>
                 <p>Thank you for the recent payment you have made to us for the sum of {{usd_amount}} USD. We hereby acknowledge receipt of payment which has been set against the invoice #{{invoice_no}}</p>
@@ -279,16 +290,16 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
-    'WALLET_INVOICE_EXPIRED_EMAIL'=>[
-        'is_active'=>true,
-        'subject'=>'Deposit fund invoice expired',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+    'WALLET_INVOICE_EXPIRED_EMAIL' => [
+        'is_active' => true,
+        'subject' => 'Deposit fund invoice expired',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
                 <p>The invoice #{{invoice_no}} for {{usd_amount}} was due at {{expiry_date}}. But we don't have any record of payment</p>
@@ -298,9 +309,9 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,invoice_no,expiry_date',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,invoice_no,expiry_date',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
 ];
 if (!function_exists('getSetting')) {
@@ -325,16 +336,19 @@ if (!function_exists('getPaymentEmailSetting')) {
 
     function getPaymentEmailSetting($key)
     {
-        if (DB::table('email_content_settings')->exists()) {
-            $setting = EmailContentSetting::query()->where('key', $key)->first();
-            if ($setting && !empty($setting->value)) {
-                return $setting->toArray();
-            }
-
+        $email = null;
+        $setting = EmailContentSetting::query()->where('key', $key)->first();
+        if ($setting && !empty($setting->value)) {
+            $email = $setting->toArray();
         }
 
-        if (isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key])) {
-            return PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
+        if (empty($email) AND isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key])) {
+            $email =  PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
+        }
+
+        if($email AND is_array($email)) {
+            $email['from'] = env('MAIL_FROM', $email['from']);
+            return $email;
         }
 
         throw new Exception(trans('payment.responses.main-key-settings-is-missing'));
@@ -342,14 +356,12 @@ if (!function_exists('getPaymentEmailSetting')) {
 }
 
 
-
-
 if (!function_exists('formatCurrencyNumber')) {
 
     function formatCurrencyNumber($value)
     {
-        if(is_numeric($value))
-            $value = number_format($value,2);
+        if (is_numeric($value))
+            $value = number_format($value, 2);
 //            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
         return $value;
@@ -360,7 +372,7 @@ if (!function_exists('usdToPf')) {
 
     function usdToPf($value)
     {
-        return (double) ( $value / (double) (getSetting('BF_TO_USD_RATE')));
+        return (double)($value / (double)(getSetting('BF_TO_USD_RATE')));
     }
 }
 
@@ -368,6 +380,6 @@ if (!function_exists('pfToUsd')) {
 
     function pfToUsd($value)
     {
-        return (double) ( $value * ((double) getSetting('BF_TO_USD_RATE')));
+        return (double)($value * ((double)getSetting('BF_TO_USD_RATE')));
     }
 }

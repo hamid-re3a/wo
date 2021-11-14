@@ -14,15 +14,23 @@ class InvoiceResource extends JsonResource
      */
     public function toArray($request)
     {
+        $transactions = $this->transactions ? InvoiceTransactionResource::collection($this->transactions) : null;
         return [
             'transaction_id' => $this->transaction_id,
             'type' => $this->type,
-            'status' => $this->status,
-            'amount' => $this->amount,
+            'status' => $this->full_status,
+            'rate' => (double)$this->rate,
+            'amount' => (double)$this->amount,
+            'amount_pf' => (double)$this->pf_amount,
             'checkout_link' => $this->checkout_link,
             'is_paid' => $this->is_paid,
-            'paid_amount' => $this->paid_amount,
-            'due_amount' => $this->due_amount,
+            'paid_amount' => (double)$this->paid_amount,
+            'paid_amount_pf' => (double)usdToPf($this->paid_amount * $this->rate),
+            'due_amount' => (double)$this->due_amount,
+            'due_amount_pf' => (double)usdToPf($this->due_amount * $this->rate),
+            'is_refund_at' => $this->is_refund_at ? $this->is_refund_at->timestamp : null,
+            'refunder_full_name' => $this->refunder_user_id ? $this->refunder->full_name : null,
+            'transactions' => $transactions,
             'expiration_time' => $this->expiration_time->timestamp,
             'created_at' => $this->created_at->timestamp,
             'updated_at' => $this->updated_at->timestamp,

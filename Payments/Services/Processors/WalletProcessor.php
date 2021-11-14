@@ -95,6 +95,8 @@ class WalletProcessor extends ProcessorAbstract
 
                 // send web socket notification
                 $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
+                EmailJob::dispatch(new EmailWalletInvoicePaidComplete($this->user_db, $this->invoice_db), $this->user_db->email);
+
             } else {
                 Log::error('Deposit wallet user error , InvoiceID => ' . $this->invoice_db->id);
                 //TODO email admin/dev-team email
@@ -102,7 +104,6 @@ class WalletProcessor extends ProcessorAbstract
         }
 
         // send user email
-        EmailJob::dispatch(new EmailWalletInvoicePaidComplete($this->user_db, $this->invoice_db), $this->user_db->email);
 
     }
 

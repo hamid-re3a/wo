@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Orders\Services\Grpc\OrderPlans;
+use Packages\Models\Package;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use User\Models\User;
@@ -20,18 +21,22 @@ use User\Models\User;
  * @property int $packages_cost_in_pf
  * @property int $registration_fee_in_pf
  * @property int $validity_in_days
- * @property string|null $is_paid_at
- * @property string|null $is_resolved_at
- * @property string|null $is_refund_at
- * @property string|null $is_commission_resolved_at
- * @property string|null $expires_at
+ * @property \Illuminate\Support\Carbon|null $is_paid_at
+ * @property \Illuminate\Support\Carbon|null $is_resolved_at
+ * @property \Illuminate\Support\Carbon|null $is_refund_at
+ * @property \Illuminate\Support\Carbon|null $is_commission_resolved_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
  * @property string $payment_type
+ * @property string $package_name
  * @property string $payment_currency
  * @property string|null $payment_driver
  * @property string $plan
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Order expired()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order active()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order resolved()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order query()
@@ -77,11 +82,24 @@ class Order extends Model
 
     ];
 
+    public function scopeActive($query)
+    {
+        return $query->whereDate("expires_at", ">", now()->toDate());
+    }
+    public function scopeExpired($query)
+    {
+        return $query->whereDate("expires_at", "<=", now()->toDate());
+    }
+
+    public function scopeResolved($query)
+    {
+        return $query->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null], ["is_commission_resolved_at", "!=", null]]);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
-
 
     public function fromUser()
     {
@@ -96,26 +114,26 @@ class Order extends Model
     public function reCalculateCosts()
     {
         $this->refresh();
-        if(in_array($this->plan, [ORDER_PLAN_START,ORDER_PLAN_COMPANY])){
+        if (in_array($this->plan, [ORDER_PLAN_SPECIAL, ORDER_PLAN_COMPANY])) {
             $this->packages_cost_in_pf = (float)0;
             $this->total_cost_in_pf = (float)0;
             $this->save();
+            return;
         }
 
         if ($this->plan == ORDER_PLAN_START)
             $this->registration_fee_in_pf = (float)getSetting('REGISTRATION_FEE');
-        $this->packages_cost_in_pf = (float)$this->orderPackagesPrice();
+        $this->packages_cost_in_pf = (float)$this->orderPackage()->getPrice();
         $this->total_cost_in_pf = (float)$this->packages_cost_in_pf + (float)$this->registration_fee_in_pf;
         $this->save();
         $this->refresh();
     }
 
-    private function orderPackagesPrice()
+    private function orderPackage()
     {
         $id = new Id;
         $id->setId($this->package_id);
-        $package_service_object = app(PackageService::class)->packageById($id);
-        return $package_service_object->getPrice();
+        return app(PackageService::class)->packageById($id);
     }
 
 
@@ -151,7 +169,7 @@ class Order extends Model
     /*
      * Methods
      */
-    public function getOrderService()
+    public function getGrpcMessage()
     {
         $order_service = new \Orders\Services\Grpc\Order();
         $order_service->setId((int)$this->attributes['id']);
@@ -197,6 +215,11 @@ class Order extends Model
             AND !empty($this->attributes['is_paid_at']) AND !empty($this->attributes['validity_in_days'])
         )
             $this->attributes['expires_at'] = Carbon::make($value)->addDays($this->attributes['validity_in_days'])->toDateTimeString();
+    }
+
+    public function getPackageNameAttribute()
+    {
+        return $this->orderPackage()->getName() . ' (' . $this->orderPackage()->getShortName() . ')';
     }
 
 

@@ -71,6 +71,12 @@ class SettingSeeder extends Seeder
                 'description' => 'Include cancellation fee'
             ],
             [
+                'name' => 'cancellation_fee_type',
+                'value' => 'fixed',
+                'title' => 'Cancellation fee fix or percentage',
+                'description' => 'Cancellation fee fix or percentage'
+            ],
+            [
                 'name' => 'cancellation_fee',
                 'value' => 1,
                 'title' => 'Cancelation fee',
@@ -81,6 +87,12 @@ class SettingSeeder extends Seeder
                 'value' => true,
                 'title' => 'Include expiration fee',
                 'description' => 'Include expiration fee for giftcode or not'
+            ],
+            [
+                'name' => 'expiration_fee_type',
+                'value' => 1,
+                'title' => 'Expiration fee fixed or percentage',
+                'description' => 'Expiration fee fixed or percentage'
             ],
             [
                 'name' => 'expiration_fee',

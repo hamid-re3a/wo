@@ -34,7 +34,7 @@ class GiftcodeCreatedEmail extends Mailable implements SettingableMail
      * Build the message.
      *
      * @return $this
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function build()
     {

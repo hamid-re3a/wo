@@ -26,23 +26,6 @@ class GiftcodeControllerTest extends GiftcodeTest
     /**
      * @test
      */
-    public function get_gift_code()
-    {
-        Mail::fake();
-        $response = $this->createGiftCode();
-        $response->assertOk();
-        $giftcode = Giftcode::query()->first();
-        $response = $this->getJson(route('giftcodes.customer.show', [
-            'uuid' => $giftcode->uuid
-        ]));
-        $response->assertOk();
-        $response->assertOk();
-        $response->assertJsonStructure($this->getGiftcodeJsonStructure());
-    }
-
-    /**
-     * @test
-     */
     public function cancel_gift_code()
     {
         Mail::fake();

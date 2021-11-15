@@ -5,7 +5,7 @@ namespace Payments\Services\Processors;
 
 
 use Illuminate\Support\Facades\Log;
-use Payments\Jobs\UrgentEmailJob;
+use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoiceExpired;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaid;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoicePaidComplete;
@@ -45,7 +45,7 @@ class WalletProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'partial_paid');
 
         //send user email
-        UrgentEmailJob::dispatch(new EmailWalletInvoicePaidPartial($this->user_db, $this->invoice_db), $this->user_db->email);
+        EmailJob::dispatch(new EmailWalletInvoicePaidPartial($this->user_db, $this->invoice_db), $this->user_db->email);
 
     }
 
@@ -54,7 +54,7 @@ class WalletProcessor extends ProcessorAbstract
 
         // send web socket notification
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
-        UrgentEmailJob::dispatch(new EmailWalletInvoicePaid($this->user_db, $this->invoice_db), $this->user_db->email);
+        EmailJob::dispatch(new EmailWalletInvoicePaid($this->user_db, $this->invoice_db), $this->user_db->email);
 
     }
 
@@ -95,7 +95,7 @@ class WalletProcessor extends ProcessorAbstract
 
                 // send web socket notification
                 $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
-                UrgentEmailJob::dispatch(new EmailWalletInvoicePaidComplete($this->user_db, $this->invoice_db), $this->user_db->email);
+                EmailJob::dispatch(new EmailWalletInvoicePaidComplete($this->user_db, $this->invoice_db), $this->user_db->email);
 
             } else {
                 Log::error('Deposit wallet user error , InvoiceID => ' . $this->invoice_db->id);
@@ -114,7 +114,7 @@ class WalletProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'expired');
 
         // send user email
-        UrgentEmailJob::dispatch(new EmailWalletInvoiceExpired($this->user_db, $this->invoice_db), $this->user_db->email);
+        EmailJob::dispatch(new EmailWalletInvoiceExpired($this->user_db, $this->invoice_db), $this->user_db->email);
 
     }
 

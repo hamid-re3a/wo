@@ -63,6 +63,8 @@ class Giftcode extends Model
         'code' => 'string',
         'expiration_date' => 'datetime',
         'redeem_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'redeem_user_id' => 'integer',
         'is_canceled' => 'boolean',
         'is_expired' => 'boolean',

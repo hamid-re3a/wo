@@ -150,11 +150,11 @@ class Giftcode extends Model
         } else if ($this->is_expired) {
             $fee = giftcodeGetSetting('expiration_fee');
             $type = giftcodeGetSetting('expiration_fee_type') == 'fixed' ? 'fixed' : 'percentage';
-        } else //Check we should calculate cancelation/expiration fee or not
+        } else //Check we should calculate cancellation/expiration fee or not
             return $this->total_cost_in_pf;
 
         if ($type == 'percentage')
-            $fee = $this->total_cost_in_pf * $fee / 100;
+            $fee = $fee > 0 ? $this->total_cost_in_pf * $fee / 100 : 0;
 
         //Calculate refundable amount
         return $this->total_cost_in_pf - $fee;

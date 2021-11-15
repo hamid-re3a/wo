@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Orders\Services\Grpc\Order;
-use Orders\Services\OrderService;
-use Payments\Jobs\EmailJob;
+use Payments\Jobs\UrgentEmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoiceCreated;
 use Payments\Services\Grpc\Invoice;
@@ -178,10 +177,10 @@ class PaymentProcessor
                 $invoice_request->setExpirationTime($response->json()['expirationTime']);
 
                 if($invoice_request->getPayableType() == 'Order')
-                    EmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
+                    UrgentEmailJob::dispatch(new EmailInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
 
                 if($invoice_request->getPayableType() == 'DepositWallet')
-                    EmailJob::dispatch(new EmailWalletInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
+                    UrgentEmailJob::dispatch(new EmailWalletInvoiceCreated($invoice_request->getUser(), $invoice_request), $invoice_request->getUser()->getEmail());
 
 
                 $this->createInvoiceModel($invoice_request);

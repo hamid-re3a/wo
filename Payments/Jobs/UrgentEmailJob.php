@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode\Jobs;
+namespace Payments\Jobs;
 
 use Giftcode\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class TrivialEmailJob implements ShouldQueue
+class UrgentEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     /**
@@ -28,7 +28,7 @@ class TrivialEmailJob implements ShouldQueue
      */
     public function __construct(SettingableMail $email, $email_address)
     {
-        $this->queue = env('QUEUE_NAME_TRIVIAL_EMAILS','subscription_trivial_emails');;
+        $this->queue = env('QUEUE_NAME_URGENT_EMAILS','subscription_urgent_emails');
         $this->email = $email;
         $this->email_address = $email_address;
     }

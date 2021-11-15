@@ -23,6 +23,8 @@ class WithdrawProfitRequestedUpdated extends Mailable implements SettingableMail
     public function __construct(WithdrawProfit $withdrawRequest)
     {
         $this->withdrawRequest = $withdrawRequest;
+        if($withdrawRequest->getRawOriginal('status') == WALLET_WITHDRAW_COMMAND_REVERT)
+            return;
     }
 
 
@@ -59,9 +61,9 @@ class WithdrawProfitRequestedUpdated extends Mailable implements SettingableMail
     {
         try {
             $key = 'WITHDRAW_REQUEST_PROCESSED';
-            if($this->withdrawRequest->getRawOriginal('status') == 2)
+            if($this->withdrawRequest->getRawOriginal('status') == WALLET_WITHDRAW_COMMAND_REJECT)
                 $key = 'WITHDRAW_REQUEST_REJECTED';
-            if($this->withdrawRequest->getRawOriginal('status') == 4)
+            if($this->withdrawRequest->getRawOriginal('status') == WALLET_WITHDRAW_COMMAND_POSTPONE)
                 $key = 'WITHDRAW_REQUEST_POSTPONED';
 
             return getWalletEmailContent($key);

@@ -28,7 +28,7 @@ class UrgentEmailJob implements ShouldQueue
      */
     public function __construct(SettingableMail $email, $email_address)
     {
-        $this->queue = 'urgent_emails';
+        $this->queue = env('QUEUE_NAME_URGENT_EMAILS','subscription_urgent_emails');
         $this->email = $email;
         $this->email_address = $email_address;
     }

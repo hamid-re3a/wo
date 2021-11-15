@@ -111,10 +111,11 @@ class DashboardController extends Controller
         $order = auth()->user()->orders()->find($request->get('id'))->first();
         return api()->success(null, OrderResource::make($order));
     }
+
     /**
      * Packages percentage based on type chart
      * @group
-     * Public User > Orders
+     * Public User > Orders Dashboard
      * @param OrderTypeFilterRequest $request
      * @return JsonResponse
      */

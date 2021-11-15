@@ -24,12 +24,13 @@ class BankService
     {
 
         $slug = Str::slug($wallet_name);
-
-        if (!$this->owner->hasWallet($slug) OR !$wallet = $this->owner->getWallet($slug))
+        $wallet = $this->owner->getWallet($slug);
+        if (!$wallet) {
             $wallet = $this->owner->createWallet([
                 'name' => $wallet_name,
                 'slug' => $slug
             ]);
+        }
 
         return $wallet;
 
@@ -111,7 +112,7 @@ class BankService
     {
         $wallet = $this->getWallet($wallet_name);
         $wallet->refreshBalance();
-        return (double)$wallet->balanceFloat;
+        return $wallet->balanceFloat;
     }
 
     public function getTransaction($uuid)

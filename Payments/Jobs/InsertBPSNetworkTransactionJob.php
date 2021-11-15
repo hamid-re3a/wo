@@ -33,7 +33,7 @@ class InsertBPSNetworkTransactionJob implements ShouldQueue
      */
     public function __construct($payout_requests_ids,$network_transaction)
     {
-        $this->queue = 'default';
+        $this->queue = env('DEFAULT_QUEUE_NAME','default');
         $this->payout_requests_ids = $payout_requests_ids;
         $this->network_transaction = $network_transaction;
     }

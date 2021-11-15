@@ -20,6 +20,7 @@ class WebhookJob implements ShouldQueue
 
     public function __construct($content)
     {
+        $this->queue = env('DEFAULT_QUEUE_NAME','default');
         $this->content = $content;
     }
 

@@ -30,6 +30,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
 
     public function __construct(Invoice $invoice_db)
     {
+        $this->queue = env('DEFAULT_QUEUE_NAME','default');
         $this->invoice_db = $invoice_db;
     }
 

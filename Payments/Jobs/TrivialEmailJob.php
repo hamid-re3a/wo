@@ -1,6 +1,6 @@
 <?php
 
-namespace Giftcode\Jobs;
+namespace Payments\Jobs;
 
 use Giftcode\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;

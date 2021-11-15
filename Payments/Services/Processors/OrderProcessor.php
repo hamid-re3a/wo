@@ -4,12 +4,11 @@
 namespace Payments\Services\Processors;
 
 
-use Illuminate\Support\Facades\Log;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
-use Payments\Jobs\EmailJob;
+use Payments\Jobs\UrgentEmailJob;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaid;
 use Payments\Mail\Payment\EmailInvoicePaidComplete;
@@ -53,7 +52,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'partial_paid');
 
         // send email notification for due amount
-        EmailJob::dispatch(new EmailInvoicePaidPartial($this->user->getGrpcMessage(), $this->invoice_db, $this->order_service), $this->user->email);
+        UrgentEmailJob::dispatch(new EmailInvoicePaidPartial($this->user->getGrpcMessage(), $this->invoice_db, $this->order_service), $this->user->email);
 
 
     }
@@ -65,7 +64,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'paid');
 
 
-        EmailJob::dispatch(new EmailInvoicePaid($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
+        UrgentEmailJob::dispatch(new EmailInvoicePaid($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
 
     }
 
@@ -98,7 +97,7 @@ class OrderProcessor extends ProcessorAbstract
             $this->socket_service->sendInvoiceMessage($this->invoice_db, 'confirmed');
 
             // send thank you email notification
-            EmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
+            UrgentEmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
         }
 
     }
@@ -110,7 +109,7 @@ class OrderProcessor extends ProcessorAbstract
         $this->socket_service->sendInvoiceMessage($this->invoice_db, 'expired');
 
         // send email to user to regenerate new invoice for due amount
-        EmailJob::dispatch(new EmailInvoiceExpired($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
+        UrgentEmailJob::dispatch(new EmailInvoiceExpired($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
 
     }
 

@@ -4,7 +4,6 @@
 namespace Payments\Services\Processors;
 
 
-use Illuminate\Support\Facades\Log;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;

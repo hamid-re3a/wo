@@ -30,7 +30,7 @@ class HandleUserForExpiredGiftcodeJob implements ShouldQueue
      */
     public function __construct(User $user)
     {
-        $this->queue = 'default';
+        $this->queue = env('DEFAULT_QUEUE_NAME','default');
         $this->user = $user;
     }
 

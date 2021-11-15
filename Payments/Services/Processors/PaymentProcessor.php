@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Orders\Services\Grpc\Order;
-use Orders\Services\OrderService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoiceCreated;

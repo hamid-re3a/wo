@@ -5,7 +5,7 @@ namespace Giftcode\Repository;
 
 
 use Exception;
-use Giftcode\Jobs\UrgentEmailJob;
+use Giftcode\Jobs\EmailJob;
 use Giftcode\Mail\User\GiftcodeCanceledEmail;
 use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Mail\User\GiftcodeExpiredEmail;
@@ -13,10 +13,7 @@ use Giftcode\Mail\User\RedeemedGiftcodeCreatorEmail;
 use Giftcode\Mail\User\RedeemedGiftcodeRedeemerEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use User\Models\User;
 
 class GiftcodeRepository
 {
@@ -57,7 +54,7 @@ class GiftcodeRepository
             /**
              * End User wallet process
              */
-            UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
+            EmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
 
             DB::commit();
             return $giftcode;
@@ -114,7 +111,7 @@ class GiftcodeRepository
             /**
              * End refund
              */
-            UrgentEmailJob::dispatch(new GiftcodeExpiredEmail($giftcode),$giftcode->creator->email);
+            EmailJob::dispatch(new GiftcodeExpiredEmail($giftcode),$giftcode->creator->email);
 
 
             DB::commit();
@@ -162,7 +159,7 @@ class GiftcodeRepository
             /**
              * End refund
              */
-            UrgentEmailJob::dispatch(new GiftcodeCanceledEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
+            EmailJob::dispatch(new GiftcodeCanceledEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
 
 
             DB::commit();
@@ -197,9 +194,9 @@ class GiftcodeRepository
 
             $giftcode->refresh();
 
-            UrgentEmailJob::dispatch(new RedeemedGiftcodeCreatorEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
+            EmailJob::dispatch(new RedeemedGiftcodeCreatorEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
             if($giftcode->user_id != $giftcode->redeem_user_id)
-                UrgentEmailJob::dispatch(new RedeemedGiftcodeRedeemerEmail($giftcode->redeemer,$giftcode),$giftcode->redeemer->email);
+                EmailJob::dispatch(new RedeemedGiftcodeRedeemerEmail($giftcode->redeemer,$giftcode),$giftcode->redeemer->email);
             DB::commit();
             return $giftcode->fresh();
         } catch (\Throwable $exception) {

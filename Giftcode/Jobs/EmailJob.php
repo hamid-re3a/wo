@@ -1,8 +1,8 @@
 <?php
 
-namespace Wallets\Jobs;
+namespace Giftcode\Jobs;
 
-use Wallets\Mail\SettingableMail;
+use Payments\Mail\SettingableMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class UrgentEmailJob implements ShouldQueue
+class EmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     /**
@@ -28,7 +28,7 @@ class UrgentEmailJob implements ShouldQueue
      */
     public function __construct(SettingableMail $email, $email_address)
     {
-        $this->queue = 'urgent_emails';
+        $this->queue = env('EMAIL_QUEUE_NAME','subscription_emails');
         $this->email = $email;
         $this->email_address = $email_address;
     }

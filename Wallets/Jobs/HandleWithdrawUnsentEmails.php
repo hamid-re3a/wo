@@ -23,7 +23,7 @@ class HandleWithdrawUnsentEmails implements ShouldQueue
      */
     public function __construct()
     {
-
+        $this->queue = env('DEFAULT_QUEUE_NAME','default');
     }
 
     /**

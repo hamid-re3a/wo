@@ -5,6 +5,7 @@ namespace Orders\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Orders\Services\Grpc\OrderPlans;
 use Packages\Models\Package;
 use Packages\Services\Grpc\Id;
@@ -27,6 +28,7 @@ use User\Models\User;
  * @property \Illuminate\Support\Carbon|null $is_commission_resolved_at
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property string $payment_type
+ * @property string $payment_type_string
  * @property string $package_name
  * @property string $payment_currency
  * @property string|null $payment_driver
@@ -220,6 +222,18 @@ class Order extends Model
     public function getPackageNameAttribute()
     {
         return $this->orderPackage()->getName() . ' (' . $this->orderPackage()->getShortName() . ')';
+    }
+
+    public function getPaymentTypeStringAttribute()
+    {
+        switch($this->attributes['payment_type']) {
+            case 'giftcode':
+                return 'Gift code';
+                break;
+            default:
+                return Str::upper($this->attributes['payment_type']);
+                break;
+        }
     }
 
 

@@ -23,8 +23,9 @@ class TransactionRepository
 
             if(!empty($wallet_id))
                 $transactions->where('wallet_id','=',$wallet_id);
-            else
-                $transactions->where('transactions.wallet_id','<>', 1);
+
+            //Except Admin Wallets
+            $transactions->whereNotIn('transactions.wallet_id',WALLET_ADMIN_WALLETS_IDS);
 
             if(!empty($wallet_name))
                 $transactions->whereHas('wallet', function(Builder $query) use($wallet_name){
@@ -60,8 +61,9 @@ class TransactionRepository
             if (!empty($user_id))
                 $sum_query->where('payable_id', '=', $user_id);
 
-            if (!empty($wallet_id))
-                $sum_query->where('wallet_id', '=', $wallet_id);
+            //Except admin wallets
+            if($user_id != 1)
+                $sum_query->whereNotIn('wallet_id', WALLET_ADMIN_WALLETS_IDS);
 
             $results[$key] =
                 (float) $sum_query->whereHas('metaData', function (Builder $subQuery) use ($type) {
@@ -76,7 +78,6 @@ class TransactionRepository
     public function getTransactionsSumByMainTypes(int $user_id = null,int $wallet_id = null, array $types = null)
     {
         $results = [];
-
         foreach ($types AS $type) {
             $key = str_replace(' ', '_', Str::lower($type)) . '_sum';
             $sum_query = null;
@@ -87,8 +88,9 @@ class TransactionRepository
             if (!empty($user_id))
                 $sum_query->where('payable_id', '=', $user_id);
 
-            if(!empty($wallet_id))
-                $sum_query->where('wallet_id','=',$wallet_id);
+            //Except Admin Wallets
+            if($user_id != 1)
+                $sum_query->whereNotIn('wallet_id',[WALLET_ADMIN_WALLETS_IDS]);
 
             $results[$key] =
                 (float) $sum_query->where('type','=', $type)->sum('amount') / 100;

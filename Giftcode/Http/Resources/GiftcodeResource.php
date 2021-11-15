@@ -29,6 +29,7 @@ class GiftcodeResource extends JsonResource
             'redeem_date' => $this->redeem_date ? $this->redeem_date->timestamp : null,
             'redeem_user_full_name' => $this->redeem_user_id ? $this->redeemer->full_name : null,
             'created_at' => $this->created_at->timestamp,
+            'updated_at' => $this->updated_at->timestamp,
             'status' => $this->status,
         ];
     }

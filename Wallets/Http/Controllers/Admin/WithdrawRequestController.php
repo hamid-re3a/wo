@@ -88,8 +88,8 @@ class WithdrawRequestController extends Controller
     {
         try {
             $withdrawRequests = WithdrawProfit::query();
-            if ($request->has('status'))
-                $withdrawRequests->where('status', '=', $request->get('status'));
+            if ($request->has('statuses'))
+                $withdrawRequests->whereIn('status', $request->get('statuses'));
 
             $list = $withdrawRequests->paginate();
             return api()->success(null, [

@@ -3,7 +3,7 @@
 
 namespace Wallets\Observers;
 
-use Wallets\Jobs\UrgentEmailJob;
+use Wallets\Jobs\EmailJob;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedUpdated;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedSubmitted;
 use Wallets\Models\WithdrawProfit;
@@ -22,7 +22,7 @@ class WithdrawProfitObserver
 
     public function created(WithdrawProfit $withdrawProfit)
     {
-        UrgentEmailJob::dispatch(new WithdrawProfitRequestedSubmitted($withdrawProfit), $withdrawProfit->user->email);
+        EmailJob::dispatch(new WithdrawProfitRequestedSubmitted($withdrawProfit), $withdrawProfit->user->email);
     }
 
     public function updating(WithdrawProfit $withdrawProfit)
@@ -38,7 +38,7 @@ class WithdrawProfitObserver
     public function updated(WithdrawProfit $withdrawProfit)
     {
         if(!$withdrawProfit->is_update_email_sent)
-            UrgentEmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+            EmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
 
         $this->createHistory($withdrawProfit);
     }

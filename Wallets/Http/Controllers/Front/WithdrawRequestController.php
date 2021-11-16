@@ -111,9 +111,9 @@ class WithdrawRequestController extends Controller
             ]);
         } catch (\Throwable $exception) {
             Log::error('WithdrawRequestController@withdraw_requests => ' . serialize(request()->all()));
-            return api()->error(null,null,[
+            return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
-            ],$exception->getCode());
+            ]);
         }
     }
 
@@ -141,9 +141,9 @@ class WithdrawRequestController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('WithdrawRequestController@create_withdraw_request_preview => ' . serialize($request->all()));
-            return api()->error(null,null,[
+            return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
-            ],$exception->getCode());
+            ]);
         }
 
     }
@@ -166,9 +166,9 @@ class WithdrawRequestController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('WithdrawRequestController@create_withdraw_request, User => ' . auth()->user()->id . ' => ' . serialize($request->all()));
-            return api()->error(null,null,[
+            return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
-            ],$exception->getCode());
+            ]);
         }
 
     }

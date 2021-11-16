@@ -93,9 +93,9 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('GiftcodeController@store  => ' . $exception->getMessage() . ' Line => ' . $exception->getLine());
-            return api()->error(null,null,[
+            return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
-            ],$exception->getCode());
+            ]);
         }
     }
 
@@ -117,9 +117,9 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('Cancel giftcode error,gift code uuid => <' . $request->get('uuid') . '>');
-            return api()->error(null,null,[
+            return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
-            ],$exception->getCode());
+            ]);
 
         }
     }

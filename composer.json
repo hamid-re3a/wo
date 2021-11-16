@@ -22,7 +22,6 @@
         "mix/grpc": "^3.0",
         "rap2hpoutre/laravel-log-viewer": "1.7",
         "ride-to-the-future/response-transformer": "0.0.2",
-        "sentry/sentry-laravel": "^2.10",
         "spatie/laravel-permission": "4.2",
         "vladimir-yuldashev/laravel-queue-rabbitmq": "11.3",
         "workerman/phpsocket.io": "1.1",

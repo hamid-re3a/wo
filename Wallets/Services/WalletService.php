@@ -27,6 +27,31 @@ class WalletService implements WalletServiceInterface
         );
 
     }
+    public function calculateCharity(int $amount): float
+    {
+        return calculateCharity($amount);
+    }
+
+    public function depositIntoCharityWallet(float $amount, array $description = null, string $type = null)
+    {
+        try {
+            DB::beginTransaction();
+            $charity_amount = $this->calculateCharity($amount);
+            $walletUser = $this->walletUser(1);
+            $bankService = new BankService($walletUser);
+
+            $wallet_name = WALLET_NAME_CHARITY_WALLET;
+
+            $transaction = $bankService->deposit($wallet_name, $charity_amount, $description, true, $type);
+
+            DB::commit();
+            return $transaction;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            Log::error('Wallets\Services\WalletService@depositIntoCharityWallet => ' . $exception->getMessage());
+            throw new \Exception();
+        }
+    }
 
     public function deposit(Deposit $deposit): Deposit
     {

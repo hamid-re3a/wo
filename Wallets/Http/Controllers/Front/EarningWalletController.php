@@ -61,7 +61,7 @@ class EarningWalletController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes(auth()->user()->id,null,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes($commissions,auth()->user()->id,null));
 
     }
 

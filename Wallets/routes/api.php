@@ -58,6 +58,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
         Route::name('charity-wallet.')->prefix('charity-wallet')->group(function(){
             Route::get('',[CharityWalletController::class,'index'])->name('index');
             Route::post('transactions',[CharityWalletController::class,'transactions'])->name('transactions');
+            Route::post('donate',[CharityWalletController::class,'donate'])->name('donate');
 
             Route::prefix('charts')->name('charts')->group(function(){
                 Route::post('overall-balance',[CharityWalletController::class,'overallBalanceChart'])->name('overall-balance');

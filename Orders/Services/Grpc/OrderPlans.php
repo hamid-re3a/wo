@@ -27,12 +27,22 @@ class OrderPlans
      * Generated from protobuf enum <code>ORDER_PLAN_COMPANY = 3;</code>
      */
     const ORDER_PLAN_COMPANY = 3;
+    /**
+     * Generated from protobuf enum <code>ORDER_PLAN_START_50 = 4;</code>
+     */
+    const ORDER_PLAN_START_50 = 4;
+    /**
+     * Generated from protobuf enum <code>ORDER_PLAN_START_75 = 5;</code>
+     */
+    const ORDER_PLAN_START_75 = 5;
 
     private static $valueToName = [
         self::ORDER_PLAN_PURCHASE => 'ORDER_PLAN_PURCHASE',
         self::ORDER_PLAN_START => 'ORDER_PLAN_START',
         self::ORDER_PLAN_SPECIAL => 'ORDER_PLAN_SPECIAL',
         self::ORDER_PLAN_COMPANY => 'ORDER_PLAN_COMPANY',
+        self::ORDER_PLAN_START_50 => 'ORDER_PLAN_START_50',
+        self::ORDER_PLAN_START_75 => 'ORDER_PLAN_START_75',
     ];
 
     public static function name($value)

@@ -159,6 +159,7 @@ if(!function_exists('calculateTransferFee')) {
         return [(double)$total, (double)$transfer_fee];
     }
 }
+
 if(!function_exists('calculateWithdrawalFee')) {
     function calculateWithdrawalFee($amount,$currency): array
     {
@@ -179,6 +180,17 @@ if(!function_exists('calculateWithdrawalFee')) {
         $fee = $fix_or_percentage == 'fixed' ? (double)$fee : ((double)$amount * (double)$fee / 100);
 
         return [(double)($fee+$amount),(double)$fee];
+    }
+}
+
+if(!function_exists('calculateCharity')) {
+    function calculateCharity($amount): int
+    {
+        $fix_or_percentage = getWalletSetting('charity_wallet_fixed_or_percentage');
+        $fee = getWalletSetting('charity_wallet_fee');
+
+        return $fix_or_percentage == 'fixed' ? (double)$fee : ((double)$amount * (double)$fee / 100);
+
     }
 }
 

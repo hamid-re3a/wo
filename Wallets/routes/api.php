@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Wallets\Http\Controllers\Admin\CharityWalletController;
 use Wallets\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use Wallets\Http\Controllers\Admin\EmailContentController;
 use Wallets\Http\Controllers\Admin\SettingController;
@@ -53,6 +54,15 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                     Route::post('paid-amount-vs-time',[AdminWithdrawRequestController::class,'paidAmountVsTimeChart'])->name('paid-amount-vs-time');
                 });
             });
+
+        Route::name('charity-wallet.')->prefix('charity-wallet')->group(function(){
+            Route::get('',[CharityWalletController::class,'index'])->name('index');
+            Route::post('transactions',[CharityWalletController::class,'transactions'])->name('transactions');
+
+            Route::prefix('charts')->name('charts')->group(function(){
+                Route::post('overall-balance',[CharityWalletController::class,'overallBalanceChart'])->name('overall-balance');
+            });
+        });
     });
 
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {

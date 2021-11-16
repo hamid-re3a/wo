@@ -6,6 +6,7 @@ use Bavix\Wallet\Models\Wallet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use User\Models\User;
+use Wallets\Http\Requests\Admin\SubmitRemarkRequest;
 use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Resources\DepositWalletResource;
 use Wallets\Http\Requests\Front\TransactionRequest;
@@ -66,6 +67,21 @@ class CharityWalletController extends Controller
                 'total' => $list->total(),
                 'per_page' => $list->perPage(),
             ]]);
+
+    }
+
+    /**
+     * Donate
+     * @group Admin User > Charity Wallet
+     * @param SubmitRemarkRequest $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function donate(SubmitRemarkRequest $request)
+    {
+        $this->prepareWallet();
+        $list = $this->bankService->withdraw($this->walletName,$request->get('amount'),$request->get('remarks'),'Donation',null,true,false);
+        return api()->success();
 
     }
 

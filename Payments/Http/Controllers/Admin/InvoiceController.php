@@ -88,7 +88,7 @@ class InvoiceController extends Controller
             Log::error('Payments\Http\Controllers\Admin\InvoiceController@refundOverPaidInvoice error => ' . $exception->getMessage());
             if(isset($invoice))
                 Log::error('Payments\Http\Controllers\Admin\InvoiceController@refundOverPaidInvoice error => ' . $invoice->id);
-            return api()->error(null,[
+            return api()->error(null,null,[
                 'subject' => $exception->getMessage()
             ],$exception->getCode());
         }

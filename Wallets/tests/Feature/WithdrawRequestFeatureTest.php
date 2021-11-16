@@ -12,8 +12,8 @@ use Payments\Jobs\ProcessBTCPayServerPayoutsJob;
 use User\Models\User;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
-use Wallets\Services\KycClientFacade;
-use Wallets\Services\MlmClientFacade;
+use Kyc\Services\KycClientFacade;
+use MLM\Services\MlmClientFacade;
 use Wallets\tests\WalletTest;
 
 class WithdrawRequestFeatureTest extends WalletTest

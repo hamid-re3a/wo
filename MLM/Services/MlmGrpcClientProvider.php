@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Wallets\Services;
+namespace MLM\Services;
 
 
 use MLM\Services\Grpc\Acknowledge;

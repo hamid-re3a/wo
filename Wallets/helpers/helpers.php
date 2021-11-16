@@ -177,19 +177,19 @@ if(!function_exists('calculateWithdrawalFee')) {
                 $fee = 0;
                 break;
         }
-        $fee = $fix_or_percentage == 'fixed' ? (double)$fee : ((double)$amount * (double)$fee / 100);
+        $fee = $fix_or_percentage == 'fixed' ? (float)$fee : ((float)$amount * (float)$fee / 100);
 
-        return [(double)($fee+$amount),(double)$fee];
+        return [(float)($fee+$amount),(float)$fee];
     }
 }
 
 if(!function_exists('calculateCharity')) {
-    function calculateCharity($amount): int
+    function calculateCharity($amount): float
     {
         $fix_or_percentage = getWalletSetting('charity_wallet_fixed_or_percentage');
         $fee = getWalletSetting('charity_wallet_fee');
 
-        return $fix_or_percentage == 'fixed' ? (double)$fee : ((double)$amount * (double)$fee / 100);
+        return $fix_or_percentage == 'fixed' ? (float)$fee : ((float)$amount * (float)$fee / 100);
 
     }
 }

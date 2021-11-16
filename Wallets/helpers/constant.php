@@ -168,5 +168,17 @@ const WALLET_SETTINGS = [
         'description' => 'Janex distribution'
     ],
 
+    'charity_wallet_fee' => [
+        'value' => 1,
+        'title' => 'Charity fee',
+        'description' => 'Charity fee'
+    ],
+
+    'charity_wallet_fixed_or_percentage' => [
+        'value' => 'percentage',
+        'title' => 'Fixed calculation or percentage',
+        'description' => 'Fixed calculation or percentage'
+    ],
+
 ];
 

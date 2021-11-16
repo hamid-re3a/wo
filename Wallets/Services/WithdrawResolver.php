@@ -6,6 +6,8 @@ namespace Wallets\Services;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Models\WithdrawProfit;
+use MLM\Services\MlmClientFacade;
+use Kyc\Services\KycClientFacade;
 
 class WithdrawResolver
 {

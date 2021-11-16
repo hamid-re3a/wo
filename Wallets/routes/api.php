@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Wallets\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use Wallets\Http\Controllers\Admin\EmailContentController;
 use Wallets\Http\Controllers\Admin\SettingController;
+use Wallets\Http\Controllers\Front\SettingController as UserSettingController;
 use Wallets\Http\Controllers\Admin\WithdrawRequestController as AdminWithdrawRequestController;
 use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
@@ -55,6 +56,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
     });
 
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {
+        Route::get('settings',[UserSettingController::class,'index'])->name('settings-list');
         Route::get('', [WalletController::class, 'index'])->name('index');
         Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');
 

@@ -4,7 +4,6 @@
 namespace Payments\Services\Processors;
 
 
-use Illuminate\Support\Facades\Log;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
@@ -16,6 +15,7 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use User\Models\User;
+use Wallets\Services\WalletService;
 
 class OrderProcessor extends ProcessorAbstract
 {
@@ -87,6 +87,13 @@ class OrderProcessor extends ProcessorAbstract
 
 
         if ($submit_response->getStatus()) {
+            //Deposit to Charity
+            $wallet_service = app(WalletService::class);
+            $wallet_service->depositIntoCharityWallet($order_service->getPackagesCostInPf(),[
+                'Purchase order' => $order_service->getId(),
+            ],'Package purchased');
+
+
             //Update order
             $order_service->setIsCommissionResolvedAt($submit_response->getCreatedAt());
             app(OrderService::class)->updateOrder($order_service);

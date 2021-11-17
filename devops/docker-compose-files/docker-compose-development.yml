@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  subscription:
+    image: staging-reg.dreamcometrue.ai/development-subscription:1
+    restart: unless-stopped
+    networks:
+      - mysql_wo_r2f
+    ports:
+      - 127.0.0.1:30081:80
+      - 9596:9596
+      - 9696:9696
+      - 127.0.0.1:2120:2120
+      - 127.0.0.1:2121:2121
+networks:
+  mysql_wo_r2f:
+    external: true

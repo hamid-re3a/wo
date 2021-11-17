@@ -36,17 +36,13 @@ class InvoiceController extends Controller
     {
         /**@var $pending_invoice Invoice */
         $pending_invoice = $this->user->invoices()
-            ->with([
-                'transactions',
-                'refunder'
-            ])
             ->notPaid()
             ->notCanceled()
             ->notExpired()
             ->first();
 
         if (!$pending_invoice) {
-            $paid_invoice = $this->user->invoices()->paid()->count();
+            $paid_invoice = $this->user->invoices()->notCanceled()->paid()->count();
             if ($paid_invoice)
                 return api()->success(null, [
                     'status' => 'confirmed'

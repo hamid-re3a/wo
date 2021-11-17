@@ -24,12 +24,13 @@ class BankService
     {
 
         $slug = Str::slug($wallet_name);
-
-        if (!$this->owner->hasWallet($slug) OR !$wallet = $this->owner->getWallet($slug))
+        $wallet = $this->owner->getWallet($slug);
+        if (!$wallet) {
             $wallet = $this->owner->createWallet([
                 'name' => $wallet_name,
                 'slug' => $slug
             ]);
+        }
 
         return $wallet;
 
@@ -111,7 +112,7 @@ class BankService
     {
         $wallet = $this->getWallet($wallet_name);
         $wallet->refreshBalance();
-        return (double)$wallet->balanceFloat;
+        return $wallet->balanceFloat;
     }
 
     public function getTransaction($uuid)
@@ -165,7 +166,8 @@ class BankService
     public function toAdminDepositWallet($transaction, $amount, $description, $type)
     {
         $this->owner = User::query()->find(1);
-        $admin_wallet = $this->getWallet(Str::slug('Deposit Wallet'));
+        $admin_wallet = $this->getWallet(WALLET_NAME_DEPOSIT_WALLET);
+
 
         //Prepare description
         $description = $this->createMeta($description);
@@ -175,7 +177,16 @@ class BankService
             'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
             'type' => $type
         ];
-        $transaction = $admin_wallet->depositFloat($amount, $this->createMeta($description));
+
+        $charity_amount = 0;
+        if($type == 'Package purchased') {
+            $charity_wallet = $this->getWallet(WALLET_NAME_CHARITY_WALLET);
+            $charity_amount = calculateCharity($amount);
+            if($charity_amount > 0)
+                $charity_wallet->depositFloat($charity_amount,$this->createMeta($description));
+        }
+
+        $transaction = $admin_wallet->depositFloat(($amount - $charity_amount), $this->createMeta($description));
         $transaction->syncMetaData($data);
 
     }

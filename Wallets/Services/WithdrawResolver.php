@@ -6,6 +6,8 @@ namespace Wallets\Services;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Models\WithdrawProfit;
+use MLM\Services\MlmClientFacade;
+use Kyc\Services\KycClientFacade;
 
 class WithdrawResolver
 {
@@ -68,7 +70,7 @@ class WithdrawResolver
         $db_sum = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
                 ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
                 ->where('id','<>',$this->withdrawRequest->id)
-                ->whereIn('status',[1,3,4])
+                ->whereIn('status',[WALLET_WITHDRAW_COMMAND_UNDER_REVIEW,WALLET_WITHDRAW_COMMAND_PROCESS,WALLET_WITHDRAW_COMMAND_POSTPONE])
                 ->sum('pf_amount');
 
         //Get user rank from MLM service

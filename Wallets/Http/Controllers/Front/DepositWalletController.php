@@ -12,7 +12,7 @@ use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Requests\Front\AskFundRequest;
 use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
 use Wallets\Http\Resources\DepositWalletResource;
-use Wallets\Jobs\UrgentEmailJob;
+use Wallets\Jobs\EmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
@@ -103,7 +103,7 @@ class DepositWalletController extends Controller
     {
         $this->prepareDepositWallet();
         $user = User::query()->where('member_id', $request->get('member_id'))->first();
-        UrgentEmailJob::dispatch(new RequestFundEmail($user, $this->user, $request->get('amount')), $user->email);
+        EmailJob::dispatch(new RequestFundEmail($user, $this->user, $request->get('amount')), $user->email);
 
         return api()->success(null, [
             'amount' => $request->get('amount'),
@@ -144,8 +144,9 @@ class DepositWalletController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error .' . $exception->getMessage());
-
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -186,8 +187,8 @@ class DepositWalletController extends Controller
                 'transfer_id' => $transfer->id
             ], 'Transfer fee');
 
-            UrgentEmailJob::dispatch(new SenderFundEmail($this->user, $transfer), $this->user->email);
-            UrgentEmailJob::dispatch(new ReceiverFundEmail($to_user, $transfer), $to_user->email);
+            EmailJob::dispatch(new SenderFundEmail($this->user, $transfer), $this->user->email);
+            EmailJob::dispatch(new ReceiverFundEmail($to_user, $transfer), $to_user->email);
 
             DB::commit();
 
@@ -195,7 +196,9 @@ class DepositWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
 
     }

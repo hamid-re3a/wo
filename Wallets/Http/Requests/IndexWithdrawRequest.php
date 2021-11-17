@@ -25,19 +25,10 @@ class IndexWithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'status' => 'nullable|integer|in:1,2,3,4', // 1=Under review, 2=Rejected, 3=Processed, 4=Postponed
+            'statuses' => 'required|array',
+            'statuses.*' => 'required|integer|in:' . implode(',',WALLET_WITHDRAW_COMMANDS)
         ];
 
-    }
-
-    public function bodyParameters()
-    {
-        return [
-            'status' => [
-                'description' => 'Query param to filter withdraw requests',
-                'type' => 'Query parameter'
-            ]
-        ];
     }
 
 }

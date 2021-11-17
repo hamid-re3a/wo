@@ -29,6 +29,7 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice refunded()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice expired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notExpired()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice notCanceled()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice query()

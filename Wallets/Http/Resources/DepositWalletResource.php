@@ -27,6 +27,8 @@ class DepositWalletResource extends JsonResource
             'name' => $wallet->name,
             'balance' => (double)$wallet->balanceFloat,
             'transactions_count' => (int) $wallet->transactions()->where('wallet_id','=', $wallet->id)->count(),
+            'transactions_received_count' => (int) $wallet->transactions()->where('wallet_id','=', $wallet->id)->where('type','=','deposit')->count(),
+            'transactions_spent_count' => (int) $wallet->transactions()->where('wallet_id','=', $wallet->id)->where('type','=','withdraw')->count(),
             'transfers_count' => (int) $wallet->transfers()->where('from_id','=', $wallet->id)->count(),
             'total_transfer' => (double)$total_transfer,
             'total_received' => (double)$total_received,

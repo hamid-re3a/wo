@@ -97,8 +97,8 @@ class WithdrawRequestController extends Controller
              */
             $user = auth()->user();
             $withdrawRequests = $user->withdrawRequests();
-            if ($request->has('status'))
-                $withdrawRequests->where('status', '=', $request->get('status'));
+            if ($request->has('statuses'))
+                $withdrawRequests->whereIn('statuses', $request->get('statuses'));
 
             $list = $withdrawRequests->paginate();
             return api()->success(null, [
@@ -109,8 +109,10 @@ class WithdrawRequestController extends Controller
                 ]
             ]);
         } catch (\Throwable $exception) {
-            Log::error('EarningWalletController@withdraw_requests => ' . serialize(request()->all()));
-            throw $exception;
+            Log::error('WithdrawRequestController@withdraw_requests => ' . serialize(request()->all()));
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -125,16 +127,8 @@ class WithdrawRequestController extends Controller
     {
 
         try {
-            DB::beginTransaction();
 
-            /**@var $withdraw_request WithdrawProfit */
-            $withdraw_request = $this->withdraw_repository->makeWithdrawRequest($request);
-            $withdraw_resolver = new WithdrawResolver($withdraw_request);
-            list($flag, $response) = $withdraw_resolver->verifyWithdrawRequest();
-
-            DB::rollBack();
-            if (!$flag)
-                throw new \Exception($response);
+            $withdraw_request = $this->createRequest($request->validated(), true);
 
             return api()->success(null, [
                 'fee' => $withdraw_request->fee,
@@ -145,8 +139,7 @@ class WithdrawRequestController extends Controller
             ]);
 
         } catch (\Throwable $exception) {
-            DB::rollBack();
-            Log::error('EarningWalletController@create_withdraw_request_preview => ' . serialize($request->all()));
+            Log::error('WithdrawRequestController@create_withdraw_request_preview => ' . serialize($request->all()));
             throw $exception;
         }
 
@@ -163,8 +156,24 @@ class WithdrawRequestController extends Controller
     {
         try {
             DB::beginTransaction();
+            $withdraw_request = $this->createRequest($request->validated());
 
-            /**@var $withdraw_request WithdrawProfit */
+            DB::commit();
+            return api()->success(null, WithdrawProfitResource::make($withdraw_request->refresh()));
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            Log::error('WithdrawRequestController@create_withdraw_request, User => ' . auth()->user()->id . ' => ' . serialize($request->all()));
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
+        }
+
+    }
+
+    private function createRequest(array $request, $simulate = false): WithdrawProfit
+    {
+        try {
+            DB::beginTransaction();
             $withdraw_request = $this->withdraw_repository->makeWithdrawRequest($request);
 
             $withdraw_resolver = new WithdrawResolver($withdraw_request);
@@ -172,17 +181,20 @@ class WithdrawRequestController extends Controller
 
             if (!$flag) {
                 DB::rollBack();
-                throw new \Exception($response,406);
+                Throw new \Exception($response,406);
             }
 
-            DB::commit();
-            return api()->success(null, WithdrawProfitResource::make($withdraw_request->refresh()));
+            if ($simulate)
+                DB::rollBack();
+            else
+                DB::commit();
+
+            return $withdraw_request;
+
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('EarningWalletController@create_withdraw_request, User => ' . auth()->user()->id . ' => ' . serialize($request->all()));
             throw $exception;
         }
-
     }
 
 }

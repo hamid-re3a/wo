@@ -11,8 +11,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Mockery\Exception;
 use Payments\Services\Processors\PayoutProcessor;
 use User\Models\User;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 use User\Services\Grpc\WalletInfo;
 use User\Services\Grpc\WalletType;
 use Wallets\Models\Transaction;
@@ -40,18 +43,37 @@ class WithdrawRepository
         $this->model_history = new WithdrawProfitHistory();
     }
 
-    public function makeWithdrawRequest(Request $request)
+    public function makeWithdrawRequest(array $request): WithdrawProfit
     {
-        if (!getWalletSetting('withdrawal_request_is_enabled'))
-            throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
-
-        /**@var $user User */
-        $user = auth()->user();
-        $this->bankService = new BankService($user);
-        $this->bankService->getWallet($this->user_wallet);
-
         try {
-            switch ($request->get('currency')) {
+            if (!getWalletSetting('withdrawal_request_is_enabled'))
+                throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
+
+            $user = array_key_exists('user_id', $request) ? User::query()->find($request['user_id']) : auth()->user();
+
+            //Check Transaction Password if request is not for reverting
+            if ($user->id == auth()->user()->id) {
+                if (!isset($request['transaction_password'])) {
+                    Log::error('Wallets\Repositories\WithdrawRepository@makeWithdrawRequest => Undefined transaction password for user in request body');
+                    throw new \Exception();
+                }
+
+                $password_request = new UserTransactionPassword();
+                $password_request->setUserId((int)$user->id);
+                $password_request->setTransactionPassword((string)$request['transaction_password']);
+                $acknowledge = GatewayClientFacade::checkTransactionPassword($password_request);
+
+                if (!$acknowledge->getStatus())
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'transaction_password' => [trans('wallet.withdraw-profit-request.incorrect-transaction-password')],
+                    ]);
+            }
+
+            /**@var $user User */
+            $request['user_id'] = $user->id;
+            $this->bankService = new BankService($user);
+
+            switch ($request['currency']) {
                 case 'BTC' :
                     return $this->withdrawBTC($request);
                     break;
@@ -64,117 +86,172 @@ class WithdrawRepository
         }
     }
 
-    public function withdrawBTC(Request $request)
+    public function withdrawBTC(array $request): WithdrawProfit
     {
+
+
         try {
-            $btc_price = Http::get('https://blockchain.info/ticker');
-
-            if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
-
-                list($total,$fee) = calculateWithdrawalFee($request->get('amount'),$request->get('currency'));
-                $withdraw_transaction = $this->bankService->withdraw($this->user_wallet, $request->get('amount'), null, 'Withdrawal request', null,true,false);
-                $withdraw_fee = $this->bankService->withdraw($this->user_wallet, $fee, null, 'Withdrawal request fee', null);
-
-                return WithdrawProfit::query()->create([
-                    'user_id' => auth()->user()->id,
-                    'withdraw_transaction_id' => $withdraw_transaction->id,
-                    'wallet_hash' => $this->getUserBTCWalletHash(),
-                    'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
-                    'currency' => $request->get('currency'),
-                    'pf_amount' => $request->get('amount'),
-                    'fee' => (double)$fee,
-                    'crypto_amount' => pfToUsd((double)$request->get('amount')) / $btc_price->json()['USD']['15m'],
-                    'crypto_rate' => $btc_price->json()['USD']['15m']
-                ]);
+            $wallet_hash = null;
+            //Check if request is revert or NOT
+            if (array_key_exists('is_revert', $request) AND isset($request['is_revert'])) {
+                $crypto_rate = $request['crypto_rate'];
+                $wallet_hash = $request['wallet_hash'];
             } else {
-
-                throw new \Exception(trans('wallet.withdraw-profit-request.external-resource-error', [
-                    'server' => 'BlockChain.info'
-                ]), 406);
-
+                $crypto_rate = $this->getBtcPrice();
             }
+
+            list($total, $fee) = calculateWithdrawalFee($request['amount'], $request['currency']);
+
+            //Check user balance again
+            if ($this->bankService->getBalance($this->user_wallet) < $total)
+                throw new \Exception(trans('wallet.responses.not-enough-balance'), 406);
+
+            $withdraw_transaction = $this->bankService->withdraw($this->user_wallet, $request['amount'], null, 'Withdrawal request', null, true, false);
+            $withdraw_fee = $this->bankService->withdraw($this->user_wallet, $fee, null, 'Withdrawal request fee', null);
+
+            if (!$wallet_hash) {
+                list($flag, $wallet_hash) = $this->getUserBTCWalletHash($request['user_id']);
+                if (!$flag) {
+                    Log::error('Wallets\Repositories\WithdrawRepository@withdrawBTC =>' . $wallet_hash);
+                    throw new \Exception($wallet_hash, 406);
+                }
+            }
+
+            return WithdrawProfit::create([
+                'user_id' => $request['user_id'],
+                'withdraw_transaction_id' => $withdraw_transaction->id,
+                'wallet_hash' => $wallet_hash,
+                'payout_service' => 'btc-pay-server', //TODO improvements or like payment drivers ?!
+                'currency' => $request['currency'],
+                'pf_amount' => $request['amount'],
+                'fee' => (double)$fee,
+                'crypto_amount' => pfToUsd((double)$request['amount']) / $crypto_rate,
+                'crypto_rate' => $crypto_rate
+            ]);
+
         } catch (\Throwable $exception) {
             throw $exception;
         }
+
     }
 
-    public function update(array $validated_request, WithdrawProfit $withdrawProfit)
+    public function update(array $validated_request, Collection $withdrawProfitRequests)
     {
-        return $withdrawProfit->update($validated_request);
+        switch ($validated_request['status']) {
+            case WALLET_WITHDRAW_COMMAND_PROCESS :
+                $this->pay($withdrawProfitRequests->where('status', '=', WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING));
+                break;
+            case WALLET_WITHDRAW_COMMAND_REJECT :
+                $this->rejectWithdrawRequest($validated_request, $withdrawProfitRequests);
+                break;
+            case WALLET_WITHDRAW_COMMAND_REVERT :
+                $this->revertWithdrawRequests($withdrawProfitRequests);
+                break;
+            case WALLET_WITHDRAW_COMMAND_POSTPONE:
+                $this->updateModel($withdrawProfitRequests->where('status', WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING)->pluck('id')->toArray(), [
+                    'status' => WALLET_WITHDRAW_COMMAND_POSTPONE,
+                    'postponed_to' => Carbon::parse($validated_request['postponed_to'])->toDateTimeString(),
+                    'act_reason' => isset($validated_request['act_reason']) ? $validated_request['act_reason'] : null
+                ]);
+                break;
+        }
     }
 
-    public function pay($withdrawProfits,$dispatchType = 'dispatchSync')
+    public function updateModel(array $ids, array $validated_data)
+    {
+        $this->model->query()->whereIn('id', $ids)->update($validated_data);
+    }
+
+    public function pay($withdrawProfits, $dispatchType = 'dispatchSync')
     {
         try {
-            if (is_array($withdrawProfits) AND array_key_exists('currency', $withdrawProfits)){
+            if (is_array($withdrawProfits) AND array_key_exists('currency', $withdrawProfits)) {
                 $currency = $withdrawProfits['currency'];
                 $amount = $withdrawProfits['crypto_amount'];
                 $withdrawProfits = collect()->push($withdrawProfits);
-            }
-            else if ($withdrawProfits instanceof Collection)
-                list($currency,$amount) = $this->checkWithdrawRequestsForPayOut($withdrawProfits);
+            } else if ($withdrawProfits instanceof Collection)
+                list($currency, $amount) = $this->checkWithdrawRequestsForPayOut($withdrawProfits);
             else
                 throw new \Exception(trans('wallet.responses.something-went-wrong'));
 
             $this->checkBPSWalletBalance($amount);
-            $this->payout_processor->pay($currency, $withdrawProfits,$dispatchType);
+            $this->payout_processor->pay($currency, $withdrawProfits, $dispatchType);
         } catch (\Throwable $exception) {
             throw $exception;
         }
     }
 
-    public function payoutGroup(array $ids)
+    public function rejectWithdrawRequest(array $request, Collection $withdraw_requests)
     {
-        try {
-            DB::beginTransaction();
-            $withdrawals_requests = $this->model->query()->where('status', '=', 1)->whereIn('uuid', $ids)->get();
-            $this->pay($withdrawals_requests);
-            DB::commit();
-        } catch (\Throwable $exception) {
-            DB::rollBack();
-            throw $exception;
+        foreach ($withdraw_requests AS $withdraw_request) {
+            $admin_bank_service = new BankService(User::query()->find(1));
+            $admin_balance = $admin_bank_service->getBalance(WALLET_NAME_DEPOSIT_WALLET);
+            if ($admin_balance < $withdraw_request->fee) {
+                //TODO Notify admin
+                Log::error('Wallets\Repositories\WithdrawRepository@rejectWithdrawRequest => Insufficient PF in admin Deposit Wallet');
+                Log::error('Admin Balance => ' . $admin_balance . ' | Fee => ' . $withdraw_request->fee . ' | WithdrawalID => ' . $withdraw_request->id);
+                throw new \Exception(trans('wallet.responses.something-went-wrong'), 500);
+            }
+
+            try {
+                //Charge Admin deposit wallet for withdrawal fee
+                $admin_bank_service->withdraw(WALLET_NAME_DEPOSIT_WALLET, $withdraw_request->fee, [
+                    'description' => 'Refund withdrawal request fee',
+                    'withdrawal_request_id' => $withdraw_request->id
+                ], 'Withdrawal refund', null);
+
+                //Deposit user wallet
+                $user_bank_service = new BankService($withdraw_request->user);
+
+                //Refund Withdrawal amount
+                $refund_transaction = $user_bank_service->deposit($this->user_wallet, $withdraw_request->getTotalAmount(), [
+                    'description' => 'Withdrawal request rejected',
+                    'withdrawal_request_id' => $withdraw_request->id,
+                ], true, 'Withdrawal refund');
+
+//            //Refund Withdrawal FEE amount
+//            $refund_fee_transaction = $bank_service->deposit($this->user_wallet, $withdraw_request->fee, [
+//                'description' => 'Withdrawal request rejected',
+//                'withdrawal_request_id' => $withdraw_request->id,
+//            ], true, 'Withdrawal fee refund');
+
+                $withdraw_request->update([
+                    'status' => $request['status'],
+                    'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
+                ]);
+
+            } catch (\Throwable $exception) {
+                throw $exception;
+            }
         }
     }
 
-    public function rejectWithdrawRequest(Request $request, WithdrawProfit $withdraw_request)
+    public function revertWithdrawRequests(Collection $withdrawProfitRequests)
     {
-        try {
-            //Withdraw Admin deposit wallet
-            $bank_service = new BankService(User::query()->first());
-            $bank_service->withdraw(WALLET_NAME_DEPOSIT_WALLET, $withdraw_request->fee , [
-                'description' => 'Refund withdrawal request fee',
-                'withdrawal_request_id' => $withdraw_request->id
-            ], 'Withdrawal refund');
+        $records_have_to_update = [];
+        foreach ($withdrawProfitRequests AS $withdrawProfitRequest) {
+            //Check if request is marked as rejected
+            if ($withdrawProfitRequest->getRawOriginal('status') != WALLET_WITHDRAW_COMMAND_REJECT)
+                throw new Exception(trans('wallet.withdraw-profit-request.you-can-revert-a-rejected-request', [
+                    'uuid' => $withdrawProfitRequest->uuid
+                ]), 406);
 
-            //Deposit user wallet
-            /**@var $user User*/
-            $user = $withdraw_request->user()->first();
-            $bank_service = new BankService($user);
-
-            //Refund Withdrawal amount
-            $refund_transaction = $bank_service->deposit($this->user_wallet, $withdraw_request->pf_amount, [
-                'description' => 'Withdrawal request rejected',
-                'withdrawal_request_id' => $withdraw_request->id,
-            ], true, 'Withdrawal refund');
-
-
-            //Refund Withdrawal FEE amount
-            $refund_fee_transaction = $bank_service->deposit($this->user_wallet, $withdraw_request->fee, [
-                'description' => 'Withdrawal request rejected',
-                'withdrawal_request_id' => $withdraw_request->id,
-            ], true, 'Withdrawal fee refund');
-
-
-            $this->update([
-                'status' => $request->get('status'),
-                'refund_transaction_id' => $refund_transaction instanceof Transaction ? $refund_transaction->id : $withdraw_request->refund_transaction_id
-            ], $withdraw_request);
-        } catch (\Throwable $exception) {
-            throw $exception;
+            //Make a fresh withdraw request
+            $request = $withdrawProfitRequest->toArray();
+            $request['is_revert'] = true;
+            $request['amount'] = $request['pf_amount'];
+            $this->makeWithdrawRequest($request);
+            $records_have_to_update[] = $withdrawProfitRequest->id;
         }
+
+        $this->updateModel($records_have_to_update, [
+            'status' => WALLET_WITHDRAW_COMMAND_REVERT,
+            'is_update_email_sent' => true //Ignore sending update email
+        ]);
+
     }
 
-    public function checkWithdrawRequestsForPayOut(Collection $withdraw_requests)
+    public function checkWithdrawRequestsForPayOut(Collection $withdraw_requests): array
     {
         try {
             /**
@@ -184,24 +261,24 @@ class WithdrawRepository
             if ($withdraw_requests->where('currency', '!=', $first_request->currency)->count())
                 throw new \Exception(trans('wallet.withdraw-profit-request.different-currency-payout'));
 
-            return [$first_request->currency,$withdraw_requests->sum('crypto_amount')];
+            return [$first_request->currency, $withdraw_requests->sum('crypto_amount')];
         } catch (\Throwable $exception) {
             throw $exception;
         }
     }
 
-    public function getPendingAmountVsTimeChart($type,$user_id = null)
+    public function getPendingAmountVsTimeChart($type, $user_id = null)
     {
         try {
             $that = $this;
-            $function_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
-                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,null,$user_id);
+            $function_withdraw_requests = function ($from_date, $to_date) use ($that, $user_id) {
+                return $that->getWithdrawRequestsByDateCollection('created_at', $from_date, $to_date, null, $user_id);
             };
 
             $sub_function = function ($collection, $intervals) {
-                /**@var $collection Collection*/
-                return $collection->whereBetween('created_at', $intervals)->sum(function($withdraw_request) {
-                    /**@var $withdraw_request WithdrawProfit*/
+                /**@var $collection Collection */
+                return $collection->whereBetween('created_at', $intervals)->sum(function ($withdraw_request) {
+                    /**@var $withdraw_request WithdrawProfit */
                     return $withdraw_request->pf_amount;
                 });
             };
@@ -216,18 +293,18 @@ class WithdrawRepository
         }
     }
 
-    public function getPaidAmountVsTimeChart($type,$user_id = null)
+    public function getPaidAmountVsTimeChart($type, $user_id = null)
     {
         try {
             $that = $this;
-            $function_withdraw_requests = function($from_date,$to_date) use ($that,$user_id){
-                return $that->getWithdrawRequestsByDateCollection('updated_at',$from_date,$to_date,WITHDRAW_COMMAND_PROCESS,$user_id);
+            $function_withdraw_requests = function ($from_date, $to_date) use ($that, $user_id) {
+                return $that->getWithdrawRequestsByDateCollection('updated_at', $from_date, $to_date, WALLET_WITHDRAW_COMMAND_PROCESS, $user_id);
             };
 
             $sub_function = function ($collection, $intervals) {
-                /**@var $collection Collection*/
-                return $collection->whereBetween('created_at', $intervals)->sum(function($withdraw_request) {
-                    /**@var $withdraw_request WithdrawProfit*/
+                /**@var $collection Collection */
+                return $collection->whereBetween('created_at', $intervals)->sum(function ($withdraw_request) {
+                    /**@var $withdraw_request WithdrawProfit */
                     return $withdraw_request->pf_amount;
                 });
             };
@@ -261,6 +338,7 @@ class WithdrawRepository
                     ]));
 
             } else {
+                Log::error('BPS Wallet balance => ' . $wallet_response->json()['confirmedBalance']);
                 throw new \Exception(trans('wallet.withdraw-profit-request.check-bps-or-blockchain.com-server', [
                     'server' => 'BTCPayServer'
                 ]));
@@ -270,65 +348,86 @@ class WithdrawRepository
         }
     }
 
-    private function getUserBTCWalletHash()
+    private function getUserBTCWalletHash(int $user_id): array
     {
-//        return 'tb1qn6whdz3fw4f7unnvvkphgpxg58jl3mcyjreya9';
-        if (app()->environment('testing'))
-            return 'grpc called';
+        try {
+            if (app()->environment('testing'))
+                return [true, 'grpc called'];
 
-        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL', 'staging-api-gateway.janex.org:9595'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-        $req = app(\User\Services\Grpc\WalletRequest::class);
-        $req->setUserId((int)auth()->user()->id);
-        $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
-        /**@var $reply WalletInfo */
-        list($reply, $status) = $client->getUserWalletInfo($req)->wait();
-        if (!$status OR $status->code != 0 OR !$reply->getAddress())
-            throw new \Exception(trans('wallet.withdraw-profit-request.cant-find-wallet-address', [
-                'name' => 'bitcoin'
+            $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL', 'staging-api-gateway.janex.org:9595'), [
+                'credentials' => \Grpc\ChannelCredentials::createInsecure()
+            ]);
+            $req = app(\User\Services\Grpc\WalletRequest::class);
+            $req->setUserId((int)$user_id);
+            $req->setWalletType(\User\Services\Grpc\WalletType::BTC);
+            /**@var $reply WalletInfo */
+            list($reply, $status) = $client->getUserWalletInfo($req)->wait();
+            if (!$status OR $status->code != 0 OR !$reply->getAddress())
+                return [false, trans('wallet.withdraw-profit-request.cant-find-wallet-address', [
+                    'name' => 'bitcoin'
 //                'name' => WalletType::name(\User\Services\Grpc\WalletType::BTC)
-            ]));
+                ])];
 
-        return $reply->getAddress();
+            return [true, $reply->getAddress()];
+        } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\WithdrawRepository@getUserBTCWalletHash => ' . $exception->getMessage());
+            throw $exception;
+        }
     }
 
-    private function getWithdrawRequestsByDateCollection($date_field,$from_date,$to_date,$status = null,$user_id = null)
+    private function getWithdrawRequestsByDateCollection($date_field, $from_date, $to_date, $status = null, $user_id = null)
     {
         try {
             $withdraw_profit_requests = $this->model->query();
-            if($status)
-                $withdraw_profit_requests->where('status','=',$status);
+            if ($status)
+                $withdraw_profit_requests->where('status', '=', $status);
 
-            if($user_id)
-                $withdraw_profit_requests->where('user_id',$user_id);
+            if ($user_id)
+                $withdraw_profit_requests->where('user_id', $user_id);
 
             $from_date = Carbon::parse($from_date)->toDateTimeString();
             $to_date = Carbon::parse($to_date)->toDateTimeString();
-            return $withdraw_profit_requests->whereBetween($date_field, [$from_date,$to_date])->get();
+            return $withdraw_profit_requests->whereBetween($date_field, [$from_date, $to_date])->get();
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
             throw new \Exception(trans('wallet.responses.something-went-wrong'));
         }
     }
 
-    private function getWithdrawRequestsHistoryByDateCollection($date_field,$from_date,$to_date,$status = null,$user_id = null)
+    private function getWithdrawRequestsHistoryByDateCollection($date_field, $from_date, $to_date, $status = null, $user_id = null)
     {
         try {
             $withdraw_profit_requests = $this->model_history->query();
-            if($status)
-                $withdraw_profit_requests->where('status','=',$status);
+            if ($status)
+                $withdraw_profit_requests->where('status', '=', $status);
 
-            if($user_id)
-                $withdraw_profit_requests->where('user_id',$user_id);
+            if ($user_id)
+                $withdraw_profit_requests->where('user_id', $user_id);
 
             $from_date = Carbon::parse($from_date)->toDateTimeString();
             $to_date = Carbon::parse($to_date)->toDateTimeString();
-            return $withdraw_profit_requests->whereBetween($date_field, [$from_date,$to_date])->get();
+            return $withdraw_profit_requests->whereBetween($date_field, [$from_date, $to_date])->get();
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
             throw new \Exception(trans('wallet.responses.something-went-wrong'));
         }
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    private function getBtcPrice()
+    {
+        $btc_price = Http::get('https://blockchain.info/ticker');
+        if ($btc_price->ok() AND is_array($btc_price->json()) AND isset($btc_price->json()['USD']['15m'])) {
+            $crypto_rate = $btc_price->json()['USD']['15m'];
+        } else {
+            throw new \Exception(trans('wallet.withdraw-profit-request.external-resource-error', [
+                'server' => 'BlockChain.info'
+            ]), 500);
+        }
+        return $crypto_rate;
     }
 
 }

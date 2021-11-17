@@ -30,7 +30,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
      */
     public function __construct($payout_requests, $dispatchType = 'dispatch')
     {
-        $this->queue = 'default';
+        $this->queue = env('DEFAULT_QUEUE_NAME','default');
         $this->payout_requests = $payout_requests instanceof Collection ? $payout_requests : collect($payout_requests);
         $this->dispatchType = $dispatchType;
     }

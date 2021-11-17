@@ -48,7 +48,7 @@ class TransferFundFromDepositWalletRequest extends FormRequest
                 'max:' . $this->maximum_amount,
                 function($attribute,$value,$fail){
                     if(($value + $this->fee) > $this->wallet_balance)
-                        return $fail('Insufficient amount .');
+                        return $fail(trans('wallet.responses.not-enough-balance'));
                 }
             ],
         ];

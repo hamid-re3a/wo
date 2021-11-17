@@ -9,10 +9,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Orders\Services\Grpc\Order;
+use Packages\Services\Grpc\Id;
+use Packages\Services\PackageService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoiceCreated;
 use Payments\Services\Grpc\Invoice;
+use User\Services\UserService;
 use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\Grpc\WalletNames;
 use Wallets\Services\WalletService;
@@ -35,7 +38,7 @@ class PaymentProcessor
                 return $this->payFromGiftcode($invoice_request,$order_service);
                 break;
             case 'deposit' :
-                return $this->payFromDepositWallet($invoice_request);
+                return $this->payFromDepositWallet($invoice_request,$order_service);
             default:
                 break;
         }
@@ -105,7 +108,7 @@ class PaymentProcessor
         }
     }
 
-    private function payFromDepositWallet(Invoice $invoice_request): array
+    private function payFromDepositWallet(Invoice $invoice_request,Order $order_object): array
     {
         try {
             DB::beginTransaction();
@@ -121,12 +124,28 @@ class PaymentProcessor
             if ($balance < $invoice_request->getPfAmount())
                 throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
 
+            $package_service = app(PackageService::class);
+            $package_object = $package_service->packageFullById(app(Id::class)->setId($order_object->getPackageId()));
+
+            $user_member_id = auth()->user()->member_id;
+            if(auth()->user()->id != $order_object->getUserId()) {
+                $user_service = app(UserService::class);
+                $user_object = $user_service->findByIdOrFail($order_object->getUserId());
+                $user_member_id = $user_object->member_id;
+            }
+
+            $description = [
+                'member_id' => $user_member_id,
+                'package_name' => $package_object->getName() . '(' . $package_object->getShortName() .')',
+                'order_id' => $order_object->getId()
+            ];
+
             //Prepare withdraw message
             $withdraw_service = app(Withdraw::class);
             $withdraw_service->setUserId($invoice_request->getUserId());
             $withdraw_service->setWalletName(WalletNames::DEPOSIT);
             $withdraw_service->setType('Package purchased');
-            $withdraw_service->setDescription('Purchase order #' . $invoice_request->getPayableId());
+            $withdraw_service->setDescription(serialize($description));
             $withdraw_service->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_service);
 

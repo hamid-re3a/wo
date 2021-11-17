@@ -5,9 +5,11 @@ namespace Payments\Services\Processors;
 
 
 use MLM\Services\Grpc\Acknowledge;
+use MLM\Services\MlmClientFacade;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
+use Packages\Services\PackageService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaid;
@@ -81,16 +83,21 @@ class OrderProcessor extends ProcessorAbstract
         $order_service = $this->order_service;
         $order_service->setIsPaidAt(now()->toDateTimeString());
         $order_service->setIsResolvedAt(now()->toDateTimeString());
-        list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
-        if ($flag->code != 0)
-            throw new \Exception('MLM Not responding', 406);
+        $acknowledge = MlmClientFacade::submitOrder($order_service);
+        if ($acknowledge)
+            throw new \Exception();
 
 
         if ($submit_response->getStatus()) {
+            $package_service = app(PackageService::class);
+            $package_object = $package_service->packageFullById(app(\Packages\Services\Grpc\Id::class)->setId($this->order_service->getPackageId()));
+
             //Deposit to Charity
             $wallet_service = app(WalletService::class);
             $wallet_service->depositIntoCharityWallet($order_service->getPackagesCostInPf(),[
-                'Purchase order' => $order_service->getId(),
+                'order_id' => $order_service->getId(),
+                'member_id' => $this->user->member_id,
+                'package_name' => $package_object->getName() . '(' . $package_object->getShortName() .')',
             ],'Package purchased');
 
 

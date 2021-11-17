@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Payments\Services\Processors\PaymentFacade;
 use Payments\Services\Processors\PaymentProcessor;
+use Payments\Services\Processors\PayoutFacade;
+use Payments\Services\Processors\PayoutProcessor;
 
 class PaymentServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,7 @@ class PaymentServiceProvider extends ServiceProvider
          * related Facades
          */
         PaymentFacade::shouldProxyTo(PaymentProcessor::class);
+        PayoutFacade::shouldProxyTo(PayoutProcessor::class);
 
         if (!$this->app->runningInConsole()) {
             return;

@@ -92,6 +92,7 @@ class UserServiceProvider extends ServiceProvider
         });
 
 
+
         $this->setupConfig();
 
         $this->registerHelpers();

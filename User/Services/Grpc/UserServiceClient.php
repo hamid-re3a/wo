@@ -58,4 +58,18 @@ class UserServiceClient extends \Grpc\BaseStub {
         $metadata, $options);
     }
 
+    /**
+     * @param \User\Services\Grpc\UserTransactionPassword $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \User\Services\Grpc\Acknowledge
+     */
+    public function checkTransactionPassword(\User\Services\Grpc\UserTransactionPassword $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/user.services.grpc.UserService/checkTransactionPassword',
+        $argument,
+        ['\User\Services\Grpc\Acknowledge', 'decode'],
+        $metadata, $options);
+    }
+
 }

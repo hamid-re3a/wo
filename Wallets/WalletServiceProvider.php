@@ -15,10 +15,6 @@ use Illuminate\Support\ServiceProvider;
 use Wallets\Observers\TransactionObserver;
 use Wallets\Observers\TransferObserver;
 use Wallets\Observers\WithdrawProfitObserver;
-use Wallets\Services\KycClientFacade;
-use Wallets\Services\KycGrpcClientProvider;
-use Wallets\Services\MlmClientFacade;
-use Wallets\Services\MlmGrpcClientProvider;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -54,9 +50,6 @@ class WalletServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
-        $this->registerFacades();
-
         $this->registerObservers();
 
         $this->setupConfig();
@@ -83,14 +76,6 @@ class WalletServiceProvider extends ServiceProvider
         ], 'wallet-resources');
     }
 
-    /**
-     * Register Facades
-     */
-    private function registerFacades()
-    {
-        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
-        KycClientFacade::shouldProxyTo(KycGrpcClientProvider::class);
-    }
 
     /**
      * Register Commands

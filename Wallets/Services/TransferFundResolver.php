@@ -6,6 +6,7 @@ namespace Wallets\Services;
 
 use Bavix\Wallet\Models\Transfer;
 use User\Models\User;
+use MLM\Services\MlmClientFacade;
 
 class TransferFundResolver
 {

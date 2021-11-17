@@ -2,14 +2,18 @@
 
 namespace User;
 
-use App\Jobs\User\UserGetDataJob;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Kyc\Services\KycClientFacade;
+use Kyc\Services\KycGrpcClientProvider;
+use MLM\Services\MlmClientFacade;
+use MLM\Services\MlmGrpcClientProvider;
 use User\Models\User;
-use User\Services\Grpc\UserUpdate;
+use User\Services\GatewayClientFacade;
+use User\Services\GatewayGrpcClientProvider;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -25,6 +29,7 @@ class UserServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerFacades();
         if (!$this->app->runningInConsole()) {
             return;
         }
@@ -104,6 +109,13 @@ class UserServiceProvider extends ServiceProvider
                 __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
+    }
+
+    private function registerFacades()
+    {
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
+        KycClientFacade::shouldProxyTo(KycGrpcClientProvider::class);
+        GatewayClientFacade::shouldProxyTo(GatewayGrpcClientProvider::class);
     }
 
     /**

@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Wallets\Http\Controllers\Admin\CharityWalletController;
 use Wallets\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use Wallets\Http\Controllers\Admin\EmailContentController;
 use Wallets\Http\Controllers\Admin\SettingController;
+use Wallets\Http\Controllers\Front\SettingController as UserSettingController;
 use Wallets\Http\Controllers\Admin\WithdrawRequestController as AdminWithdrawRequestController;
 use Wallets\Http\Controllers\Front\DepositWalletController;
 use Wallets\Http\Controllers\Front\EarningWalletController;
@@ -52,9 +54,20 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                     Route::post('paid-amount-vs-time',[AdminWithdrawRequestController::class,'paidAmountVsTimeChart'])->name('paid-amount-vs-time');
                 });
             });
+
+        Route::name('charity-wallet.')->prefix('charity-wallet')->group(function(){
+            Route::get('',[CharityWalletController::class,'index'])->name('index');
+            Route::post('transactions',[CharityWalletController::class,'transactions'])->name('transactions');
+            Route::post('donate',[CharityWalletController::class,'donate'])->name('donate');
+
+            Route::prefix('charts')->name('charts')->group(function(){
+                Route::post('overall-balance',[CharityWalletController::class,'overallBalanceChart'])->name('overall-balance');
+            });
+        });
     });
 
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {
+        Route::get('settings',[UserSettingController::class,'index'])->name('settings-list');
         Route::get('', [WalletController::class, 'index'])->name('index');
         Route::post('transactions', [WalletController::class, 'getTransaction'])->name('get-transaction');
 

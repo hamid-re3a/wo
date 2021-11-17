@@ -61,7 +61,7 @@ class EarningWalletController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes(auth()->user()->id,null,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes($commissions,auth()->user()->id,null));
 
     }
 
@@ -149,7 +149,9 @@ class EarningWalletController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error :' . $exception->getMessage());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -201,7 +203,9 @@ class EarningWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 

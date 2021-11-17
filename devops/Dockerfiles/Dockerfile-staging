@@ -43,6 +43,7 @@ RUN su application -c "php artisan db:seed"
 RUN su application -c "php artisan scribe:generate"
 RUN su application -c "php artisan optimize:clear"
 RUN su application -c "php artisan queue:restart"
+RUN su application -c "php artisan convert:packages"
 
 
 

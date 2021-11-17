@@ -24,7 +24,6 @@ class UserTableSeeder extends Seeder
                 Role::query()->firstOrCreate(['name' => $role]);
 
         // Load local seeder
-        if (app()->environment() === 'local' || app()->environment() === 'testing') {
             $admin = User::query()->firstOrCreate(['id' => 1]);
             $admin->update([
                 'first_name' => 'Admin',
@@ -39,7 +38,6 @@ class UserTableSeeder extends Seeder
 
             if (defined('USER_ROLE_CLIENT'))
                 $admin->assignRole(USER_ROLE_CLIENT);
-        }
 
     }
 }

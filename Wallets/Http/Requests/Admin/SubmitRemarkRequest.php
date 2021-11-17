@@ -34,8 +34,15 @@ class SubmitRemarkRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount' => 'required|numeric|lte:' . $this->wallet_balance,
-            'remarks' => 'nullable|string'
+            'remarks' => 'nullable|string',
+            'amount' => [
+                'required',
+                'numeric',
+                function($attribute,$value,$fail){
+                    if($value > $this->wallet_balance)
+                        return $fail(trans('wallet.responses.not-enough-balance'));
+                }
+            ]
         ];
 
     }

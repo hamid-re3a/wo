@@ -4,7 +4,6 @@ namespace Wallets\Http\Controllers\Front;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -141,9 +140,7 @@ class WithdrawRequestController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('WithdrawRequestController@create_withdraw_request_preview => ' . serialize($request->all()));
-            return api()->error(null,null,$exception->getCode(),[
-                'subject' => $exception->getMessage()
-            ]);
+            throw $exception;
         }
 
     }

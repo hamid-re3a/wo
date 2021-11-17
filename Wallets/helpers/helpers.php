@@ -67,24 +67,6 @@ if (!function_exists('formatCurrencyFormat')) {
     }
 }
 
-if (!function_exists('getMLMGrpcClient')) {
-    function getMLMGrpcClient()
-    {
-        return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL', 'staging-api-gateway.janex.org:9598'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-
-if (!function_exists('getKycGrpcClient')) {
-    function getKycGrpcClient()
-    {
-        return new \Kyc\Services\Grpc\KycServiceClient(env('KYC_GRPC_URL', 'staging.janex.org:9597'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-
 if (!function_exists('chartMaker')) {
     function chartMaker($duration_type, $repo_function, $sub_function)
     {

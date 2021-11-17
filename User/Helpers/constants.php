@@ -31,6 +31,32 @@ const USER_ROLES = [
     USER_ROLE_HELP_DESK,
 ];
 
+if (!function_exists('getGatewayGrpcClient')) {
+    function getGatewayGrpcClient()
+    {
+        return new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL', 'development.dreamcometrue.ai:9595'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+if (!function_exists('getMLMGrpcClient')) {
+    function getMLMGrpcClient()
+    {
+        return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL', 'staging-api-gateway.janex.org:9598'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+if (!function_exists('getKycGrpcClient')) {
+    function getKycGrpcClient()
+    {
+        return new \Kyc\Services\Grpc\KycServiceClient(env('KYC_GRPC_URL', 'staging.janex.org:9597'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
 
 if (!function_exists('updateUserFromGrpcServer')) {
 
@@ -38,19 +64,10 @@ if (!function_exists('updateUserFromGrpcServer')) {
     {
         if(!is_numeric($input_id))
             return null;
-        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
         $id = new \User\Services\Grpc\Id();
         $id->setId((int)$input_id);
         try {
-            /** @var $user \User\Services\Grpc\User */
-            list($user, $status) = $client->getUserById($id)->wait();
-            if ($status->code == 0 && $user->getId()) {
-                app(UserService::class)->userUpdate($user);
-                return $user;
-            }
-            return null;
+            return \User\Services\GatewayClientFacade::getUserById($id);
         } catch (\Exception $exception) {
             return null;
         }
@@ -64,20 +81,10 @@ if (!function_exists('updateUserFromGrpcServerByMemberId')) {
     {
         if(!is_numeric($input_id))
             return null;
-        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
         $id = new \User\Services\Grpc\Id();
         $id->setId((int)$input_id);
         try {
-            /** @var $user \User\Services\Grpc\User */
-            list($user, $status) = $client->getUserByMemberId($id)->wait();
-            if ($status->code == 0 && $user->getId()) {
-                \Illuminate\Support\Facades\Log::info('User Updated by GRPC/MemberID => ' . $user->getId());
-                app(UserService::class)->userUpdate($user);
-                return $user;
-            }
-            return null;
+            return \User\Services\GatewayClientFacade::getUserByMemberId($id);
         } catch (\Exception $exception) {
             return null;
         }

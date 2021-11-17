@@ -52,6 +52,7 @@ class CreateWithdrawRequest extends FormRequest
                 }
             ],
             'currency' => 'required|in:' . implode(',', $this->getNamePaymentCurrency()),
+            'transaction_password' => 'required|string',
         ];
     }
 

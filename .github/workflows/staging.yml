@@ -28,6 +28,7 @@ jobs:
 
   laravel-deploy:
     runs-on: staging
+    timeout-minutes: 2000
 #    needs: laravel-tests
     steps:
     - uses: actions/checkout@v2

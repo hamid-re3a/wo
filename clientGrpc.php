@@ -44,14 +44,14 @@ $client = new \Packages\Services\Grpc\PackagesServiceClient('development.dreamco
 ]);
 
 $packages = new PackageCheck;
-$packages->setPackageIndexId((int)1);
+$packages->setPackageIndexId((int)6);
 $packages->setPackageToBuyId((int)2);
 
 list($reply, $status) = $client->packageIsInBiggestPackageCategory($packages)->wait();
 
 var_dump($status);
-var_dump($reply->getId());
-var_dump($reply->getName());
+var_dump($reply->getStatus());
+var_dump($reply->getMessage());
 
 
 

@@ -12,6 +12,8 @@ use Kyc\Services\KycGrpcClientProvider;
 use MLM\Services\MlmClientFacade;
 use MLM\Services\MlmGrpcClientProvider;
 use User\Models\User;
+use User\Services\GatewayClientFacade;
+use User\Services\GatewayGrpcClientProvider;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -90,7 +92,6 @@ class UserServiceProvider extends ServiceProvider
         });
 
 
-
         $this->setupConfig();
 
         $this->registerHelpers();
@@ -113,6 +114,7 @@ class UserServiceProvider extends ServiceProvider
     {
         MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
         KycClientFacade::shouldProxyTo(KycGrpcClientProvider::class);
+        GatewayClientFacade::shouldProxyTo(GatewayGrpcClientProvider::class);
     }
 
     /**

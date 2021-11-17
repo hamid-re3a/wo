@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use Mockery\Exception;
 use Payments\Services\Processors\PayoutProcessor;
 use User\Models\User;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 use User\Services\Grpc\WalletInfo;
 use User\Services\Grpc\WalletType;
 use Wallets\Models\Transaction;
@@ -47,8 +49,27 @@ class WithdrawRepository
             if (!getWalletSetting('withdrawal_request_is_enabled'))
                 throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
 
-            /**@var $user User */
             $user = array_key_exists('user_id', $request) ? User::query()->find($request['user_id']) : auth()->user();
+
+            //Check Transaction Password if request is not for reverting
+            if ($user->id == auth()->user()->id) {
+                if (!isset($request['transaction_password'])) {
+                    Log::error('Wallets\Repositories\WithdrawRepository@makeWithdrawRequest => Undefined transaction password for user in request body');
+                    throw new \Exception();
+                }
+
+                $password_request = new UserTransactionPassword();
+                $password_request->setUserId((int)$user->id);
+                $password_request->setTransactionPassword((string)$request['transaction_password']);
+                $acknowledge = GatewayClientFacade::checkTransactionPassword($password_request);
+
+                if (!$acknowledge->getStatus())
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'transaction_password' => [trans('wallet.withdraw-profit-request.incorrect-transaction-password')],
+                    ]);
+            }
+
+            /**@var $user User */
             $request['user_id'] = $user->id;
             $this->bankService = new BankService($user);
 
@@ -127,7 +148,7 @@ class WithdrawRepository
                 $this->revertWithdrawRequests($withdrawProfitRequests);
                 break;
             case WALLET_WITHDRAW_COMMAND_POSTPONE:
-                $this->updateModel($withdrawProfitRequests->where('status',WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING)->pluck('id')->toArray(), [
+                $this->updateModel($withdrawProfitRequests->where('status', WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING)->pluck('id')->toArray(), [
                     'status' => WALLET_WITHDRAW_COMMAND_POSTPONE,
                     'postponed_to' => Carbon::parse($validated_request['postponed_to'])->toDateTimeString(),
                     'act_reason' => isset($validated_request['act_reason']) ? $validated_request['act_reason'] : null

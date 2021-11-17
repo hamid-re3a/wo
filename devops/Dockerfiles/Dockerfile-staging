@@ -38,14 +38,11 @@ RUN su application -c "composer install"
 RUN su application -c "composer require aws/aws-sdk-php"
 RUN su application -c "php artisan key:generate"
 RUN su application -c "php artisan vendor:publish --all"
-RUN su application -c "php artisan migrate:fresh"
+RUN su application -c "php artisan migrate"
 RUN su application -c "php artisan db:seed"
 RUN su application -c "php artisan scribe:generate"
 RUN su application -c "php artisan optimize:clear"
 RUN su application -c "php artisan queue:restart"
-RUN su application -c "php artisan convert:packages"
-
-
 
 # permission
 RUN chown -R application:application /app

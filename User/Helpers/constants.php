@@ -67,7 +67,9 @@ if (!function_exists('updateUserFromGrpcServer')) {
         $id = new \User\Services\Grpc\Id();
         $id->setId((int)$input_id);
         try {
-            return \User\Services\GatewayClientFacade::getUserById($id);
+            $grpc_user = \User\Services\GatewayClientFacade::getUserById($id);
+            app(UserService::class)->userUpdate($grpc_user);
+            return $grpc_user;
         } catch (\Exception $exception) {
             return null;
         }
@@ -84,7 +86,9 @@ if (!function_exists('updateUserFromGrpcServerByMemberId')) {
         $id = new \User\Services\Grpc\Id();
         $id->setId((int)$input_id);
         try {
-            return \User\Services\GatewayClientFacade::getUserByMemberId($id);
+            $grpc_user = \User\Services\GatewayClientFacade::getUserById($id);
+            app(UserService::class)->userUpdate($grpc_user);
+            return $grpc_user;
         } catch (\Exception $exception) {
             return null;
         }

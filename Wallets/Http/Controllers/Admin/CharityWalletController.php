@@ -8,6 +8,8 @@ use Illuminate\Routing\Controller;
 use User\Models\User;
 use Wallets\Http\Requests\Admin\SubmitRemarkRequest;
 use Wallets\Http\Requests\ChartTypeRequest;
+use Wallets\Http\Resources\Admin\CharityWalletResource;
+use Wallets\Http\Resources\Admin\CharityWalletTransactionResource;
 use Wallets\Http\Resources\DepositWalletResource;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Resources\TransactionResource;
@@ -47,7 +49,7 @@ class CharityWalletController extends Controller
     public function index()
     {
         $this->prepareWallet();
-        return api()->success(null, DepositWalletResource::make($this->bankService->getWallet($this->walletName)));
+        return api()->success(null, CharityWalletResource::make($this->bankService->getWallet($this->walletName)));
 
     }
 
@@ -62,7 +64,7 @@ class CharityWalletController extends Controller
         $this->prepareWallet();
         $list = $this->bankService->getTransactions($this->walletName)->paginate();
         return api()->success(null, [
-            'list' => TransactionResource::collection($list),
+            'list' => CharityWalletTransactionResource::collection($list),
             'pagination' => [
                 'total' => $list->total(),
                 'per_page' => $list->perPage(),
@@ -80,7 +82,7 @@ class CharityWalletController extends Controller
     public function donate(SubmitRemarkRequest $request)
     {
         $this->prepareWallet();
-        $list = $this->bankService->withdraw($this->walletName,$request->get('amount'),$request->get('remarks'),'Donation',null,true,false);
+        $list = $this->bankService->withdraw($this->walletName,$request->get('amount'),['remarks' => $request->get('remarks')],'Donation',null,true,false);
         return api()->success();
 
     }

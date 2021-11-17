@@ -21,21 +21,25 @@ class TransactionRepository
             $transaction = new $this->entity;
             $transactions = $transaction->query();
 
-            if (!empty($wallet_id))
+            if ($wallet_id)
                 $transactions->where('wallet_id', '=', $wallet_id);
 
             //Except Admin Wallets
-            $transactions->whereNotIn('transactions.wallet_id', WALLET_ADMIN_WALLETS_IDS);
+            if(!$wallet_id)
+                $transactions->whereNotIn('transactions.wallet_id', WALLET_ADMIN_WALLETS_IDS);
 
-            if (!empty($wallet_name))
+            if ($wallet_name)
                 $transactions->whereHas('wallet', function (Builder $query) use ($wallet_name) {
                     $query->where('name', '=', $wallet_name);
                 });
 
-            if ($type)
-                $transactions->whereHas('metaData', function (Builder $query) use ($type) {
-                    $query->where('wallet_transaction_types.name', '=', $type);
+            if ($type) {
+                $transactions->where(function($query) use($type){
+                    $query->whereHas('metaData', function (Builder $query) use ($type) {
+                        $query->where('wallet_transaction_types.name', '=', $type);
+                    })->orWhere('type','=',$type);
                 });
+            }
 
             $from_date = Carbon::parse($from_date)->startOfDay()->toDateTimeString();
             $to_date = Carbon::parse($to_date)->endOfDay()->toDateTimeString();

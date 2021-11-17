@@ -54,13 +54,11 @@ class ConvertOrderCommand extends Command
 
         $this->info(PHP_EOL . 'Start user conversion');
         $bar->start();
-        $users = UserPackageInfo::with('lastPackage')->
+        UserPackageInfo::with('lastPackage')->
         chunk(50, function ($users) use ($bar, $sorted_packages) {
 
             foreach ($users as $item) {
-                $current_user = User::query()->find($item->user_id);
-                if (!$current_user)
-                    $current_user = User::factory()->create(['id' => $item->user_id]);
+                User::factory()->create(['id' => $item->user_id]);
                 if (!is_null($item->lastPackage)) {
                     $plan = $this->selectPlan((int)$item->lastPackage->product_value, (int)$item->total_debit);
                     if (!is_null($plan)) {

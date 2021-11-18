@@ -9,6 +9,7 @@ return [
         'something-went-wrong' => 'Oops, Something went wrong, Try again please.',
         'global-error' => 'An error occurred, Try again please.',
         'ok'=>'ok',
+        'setting-key-doesnt-exists' => "setting key doesn't exists",
         'email-key-doesnt-exists' => "giftcode email content doesn't exists",
         'not-valid-giftcode-id' => 'Giftcode ID is not valid',
 

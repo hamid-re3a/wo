@@ -1,6 +1,8 @@
 <?php
+
 namespace Giftcode\database\seeders;
 
+use Giftcode\Models\EmailContent;
 use Giftcode\Models\Package;
 use Giftcode\Models\Setting;
 use Illuminate\Database\Seeder;
@@ -113,8 +115,10 @@ class SettingSeeder extends Seeder
                 'description' => 'Registration fee will add in users payable amount'
             ]
         ];
-        Setting::insert($settings);
-        cache(['giftcode_settings' =>  $settings]);
+        if (Setting::query()->count() == 0) {
+            Setting::insert($settings);
+            cache(['giftcode_settings' => $settings]);
+        }
     }
 
 }

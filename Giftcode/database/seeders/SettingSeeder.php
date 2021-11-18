@@ -81,7 +81,7 @@ class SettingSeeder extends Seeder
             [
                 'name' => 'cancellation_fee',
                 'value' => 1,
-                'title' => 'Cancelation fee',
+                'title' => 'Cancellation fee',
                 'description' => 'Cancellation fee for giftcode in percent'
             ],
             [

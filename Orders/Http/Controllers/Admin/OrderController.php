@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Orders\Http\Requests\Admin\Order\OrderRequest;
 use Orders\Http\Resources\Admin\OrderResource;
 use Orders\Models\Order;
-use Orders\Services\MlmClientFacade;
+use MLM\Services\MlmClientFacade;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\PaymentService;

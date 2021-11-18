@@ -4,6 +4,7 @@ namespace Wallets\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
+use Payments\Services\Processors\PayoutFacade;
 use Payments\Services\Processors\PayoutProcessor;
 use Wallets\Models\WithdrawProfit;
 
@@ -54,7 +55,7 @@ class ProcessBTCWithdrawalRequestsCommand extends Command
 
         if ($withdrawal_requests->count() >= $chunk_allowed_size_setting) {
             $withdrawal_requests->chunkById($chunk_allowed_size_setting, function ($chunked) {
-                $this->payout_processor->pay('BTC',$chunked);
+                PayoutFacade::shouldProxyTo($chunked);
             });
         }
     }

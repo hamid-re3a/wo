@@ -46,6 +46,7 @@ class ConvertOrderCommand extends Command
     public function handle()
     {
         $sorted_packages = Package::query()->orderBy("price", 'desc')->get();
+        $biggest_package = Package::query()->orderBy("price", 'asc')->first();
 
         $count = UserPackageInfo::query()->count();
         $this->info(PHP_EOL . 'number of user rows ' . $count . PHP_EOL);
@@ -55,7 +56,7 @@ class ConvertOrderCommand extends Command
         $this->info(PHP_EOL . 'Start user conversion');
         $bar->start();
         UserPackageInfo::with('lastPackage')->
-        chunk(50, function ($users) use ($bar, $sorted_packages) {
+        chunk(50, function ($users) use ($bar, $sorted_packages,$biggest_package) {
 
             foreach ($users as $item) {
                 User::factory()->create(['id' => $item->user_id]);
@@ -63,7 +64,7 @@ class ConvertOrderCommand extends Command
                     $plan = $this->selectPlan((int)$item->lastPackage->product_value, (int)$item->total_debit);
                     if (!is_null($plan)) {
                         /** @var  $new_package Package */
-                        $new_package = $this->mapOldPackageToNew($item->lastPackage->product_value, $sorted_packages);
+                        $new_package = $this->mapOldPackageToNew($item->lastPackage->product_value, $sorted_packages,$biggest_package);
                         $id = new Id();
                         $id->setId((int)$new_package->id);
                         $package_grpc = app(PackageService::class)->packageFullById($id);
@@ -102,9 +103,13 @@ class ConvertOrderCommand extends Command
     }
 
 
-    public function mapOldPackageToNew($price, $packages)
+    public function mapOldPackageToNew($price, $packages,$biggest_package)
     {
-        return $packages->where('price', '>=', $price)->first();
+
+        $package = $packages->where('price', '>=', (int)$price)->first();
+        if(!$package)
+            return $biggest_package;
+        return $package;
     }
 
     private function selectPlan(int $package_amount, int $withdrawal_amount)

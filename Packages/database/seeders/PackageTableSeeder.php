@@ -11,7 +11,7 @@ class PackageTableSeeder extends Seeder
         if (Package::query()->count() > 0)
             return;
         if(is_null(config('package.packages')))
-            throw new \Exception('packages.config-key-setting-missing');
+            throw new \Exception('packages.config-key-setting-missing',400);
 
         foreach (config('package.packages') as $key => $setting) {
             if (!Package::query()->whereName($setting['name'])->exists()) {

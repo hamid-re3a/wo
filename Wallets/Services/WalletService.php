@@ -49,7 +49,7 @@ class WalletService implements WalletServiceInterface
         } catch (\Exception $exception) {
             DB::rollBack();
             Log::error('Wallets\Services\WalletService@depositIntoCharityWallet => ' . $exception->getMessage());
-            throw new \Exception();
+            throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
         }
     }
 
@@ -78,7 +78,7 @@ class WalletService implements WalletServiceInterface
             } else {
                 DB::rollBack();
                 Log::error('Deposit error 1 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
-                throw new \Exception();
+                throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
             }
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -113,7 +113,7 @@ class WalletService implements WalletServiceInterface
             } else {
                 DB::rollBack();
                 Log::error('withdraw error 1 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
-                throw new \Exception();
+                throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
@@ -153,7 +153,7 @@ class WalletService implements WalletServiceInterface
             } else {
                 DB::rollBack();
                 Log::error('transfer error 1 :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
-                throw new \Exception();
+                throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
             }
         } catch (\Throwable $exception) {
             DB::rollBack();

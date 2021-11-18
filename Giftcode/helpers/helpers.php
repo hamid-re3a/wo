@@ -11,15 +11,15 @@ if (!function_exists('giftcodeGetSetting')) {
         if(cache()->has('giftcode_settings'))
             if($setting = collect(cache('giftcode_settings'))->where('name', $key)->first())
                 return $setting['value'];
-
         $setting = \Giftcode\Models\Setting::whereName($key)->first();
+
         if($setting)
             return $setting->value;
 
-        if(defined('GIFTCODE_SETTINGS'))
+        if(defined('GIFTCODE_SETTINGS') AND is_array(GIFTCODE_SETTINGS) AND array_key_exists($key,GIFTCODE_SETTINGS))
             return GIFTCODE_SETTINGS[$key];
 
-        throw new Exception(trans('giftcode.responses.setting-key-doesnt-exists'));
+        throw new \Exception(trans('giftcode.responses.setting-key-doesnt-exists',['key' => $key]),400);
     }
 }
 
@@ -46,7 +46,7 @@ if(!function_exists('giftcodeGetEmailContent')) {
         }
 
         \Illuminate\Support\Facades\Log::error('giftcodeEmailContentError => ' . $key);
-        throw new Exception(trans('giftcode.responses.email-key-doesnt-exists'));
+        throw new \Exception(trans('giftcode.responses.email-key-doesnt-exists',['key' => $key]),400);
     }
 
 }

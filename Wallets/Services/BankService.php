@@ -60,7 +60,7 @@ class BankService
     public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true,$to_admin_wallet = true)
     {
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
-            throw new \Exception();
+            throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
 
         $balance = $this->getBalance($wallet_name);
         $data = [

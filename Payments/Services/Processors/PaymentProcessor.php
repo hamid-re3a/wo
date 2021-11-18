@@ -128,7 +128,7 @@ class PaymentProcessor
             $package_service = app(PackageService::class);
             $package_object = $package_service->packageFullById(app(Id::class)->setId($order_object->getPackageId()));
 
-            $user = auth()->check() ? auth()->user()->id : User::query()->find($order_object->getUserId());
+            $user = auth()->check() ? auth()->user() : User::query()->find($order_object->getUserId());
             $user_member_id = $user->member_id;
 
             if($user->id != $order_object->getUserId()) {

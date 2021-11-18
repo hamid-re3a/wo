@@ -84,9 +84,7 @@ class WithdrawRequestFeatureTest extends WalletTest
         $payment_currency = $this->addPaymentCurrency();
         $this->mockWithdrawServices();
 
-
-        $user = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user);
+        $bank_service = new BankService($this->user);
         $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 30000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
@@ -139,8 +137,8 @@ class WithdrawRequestFeatureTest extends WalletTest
         Mail::fake();
         $this->mockWithdrawServices();
         $payment_currency = $this->addPaymentCurrency();
-        $user = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user);
+
+        $bank_service = new BankService($this->user);
         $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 300000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.create'), [

@@ -51,9 +51,9 @@ class WalletTest extends TestCase
             foreach (USER_ROLES as $role)
                 Role::query()->firstOrCreate(['name' => $role]);
         $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_SUPER_ADMIN]);
-        $hash = md5(serialize($user->getUserService()));
+        $hash = md5(serialize($user->getGrpcMessage()));
         return [
-            'X-user-id' => '1',
+            'X-user-id' => $user->id,
             'X-user-hash' => $hash,
         ];
     }

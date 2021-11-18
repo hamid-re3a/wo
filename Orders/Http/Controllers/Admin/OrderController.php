@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Orders\Http\Requests\Admin\Order\OrderRequest;
 use Orders\Http\Resources\Admin\OrderResource;
 use Orders\Models\Order;
-use Orders\Services\MlmClientFacade;
+use MLM\Services\MlmClientFacade;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\PaymentService;
@@ -65,32 +65,28 @@ class OrderController extends Controller
             $user = auth()->user();
 
             DB::beginTransaction();
+            $now = now()->toDateTimeString();
             $order_db = Order::query()->create([
                 "from_user_id" => $user->id,
                 "user_id" => $request->get('user_id'),
                 "payment_type" => 'admin',
                 "package_id" => $request->get('package_id'),
                 'validity_in_days' => $package->getValidityInDays(),
-                'plan' => $request->get('plan')
+                'is_paid_at' => $now,
+                'is_resolved_at' => $now,
+                'plan' => $request->get('plan'),
             ]);
             $order_db->refreshOrder();
 
-            $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
+            $response = MlmClientFacade::simulateOrder($order_db->getGrpcMessage());
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
             }
 
-            $now = now()->toDateTimeString();
 
-            $order_service = $order_db->fresh()->getOrderService();
-            $order_service->setIsPaidAt($now);
-            $order_service->setIsResolvedAt($now);
-
-            $submit_response = MlmClientFacade::submitOrder($order_db->getOrderService());
+            $submit_response = MlmClientFacade::submitOrder($order_db->fresh()->getGrpcMessage());
             $order_db->update([
-                'is_paid_at' => $now,
-                'is_resolved_at' => $now,
                 'is_commission_resolved_at' => $submit_response->getCreatedAt()
             ]);
 
@@ -98,7 +94,9 @@ class OrderController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('OrderController@newOrder => ' . $exception->getMessage());
-            throw new $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 

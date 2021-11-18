@@ -15,8 +15,6 @@ use Illuminate\Support\ServiceProvider;
 use Wallets\Observers\TransactionObserver;
 use Wallets\Observers\TransferObserver;
 use Wallets\Observers\WithdrawProfitObserver;
-use Wallets\Services\MlmClientFacade;
-use Wallets\Services\MlmGrpcClientProvider;
 
 class WalletServiceProvider extends ServiceProvider
 {
@@ -52,9 +50,6 @@ class WalletServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
-        $this->registerFacades();
-
         $this->registerObservers();
 
         $this->setupConfig();
@@ -62,8 +57,6 @@ class WalletServiceProvider extends ServiceProvider
         $this->registerHelpers();
 
         $this->registerCommands();
-
-        $this->registerWalletsName();
 
         Route::prefix('v1/wallets')
             ->middleware('api')
@@ -83,13 +76,6 @@ class WalletServiceProvider extends ServiceProvider
         ], 'wallet-resources');
     }
 
-    /**
-     * Register Facades
-     */
-    private function registerFacades()
-    {
-        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
-    }
 
     /**
      * Register Commands
@@ -144,17 +130,6 @@ class WalletServiceProvider extends ServiceProvider
         if (file_exists($helperFile = __DIR__ . '/helpers/queryMacros.php')) {
             require_once $helperFile;
         }
-    }
-
-    /**
-     * Register wallets name
-     */
-    private function registerWalletsName()
-    {
-        config([
-            'depositWallet' => 'Deposit Wallet',
-            'earningWallet' => 'Earning Wallet'
-        ]);
     }
 
 

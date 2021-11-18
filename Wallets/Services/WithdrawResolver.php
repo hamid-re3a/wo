@@ -3,9 +3,11 @@
 
 namespace Wallets\Services;
 
-
+use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Models\WithdrawProfit;
+use MLM\Services\MlmClientFacade;
+use Kyc\Services\KycClientFacade;
 
 class WithdrawResolver
 {
@@ -17,7 +19,7 @@ class WithdrawResolver
         $this->withdrawRequest = $withdrawRequest;
         /**@var $user_db User */
         $user_db = $this->withdrawRequest->user()->first();
-        $this->user_service = $user_db->getUserService();
+        $this->user_service = $user_db->getGrpcMessage();
 
     }
 
@@ -30,6 +32,11 @@ class WithdrawResolver
      */
     public function verifyWithdrawRequest()
     {
+
+        //Check KYC for user KYC status
+        list($flag,$response) = $this->checkKycStatus();
+        if(!$flag)
+            return [$flag,$response];
 
         //Check daily limit
         list($flag, $response) = $this->checkDailyLimit();
@@ -46,16 +53,31 @@ class WithdrawResolver
 
     }
 
+    private function checkKycStatus()
+    {
+        //Check KYC for user KYC status
+        $user_kyc = KycClientFacade::checkKYCStatus($this->user_service);
+        if(!$user_kyc->getStatus())
+            return [false,$user_kyc->getMessage()];
+
+        return [true,null];
+    }
+
     private function checkDailyLimit()
     {
 
         //get user today's withdraw sum
         $db_sum = WithdrawProfit::query()->where('user_id', $this->withdrawRequest->user_id)
                 ->whereBetween('created_at', [now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString()])
+                ->where('id','<>',$this->withdrawRequest->id)
+                ->whereIn('status',[WALLET_WITHDRAW_COMMAND_UNDER_REVIEW,WALLET_WITHDRAW_COMMAND_PROCESS,WALLET_WITHDRAW_COMMAND_POSTPONE])
                 ->sum('pf_amount');
 
         //Get user rank from MLM service
         $user_rank = MlmClientFacade::getUserRank($this->user_service);
+        Log::info('getGrpcMessage() called for => ' . $this->user_service->getId());
+        Log::info('MlmClientFacade::getUserRank() => ' . $user_rank->getRankName());
+        Log::info('Withdrawal rank check => ' . $db_sum . ' - ' . $this->withdrawRequest->pf_amount . ' - ' . $user_rank->getWithdrawalLimit());
         if (( $db_sum + $this->withdrawRequest->pf_amount ) > $user_rank->getWithdrawalLimit())
             return [false, trans('wallet.responses.withdraw-profit-request.withdraw_rank_limit', ['amount' => $user_rank->getWithdrawalLimit() - $db_sum])];
 

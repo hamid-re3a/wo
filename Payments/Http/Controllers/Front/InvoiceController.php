@@ -11,16 +11,20 @@ use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
 use Payments\Http\Resources\InvoiceResource;
 use Payments\Http\Resources\InvoiceTransactionResource;
 use Payments\Models\Invoice;
-use Payments\Models\InvoiceTransaction;
 use Payments\Services\InvoiceService;
+use User\Models\User;
 
 class InvoiceController extends Controller
 {
     private $invoice_service;
+    /**@var $user User */
+    private $user;
 
     public function __construct(InvoiceService $invoice_service)
     {
         $this->invoice_service = $invoice_service;
+        if (auth()->check())
+            $this->user = auth()->user();
     }
 
     /**
@@ -30,19 +34,33 @@ class InvoiceController extends Controller
      */
     public function pendingOrderInvoice()
     {
-        $pending_invoice = auth()->user()->invoices()->where('payable_type','Order')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
+        /**@var $pending_invoice Invoice */
+        $pending_invoice = $this->user->invoices()
+            ->notPaid()
+            ->notCanceled()
+            ->notExpired()
+            ->first();
 
-        if(!$pending_invoice) {
-            $paid_invoice = auth()->user()->invoices()->where('payable_type','Order')->where('is_paid',1)->count();
-            if($paid_invoice)
-                return api()->success(null,[
+        if (!$pending_invoice) {
+            $paid_invoice = $this->user->invoices()->notCanceled()->paid()->count();
+            if ($paid_invoice)
+                return api()->success(null, [
                     'status' => 'confirmed'
                 ]);
 
-            return api()->error(null,null,404);
+            return api()->error(null, [
+                'has_invoice' => false,
+            ], 400);
         }
 
-        return api()->success(null, InvoiceResource::make($pending_invoice));
+        return api()->success(null, [
+            'payment_currency' => $pending_invoice['payment_currency'],
+            'amount' => $pending_invoice['amount'],
+            'checkout_link' => $pending_invoice['checkout_link'],
+            'transaction_id' => $pending_invoice['transaction_id'],
+            'expiration_time' => $pending_invoice['expiration_time'],
+            'due_amount' => $pending_invoice['due_amount'],
+        ]);
     }
 
     /**
@@ -52,16 +70,24 @@ class InvoiceController extends Controller
      */
     public function pendingWalletInvoice()
     {
-        $pending_invoice = auth()->user()->invoices()->where('payable_type','DepositWallet')->where('is_paid',0)->where('expiration_time','>',now()->toDateTimeString())->first();
+        $pending_invoice = $this->user->invoices()->depositWallets()
+            ->with([
+                'transactions',
+                'refunder'
+            ])
+            ->notPaid()
+            ->notCanceled()
+            ->notExpired()
+            ->first();
 
-        if(!$pending_invoice) {
-            $paid_invoice = auth()->user()->invoices()->where('payable_type','DepositWallet')->where('is_paid',1)->count();
-            if($paid_invoice)
-                return api()->success(null,[
+        if (!$pending_invoice) {
+            $paid_invoice = $this->user->invoices()->depositWallets()->paid()->count();
+            if ($paid_invoice)
+                return api()->success(null, [
                     'status' => 'confirmed'
                 ]);
 
-            return api()->error(null,null,404);
+            return api()->error(null, null, 404);
         }
 
         return api()->success(null, InvoiceResource::make($pending_invoice));
@@ -74,8 +100,14 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $list = Invoice::query()->where('user_id',request()->header('X-user-id'))->paginate();
-        return api()->success(null,[
+        $list = $this->user->invoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ])
+            ->paginate();
+
+        return api()->success(null, [
             'list' => InvoiceResource::collection($list),
             'pagination' => [
                 'total' => $list->total(),
@@ -93,21 +125,26 @@ class InvoiceController extends Controller
      */
     public function show(ShowInvoiceRequest $request)
     {
-        $invoice = Invoice::query()->with('transactions');
+        $invoice = $this->user->invoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ]);
 
-        if($request->has('transaction_id'))
-            $invoice->when($request->has('transaction_id'), function(Builder $subQuery) use($request) {
-                return $subQuery->where('transaction_id',$request->get('transaction_id'));
+        if ($request->has('transaction_id'))
+            $invoice->when($request->has('transaction_id'), function (Builder $subQuery) use ($request) {
+                return $subQuery->where('transaction_id', $request->get('transaction_id'));
             });
         else
-            $invoice->when($request->has('order_id'), function(Builder $subQuery) use($request) {
-                return $subQuery->where('payable_id',$request->get('order_id'))->where('payable_type','=','Order');
+            $invoice->when($request->has('order_id'), function (Builder $subQuery) use ($request) {
+                return $subQuery->where('payable_id', $request->get('order_id'))->where('payable_type', '=', 'Order');
             });
-        $invoice = $invoice->where('user_id',auth()->user()->id)->first();
-        if(!$invoice)
-            return api()->error(null,null,404);
 
-        return api()->success(null,InvoiceResource::make($invoice));
+        $invoice = $invoice->first();
+        if (!$invoice)
+            return api()->error(null, null, 404);
+
+        return api()->success(null, InvoiceResource::make($invoice));
     }
 
     /**
@@ -119,22 +156,26 @@ class InvoiceController extends Controller
      */
     public function transactions(ShowOrderTransactionsRequest $request)
     {
-        $invoice = Invoice::query()->with('transactions');
+        $invoice = $this->user->invoices()
+            ->with([
+                'transactions',
+                'refunder'
+            ]);
 
-        if($request->has('transaction_id'))
-            $invoice->when($request->has('transaction_id'), function(Builder $subQuery) use($request) {
-                return $subQuery->where('transaction_id',$request->get('transaction_id'));
+        if ($request->has('transaction_id'))
+            $invoice->when($request->has('transaction_id'), function (Builder $subQuery) use ($request) {
+                return $subQuery->where('transaction_id', $request->get('transaction_id'));
             });
         else
-            $invoice->when($request->has('order_id'), function(Builder $subQuery) use($request) {
-                return $subQuery->where('payable_id',$request->get('order_id'))->where('payable_type','=','Order');
+            $invoice->when($request->has('order_id'), function (Builder $subQuery) use ($request) {
+                return $subQuery->where('payable_id', $request->get('order_id'))->where('payable_type', '=', 'Order');
             });
-        $invoice = $invoice->where('user_id',auth()->user()->id)->first();
+        $invoice = $invoice->first();
 
-        if(!$invoice)
-            return api()->error(null,null,404);
+        if (!$invoice)
+            return api()->error(null, null, 404);
 
-        return api()->success(null,InvoiceTransactionResource::collection($invoice->transactions));
+        return api()->success(null, InvoiceTransactionResource::collection($invoice->transactions));
     }
 
     /**
@@ -147,6 +188,6 @@ class InvoiceController extends Controller
     public function cancelInvoice(CancelInvoiceRequest $request)
     {
         $this->invoice_service->cancelInvoice($request->transaction_id);
-        return api()->success("invoice has been canceled",null);
+        return api()->success("invoice has been canceled", null);
     }
 }

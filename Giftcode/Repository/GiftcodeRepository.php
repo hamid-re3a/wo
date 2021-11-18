@@ -5,24 +5,25 @@ namespace Giftcode\Repository;
 
 
 use Exception;
-use Giftcode\Jobs\UrgentEmailJob;
+use Giftcode\Jobs\EmailJob;
 use Giftcode\Mail\User\GiftcodeCanceledEmail;
 use Giftcode\Mail\User\GiftcodeCreatedEmail;
 use Giftcode\Mail\User\GiftcodeExpiredEmail;
+use Giftcode\Mail\User\RedeemedGiftcodeCreatorEmail;
+use Giftcode\Mail\User\RedeemedGiftcodeRedeemerEmail;
 use Giftcode\Models\Giftcode;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class GiftcodeRepository
 {
+    /**@var $model Giftcode*/
     private $model;
     private $wallet_repository;
 
-    public function __construct(Giftcode $giftcode,WalletRepository $wallet_repository)
+    public function __construct(WalletRepository $wallet_repository)
     {
-        $this->model = $giftcode;
+        $this->model = new Giftcode();
         $this->wallet_repository = $wallet_repository;
     }
 
@@ -53,7 +54,7 @@ class GiftcodeRepository
             /**
              * End User wallet process
              */
-            UrgentEmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
+            EmailJob::dispatch(new GiftcodeCreatedEmail($giftcode->creator, $giftcode), $giftcode->creator->email);
 
             DB::commit();
             return $giftcode;
@@ -63,9 +64,11 @@ class GiftcodeRepository
         }
     }
 
-    public function getById($id)
+    public function getById($id) : ?Giftcode
     {
-        return $this->model->query()->find($id);
+        /**@var $giftcode Giftcode*/
+        $giftcode = $this->model->query()->find($id);
+        return $giftcode;
     }
 
     public function getByUuid($uuid)
@@ -73,9 +76,11 @@ class GiftcodeRepository
         return $this->model->query()->where('uuid',$uuid)->first();
     }
 
-    public function getByCode($code)
+    public function getByCode($code) : ?Giftcode
     {
-        return $this->model->query()->where('code',$code)->first();
+        /**@var $giftcode Giftcode*/
+        $giftcode = $this->model->query()->where('code','=',$code)->first();
+        return $giftcode;
     }
 
     public function expire(Giftcode $giftcode)
@@ -106,7 +111,7 @@ class GiftcodeRepository
             /**
              * End refund
              */
-            UrgentEmailJob::dispatch(new GiftcodeExpiredEmail($giftcode),$giftcode->creator->email);
+            EmailJob::dispatch(new GiftcodeExpiredEmail($giftcode),$giftcode->creator->email);
 
 
             DB::commit();
@@ -143,10 +148,10 @@ class GiftcodeRepository
 
 
             /**
-             * Refund Giftcode total paid - cancelation fee
+             * Refund Gift code total paid - cancellation fee
              */
-            //Refund giftcode pay fee
-            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Giftcode #' . $giftcode->uuid,'Gift code cancelled');
+            //Refund gift code pay fee
+            $finalTransaction = $this->wallet_repository->depositUserWallet($giftcode,'Cancel Gift code #' . $giftcode->uuid,'Gift code cancelled');
 
             //Wallet transaction failed [Server error]
             if(!is_string($finalTransaction->getTransactionId()))
@@ -154,7 +159,7 @@ class GiftcodeRepository
             /**
              * End refund
              */
-            UrgentEmailJob::dispatch(new GiftcodeCanceledEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
+            EmailJob::dispatch(new GiftcodeCanceledEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
 
 
             DB::commit();
@@ -165,11 +170,10 @@ class GiftcodeRepository
         }
     }
 
-    public function redeem(Request $request)
+    public function redeem(Giftcode $giftcode,int $redeemer_user_id, int $order_id = null)
     {
         try {
             DB::beginTransaction();
-            $giftcode = $this->getByUuid($request->get('id'));
 
             if($giftcode->is_canceled === true)
                 throw new \Exception(trans('giftcode.responses.giftcode-is-canceled-and-user-cant-redeem'),406);
@@ -183,10 +187,16 @@ class GiftcodeRepository
                 throw new \Exception(trans('giftcode.responses.giftcode-is-expired-and-user-cant-redeem'),406);
 
             $giftcode->update([
-                'redeem_user_id' => auth()->user()->id,
+                'redeem_user_id' => $redeemer_user_id,
                 'redeem_date' => now()->toDateTimeString(),
-                'order_id' => $request->get('order_id')
+                'order_id' => $order_id
             ]);
+
+            $giftcode->refresh();
+
+            EmailJob::dispatch(new RedeemedGiftcodeCreatorEmail($giftcode->creator,$giftcode),$giftcode->creator->email);
+            if($giftcode->user_id != $giftcode->redeem_user_id)
+                EmailJob::dispatch(new RedeemedGiftcodeRedeemerEmail($giftcode->redeemer,$giftcode),$giftcode->redeemer->email);
             DB::commit();
             return $giftcode->fresh();
         } catch (\Throwable $exception) {
@@ -205,7 +215,7 @@ class GiftcodeRepository
         return null;
     }
 
-    public function getGiftcodeServiceByUuid($uuid)
+    public function getGiftcodeServiceByUuid($uuid) : ?\Giftcode\Services\Grpc\Giftcode
     {
         $giftcode = $this->model->query()->where('uuid',$uuid)->first();
         if($giftcode)
@@ -218,7 +228,7 @@ class GiftcodeRepository
     {
         $giftcode_service = new \Giftcode\Services\Grpc\Giftcode();
         if($giftcode instanceof Giftcode AND !empty($giftcode->id))
-            return $giftcode->getGiftcodeService();
+            return $giftcode->getGrpcMessage();
 
         return $giftcode_service;
     }

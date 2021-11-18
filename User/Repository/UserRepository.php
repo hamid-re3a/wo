@@ -12,9 +12,9 @@ class UserRepository
 
     public function findById(int $id)
     {
-
+        /** @var $user_entity \User\Models\User*/
         $user_entity = new $this->entity_name;
-        return $user_entity::find($id);
+        return $user_entity::query()->find($id);
     }
 
     public function editOrCreate(User $user)

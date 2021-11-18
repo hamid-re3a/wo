@@ -2,14 +2,18 @@
 
 namespace User;
 
-use App\Jobs\User\UserGetDataJob;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Kyc\Services\KycClientFacade;
+use Kyc\Services\KycGrpcClientProvider;
+use MLM\Services\MlmClientFacade;
+use MLM\Services\MlmGrpcClientProvider;
 use User\Models\User;
-use User\Services\Grpc\UserUpdate;
+use User\Services\GatewayClientFacade;
+use User\Services\GatewayGrpcClientProvider;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -25,6 +29,7 @@ class UserServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerFacades();
         if (!$this->app->runningInConsole()) {
             return;
         }
@@ -68,7 +73,7 @@ class UserServiceProvider extends ServiceProvider
                     $user = User::query()->whereId($request->header('X-user-id'))->first();
                 }
 
-                $hash_user_service = md5(serialize($user->getUserService()));
+                $hash_user_service = md5(serialize($user->getGrpcMessage()));
                 /**
                  * if there is not update data user. get data user complete from api gateway
                  * error code 471 is for data user not update log for development
@@ -104,6 +109,13 @@ class UserServiceProvider extends ServiceProvider
                 __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
+    }
+
+    private function registerFacades()
+    {
+        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
+        KycClientFacade::shouldProxyTo(KycGrpcClientProvider::class);
+        GatewayClientFacade::shouldProxyTo(GatewayGrpcClientProvider::class);
     }
 
     /**

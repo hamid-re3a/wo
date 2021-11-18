@@ -23,46 +23,35 @@ class DashboardController extends Controller
         $this->order_service = $order_service;
     }
 
-
-
     /**
-     * get count subscriptions
+     * Sums orders
      * @group
      * Admin User > Orders Dashboard
-     * @param ListOrderRequest $request
-     * @return JsonResponse
      */
-    public function getCountSubscriptions()
+    public function sums()
     {
-        return api()->success(null, SubscriptionCountDataResource::make($this->order_service->getCountPackageSubscriptions()));
+        return api()->success(null, [
+            'paid_orders_sum' => $this->order_service->getPaidOrdersSum(),
+        ]);
     }
 
     /**
-     * get count active package
+     * Counts orders
      * @group
      * Admin User > Orders Dashboard
-     * @param ListOrderRequest $request
-     * @return JsonResponse
      */
-    public function activePackageCount()
+    public function counts()
     {
-        return api()->success(null, SubscriptionCountDataResource::make($this->order_service->activePackageCount()));
+        return api()->success(null, [
+            'total_orders' => $this->order_service->getCountOrders(),
+            'active_orders' => $this->order_service->getActiveOrdersCount(),
+            'expired_orders' => $this->order_service->getExpiredOrders(),
+        ]);
     }
 
-    /**
-     * get count expired package
-     * @group
-     * Admin User > Orders Dashboard
-     * @param ListOrderRequest $request
-     * @return JsonResponse
-     */
-    public function expiredPackageCount()
-    {
-        return api()->success(null, SubscriptionCountDataResource::make($this->order_service->ExpiredPackageCount()));
-    }
 
     /**
-     * get package overview count
+     * Packages overview count chart
      * @group
      * Admin User > Orders Dashboard
      * @param OrderTypeFilterRequest $request
@@ -70,11 +59,11 @@ class DashboardController extends Controller
      */
     public function packageOverviewCount(OrderTypeFilterRequest $request)
     {
-        return api()->success(null, $this->order_service->packageOverviewCount($request->type));
+        return api()->success(null, $this->order_service->packageOverviewCountChart($request->type));
     }
 
     /**
-     * Get packages based on type
+     * Packages based on type chart
      * @group
      * Admin User > Orders Dashboard
      * @param OrderTypeFilterRequest $request
@@ -82,11 +71,11 @@ class DashboardController extends Controller
      */
     public function packageTypeCount(OrderTypeFilterRequest $request)
     {
-        return api()->success(null, $this->order_service->packageTypeCount($request->type));
+        return api()->success(null, $this->order_service->packageTypeCountChart($request->type));
     }
 
     /**
-     * Get packages percentage based on type
+     * Packages percentage based on type chart
      * @group
      * Admin User > Orders Dashboard
      * @param OrderTypeFilterRequest $request
@@ -94,7 +83,7 @@ class DashboardController extends Controller
      */
     public function packageTypePercentCount(OrderTypeFilterRequest $request)
     {
-        return api()->success(null, $this->order_service->packageTypePercentageCount($request->type));
+        return api()->success(null, $this->order_service->packageTypePercentageCountChart($request->type));
     }
 
 }

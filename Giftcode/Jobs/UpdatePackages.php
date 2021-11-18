@@ -26,6 +26,7 @@ class UpdatePackages implements ShouldQueue
      */
     public function __construct()
     {
+        $this->queue = env('DEFAULT_QUEUE_NAME','default');
         $this->packageService = app(PackageService::class);;
     }
 

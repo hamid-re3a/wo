@@ -9,14 +9,20 @@ return [
     ],
     'withdraw-profit-request' => [
         'withdrawal-requests-is-not-active' => 'Withdrawal is not active temporary, Try again later',
-        'cant-find-wallet-address' => 'Please register your :name wallet address.',
+        'cant-find-wallet-address' => 'Add :name wallet address to your profile',
         'btc-price-error' => 'We can\t fetch BTC live price, contact Developer team please.',
         'insufficient-bpb-wallet-balance' => 'Insufficient balance in our BTCPayServer wallet, Charge wallet for :amount',
         'external-resource-error' => 'We cant fetch data from :server',
         'not-enough-balance' => 'Insufficient balance, :amount + :fee',
         'withdraw_rank_limit' => 'You can\t withdraw more than :amount for today',
         'withdraw_distribution_limit' => 'You can\t withdraw :currency for today,Choose another one please.',
-        'different-currency-payout' => 'All withdraw request should have same currency'
+        'different-currency-payout' => 'All withdraw request should have same currency',
+        'you-can-revert-a-rejected-request' => 'Payout request #:uuid is not rejected request.',
+        'incorrect-transaction-password' => 'Your transaction password is incorrect.',
+    ],
+
+    'transfer_funds' => [
+        'user-has-not-valid-package' => 'Receiver user has not a valid package.',
     ]
 ];
 

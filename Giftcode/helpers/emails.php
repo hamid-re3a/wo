@@ -3,7 +3,7 @@
 CONST EMAIL_CONTENTS = [
     'GIFT_CODE_CREATED' => [
         'is_active' => true,
-        'subject'=>'Gift code created successfully',
+        'subject'=>'Gift code created is created',
         'from'=>'it@ridetothefuture.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
@@ -51,7 +51,7 @@ CONST EMAIL_CONTENTS = [
         'body'=><<<EOT
                 <div>
                 <p>Hello <b>{{full_name}}</b>,</p>
-                <p>Your gift code ( {{code}} ) is used by your friend {{redeem_user_full_name}}. We have activated the {{package_name}} for him/her .</p>
+                <p>Your gift code ( {{code}} ) is used by your friend <b>{{redeem_user_full_name}}</b>. We have activated the {{package_name}} for him/her .</p>
                 <p></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
@@ -69,12 +69,10 @@ CONST EMAIL_CONTENTS = [
         'body'=><<<EOT
                 <div>
                 <p>Hello <b>{{full_name}}</b>,</p>
-                <p>You redeemed a giftcode</p>
+                <p>Thank you for the recent gift code <b>({{code}})</b> you have used. </p>
+                <p>The gift code was provided by your friend,<b>{{creator_full_name}}</b> . </p>
+                <p>Your package {{package_name}} will automatically activate.</p>
                 <p></p>
-                <p>Code : <b>{{code}}</b></p>
-                <p>Creator User : <b>{{creator_full_name}}</b></p>
-                <p>Package name : <b>{{package_name}}</b></p>
-                <p>Redeem date : <b>{{redeem_date}}</b></p>
                 <p>Cheers,</p>
                 <p>Janex Support Team</p>
                 </div>

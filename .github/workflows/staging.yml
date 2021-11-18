@@ -3,32 +3,34 @@ on:
   push:
     branches: [ staging ]
 jobs:
-#  laravel-tests:
-#    runs-on: ubuntu-latest
-#    steps:
-#    - uses: actions/checkout@v2
-#    - uses: shivammathur/setup-php@v2
-#      with:
-#        php-version: '7.4'
-#        extensions: imagick, swoole
-#    - name: Copy .env
-#      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-#    - name: Config composer
-#      run: composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
-#    - name: Install Dependencies
-#      run: composer install
-#    - name: Generate key
-#      run: php artisan key:generate
-#    - name: Directory Permissions
-#      run: chmod -R 777 storage bootstrap/cache
-#    - name: Create Database
-#      run: |
-#        mkdir -p database
-#        touch database/database.sqlite
+  laravel-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        extensions: imagick, swoole, grpc
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Config composer
+      run: composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
+    - name: Install Dependencies
+      run: composer install
+    - name: Generate key
+      run: php artisan key:generate
+    - name: Directory Permissions
+      run: chmod -R 777 storage bootstrap/cache
+    - name: Create Database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+    - name: Execute tests
+      run: php ./vendor/bin/phpunit
 
   laravel-deploy:
     runs-on: staging
-#    needs: laravel-tests
+    needs: laravel-tests
     steps:
     - uses: actions/checkout@v2
     - name: Building docker image
@@ -36,10 +38,10 @@ jobs:
         shopt -s dotglob
         rm -rf .env
         cp .env.staging .env
-        sudo docker build --network=mysql_wo_r2f -t subscription:1 .
+        sudo docker build -f devops/Dockerfiles/Dockerfile-staging --network=mysql_wo_r2f -t staging-subscription:1 .
+        sudo docker tag staging-subscription:1 staging-reg.dreamcometrue.ai/staging-subscription:1
+        sudo docker push staging-reg.dreamcometrue.ai/staging-subscription:1
     - name: deploy docker-compose
       run: | 
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml stop subscription
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml rm -f subscription
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml up -d subscription
-
+        sudo docker-compose -f devops/docker-compose-files/docker-compose-staging.yml -p subscription down
+        sudo docker-compose -f devops/docker-compose-files/docker-compose-staging.yml -p subscription up -d

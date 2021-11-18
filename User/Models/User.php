@@ -7,10 +7,10 @@ use Bavix\Wallet\Traits\CanConfirm;
 use Bavix\Wallet\Traits\HasWalletFloat;
 use Bavix\Wallet\Traits\HasWallets;
 use Giftcode\Models\Giftcode;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Log;
 use Orders\Models\Order;
 use Payments\Models\Invoice;
 use Spatie\Permission\Traits\HasRoles;
@@ -119,6 +119,11 @@ class User extends Model implements WalletFloat
         return $this->invoices()->where('payable_type','Order');
     }
 
+    public function walletInvoices()
+    {
+        return $this->invoices()->where('payable_type','DepositWallet');
+    }
+
     public function withdrawRequests()
     {
         return $this->hasMany(WithdrawProfit::class,'user_id','id');
@@ -133,7 +138,7 @@ class User extends Model implements WalletFloat
     /**
      * Methods
      */
-    public function getUserService()
+    public function getGrpcMessage()
     {
         $this->fresh();
         $user = new \User\Services\Grpc\User();

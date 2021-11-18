@@ -3,54 +3,69 @@
 
 namespace Wallets\Observers;
 
-use Ramsey\Uuid\Uuid;
-use Wallets\Jobs\UrgentEmailJob;
+use Wallets\Jobs\EmailJob;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedUpdated;
 use Wallets\Mail\EarningWallet\WithdrawProfitRequestedSubmitted;
 use Wallets\Models\WithdrawProfit;
+use Wallets\Models\WithdrawProfitHistory;
 
 class WithdrawProfitObserver
 {
     public function creating(WithdrawProfit $withdrawProfit)
     {
-        $withdrawProfit = $this->calculateFee($withdrawProfit);
-        $withdrawProfit->uuid = $withdrawProfit->user->member_id . mt_rand(10, 9999) . time();
+        $uuid = $withdrawProfit->user->member_id . mt_rand(1000,9999) . time();
+        while(WithdrawProfit::query()->where('uuid',$uuid)->exists())
+            $uuid = $withdrawProfit->user->member_id . mt_rand(1000,9999) . time();
+        $withdrawProfit->uuid = $uuid;
 
     }
 
     public function created(WithdrawProfit $withdrawProfit)
     {
-        UrgentEmailJob::dispatch(new WithdrawProfitRequestedSubmitted($withdrawProfit), $withdrawProfit->user->email);
+        EmailJob::dispatch(new WithdrawProfitRequestedSubmitted($withdrawProfit), $withdrawProfit->user->email);
+    }
+
+    public function updating(WithdrawProfit $withdrawProfit)
+    {
+        if(auth()->check()) { //Check WithdrawRequest is updating with QUEUE or logged-in user
+            $withdrawProfit->actor_id = auth()->user()->id;
+            if(request()->has('act_reason'))
+                $withdrawProfit->act_reason = request()->get('act_reason');
+        }
     }
 
 
     public function updated(WithdrawProfit $withdrawProfit)
     {
-        UrgentEmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+        if(!$withdrawProfit->is_update_email_sent)
+            EmailJob::dispatch(new WithdrawProfitRequestedUpdated($withdrawProfit), $withdrawProfit->user->email);
+
+        $this->createHistory($withdrawProfit);
     }
 
-    private function calculateFee(WithdrawProfit $withdrawProfit)
+    /**
+     * @param WithdrawProfit $withdrawProfit
+     */
+    private function createHistory(WithdrawProfit $withdrawProfit): void
     {
-        switch ($withdrawProfit->currency) {
-            case 'BTC' :
-                $fix_or_percentage = getWalletSetting('payout_btc_fee_fixed_or_percentage');
-                $fee = getWalletSetting('payout_btc_fee');
-                break;
-            case 'Janex' :
-                $fix_or_percentage = getWalletSetting('payout_janex_fee_fixed_or_percentage');
-                $fee = getWalletSetting('payout_janex_fee');
-                break;
-            default:
-                $fix_or_percentage = 'fixed';
-                $fee = 0;
-                break;
-        }
-        $fee = $fix_or_percentage == 'fixed' ? $fee : ($withdrawProfit->pf_amount * $fee / 100);
-
-        $withdrawProfit->pf_amount = $withdrawProfit->pf_amount - $fee;
-        $withdrawProfit->crypto_amount = $withdrawProfit->pf_amount / $withdrawProfit->crypto_rate;
-        $withdrawProfit->fee = $fee;
-
-        return $withdrawProfit;
+        WithdrawProfitHistory::query()->insert([
+            'withdraw_profit_id' => $withdrawProfit->id,
+            'uuid' => $withdrawProfit->uuid,
+            'wallet_hash' => $withdrawProfit->wallet_hash,
+            'user_id' => $withdrawProfit->user_id,
+            'withdraw_transaction_id' => $withdrawProfit->withdraw_transaction_id,
+            'refund_transaction_id' => $withdrawProfit->refund_transaction_id,
+            'network_transaction_id' => $withdrawProfit->network_transaction_id,
+            'status' => $withdrawProfit->getRawOriginal('status'),
+            'payout_service' => $withdrawProfit->payout_service,
+            'currency' => $withdrawProfit->currency,
+            'pf_amount' => $withdrawProfit->pf_amount,
+            'crypto_amount' => $withdrawProfit->crypto_amount,
+            'crypto_rate' => $withdrawProfit->crypto_rate,
+            'fee' => $withdrawProfit->fee,
+            'actor_id' => $withdrawProfit->actor_id,
+            'act_reason' => $withdrawProfit->act_reason,
+            'postponed_to' => $withdrawProfit->postponed_to,
+        ]);
     }
 }

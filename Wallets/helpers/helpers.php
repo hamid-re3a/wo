@@ -36,10 +36,10 @@ if (!function_exists('getWalletEmailContent')) {
                 $email = $check;
 
 
-        if ($email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
+        if (empty($email) AND $email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
             $email = $email->toArray();
 
-        if (defined('WALLET_EMAIL_CONTENTS') AND
+        if (empty($email) AND defined('WALLET_EMAIL_CONTENTS') AND
             is_array(WALLET_EMAIL_CONTENTS) AND
             array_key_exists($key, WALLET_EMAIL_CONTENTS))
             $email = WALLET_EMAIL_CONTENTS[$key];
@@ -64,15 +64,6 @@ if (!function_exists('formatCurrencyFormat')) {
 //            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
         return $value;
-    }
-}
-
-if (!function_exists('getMLMGrpcClient')) {
-    function getMLMGrpcClient()
-    {
-        return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL', 'staging-api-gateway.janex.org:9598'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
     }
 }
 
@@ -133,3 +124,55 @@ if (!function_exists('chartMaker')) {
 
     }
 }
+
+if(!function_exists('calculateTransferFee')) {
+    function calculateTransferFee($amount)
+    {
+        $transfer_fee = (double)getWalletSetting('transfer_fee');
+        $transaction_fee_way = getWalletSetting('transaction_fee_calculation');
+
+        if (!empty($transaction_fee_way) AND $transaction_fee_way == 'percentage' AND !empty($transfer_fee) AND $transfer_fee > 0)
+            $transfer_fee = (double)$amount * (double)($transfer_fee / 100);
+
+        if (empty($transfer_fee) OR $transfer_fee <= 0)
+            $transfer_fee = (double)10;
+
+        $total = (double)$amount + (double)$transfer_fee;
+        return [(double)$total, (double)$transfer_fee];
+    }
+}
+
+if(!function_exists('calculateWithdrawalFee')) {
+    function calculateWithdrawalFee($amount,$currency): array
+    {
+        switch ($currency) {
+            case 'BTC' :
+                $fix_or_percentage = getWalletSetting('payout_btc_fee_fixed_or_percentage');
+                $fee = getWalletSetting('payout_btc_fee');
+                break;
+            case 'Janex' :
+                $fix_or_percentage = getWalletSetting('payout_janex_fee_fixed_or_percentage');
+                $fee = getWalletSetting('payout_janex_fee');
+                break;
+            default:
+                $fix_or_percentage = 'fixed';
+                $fee = 0;
+                break;
+        }
+        $fee = $fix_or_percentage == 'fixed' ? (float)$fee : ((float)$amount * (float)$fee / 100);
+
+        return [(float)($fee+$amount),(float)$fee];
+    }
+}
+
+if(!function_exists('calculateCharity')) {
+    function calculateCharity($amount): float
+    {
+        $fix_or_percentage = getWalletSetting('charity_wallet_fixed_or_percentage');
+        $fee = getWalletSetting('charity_wallet_fee');
+
+        return $fix_or_percentage == 'fixed' ? (float)$fee : ((float)$amount * (float)$fee / 100);
+
+    }
+}
+

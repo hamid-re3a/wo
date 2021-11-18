@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Models\Order;
-use Orders\Services\MlmClientFacade;
+use MLM\Services\MlmClientFacade;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\Invoice;
@@ -55,6 +55,8 @@ class OrderController extends Controller
 
 
             DB::beginTransaction();
+            $now = now()->toDateTimeString();
+
             $order_db = Order::query()->create([
                 "from_user_id" => $user_who_pays_for_package->id,
                 "user_id" => $user_who_is_package_for->id,
@@ -67,8 +69,12 @@ class OrderController extends Controller
             ]);
             $order_db->refreshOrder();
 
+            $order_service = $order_db->fresh()->getGrpcMessage();
+            $order_service->setIsPaidAt($now);
+            $order_service->setIsResolvedAt($now);
+
             Log::info('Front/OrderController@newOrder First MLM request');
-            $response = MlmClientFacade::simulateOrder($order_db->getOrderService());
+            $response = MlmClientFacade::simulateOrder($order_service);
 
             if (!$response->getStatus()) {
                 throw new \Exception($response->getMessage(), 406);
@@ -82,10 +88,10 @@ class OrderController extends Controller
             $invoice_request->setPaymentDriver($order_db->payment_driver);
             $invoice_request->setPaymentType($order_db->payment_type);
             $invoice_request->setPaymentCurrency($order_db->payment_currency);
-            $invoice_request->setUser($user_who_pays_for_package->getUserService());
+            $invoice_request->setUser($user_who_pays_for_package->getGrpcMessage());
             $invoice_request->setUserId((int)auth()->user()->id);
 
-            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getOrderService());
+            list($payment_flag, $payment_response) = PaymentFacade::pay($invoice_request, $order_db->getGrpcMessage());
 
 
             if (!$payment_flag)
@@ -93,9 +99,8 @@ class OrderController extends Controller
 
             if ($request->get('payment_type') != 'purchase') {
 
-                $now = now()->toDateTimeString();
 
-                $order_service = $order_db->fresh()->getOrderService();
+                $order_service = $order_db->fresh()->getGrpcMessage();
                 $order_service->setIsPaidAt($now);
                 $order_service->setIsResolvedAt($now);
 
@@ -119,7 +124,9 @@ class OrderController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('OrderController@newOrder => ' . $exception->getMessage());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 

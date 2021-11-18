@@ -2,10 +2,9 @@
 
 namespace Payments\Models;
 
-use GPBMetadata\User;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use User\Models\User;
 
 /**
  * Payments\Models\Invoice
@@ -21,6 +20,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $full_status
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice orders()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice depositWallets()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paid()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice notPaid()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOver()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOverNotRefunded()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice refunded()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice expired()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice notExpired()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice notCanceled()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice query()
@@ -43,6 +52,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDueAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereIsPaid($value)
  * @property string|null $expiration_time
+ * @property string|null $is_refund_at
+ * @property int|null $refunder_user_id
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereExpirationTime($value)
  * @property float $pf_amount
  * @property string $payment_type
@@ -55,6 +66,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice whereDepositAmount($value)
  * @property int|null $user_id
  * @property-read \Illuminate\Database\Eloquent\Collection|\Payments\Models\InvoiceTransaction[] $transactions
+ * @property-read \User\Models\User[] $user
+ * @property-read \User\Models\User[] $refunder
  * @property-read int|null $transactions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice wherePayableType($value)
@@ -69,6 +82,7 @@ class Invoice extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'expiration_time' => 'datetime',
+        'is_refund_at' => 'datetime',
         'is_paid' => 'boolean'
     ];
 
@@ -88,7 +102,62 @@ class Invoice extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id','id');
+    }
+
+    public function scopeOrders($query)
+    {
+        return $query->where('payable_type','=','Order');
+    }
+
+    public function scopeNotCanceled($query)
+    {
+        return $query->where('status','<>','user_cancel');
+    }
+
+    public function scopeDepositWallets($query)
+    {
+        return $query->where('payable_type','=','DepositWallet');
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('is_paid','=',true);
+    }
+
+    public function scopeNotPaid($query)
+    {
+        return $query->where('is_paid','=',false);
+    }
+
+    public function scopePaidOver($query)
+    {
+        return $query->where('additional_status','=','PaidOver');
+    }
+
+    public function scopePaidOverNotRefunded($query)
+    {
+        return $query->where('additional_status','=','PaidOver')->whereNull('is_refund_at');
+    }
+
+    public function scopeRefunded($query)
+    {
+        return $query->whereNotNull('is_refund_at');
+    }
+
+    public function scopeExpired($query)
+    {
+        return $query->where('expiration_time','<',now()->toDateTimeString());
+    }
+
+    public function scopeNotExpired($query)
+    {
+        return $query->where('expiration_time','>',now()->toDateTimeString());
+    }
+
+    public function refunder()
+    {
+        return $this->belongsTo(User::class,'refunder_user_id','id');
     }
 
     /**
@@ -140,7 +209,7 @@ class Invoice extends Model
         $invoice_service->setCreatedAt((string)$this->attributes['created_at']);
         $invoice_service->setUpdatedAt((string)$this->attributes['updated_at']);
 
-        $invoice_service->setUser($this->user->getUserService());
+        $invoice_service->setUser($this->user->getGrpcMessage());
         return $invoice_service;
 
     }

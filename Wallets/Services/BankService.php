@@ -24,12 +24,13 @@ class BankService
     {
 
         $slug = Str::slug($wallet_name);
-
-        if (!$this->owner->hasWallet($slug) OR !$wallet = $this->owner->getWallet($slug))
+        $wallet = $this->owner->getWallet($slug);
+        if (!$wallet) {
             $wallet = $this->owner->createWallet([
                 'name' => $wallet_name,
                 'slug' => $slug
             ]);
+        }
 
         return $wallet;
 
@@ -37,7 +38,7 @@ class BankService
 
     public function getAllWallets()
     {
-        return $this->owner->wallets()->get();
+        return $this->owner->wallets()->orderByDesc('id')->get();
     }
 
     public function deposit($wallet_name, $amount, $description = null, $confirmed = true, $type = 'Deposit', $sub_type = null)
@@ -46,7 +47,7 @@ class BankService
         $balance = $this->getBalance($wallet_name);
         $data = [
             'wallet_before_balance' => $balance,
-            'wallet_after_balance' => $balance + $amount,
+            'wallet_after_balance' => (double)$balance + (double)$amount,
             'type' => $type,
             'sub_type' => $sub_type
         ];
@@ -56,7 +57,7 @@ class BankService
         return $transaction;
     }
 
-    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true)
+    public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true,$to_admin_wallet = true)
     {
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
             throw new \Exception();
@@ -69,7 +70,7 @@ class BankService
             'sub_type' => $sub_type
         ];
         $transaction = $this->getWallet($wallet_name)->withdrawFloat($amount, $this->createMeta($description), $confirmed);
-        if ($this->owner->id != 1)
+        if ($this->owner->id != 1 AND $to_admin_wallet)
             $this->toAdminDepositWallet($transaction, $amount, $description, $type);
         $transaction->syncMetaData($data);
         return $transaction;
@@ -98,7 +99,7 @@ class BankService
         $depositMeta = [
             'wallet_before_balance' => $to_wallet->balanceFloat,
             'wallet_after_balance' => $to_wallet->balanceFloat + $amount,
-            'type' => 'Funds transferred'
+            'type' => 'Funds received'
         ];
 
         $transfer = $from_wallet->transferFloat($to_wallet, $amount, $this->createMeta($description));
@@ -129,8 +130,10 @@ class BankService
             $transactionQuery->where('uuid', request()->get('transaction_id'));
 
         if (request()->has('type'))
-            $transactionQuery->whereHas('metaData', function ($query) {
+            $transactionQuery->where(function($query){
+                $query->whereHas('metaData', function ($query) {
                     $query->where('wallet_transaction_types.name', '=', trim(request()->get('type')));
+                })->orWhere('type','=',request()->get('type'));
             });
 
         if (request()->has('amount'))
@@ -165,7 +168,8 @@ class BankService
     public function toAdminDepositWallet($transaction, $amount, $description, $type)
     {
         $this->owner = User::query()->find(1);
-        $admin_wallet = $this->getWallet(Str::slug('Deposit Wallet'));
+        $admin_wallet = $this->getWallet(WALLET_NAME_DEPOSIT_WALLET);
+
 
         //Prepare description
         $description = $this->createMeta($description);
@@ -175,7 +179,16 @@ class BankService
             'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
             'type' => $type
         ];
-        $transaction = $admin_wallet->depositFloat($amount, $this->createMeta($description));
+
+        $charity_amount = 0;
+        if($type == 'Package purchased') {
+            $charity_wallet = $this->getWallet(WALLET_NAME_CHARITY_WALLET);
+            $charity_amount = calculateCharity($amount);
+            if($charity_amount > 0)
+                $charity_wallet->depositFloat($charity_amount,$this->createMeta($description));
+        }
+
+        $transaction = $admin_wallet->depositFloat(($amount - $charity_amount), $this->createMeta($description));
         $transaction->syncMetaData($data);
 
     }

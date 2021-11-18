@@ -1,6 +1,8 @@
 <?php
+
 namespace Giftcode\database\seeders;
 
+use Giftcode\Models\EmailContent;
 use Giftcode\Models\Package;
 use Giftcode\Models\Setting;
 use Illuminate\Database\Seeder;
@@ -79,7 +81,7 @@ class SettingSeeder extends Seeder
             [
                 'name' => 'cancellation_fee',
                 'value' => 1,
-                'title' => 'Cancelation fee',
+                'title' => 'Cancellation fee',
                 'description' => 'Cancellation fee for giftcode in percent'
             ],
             [
@@ -113,8 +115,9 @@ class SettingSeeder extends Seeder
                 'description' => 'Registration fee will add in users payable amount'
             ]
         ];
-        Setting::insert($settings);
-        cache(['giftcode_settings' =>  $settings]);
+
+        Setting::query()->upsert($settings, 'name');
+        cache(['giftcode_settings' => $settings]);
     }
 
 }

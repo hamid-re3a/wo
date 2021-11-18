@@ -93,23 +93,10 @@ class GiftcodeController extends Controller
         } catch (\Throwable $exception) {
             //Handle exceptions
             Log::error('GiftcodeController@store  => ' . $exception->getMessage() . ' Line => ' . $exception->getLine());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
-    }
-
-    /**
-     * Get giftcode detail
-     * @group Public User > Giftcode
-     */
-    public function show()
-    {
-        $giftcode = $this->giftcode_repository->getByUuid(request()->route()->parameters['uuid']);
-
-        if (!$giftcode OR $giftcode->user_id != request()->header('X-user-id'))
-            return api()->error(null, null, 404);
-
-        return api()->success(null, GiftcodeResource::make($giftcode));
-
     }
 
     /**
@@ -117,6 +104,7 @@ class GiftcodeController extends Controller
      * @group Public User > Giftcode
      * @param CancelGiftcodeRequest $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function cancel(CancelGiftcodeRequest $request)
     {
@@ -128,8 +116,10 @@ class GiftcodeController extends Controller
 
         } catch (\Throwable $exception) {
             //Handle exceptions
-            Log::error('Cancel giftcode error,iftcode uuid => <' . $request->get('uuid') . '>');
-            throw $exception;
+            Log::error('Cancel giftcode error,gift code uuid => <' . $request->get('uuid') . '>');
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
 
         }
     }

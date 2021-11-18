@@ -98,10 +98,10 @@ class ChartRepository
             return $that->getGiftcodeByDateCollection('created_at',$from_date,$to_date,$user_id,$packages);
         };
 
-        $function_giftcode_pPackage_collection = function($from_date,$to_date) use($that,$user_id) {
-            $packages = Package::query()->where('short_name','like','P%')->pluck('id');
-            return $that->getGiftcodeByDateCollection('created_at',$from_date,$to_date,$user_id,$packages);
-        };
+//        $function_giftcode_pPackage_collection = function($from_date,$to_date) use($that,$user_id) {
+//            $packages = Package::query()->where('short_name','like','P%')->pluck('id');
+//            return $that->getGiftcodeByDateCollection('created_at',$from_date,$to_date,$user_id,$packages);
+//        };
 
         $sub_function_total = function ($collection, $intervals) {
             /**@var $collection Collection*/
@@ -113,7 +113,7 @@ class ChartRepository
         $result['beginner'] = chartMaker($type, $function_giftcode_bPackage_collection, $sub_function_total);
         $result['intermediate'] = chartMaker($type, $function_giftcode_iPackage_collection, $sub_function_total);
         $result['advance'] = chartMaker($type, $function_giftcode_aPackage_collection, $sub_function_total);
-        $result['pro'] = chartMaker($type, $function_giftcode_pPackage_collection, $sub_function_total);
+//        $result['pro'] = chartMaker($type, $function_giftcode_pPackage_collection, $sub_function_total);
         return $result;
 
     }

@@ -342,7 +342,7 @@ if (!function_exists('getPaymentEmailSetting')) {
             $email = $setting->toArray();
         }
 
-        if (isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key])) {
+        if (empty($email) AND isset(PAYMENT_EMAIL_CONTENT_SETTINGS[$key])) {
             $email =  PAYMENT_EMAIL_CONTENT_SETTINGS[$key];
         }
 

@@ -26,20 +26,24 @@ class UpdateWithdrawRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => [
-                'required',
-                Rule::exists('wallet_withdraw_profit_requests','uuid')->where('uuid',$this->get('id'))->whereNotIn('status',[
-                    WITHDRAW_COMMAND_REJECT,
-                    WITHDRAW_COMMAND_PROCESS
+            'ids' => 'required|array|max:30',
+            'ids.*' => [
+                Rule::exists('wallet_withdraw_profit_requests','uuid')->whereNotIn('status',[
+//                    WALLET_WITHDRAW_COMMAND_REJECT,
+                    WALLET_WITHDRAW_COMMAND_PROCESS
                 ])
             ],
-            'status' => 'required|in:' . implode(',', [
-                    WITHDRAW_COMMAND_REJECT,
-                    WITHDRAW_COMMAND_PROCESS,
-                    WITHDRAW_COMMAND_POSTPONE
-                ]),
-            'rejection_reason' => 'required_if:status,2|string',
-            'postponed_to' => 'required_if:status,4|date|date_format:Y/m/d|after:today'
+            'status' => [
+                'required',
+                'in:' . implode(',', [
+                    WALLET_WITHDRAW_COMMAND_REJECT,
+                    WALLET_WITHDRAW_COMMAND_PROCESS,
+                    WALLET_WITHDRAW_COMMAND_POSTPONE,
+                    WALLET_WITHDRAW_COMMAND_REVERT
+                ])
+            ],
+            'act_reason' => 'required_if:status,'. WALLET_WITHDRAW_COMMAND_REJECT .'|string',
+            'postponed_to' => 'required_if:status,' .WALLET_WITHDRAW_COMMAND_POSTPONE. '|date|date_format:Y/m/d H:i:s|after:today'
         ];
 
     }
@@ -47,7 +51,7 @@ class UpdateWithdrawRequest extends FormRequest
     public function messages()
     {
         return [
-            'rejection_reason.required_if' => 'The rejection reason field is required when status is rejected',
+            'act_reason.required_if' => 'The rejection reason field is required when status is rejected',
             'postponed_to.required_if' => 'The postponed date field is required when status is postponed',
         ];
     }

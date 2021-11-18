@@ -63,13 +63,18 @@ class Giftcode extends Model
         'code' => 'string',
         'expiration_date' => 'datetime',
         'redeem_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'redeem_user_id' => 'integer',
         'is_canceled' => 'boolean',
         'is_expired' => 'boolean',
     ];
 
     protected $with = [
-      'user'
+        'creator',
+        'user',
+        'package',
+        'redeemer'
     ];
 
     protected $hidden = [
@@ -93,7 +98,7 @@ class Giftcode extends Model
 
     public function package()
     {
-        return $this->belongsTo(Package::class,'package_id','id');
+        return $this->belongsTo(Package::class, 'package_id', 'id');
     }
 
     public function redeemer()
@@ -110,28 +115,12 @@ class Giftcode extends Model
         $name = null;
         if ($this->package()->exists() AND !is_null($this->package->name)) {
             $name = $this->package->name;
-            if($this->package->short_name)
-                $name = $name . ' (' . $this->package->short_name .')' ;
+            if ($this->package->short_name)
+                $name = $name . ' (' . $this->package->short_name . ')';
 
         }
 
         return $name;
-    }
-
-    public function getRedeemerFullNameAttribute()
-    {
-        if ($this->redeemer()->exists() AND !is_null($this->redeemer->first_name))
-            return $this->redeemer->full_name;
-
-        return null;
-    }
-
-    public function getCreatorFullNameAttribute()
-    {
-        if ($this->creator()->exists() AND !is_null($this->creator->first_name))
-            return $this->creator->full_name;
-
-        return null;
     }
 
     public function getStatusAttribute()
@@ -155,30 +144,26 @@ class Giftcode extends Model
     {
 
         $fee = null;
-        $type = null ;
+        $type = null;
 
-        if($this->is_canceled) {
+        if ($this->is_canceled) {
             $fee = giftcodeGetSetting('cancellation_fee');
             $type = giftcodeGetSetting('cancellation_fee_type') == 'fixed' ? 'fixed' : 'percentage';
-        }
-
-        else if($this->is_expired) {
+        } else if ($this->is_expired) {
             $fee = giftcodeGetSetting('expiration_fee');
             $type = giftcodeGetSetting('expiration_fee_type') == 'fixed' ? 'fixed' : 'percentage';
-        }
-
-        else //Check we should calculate cancelation/expiration fee or not
+        } else //Check we should calculate cancellation/expiration fee or not
             return $this->total_cost_in_pf;
 
-        if($type == 'percentage')
-            $fee = $this->total_cost_in_pf * $fee / 100;
+        if ($type == 'percentage')
+            $fee = $fee > 0 ? $this->total_cost_in_pf * $fee / 100 : 0;
 
         //Calculate refundable amount
         return $this->total_cost_in_pf - $fee;
     }
 
 
-    public function getGiftcodeService()
+    public function getGrpcMessage()
     {
         $giftcode_service = new \Giftcode\Services\Grpc\Giftcode();
         $giftcode_service->setId((int)$this->attributes['id']);

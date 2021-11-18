@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use MLM\Services\Grpc\Acknowledge;
 use Orders\Models\Order;
 use Orders\OrderConfigure;
-use Orders\Services\MlmClientFacade;
+use MLM\Services\MlmClientFacade;
 use Orders\tests\OrderTest;
 use Payments\Models\PaymentCurrency;
 use Payments\Services\Processors\PaymentFacade;

@@ -7,12 +7,46 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Orders\Http\Requests\Front\Order\ListOrderRequest;
+use Orders\Http\Requests\Front\Order\OrderTypeFilterRequest;
 use Orders\Http\Requests\Front\Order\ShowRequest;
 use Orders\Http\Resources\OrderResource;
+use Orders\Services\OrderService;
 use User\Models\User;
 
 class DashboardController extends Controller
 {
+
+    private $order_service;
+
+    public function __construct(OrderService $order_service)
+    {
+        $this->order_service = $order_service;
+    }
+
+    /**
+     * get package overview count
+     * @group
+     * Public User > Orders Dashboard
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageOverviewCount(OrderTypeFilterRequest $request)
+    {
+        return api()->success(null, $this->order_service->packageOverviewCountForUser($request->type, auth()->user()));
+    }
+
+    /**
+     * Get packages based on type
+     * @group
+     * Public User > Orders Dashboard
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageTypeCount(OrderTypeFilterRequest $request)
+    {
+        return api()->success(null, $this->order_service->packageTypeCountForUser($request->type, auth()->user()));
+    }
+
     /**
      * Order Counts
      * @group
@@ -78,5 +112,17 @@ class DashboardController extends Controller
         return api()->success(null, OrderResource::make($order));
     }
 
+    /**
+     * Packages percentage based on type chart
+     * @group
+     * Public User > Orders Dashboard
+     * @param OrderTypeFilterRequest $request
+     * @return JsonResponse
+     */
+    public function packageTypePercentCount(OrderTypeFilterRequest $request)
+    {
+
+        return api()->success(null, $this->order_service->packageTypePercentageCountChart($request->type,auth()->user()->id));
+    }
 
 }

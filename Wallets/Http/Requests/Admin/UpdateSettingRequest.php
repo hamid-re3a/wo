@@ -3,7 +3,6 @@
 namespace Wallets\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Wallets\Models\Setting;
 
 class UpdateSettingRequest extends FormRequest
@@ -51,9 +50,6 @@ class UpdateSettingRequest extends FormRequest
                 case 'count_withdraw_requests_to_automatic_payout_process':
                     return 'required|integer|min:1';
                     break;
-                case 'transaction_fee_calculation' :
-                    return 'required|in:fix,percentage';
-                    break;
                 case 'minimum_deposit_fund_amount':
                     return 'required|min:1|lte:' . getWalletSetting('maximum_deposit_fund_amount');
                     break;
@@ -91,11 +87,14 @@ class UpdateSettingRequest extends FormRequest
                     break;
                 case 'payout_btc_fee_fixed_or_percentage':
                 case 'payout_janex_fee_fixed_or_percentage':
+                case 'charity_wallet_fixed_or_percentage':
+                case 'transaction_fee_calculation' :
                 return 'required|in:percentage,fixed';
                     break;
                 case 'payout_btc_fee':
                 case 'payout_janex_fee':
-                    return 'required|integer';
+                case 'charity_wallet_fee':
+                    return 'required|integer|min:0';
                     break;
                 case 'withdrawal_distribution_in_btc' :
                     $withdrawal_distribution_in_janex = (int) getWalletSetting('withdrawal_distribution_in_janex');

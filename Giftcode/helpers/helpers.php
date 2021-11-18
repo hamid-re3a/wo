@@ -16,7 +16,10 @@ if (!function_exists('giftcodeGetSetting')) {
         if($setting)
             return $setting->value;
 
-        return config("giftcode.{$key}");
+        if(defined('GIFTCODE_SETTINGS'))
+            return GIFTCODE_SETTINGS[$key];
+
+        throw new Exception(trans('giftcode.responses.setting-key-doesnt-exists'));
     }
 }
 

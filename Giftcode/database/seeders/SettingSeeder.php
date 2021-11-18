@@ -81,7 +81,7 @@ class SettingSeeder extends Seeder
             [
                 'name' => 'cancellation_fee',
                 'value' => 1,
-                'title' => 'Cancelation fee',
+                'title' => 'Cancellation fee',
                 'description' => 'Cancellation fee for giftcode in percent'
             ],
             [
@@ -115,10 +115,9 @@ class SettingSeeder extends Seeder
                 'description' => 'Registration fee will add in users payable amount'
             ]
         ];
-        if (Setting::query()->count() == 0) {
-            Setting::insert($settings);
-            cache(['giftcode_settings' => $settings]);
-        }
+
+        Setting::query()->upsert($settings, 'name');
+        cache(['giftcode_settings' => $settings]);
     }
 
 }

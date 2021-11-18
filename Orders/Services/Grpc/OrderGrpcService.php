@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Mix\Grpc\Context;
 use Orders\Models\Order as OrderModel;
-use Orders\Services\MlmClientFacade;
 use Packages\Services\Grpc\Id;
 use Packages\Services\Grpc\Package;
 use Packages\Services\PackageService;

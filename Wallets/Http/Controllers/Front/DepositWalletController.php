@@ -180,7 +180,7 @@ class DepositWalletController extends Controller
 
             list($flag,$response) = $transfer_resolver->resolve();
             if(!$flag)
-                throw new \Exception($response);
+                throw new \Exception($response,400);
 
             //Charger user wallet for transfer fee
             $this->bankService->withdraw($this->walletName, (double)$fee, [

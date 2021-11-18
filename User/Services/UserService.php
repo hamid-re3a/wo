@@ -32,7 +32,7 @@ class UserService
             }
         }
 
-        throw new \Exception('User not found => id ' . $id);
+        throw new \Exception('User not found => id ' . $id,400);
 
     }
     public function userUpdate(User $user)

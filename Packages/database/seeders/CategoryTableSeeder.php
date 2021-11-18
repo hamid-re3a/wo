@@ -11,7 +11,7 @@ class CategoryTableSeeder extends Seeder
         if (Category::query()->count() > 0)
             return;
         if(is_null(config('package.categories')))
-            throw new \Exception('packages.config-key-setting-missing');
+            throw new \Exception('packages.config-key-setting-missing',400);
 
         foreach (config('package.categories') as $key => $setting) {
 

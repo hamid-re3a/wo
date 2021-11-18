@@ -39,7 +39,7 @@ class WithdrawRequestController extends Controller
                     config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
                     config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
             if (!$bps_wallet_response->ok())
-                throw new \Exception(trans('payment.responses.payment-service.btc-pay-server-error'));
+                throw new \Exception(trans('payment.responses.payment-service.btc-pay-server-error'),400);
 
             $bps_wallet_balance = $bps_wallet_response->json()['confirmedBalance'];
 

@@ -177,7 +177,6 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function process_withdraw_request()
     {
-        $this->refreshDatabase();
         $this->create_withdraw_request_sufficient_balance();
         $withdraw_request = WithdrawProfit::query()->first();
         PayoutFacade::shouldReceive('pay')->andReturn([true,null]);
@@ -194,8 +193,7 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function reject_withdraw_request()
     {
-        $this->refreshDatabase();
-        $this->create_withdraw_request_sufficient_balance();
+        $this->process_withdraw_request();
         $withdraw_request = WithdrawProfit::query()->first();
         $response = $this->patch(route('wallets.admin.withdraw-requests.update'), [
             'ids' => [$withdraw_request->uuid],
@@ -210,9 +208,7 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function revert_withdraw_request()
     {
-        $this->refreshDatabase();
         $this->mockWithdrawServices();
-        $this->create_withdraw_request_sufficient_balance();
         $this->reject_withdraw_request();
         $withdraw_request = WithdrawProfit::query()->where('status', WALLET_WITHDRAW_COMMAND_REJECT)->first();
         $response = $this->patch(route('wallets.admin.withdraw-requests.update'), [

@@ -41,7 +41,7 @@ class WebhookJob implements ShouldQueue
                 Log::error('Webhook called | Invalid TransactionID => ' . $event['invoiceId']);
             }
         } else {
-            throw new \Exception('btc pay server issues');
+            throw new \Exception('btc pay server issues',400);
         }
 
     }

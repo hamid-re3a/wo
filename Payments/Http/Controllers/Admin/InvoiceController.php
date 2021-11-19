@@ -215,7 +215,7 @@ class InvoiceController extends Controller
 
         //Deposit check
         if (!is_string($deposit->getTransactionId()))
-            throw new \Exception('Deposit Wallet Error');
+            throw new \Exception('Deposit Wallet Error',400);
 
         return $refundable_amount;
     }

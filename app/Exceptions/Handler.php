@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -41,10 +42,13 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        $code = ((int)$e->getCode() > 599 || (int)$e->getCode() < 100) ? 400 : (int)$e->getCode();
+        $code = ((int)$e->getStatusCode() > 599 || (int)$e->getStatusCode() < 100) ? 400 : (int)$e->getStatusCode();
+
+        Log::error('Exception : ' . $e->getMessage() . ' | Code => ' . $e->getStatusCode() . ' | Uri => ' . $request->getRequestUri());
 
         if ($e instanceof ValidationException)
             return api()->validation(trans('responses.validation-error'), $e->errors());
+
         if ($this->isHttpException($e)) {
             switch ($code) {
                 case '401':
@@ -53,9 +57,7 @@ class Handler extends ExceptionHandler
                     ]);
                     break;
                 case '404':
-                    return api()->error(null, [], 404, [
-                        'subject' => trans('responses.not-found')
-                    ]);
+                    return api()->notFound();
                     break;
                 case '500':
                     return api()->error(null, null, 500, [

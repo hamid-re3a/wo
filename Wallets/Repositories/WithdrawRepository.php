@@ -44,7 +44,7 @@ class WithdrawRepository
     {
         try {
             if (!getWalletSetting('withdrawal_request_is_enabled'))
-                throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
+                throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'),400);
 
             $user = array_key_exists('user_id', $request) ? User::query()->find($request['user_id']) : auth()->user();
             $request['user_id'] = $user->id;
@@ -53,7 +53,7 @@ class WithdrawRepository
             if ($user->id == auth()->user()->id AND !array_key_exists('is_revert',$request)) {
                 if (!isset($request['transaction_password'])) {
                     Log::error('Wallets\Repositories\WithdrawRepository@makeWithdrawRequest => Undefined transaction password for user in request body');
-                    throw new \Exception();
+                    throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
                 }
 
                 $password_request = new UserTransactionPassword();
@@ -271,7 +271,7 @@ class WithdrawRepository
 
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getPendingAmountVsTimeChart => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 
@@ -297,7 +297,7 @@ class WithdrawRepository
 
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getPendingAmountVsTimeChart => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 
@@ -343,7 +343,7 @@ class WithdrawRepository
             return $withdraw_profit_requests->whereBetween($date_field, [$from_date, $to_date])->get();
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 
@@ -362,7 +362,7 @@ class WithdrawRepository
             return $withdraw_profit_requests->whereBetween($date_field, [$from_date, $to_date])->get();
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 

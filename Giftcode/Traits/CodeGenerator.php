@@ -12,21 +12,25 @@ trait CodeGenerator
 
     public function generateCode()
     {
-        $giftcodeModel = new Giftcode();
-        $code = $this->makeCode();
-
-        while($giftcodeModel->where('code',$code)->first())
+        try {
+            $giftcodeModel = new Giftcode();
             $code = $this->makeCode();
 
+            while($giftcodeModel->where('code',$code)->first())
+                $code = $this->makeCode();
 
-        return [$code,$this->getExpirationDate()];
+
+            return [$code,$this->getExpirationDate()];
+        } catch (\Throwable $exception) {
+            throw $exception;
+        }
     }
 
     private function makeCode()
     {
         $characters = collect(str_split(giftcodeGetSetting('characters')));
         $length = giftcodeGetSetting('length');
-        $mask = giftcodeGetSetting('mask');
+        $mask = config('giftcode.mask');
         $code = $this->getPrefix();
 
         for($i = 0; $i < $length; $i++) {
@@ -60,7 +64,6 @@ trait CodeGenerator
         $prefix = giftcodeGetSetting('prefix');
         if($usePostFix AND !empty($prefix))
             return $prefix . $this->getSeparator();
-
         return null;
     }
 

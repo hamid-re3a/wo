@@ -117,7 +117,7 @@ class WithdrawResolver
             $distribution = getWalletSetting('withdrawal_distribution_in_janex');
 
         if ($distribution > 100 OR $distribution < 0)
-            throw new \Exception('Distribution error');
+            throw new \Exception('Distribution error',400);
         return $distribution;
     }
 }

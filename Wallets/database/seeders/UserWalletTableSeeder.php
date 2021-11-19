@@ -33,10 +33,10 @@ class UserWalletTableSeeder extends Seeder
             $bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
             $bankService->getWallet(WALLET_NAME_EARNING_WALLET);
 
-            if ($bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET) == 0)
+            if ($bankService->getBalance(WALLET_NAME_DEPOSIT_WALLET) == 0)
                 $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET, 10000000000);
 
-            if ($bankService->getWallet(WALLET_NAME_EARNING_WALLET) == 0)
+            if ($bankService->getBalance(WALLET_NAME_EARNING_WALLET) == 0)
                 $bankService->deposit(WALLET_NAME_EARNING_WALLET, 10000000000);
 
 

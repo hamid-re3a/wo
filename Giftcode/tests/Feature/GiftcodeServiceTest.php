@@ -7,7 +7,6 @@ use Giftcode\Models\Giftcode;
 use Giftcode\Services\GiftcodeService;
 use Giftcode\tests\GiftcodeTest;
 use Illuminate\Support\Facades\Mail;
-use User\Models\User;
 
 class GiftcodeServiceTest extends GiftcodeTest
 {
@@ -56,8 +55,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         /** @var $giftcode_object \Giftcode\Services\Grpc\Giftcode */
         $giftcode_object = $giftcode_model->getGrpcMessage();
         $giftcode_object->setOrderId(1);
-        $user = User::query()->first();
-        $user_object = $user->getGrpcMessage();
+        $user_object = $this->user_2->getGrpcMessage();
         $giftcode_service = app(GiftcodeService::class);
         $response = $giftcode_service->redeemGiftcode($giftcode_object,$user_object);
         $this->assertIsInt($response->getId());
@@ -75,8 +73,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response = $this->createGiftCode();
         $response->assertOk();
 
-        $user = User::query()->whereId(1)->first();
-        $user_object = $user->getGrpcMessage();
+        $user_object = $this->user_2->getGrpcMessage();
 
         $giftcode_service = app(GiftcodeService::class);
         $response = $giftcode_service->getUserCreatedGiftcodesCount($user_object);
@@ -93,8 +90,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $response->assertOk();
 
-        $user = User::query()->whereId(1)->first();
-        $user_object = $user->getGrpcMessage();
+        $user_object = $this->user_2->getGrpcMessage();
 
         $giftcode_service = app(GiftcodeService::class);
         $response = $giftcode_service->getUserExpiredGiftcodesCount($user_object);
@@ -112,8 +108,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $response->assertOk();
 
-        $user = User::query()->whereId(1)->first();
-        $user_object = $user->getGrpcMessage();
+        $user_object = $this->user_2->getGrpcMessage();
 
         $giftcode_service = app(GiftcodeService::class);
         $response = $giftcode_service->getUserCanceledGiftcodesCount($user_object);
@@ -131,8 +126,7 @@ class GiftcodeServiceTest extends GiftcodeTest
         $response->assertOk();
         $response->assertOk();
 
-        $user = User::query()->whereId(1)->first();
-        $user_object = $user->getGrpcMessage();
+        $user_object = $this->user_2->getGrpcMessage();
 
         $giftcode_service = app(GiftcodeService::class);
         $response = $giftcode_service->getUserRedeemedGiftcodesCount($user_object);

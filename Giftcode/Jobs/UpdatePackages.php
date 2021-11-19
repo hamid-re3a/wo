@@ -18,6 +18,7 @@ class UpdatePackages implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     /**
      * @var Mailable
+     * @var $packageService PackageService
      */
     private $packageService;
 

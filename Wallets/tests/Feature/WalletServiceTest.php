@@ -26,7 +26,7 @@ class WalletServiceTest extends WalletTest
 
         //Deposit Service
         $deposit_service = app(Deposit::class);
-        $deposit_service->setUserId(1);
+        $deposit_service->setUserId($this->user->id);
         $deposit_service->setAmount(10000000);
         $deposit_service->setType('Deposit');
         $deposit_service->setWalletName(3);
@@ -41,8 +41,10 @@ class WalletServiceTest extends WalletTest
     /**
      * @test
      */
-    public function deposit_wallet_confirmed($user_id = 1)
+    public function deposit_wallet_confirmed($user_id = null)
     {
+        if(!$user_id)
+            $user_id = $this->user->id;
         $wallet_service = app(WalletService::class);
 
         //Deposit Service
@@ -62,8 +64,11 @@ class WalletServiceTest extends WalletTest
     /**
      * @test
      */
-    public function earning_wallet_confirmed($user_id = 1)
+    public function earning_wallet_confirmed($user_id = null)
     {
+        if(!$user_id)
+            $user_id = $this->user->id;
+
         $wallet_service = app(WalletService::class);
 
         //Deposit Service
@@ -83,8 +88,11 @@ class WalletServiceTest extends WalletTest
     /**
      * @test
      */
-    public function deposit_with_sub_type_confirmed($user_id = 1)
+    public function deposit_with_sub_type_confirmed($user_id = null)
     {
+        if(!$user_id)
+            $user_id = $this->user->id;
+
         $wallet_service = app(WalletService::class);
 
         //Deposit Service
@@ -114,7 +122,7 @@ class WalletServiceTest extends WalletTest
 
         //Withdraw
         $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setUserId(1);
+        $withdraw_service->setUserId($this->user->id);
         $withdraw_service->setWalletName(3);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(100);
@@ -135,7 +143,7 @@ class WalletServiceTest extends WalletTest
 
         //Withdraw
         $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setUserId(1);
+        $withdraw_service->setUserId($this->user->id);
         $withdraw_service->setWalletName(WalletNames::DEPOSIT);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(119.8);
@@ -156,7 +164,7 @@ class WalletServiceTest extends WalletTest
 
         //Withdraw
         $withdraw_service = app(Withdraw::class);
-        $withdraw_service->setUserId(1);
+        $withdraw_service->setUserId($this->user->id);
         $withdraw_service->setWalletName(WalletNames::EARNING);
         $withdraw_service->setType('Giftcode');
         $withdraw_service->setAmount(100);
@@ -170,20 +178,16 @@ class WalletServiceTest extends WalletTest
      */
     public function transfer_fund()
     {
-        //User
-        $from_user = User::factory()->create();
-
-        $to_user = User::factory()->create();
 
         $wallet_service = app(WalletService::class);
         //Deposit from user wallet
-        $this->deposit_wallet_confirmed($from_user->id);
+        $this->deposit_wallet_confirmed($this->user->id);
 
         //Prepare transfer
         $transfer_service = app(Transfer::class);
-        $transfer_service->setFromUserId($from_user->id);
+        $transfer_service->setFromUserId($this->user->id);
         $transfer_service->setFromWalletName(WalletNames::DEPOSIT);
-        $transfer_service->setToUserId($to_user->id);
+        $transfer_service->setToUserId($this->user_2->id);
         $transfer_service->setToWalletName(WalletNames::DEPOSIT);
         $transfer_service->setAmount(1000);
 
@@ -198,17 +202,14 @@ class WalletServiceTest extends WalletTest
      */
     public function get_wallet_balance()
     {
-        //User
-        $user = User::factory()->create();
-
         $wallet_service = app(WalletService::class);
 
         //Deposit
-        $this->deposit_wallet_confirmed($user->id);
+        $this->deposit_wallet_confirmed($this->user->id);
 
         //Prepare wallet
         $user_wallet_service = app(Wallet::class);
-        $user_wallet_service->setUserId($user->id);
+        $user_wallet_service->setUserId($this->user->id);
         $user_wallet_service->setName(WalletNames::DEPOSIT);
 
         //Check balance

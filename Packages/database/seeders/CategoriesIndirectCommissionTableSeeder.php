@@ -11,7 +11,7 @@ class CategoriesIndirectCommissionTableSeeder extends Seeder
         if (CategoriesIndirectCommission::query()->count() > 0)
             return;
         if(is_null(config('package.categories-indirect-commissions')))
-            throw new \Exception('packages.config-key-setting-missing');
+            throw new \Exception('packages.config-key-setting-missing',400);
 
         foreach (config('package.categories-indirect-commissions') as $key => $commission) {
             if (!CategoriesIndirectCommission::query()->whereCategoryId($commission['category_id'])->whereLevel($commission['level'])->exists()) {

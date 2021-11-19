@@ -55,7 +55,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
             //TODO Notify admin for insufficient balance
             throw new \Exception(trans('wallet.withdraw-profit-request.insufficient-bpb-wallet-balance', [
                 'amount' => $total_needed_balance . ' BTC'
-            ]));
+            ]),400);
         }
 
         $destinations = [];
@@ -83,7 +83,7 @@ class ProcessBTCPayServerPayoutsJob implements ShouldQueue
         } else {
             Log::info($response->status());
             Log::info(serialize($response->json()));
-            throw new \Exception('Payout BPS failed');
+            throw new \Exception('Payout BPS failed',400);
             //TODO notify admin
         }
     }

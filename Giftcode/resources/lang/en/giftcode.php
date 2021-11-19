@@ -9,7 +9,8 @@ return [
         'something-went-wrong' => 'Oops, Something went wrong, Try again please.',
         'global-error' => 'An error occurred, Try again please.',
         'ok'=>'ok',
-        'email-key-doesnt-exists' => "giftcode email content doesn't exists",
+        'setting-key-doesnt-exists' => "setting key {:key} doesn't exists",
+        'email-key-doesnt-exists' => "giftcode email {:key} content doesn't exists",
         'not-valid-giftcode-id' => 'Giftcode ID is not valid',
 
         'giftcode-is-canceled-and-user-cant-cancel' => 'You can not cancel a giftcode again.',

@@ -63,7 +63,7 @@ class InsertBPSNetworkTransactionJob implements ShouldQueue
             DB::commit();
         } catch (\Throwable $exception) {
             DB::rollBack();
-            throw new \Exception('Payout BPS payout failed');
+            throw new \Exception('Payout BPS payout failed',400);
             //TODO notify admin for unsuccessful payout and db error
         }
     }

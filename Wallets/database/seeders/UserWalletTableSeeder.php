@@ -24,9 +24,17 @@ class UserWalletTableSeeder extends Seeder
 
         $bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
         $bankService->getWallet(WALLET_NAME_EARNING_WALLET);
-
-        if (!in_array(app()->environment(), ['production', 'staging'])) {
-
+        $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET,10000000);
+        if (!in_array(app()->environment(), ['production'])) {
+            /**
+             *
+             */
+            $user = User::query()->firstOrCreate(['id' => 2]);
+            $bankService = new BankService($user);
+            $bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
+            $bankService->getWallet(WALLET_NAME_EARNING_WALLET);
+            $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET, 10000000000);
+            $bankService->deposit(WALLET_NAME_EARNING_WALLET, 10000000000);
             $customer_user = User::query()->firstOrCreate(['id' => 3]);
             $bankService = new BankService($customer_user);
 

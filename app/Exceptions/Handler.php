@@ -42,9 +42,9 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        $code = ((int)$e->getStatusCode() > 599 || (int)$e->getStatusCode() < 100) ? 400 : (int)$e->getStatusCode();
+        $code = ((int)$e->getCode() > 599 || (int)$e->getCode() < 100) ? 400 : (int)$e->getCode();
 
-        Log::error('Exception : ' . $e->getMessage() . ' | Code => ' . $e->getStatusCode() . ' | Uri => ' . $request->getRequestUri());
+        Log::error('Exception : ' . $e->getCode() . ' | Code => ' . $e->getCode() . ' | Uri => ' . $request->getRequestUri());
 
         if ($e instanceof ValidationException)
             return api()->validation(trans('responses.validation-error'), $e->errors());

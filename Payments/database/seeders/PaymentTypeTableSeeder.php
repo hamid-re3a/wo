@@ -11,7 +11,7 @@ class PaymentTypeTableSeeder extends Seeder
         if (PaymentType::query()->count() > 0)
         return;
         if(is_null(config('payment.payment_types')))
-            throw new \Exception('payments.config-key-setting-missing');
+            throw new \Exception('payments.config-key-setting-missing',400);
 
         foreach (config('payment.payment_types') as $key => $setting) {
             if (!PaymentType::query()->whereName($setting['name'])->exists()) {

@@ -135,7 +135,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 //
                 break;
             default:
-                throw new \Exception('BTCPayServerError');
+                throw new \Exception('BTCPayServerError',400);
                 break;
 
         }

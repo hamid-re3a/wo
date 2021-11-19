@@ -43,7 +43,7 @@ class PayoutProcessor
              */
             $first_request = $withdraw_requests->first();
             if ($withdraw_requests->where('currency', '!=', $first_request->currency)->count())
-                throw new \Exception(trans('wallet.withdraw-profit-request.different-currency-payout'));
+                throw new \Exception(trans('wallet.withdraw-profit-request.different-currency-payout'),400);
 
             return [$first_request->currency, $withdraw_requests->sum('crypto_amount')];
         } catch (\Throwable $exception) {
@@ -67,13 +67,13 @@ class PayoutProcessor
                 if ((float)$amount > (float)$wallet_balance)
                     throw new \Exception(trans('wallet.withdraw-profit-request.insufficient-bpb-wallet-balance', [
                         'amount' => ($amount - $wallet_balance)
-                    ]));
+                    ]),400);
 
             } else {
                 Log::error('BPS Wallet balance => ' . $wallet_response->json()['confirmedBalance']);
                 throw new \Exception(trans('wallet.withdraw-profit-request.check-bps-or-blockchain.com-server', [
                     'server' => 'BTCPayServer'
-                ]));
+                ]),400);
             }
         } catch (\Throwable $exception) {
             throw $exception;

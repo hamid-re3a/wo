@@ -11,7 +11,7 @@ class PaymentCurrencyTableSeeder extends Seeder
         if (PaymentCurrency::query()->count() > 0)
         return;
         if(is_null(config('payment.payment_currencies')))
-            throw new \Exception('payments.config-key-setting-missing');
+            throw new \Exception('payments.config-key-setting-missing',400);
 
         foreach (config('payment.payment_currencies') as $key => $setting) {
             if (!PaymentCurrency::query()->whereName($setting['name'])->exists()) {

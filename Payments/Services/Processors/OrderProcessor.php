@@ -85,7 +85,7 @@ class OrderProcessor extends ProcessorAbstract
         $order_service->setIsResolvedAt(now()->toDateTimeString());
         $acknowledge = MlmClientFacade::submitOrder($order_service);
         if ($acknowledge)
-            throw new \Exception();
+            throw new \Exception(null,400);
 
 
         if ($submit_response->getStatus()) {

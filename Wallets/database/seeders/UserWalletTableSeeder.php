@@ -23,7 +23,7 @@ class UserWalletTableSeeder extends Seeder
         $bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
         $bankService->getWallet(WALLET_NAME_EARNING_WALLET);
         $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET,10000000);
-        if (!in_array(app()->environment(), ['production', 'staging'])) {
+        if (!in_array(app()->environment(), ['production'])) {
             /**
              *
              */

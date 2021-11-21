@@ -90,9 +90,14 @@ class OrderService implements OrdersServiceInterface
         return $this->order_repository->getPaidOrdersSum();
     }
 
-    public function getCountOrders()
+    public function getResolvedOrdersCount()
     {
-        return $this->order_repository->getCountOrders();
+        return $this->order_repository->getResolvedOrdersCount();
+    }
+
+    public function getCanceledOrdersCount()
+    {
+        return $this->order_repository->getCanceledOrdersCount();
     }
 
     public function getActiveOrdersCount()
@@ -100,9 +105,9 @@ class OrderService implements OrdersServiceInterface
         return $this->order_repository->getActiveOrdersCount();
     }
 
-    public function getExpiredOrders()
+    public function getExpiredOrdersCount()
     {
-        return $this->order_repository->getExpiredOrders();
+        return $this->order_repository->getExpiredOrdersCount();
     }
 
     public function packageOverviewCountChart($type)

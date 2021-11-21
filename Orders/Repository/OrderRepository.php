@@ -12,7 +12,7 @@ class OrderRepository
     {
         /**@var $order Order */
         $order = new $this->entity_name;
-        return $order->query()->active()->expired()->resolved()->count();
+        return $order->query()->active()->resolved()->count();
     }
 
     public function getActiveOrdersSum()

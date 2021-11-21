@@ -35,7 +35,7 @@ class WebhookJob implements ShouldQueue
             $invoice_db = Invoice::query()->where('transaction_id', $event['invoiceId'])->first();
 
 
-            if($invoice_db)
+            if($invoice_db AND $invoice_db->status != 'user_cancel')
                 InvoiceResolverBTCPayServerJob::dispatch($invoice_db);
             else{
                 Log::error('Webhook called | Invalid TransactionID => ' . $event['invoiceId']);

@@ -4,7 +4,7 @@ CONST EMAIL_CONTENTS = [
     'GIFT_CODE_CREATED' => [
         'is_active' => true,
         'subject'=>'Gift code created is created',
-        'from'=>'it@ridetothefuture.com',
+        'from'=>'it@dreamcometrue.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -28,7 +28,7 @@ CONST EMAIL_CONTENTS = [
     'GIFT_CODE_CANCELED' => [
         'is_active' => true,
         'subject'=>'Gift code is canceled',
-        'from'=>'it@ridetothefuture.com',
+        'from'=>'it@dreamcometrue.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -46,7 +46,7 @@ CONST EMAIL_CONTENTS = [
     'GIFTCODE_REDEEMED_CREATOR_EMAIL' => [
         'is_active' => true,
         'subject'=>'Giftcode is used',
-        'from'=>'it@ridetothefuture.com',
+        'from'=>'it@dreamcometrue.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -64,7 +64,7 @@ CONST EMAIL_CONTENTS = [
     'GIFTCODE_REDEEMED_REDEEMER_EMAIL' => [
         'is_active' => true,
         'subject'=>'You redeemed a gift code',
-        'from'=>'it@ridetothefuture.com',
+        'from'=>'it@dreamcometrue.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -84,7 +84,7 @@ CONST EMAIL_CONTENTS = [
     'GIFTCODE_WILL_EXPIRING_SOON_EMAIL' => [
         'is_active' => true,
         'subject'=>'Gift code is expiring soon',
-        'from'=>'it@ridetothefuture.com',
+        'from'=>'it@dreamcometrue.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -101,7 +101,7 @@ CONST EMAIL_CONTENTS = [
     'GIFTCODE_EXPIRED_EMAIL' => [
         'is_active' => true,
         'subject'=>'Gift code is expired',
-        'from'=>'it@ridetothefuture.com',
+        'from'=>'it@dreamcometrue.com',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>

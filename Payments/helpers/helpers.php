@@ -90,7 +90,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'INVOICE_CREATED_EMAIL' => [
         'is_active' => true,
         'subject' => 'New Invoice',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -141,7 +141,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'INVOICE_PARTIAL_PAID_EMAIL' => [
         'is_active' => true,
         'subject' => 'Invoice partial paid',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -160,7 +160,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'INVOICE_PAID_EMAIL' => [
         'is_active' => true,
         'subject' => 'Payment Received',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -179,7 +179,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'INVOICE_COMPLETE_PAID_EMAIL' => [
         'is_active' => true,
         'subject' => 'Payment Received',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -198,7 +198,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'INVOICE_EXPIRED_EMAIL' => [
         'is_active' => true,
         'subject' => 'Invoice expired',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -219,7 +219,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'WALLET_INVOICE_CREATED_EMAIL' => [
         'is_active' => true,
         'subject' => 'Pay invoice on time',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -240,7 +240,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'WALLET_INVOICE_PARTIAL_PAID_EMAIL' => [
         'is_active' => true,
         'subject' => 'Deposit fund partial paid',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -259,7 +259,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'WALLET_INVOICE_PAID_EMAIL' => [
         'is_active' => true,
         'subject' => 'Deposit fund payment received',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -278,7 +278,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'WALLET_INVOICE_COMPLETE_PAID_EMAIL' => [
         'is_active' => true,
         'subject' => 'Deposit fund payment received',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -297,7 +297,7 @@ const PAYMENT_EMAIL_CONTENT_SETTINGS = [
     'WALLET_INVOICE_EXPIRED_EMAIL' => [
         'is_active' => true,
         'subject' => 'Deposit fund invoice expired',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.com',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>

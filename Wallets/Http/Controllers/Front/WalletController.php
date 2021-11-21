@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use User\Models\User;
 use Wallets\Http\Requests\Front\GetTransactionRequest;
 use Wallets\Http\Resources\TransactionResource;
-use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Http\Resources\WalletResource;
 use Wallets\Services\BankService;
 
 class WalletController extends Controller
@@ -36,7 +36,7 @@ class WalletController extends Controller
     public function index()
     {
         $this->readyBankService();
-        return api()->success(null,EarningWalletResource::collection($this->bankService->getAllWallets()));
+        return api()->success(null,WalletResource::collection($this->bankService->getAllWallets()));
     }
 
 

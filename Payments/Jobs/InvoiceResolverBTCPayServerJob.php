@@ -49,7 +49,7 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     config('payment.btc-pay-server-store-id') . '/invoices/' . $this->invoice_db->transaction_id . '/payment-methods'
                 );
 
-            if ($response->ok() && $payment_response->ok()) {
+            if ($response->ok() && $payment_response->ok() AND $this->invoice_db->status != 'user_cancel') {
                 $amount_paid = $payment_response->json()[0]['totalPaid'];
                 $amount_due = $payment_response->json()[0]['due'];
                 $rate = $payment_response->json()[0]['rate'];

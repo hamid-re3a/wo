@@ -30,6 +30,7 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice expired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notExpired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notCanceled()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice canceled()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice query()
@@ -178,6 +179,11 @@ class Invoice extends Model
     public function scopeNotCanceled($query)
     {
         return $query->where('status','<>','user_cancel');
+    }
+
+    public function scopeCanceled($query)
+    {
+        return $query->where('status','=','user_cancel');
     }
 
     public function scopeDepositWallets($query)

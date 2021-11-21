@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 //Route::get('/', function () {
 //    return view('welcome');
 //});
-
-Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
-Route::get('_healthz', [\App\Http\Controllers\HealthCheckController::class,'_healthz']);
+if (!in_array(app()->environment(), ['production'])) {
+    Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+}
+Route::get('_healthz', [\App\Http\Controllers\HealthCheckController::class, '_healthz']);

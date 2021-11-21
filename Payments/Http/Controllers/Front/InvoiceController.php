@@ -5,6 +5,7 @@ namespace Payments\Http\Controllers\Front;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Log;
 use Payments\Http\Requests\Invoice\CancelInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
@@ -187,7 +188,12 @@ class InvoiceController extends Controller
      */
     public function cancelInvoice(CancelInvoiceRequest $request)
     {
-        $this->invoice_service->cancelInvoice($request->transaction_id);
-        return api()->success("invoice has been canceled", null);
+        try {
+            $this->invoice_service->cancelInvoice($request->get('transaction_id'));
+            return api()->success("invoice has been canceled", null);
+        } catch (\Throwable $exception) {
+            Log::error('\Payments\Http\Controllers\InvoiceController@cancelInvoice exception => ' . $exception->getMessage());
+            return api()->error();
+        }
     }
 }

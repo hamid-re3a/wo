@@ -4,7 +4,9 @@
 namespace Orders\Services;
 
 
+use Illuminate\Support\Facades\Log;
 use Orders\Repository\OrderRepository;
+use Orders\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
@@ -61,6 +63,21 @@ class OrderService implements OrdersServiceInterface
             'plan' => !empty($order->getPlan()) ? OrderPlans::name($order->getPlan()) : $order_db->plan,
         ]);
         return $order;
+    }
+
+    public function cancelOrder(Id $id): Acknowledge
+    {
+        $ack = new Acknowledge();
+        try {
+            $order_db = \Orders\Models\Order::query()->find($id->getId());
+            $order_db->update([
+                'is_canceled_at' => now()->toDateTimeString()
+            ]);
+            return $ack->setStatus(true);
+        } catch (\Throwable $exception) {
+            Log::error('Orders\Services\OrderService@cancelOrder exception => ' . $exception->getMessage());
+            return $ack->setStatus(false);
+        }
     }
 
     public function getActiveOrdersSum()

@@ -26,6 +26,7 @@ use User\Models\User;
  * @property \Illuminate\Support\Carbon|null $is_resolved_at
  * @property \Illuminate\Support\Carbon|null $is_refund_at
  * @property \Illuminate\Support\Carbon|null $is_commission_resolved_at
+ * @property \Illuminate\Support\Carbon|null $is_canceled_at
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property string $payment_type
  * @property string $payment_type_string

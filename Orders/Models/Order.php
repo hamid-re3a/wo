@@ -104,7 +104,7 @@ class Order extends Model
 
     public function scopeCanceled($query)
     {
-        return $query->whereNotNul('is_canceled_at');
+        return $query->whereNotNull('is_canceled_at');
     }
 
     public function user()

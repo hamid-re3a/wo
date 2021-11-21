@@ -6,7 +6,6 @@ namespace Wallets\tests\Feature;
 
 use Illuminate\Support\Facades\Mail;
 use Payments\Services\Processors\PaymentFacade;
-use User\Models\User;
 use Wallets\Services\BankService;
 use Wallets\tests\WalletTest;
 
@@ -74,10 +73,10 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function transfer_fund_preview_insufficient_balance()
     {
-        $user_2 = User::factory()->create();
+        $this->refreshDatabase();
         $response = $this->postJson(route('wallets.customer.deposit.transfer-fund-preview'), [
             'amount' => 10000000000000000000000000,
-            'member_id' => $user_2->member_id
+            'member_id' => $this->user_2->member_id
         ]);
         $response->assertStatus(422);
         $response->assertJsonStructure([
@@ -94,15 +93,13 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function transfer_fund_preview_sufficient_balance()
     {
-        Mail::fake();
-        $user_1 = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user_1);
+        $this->refreshDatabase();
+        $bank_service = new BankService($this->user);
         $bank_service->deposit('Deposit Wallet', 30000);
 
-        $user_2 = User::factory()->create();
         $response = $this->postJson(route('wallets.customer.deposit.transfer-fund-preview'), [
             'amount' => 101,
-            'member_id' => $user_2->member_id
+            'member_id' => $this->user_2->member_id
         ]);
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -118,11 +115,10 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function transfer_fund_insufficient_balance()
     {
-
-        $user_2 = User::factory()->create();
+        $this->refreshDatabase();
         $response = $this->postJson(route('wallets.customer.deposit.transfer-fund'), [
             'amount' => 1010000000000000,
-            'member_id' => $user_2->member_id
+            'member_id' => $this->user_2->member_id
         ]);
         $response->assertStatus(422);
         $response->assertJsonStructure([
@@ -140,14 +136,11 @@ class DepositWalletFeatureTest extends WalletTest
     public function transfer_fund_sufficient_balance()
     {
         Mail::fake();
-        $user_1 = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user_1);
+        $bank_service = new BankService($this->user);
         $bank_service->deposit('Deposit Wallet', 30000);
-
-        $user_2 = User::factory()->create();
         $response = $this->postJson(route('wallets.customer.deposit.transfer-fund'), [
             'amount' => 101,
-            'member_id' => $user_2->member_id
+            'member_id' => $this->user_2->member_id
         ]);
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -163,6 +156,7 @@ class DepositWalletFeatureTest extends WalletTest
      */
     public function deposit_fund()
     {
+        $this->refreshDatabase();
         Mail::fake();
         PaymentFacade::shouldReceive('pay')->once()->andReturn([true, [
             "payment_currency" => "nothing",

@@ -4,8 +4,6 @@ namespace Orders;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Orders\Services\MlmClientFacade;
-use Orders\Services\MlmGrpcClientProvider;
 
 class OrderServiceProvider extends ServiceProvider
 {
@@ -49,8 +47,6 @@ class OrderServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        MlmClientFacade::shouldProxyTo(MlmGrpcClientProvider::class);
-
         $this->setupConfig();
 
         $this->registerHelpers();

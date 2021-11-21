@@ -190,7 +190,7 @@ class EarningWalletController extends Controller
 
             list($flag,$response) = $transfer_resolver->resolve();
             if(!$flag)
-                throw new \Exception($response);
+                throw new \Exception($response,400);
 
             if ($request->has('member_id') AND $fee > 0)
                 $this->bankService->withdraw($this->walletName, (double)$fee, [

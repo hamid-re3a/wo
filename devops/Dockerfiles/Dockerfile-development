@@ -1,7 +1,7 @@
 FROM webdevops/php-nginx:7.4
 
 # php modules
-RUN apt update -y 
+RUN apt update -y
 RUN apt-get update && apt-get install -y \
     curl \
     nano \
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    zip \ 
+    zip \
     unzip\
     libcurl4-openssl-dev
 
@@ -37,7 +37,7 @@ RUN su application -c "composer config --global --auth http-basic.ride-to-the-fu
 RUN su application -c "composer install"
 RUN su application -c "php artisan key:generate"
 RUN su application -c "php artisan vendor:publish --all"
-RUN su application -c "php artisan migrate:fresh"
+RUN su application -c "php artisan migrate"
 RUN su application -c "php artisan db:seed"
 RUN su application -c "php artisan scribe:generate"
 RUN su application -c "php artisan optimize:clear"

@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -41,28 +42,41 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+        $code = ((int)$e->getStatusCode() > 599 || (int)$e->getStatusCode() < 100) ? 400 : (int)$e->getStatusCode();
+
+        Log::error('Exception : ' . $e->getMessage() . ' | Code => ' . $e->getStatusCode() . ' | Uri => ' . $request->getRequestUri());
+
         if ($e instanceof ValidationException)
             return api()->validation(trans('responses.validation-error'), $e->errors());
+
         if ($this->isHttpException($e)) {
-            switch ($e->getStatusCode()) {
+            switch ($code) {
                 case '401':
-                    return api()->error($e->getMessage() ?? trans('responses.login-again'), [], 401);
+                    return api()->error(null, null, 401, [
+                        'subject' => $e->getMessage() ?? trans('responses.login-again')
+                    ]);
                     break;
                 case '404':
-                    return api()->error(trans('responses.not-found'), [], 404);
+                    return api()->notFound();
                     break;
                 case '500':
-                    return api()->error(trans('responses.something-went-wrong'), [], 500);
+                    return api()->error(null, null, 500, [
+                        'subject' => trans('responses.something-went-wrong')
+                    ]);
                     break;
 
                 default:
-                    return api()->error($e->getMessage(), [], $e->getStatusCode());
+                    return api()->error(null, null, $code, [
+                        'subject' => $e->getMessage()
+                    ]);
                     break;
 
             }
         }
-        $code = (int)$e->getCode();
-        return api()->error($e->getMessage(), [], ($code > 599 || $code < 100) ? 400 : $code);
+
+        return api()->error(null, null, $code, [
+            'subject' => $e->getMessage()
+        ]);
 
     }
 }

@@ -15,6 +15,7 @@ use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceCreated;
 use Payments\Mail\Payment\Wallet\EmailWalletInvoiceCreated;
 use Payments\Services\Grpc\Invoice;
+use User\Models\User;
 use User\Services\UserService;
 use Wallets\Services\Grpc\Wallet;
 use Wallets\Services\Grpc\WalletNames;
@@ -56,7 +57,7 @@ class PaymentProcessor
                 return $this->payBtcServer($invoice_request);
                 break;
         }
-        Log::error('PaymentService@payFromGateway switch case not found PaymentDriver, TransactionID: ' . $invoice_request->getTransactionId());
+        Log::error('PaymentProcessor@payFromGateway switch case not found PaymentDriver, TransactionID: ' . $invoice_request->getTransactionId());
         return [false,trans('payment.responses.payment-service.gateway-error')];
     }
 
@@ -72,29 +73,29 @@ class PaymentProcessor
             $giftcode_response = $giftcode_service->getGiftcodeByCode($giftcode_object);
 
             if (!$giftcode_response->getId()) // code is not valid
-                throw new \Exception(trans('payment.responses.giftcode.wrong-code'));
+                throw new \Exception(trans('payment.responses.giftcode.wrong-code'),406);
 
             if ($giftcode_response->getPackageId() != $order_service->getPackageId())
-                throw new \Exception(trans('payment.responses.giftcode.wrong-package'));
+                throw new \Exception(trans('payment.responses.giftcode.wrong-package'),406);
 
             if (!empty($giftcode_response->getRedeemUserId()))
-                throw new \Exception(trans('payment.responses.giftcode.used'));
+                throw new \Exception(trans('payment.responses.giftcode.used'),406);
 
             if (!empty($giftcode_response->getExpirationDate()) AND Carbon::parse($giftcode_response->getExpirationDate())->isPast())
-                throw new \Exception(trans('payment.responses.giftcode.expired'));
+                throw new \Exception(trans('payment.responses.giftcode.expired'),406);
 
             if (!empty($giftcode_response->getIsCanceled()))
-                throw new \Exception(trans('payment.responses.giftcode.canceled'));
+                throw new \Exception(trans('payment.responses.giftcode.canceled'),406);
 
             if(is_numeric($order_service->getRegistrationFeeInPf()) AND $order_service->getRegistrationFeeInPf() > 0 AND empty($giftcode_response->getRegistrationFeeInPf()))
-                throw new \Exception(trans('payment.responses.giftcode.giftcode-not-included-registration-fee'));
+                throw new \Exception(trans('payment.responses.giftcode.giftcode-not-included-registration-fee'),406);
 
             //Redeem giftcode
             $giftcode_response->setOrderId($order_service->getId());
             $redeem_giftcode = $giftcode_service->redeemGiftcode($giftcode_response, $invoice_request->getUser());
 
             if (!$redeem_giftcode->getRedeemUserId())
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
+                throw new \Exception(trans('payment.responses.something-went-wrong'),400);
 
             DB::commit();
             return [
@@ -103,7 +104,7 @@ class PaymentProcessor
             ];
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('PaymentService@payFromGiftcode error ' . $exception->getMessage());
+            Log::error('PaymentProcessor@payFromGiftcode error ' . $exception->getMessage());
             return [false,$exception->getMessage()];
         }
     }
@@ -122,13 +123,15 @@ class PaymentProcessor
             $wallet->setName(WalletNames::DEPOSIT);
             $balance = $wallet_service->getBalance($wallet)->getBalance();
             if ($balance < $invoice_request->getPfAmount())
-                throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
+                throw new \Exception(trans('payment.responses.wallet.not-enough-balance'),406);
 
             $package_service = app(PackageService::class);
             $package_object = $package_service->packageFullById(app(Id::class)->setId($order_object->getPackageId()));
 
-            $user_member_id = auth()->user()->member_id;
-            if(auth()->user()->id != $order_object->getUserId()) {
+            $user = auth()->check() ? auth()->user() : User::query()->find($order_object->getUserId());
+            $user_member_id = $user->member_id;
+
+            if($user->id != $order_object->getUserId()) {
                 $user_service = app(UserService::class);
                 $user_object = $user_service->findByIdOrFail($order_object->getUserId());
                 $user_member_id = $user_object->member_id;
@@ -151,7 +154,7 @@ class PaymentProcessor
 
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
+                throw new \Exception(trans('payment.responses.something-went-wrong'),400);
 
             DB::commit();
             return [
@@ -160,7 +163,7 @@ class PaymentProcessor
             ];
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('PaymentService@payFromDepositWallet error Line =>  ' . $exception->getLine() . ' | MSG => ' . $exception->getMessage());
+            Log::error('PaymentProcessor@payFromDepositWallet error Line =>  ' . $exception->getLine() . ' | MSG => ' . $exception->getMessage());
             return [false,$exception->getMessage()];
         }
     }
@@ -221,7 +224,7 @@ class PaymentProcessor
             return [false,trans('payment.responses.payment-service.btc-pay-server-error')];
         } catch (\Throwable $exception) {
             DB::rollBack();
-            Log::error('PaymentService@payBtcServer error ' . $exception->getMessage());
+            Log::error('PaymentProcessor@payBtcServer error ' . $exception->getMessage());
             return [false,trans('payment.responses.payment-service.btc-pay-server-error')];
         }
     }

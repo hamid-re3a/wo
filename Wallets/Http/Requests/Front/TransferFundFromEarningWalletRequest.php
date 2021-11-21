@@ -92,7 +92,7 @@ class TransferFundFromEarningWalletRequest extends FormRequest
             }
         } catch (\Throwable $exception){
             Log::error('Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest@prepare => ' . $exception->getMessage());
-            throw new \Exception();
+            throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
         }
     }
 

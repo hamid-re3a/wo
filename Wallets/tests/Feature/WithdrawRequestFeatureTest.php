@@ -84,9 +84,7 @@ class WithdrawRequestFeatureTest extends WalletTest
         $payment_currency = $this->addPaymentCurrency();
         $this->mockWithdrawServices();
 
-
-        $user = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user);
+        $bank_service = new BankService($this->user);
         $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 30000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
@@ -139,8 +137,8 @@ class WithdrawRequestFeatureTest extends WalletTest
         Mail::fake();
         $this->mockWithdrawServices();
         $payment_currency = $this->addPaymentCurrency();
-        $user = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user);
+
+        $bank_service = new BankService($this->user);
         $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 300000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.create'), [
@@ -179,7 +177,6 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function process_withdraw_request()
     {
-        $this->refreshDatabase();
         $this->create_withdraw_request_sufficient_balance();
         $withdraw_request = WithdrawProfit::query()->first();
         PayoutFacade::shouldReceive('pay')->andReturn([true,null]);
@@ -196,8 +193,7 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function reject_withdraw_request()
     {
-        $this->refreshDatabase();
-        $this->create_withdraw_request_sufficient_balance();
+        $this->process_withdraw_request();
         $withdraw_request = WithdrawProfit::query()->first();
         $response = $this->patch(route('wallets.admin.withdraw-requests.update'), [
             'ids' => [$withdraw_request->uuid],
@@ -212,9 +208,7 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function revert_withdraw_request()
     {
-        $this->refreshDatabase();
         $this->mockWithdrawServices();
-        $this->create_withdraw_request_sufficient_balance();
         $this->reject_withdraw_request();
         $withdraw_request = WithdrawProfit::query()->where('status', WALLET_WITHDRAW_COMMAND_REJECT)->first();
         $response = $this->patch(route('wallets.admin.withdraw-requests.update'), [

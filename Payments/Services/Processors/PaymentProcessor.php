@@ -105,7 +105,9 @@ class PaymentProcessor
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('PaymentProcessor@payFromGiftcode error ' . $exception->getMessage());
-            return [false,$exception->getMessage()];
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'giftcode' => [$exception->getMessage()],
+            ]);
         }
     }
 

@@ -88,7 +88,7 @@ class Invoice extends Model
 
     public function getFullStatusAttribute()
     {
-        return $this->status .' '. $this->additional_status;
+        return $this->status . ' ' . $this->additional_status;
     }
 
     /**
@@ -97,13 +97,78 @@ class Invoice extends Model
 
     public function transactions()
     {
-        return $this->hasMany(InvoiceTransaction::class,'invoice_id','id');
+        return $this->hasMany(InvoiceTransaction::class, 'invoice_id', 'id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class,'user_id','id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function refunder()
+    {
+        return $this->belongsTo(User::class, 'refunder_user_id', 'id');
+    }
+
+    /**
+     * Mutators
+     */
+
+    public function getTypeAttribute()
+    {
+        switch ($this->attributes['payable_type']) {
+            case 'Order':
+                return 'order';
+                break;
+            case 'DepositWallet' :
+                return 'wallet';
+                break;
+            default:
+                return 'Unknown';
+                break;
+        }
+    }
+
+    /**
+     * Methods
+     */
+    public function getInvoiceService()
+    {
+        $invoice_service = app(\Payments\Services\Invoice::class);
+        $invoice_service->setPayableType((string)$this->attributes['payable_type']);
+        $invoice_service->setPayableId((int)$this->attributes['payable_id']);
+        $invoice_service->setUserId((int)$this->attributes['user_id']);
+        $invoice_service->setPfAmount((double)$this->attributes['pf_amount']);
+        $invoice_service->setAmount((double)$this->attributes['amount']);
+        $invoice_service->setTransactionsId((string)$this->attributes['transaction_id']);
+        $invoice_service->setCheckoutLink((string)$this->attributes['checkout_link']);
+        $invoice_service->setStatus((string)$this->attributes['status']);
+        $invoice_service->setAdditionalStatus((string)$this->attributes['additional_status']);
+
+        $invoice_service->setIsPaid((boolean)$this->attributes['is_paid']);
+
+        $invoice_service->setPaidAmount((double)$this->attributes['paid_amount']);
+        $invoice_service->setDueAmount((double)$this->attributes['due_amount']);
+        $invoice_service->setDepositAmount((double)$this->attributes['deposit_amount']);
+        $invoice_service->setExpirationTime((string)$this->attributes['expiration_time']);
+
+        $invoice_service->setPaymentType((string)$this->attributes['payment_type']);
+        $invoice_service->setPaymentCurrency((string)$this->attributes['payment_currency']);
+        $invoice_service->setPaymentDriver((string)$this->attributes['payment_driver']);
+
+        $invoice_service->setCreatedAt((string)$this->attributes['created_at']);
+        $invoice_service->setUpdatedAt((string)$this->attributes['updated_at']);
+
+        $invoice_service->setUser($this->user->getGrpcMessage());
+        return $invoice_service;
+
+    }
+
+    /**
+     * Scopes
+     */
+
+
 
     public function scopeOrders($query)
     {
@@ -153,64 +218,5 @@ class Invoice extends Model
     public function scopeNotExpired($query)
     {
         return $query->where('expiration_time','>',now()->toDateTimeString());
-    }
-
-    public function refunder()
-    {
-        return $this->belongsTo(User::class,'refunder_user_id','id');
-    }
-
-    /**
-     * Mutators
-     */
-
-    public function getTypeAttribute()
-    {
-        switch($this->attributes['payable_type']) {
-            case 'Order':
-                return 'order';
-                break;
-            case 'DepositWallet' :
-                return 'wallet';
-                break;
-            default:
-                return 'Unknown';
-                break;
-        }
-    }
-
-    /**
-     * Methods
-     */
-    public function getInvoiceService()
-    {
-        $invoice_service = app(\Payments\Services\Invoice::class);
-        $invoice_service->setPayableType((string)$this->attributes['payable_type']);
-        $invoice_service->setPayableId((int)$this->attributes['payable_id']);
-        $invoice_service->setUserId((int)$this->attributes['user_id']);
-        $invoice_service->setPfAmount((double)$this->attributes['pf_amount']);
-        $invoice_service->setAmount((double)$this->attributes['amount']);
-        $invoice_service->setTransactionsId((string)$this->attributes['transaction_id']);
-        $invoice_service->setCheckoutLink((string)$this->attributes['checkout_link']);
-        $invoice_service->setStatus((string)$this->attributes['status']);
-        $invoice_service->setAdditionalStatus((string)$this->attributes['additional_status']);
-
-        $invoice_service->setIsPaid((boolean)$this->attributes['is_paid']);
-
-        $invoice_service->setPaidAmount((double)$this->attributes['paid_amount']);
-        $invoice_service->setDueAmount((double)$this->attributes['due_amount']);
-        $invoice_service->setDepositAmount((double)$this->attributes['deposit_amount']);
-        $invoice_service->setExpirationTime((string)$this->attributes['expiration_time']);
-
-        $invoice_service->setPaymentType((string)$this->attributes['payment_type']);
-        $invoice_service->setPaymentCurrency((string)$this->attributes['payment_currency']);
-        $invoice_service->setPaymentDriver((string)$this->attributes['payment_driver']);
-
-        $invoice_service->setCreatedAt((string)$this->attributes['created_at']);
-        $invoice_service->setUpdatedAt((string)$this->attributes['updated_at']);
-
-        $invoice_service->setUser($this->user->getGrpcMessage());
-        return $invoice_service;
-
     }
 }

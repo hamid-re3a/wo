@@ -23,14 +23,16 @@ class InvoiceService
            DB::beginTransaction();
            $invoice = $this->invoice_repository->cancelInvoice($transaction_id);
 
-           //Cancel Order
-           $order_service = app(OrderService::class);
-           $id = new Id();
-           $id->setId($invoice->payable_id);
-           $ack = $order_service->cancelOrder($id);
-           if($ack->getStatus()) {
-               DB::commit();
-               return true;
+           if($invoice->payment_type == 'Order') {
+               //Cancel Order
+               $order_service = app(OrderService::class);
+               $id = new Id();
+               $id->setId($invoice->payable_id);
+               $ack = $order_service->cancelOrder($id);
+               if($ack->getStatus()) {
+                   DB::commit();
+                   return true;
+               }
            }
 
            throw new \Exception();

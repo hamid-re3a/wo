@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Orders\Services\Grpc\Id;
 use Orders\Services\OrderService;
+use Payments\Jobs\CancelInvoiceJob;
 use Payments\Repository\InvoiceRepository;
 
 class InvoiceService
@@ -29,18 +30,13 @@ class InvoiceService
                $id = new Id();
                $id->setId($invoice->payable_id);
                $ack = $order_service->cancelOrder($id);
-               if($ack->getStatus()) {
-                   DB::commit();
-                   return true;
-               }
+               if(!$ack->getStatus())
+                   throw new \Exception();
            }
 
-           if($invoice->payable_type == 'DepositWallet') {
-               DB::commit();
-               return true;
-           }
-
-           throw new \Exception();
+           CancelInvoiceJob::dispatch($invoice);
+           DB::commit();
+           return true;
 
 
        } catch (\Throwable $exception) {

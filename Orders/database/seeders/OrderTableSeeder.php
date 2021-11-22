@@ -21,7 +21,7 @@ class OrderTableSeeder extends Seeder
     {
         // Load local seeder
         $data = [];
-        if (!in_array(app()->environment(), ['production'])) {
+        if (!in_array(app()->environment(), ['production']) AND Order::query()->count() == 0) {
 
             $data = [
                 ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],

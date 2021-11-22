@@ -32,22 +32,23 @@ class SettingTableSeeder extends Seeder
         foreach (PAYMENT_EMAIL_CONTENT_SETTINGS as $key => $setting) {
 
             if (!EmailContentSetting::query()->whereKey($key)->exists()) {
-                if(filter_var(env('MAIL_FROM', $setting['from']), FILTER_VALIDATE_EMAIL))
-                    $from =  env('MAIL_FROM', $setting['from']);
+                if (filter_var(env('MAIL_FROM', $setting['from']), FILTER_VALIDATE_EMAIL))
+                    $from = env('MAIL_FROM', $setting['from']);
                 else
                     $from = $setting['from'];
 
-                EmailContentSetting::query()->create([
-                    'key' => $key,
-                    'is_active' => $setting['is_active'],
-                    'subject' => $setting['subject'],
-                    'from' => env('MAIL_FROM',$from),
-                    'from_name' => $setting['from_name'],
-                    'body' => $setting['body'],
-                    'variables' => $setting['variables'],
-                    'variables_description' => $setting['variables_description'],
-                    'type' => $setting['type'],
-                ]);
+                EmailContentSetting::query()->updateOrInsert(
+                    ['key' => $key],
+                    [
+                        'is_active' => $setting['is_active'],
+                        'subject' => $setting['subject'],
+                        'from' => env('MAIL_FROM', $from),
+                        'from_name' => $setting['from_name'],
+                        'body' => $setting['body'],
+                        'variables' => $setting['variables'],
+                        'variables_description' => $setting['variables_description'],
+                        'type' => $setting['type'],
+                    ]);
             }
         }
 

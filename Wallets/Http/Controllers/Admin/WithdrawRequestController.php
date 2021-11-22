@@ -136,6 +136,18 @@ class WithdrawRequestController extends Controller
     }
 
     /**
+     * Overall vs time chart
+     * @group Admin User > Wallets > Withdraw Requests
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function overallAmountVsTimeChart(ChartTypeRequest $request)
+    {
+        return api()->success(null, $this->withdraw_repository->getOverallTimeChart($request->get('type')));
+    }
+
+    /**
      * Pending amount vs time chart
      * @group Admin User > Wallets > Withdraw Requests
      * @param ChartTypeRequest $request

@@ -35,6 +35,11 @@ class InvoiceService
                }
            }
 
+           if($invoice->payable_type == 'DepositWallet') {
+               DB::commit();
+               return true;
+           }
+
            throw new \Exception();
 
 

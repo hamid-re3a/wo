@@ -23,7 +23,7 @@ class InvoiceService
            DB::beginTransaction();
            $invoice = $this->invoice_repository->cancelInvoice($transaction_id);
 
-           if($invoice->payment_type == 'Order') {
+           if($invoice->payable_type == 'Order') {
                //Cancel Order
                $order_service = app(OrderService::class);
                $id = new Id();

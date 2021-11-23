@@ -12,7 +12,6 @@ class EmailContentSeeder extends Seeder
         if (defined('GIFTCODE_EMAIL_CONTENTS') AND is_array(GIFTCODE_EMAIL_CONTENTS)) {
 
             $now = now()->toDateTimeString();
-            $emails = [];
             foreach (GIFTCODE_EMAIL_CONTENTS AS $key => $email) {
                 if (filter_var(env('MAIL_FROM', $email['from']), FILTER_VALIDATE_EMAIL))
                     $from = env('MAIL_FROM', $email['from']);

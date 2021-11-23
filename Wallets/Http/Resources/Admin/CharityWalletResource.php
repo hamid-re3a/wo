@@ -1,13 +1,13 @@
 <?php
 
-namespace Wallets\Http\Resources;
+namespace Wallets\Http\Resources\Admin;
 
 use Bavix\Wallet\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Wallets\Repositories\WalletRepository;
 
-class DepositWalletResource extends JsonResource
+class CharityWalletResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -26,9 +26,8 @@ class DepositWalletResource extends JsonResource
         return [
             'name' => $wallet->name,
             'balance' => (double)$wallet->balanceFloat,
-            'transactions_count' => (int) $wallet->transactions()->where('wallet_id','=', $wallet->id)->count(),
-            'transfers_count' => (int) $wallet->transfers()->where('from_id','=', $wallet->id)->count(),
-            'total_transfer' => (double)$total_transfer,
+            'transactions_received_count' => (int) $wallet->transactions()->where('wallet_id','=', $wallet->id)->where('type','=','deposit')->count(),
+            'transactions_spent_count' => (int) $wallet->transactions()->where('wallet_id','=', $wallet->id)->where('type','=','withdraw')->count(),
             'total_received' => (double)$total_received,
             'total_spent' => (double)$total_spent
         ];

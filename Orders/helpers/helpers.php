@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 const ORDER_PLAN_PURCHASE = 'ORDER_PLAN_PURCHASE';
 const ORDER_PLAN_START = 'ORDER_PLAN_START';
 const ORDER_PLAN_SPECIAL = 'ORDER_PLAN_SPECIAL';
@@ -12,16 +13,6 @@ const ORDER_PLANS = [
     ORDER_PLAN_SPECIAL,
     ORDER_PLAN_COMPANY
 ];
-
-if (!function_exists('getMLMGrpcClient')) {
-    function getMLMGrpcClient()
-    {
-        return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL','staging-api-gateway.janex.org:9598'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-
 
 if (!function_exists('chartMaker')) {
     function chartMaker($duration_type, $repo_function, $sub_function)
@@ -78,5 +69,18 @@ if (!function_exists('chartMaker')) {
                 break;
         }
 
+    }
+}
+
+if(!function_exists('checkTransactionPassword')) {
+    function checkTransactionPassword($user_id,$password) : bool{
+        $request = new UserTransactionPassword();
+        $request->setUserId($user_id);
+        $request->setTransactionPassword($password);
+        $ack = GatewayClientFacade::checkTransactionPassword($request);
+        if($ack->getStatus())
+            return true;
+
+        return false;
     }
 }

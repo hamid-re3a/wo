@@ -39,7 +39,7 @@ class WithdrawRequestController extends Controller
                     config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
                     config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
             if (!$bps_wallet_response->ok())
-                throw new \Exception(trans('payment.responses.payment-service.btc-pay-server-error'));
+                throw new \Exception(trans('payment.responses.payment-service.btc-pay-server-error'),400);
 
             $bps_wallet_balance = $bps_wallet_response->json()['confirmedBalance'];
 
@@ -51,7 +51,9 @@ class WithdrawRequestController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('Wallets\Http\Controllers\Admin\WithdrawRequestController@walletBalance => ' . $exception->getMessage());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -101,7 +103,9 @@ class WithdrawRequestController extends Controller
             ]);
         } catch (\Throwable $exception) {
             Log::error('Admin/WithdrawRequestController@index => ' . serialize(request()->all()));
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -125,8 +129,22 @@ class WithdrawRequestController extends Controller
         } catch (\Throwable $exception) {
             DB::rollback();
             Log::error('Admin/WithdrawRequestController@update => ' . serialize($request->all()));
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
+    }
+
+    /**
+     * Overall vs time chart
+     * @group Admin User > Wallets > Withdraw Requests
+     * @param ChartTypeRequest $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function overallAmountVsTimeChart(ChartTypeRequest $request)
+    {
+        return api()->success(null, $this->withdraw_repository->getOverallTimeChart($request->get('type')));
     }
 
     /**

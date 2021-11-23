@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Orders\Http\Requests\Front\Order\OrderRequest;
 use Orders\Models\Order;
-use Orders\Services\MlmClientFacade;
+use MLM\Services\MlmClientFacade;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\Grpc\Invoice;

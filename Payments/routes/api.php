@@ -43,8 +43,9 @@ Route::name('payments.')->group(function(){
 
         Route::name('invoices.')->prefix("invoices")->group(function () {
             Route::get('', [AdminInvoiceController::class, 'index'])->name('index');
-            Route::get('over-paid', [AdminInvoiceController::class, 'overPaidInvoices'])->name('overPaidInvoices');
-            Route::post('refund-over-paid', [AdminInvoiceController::class, 'refundOverPaidInvoice'])->name('refundOverPaidInvoice');
+            Route::get('over-paid', [AdminInvoiceController::class, 'overPaidInvoices'])->name('over-paid-invoices');
+            Route::post('refund-over-paid', [AdminInvoiceController::class, 'refundOverPaidInvoice'])->name('refund-over-paid-invoice');
+            Route::post('cancel-over-paid', [AdminInvoiceController::class, 'cancelOverPaidInvoice'])->name('cancel-over-paid-invoice');
             Route::get('pending-order', [AdminInvoiceController::class, 'pendingOrderInvoices'])->name('pending-order-invoice');
             Route::get('pending-wallet', [AdminInvoiceController::class, 'pendingWalletInvoices'])->name('pending-wallet-invoice');
             Route::post('show', [AdminInvoiceController::class, 'show'])->name('show');

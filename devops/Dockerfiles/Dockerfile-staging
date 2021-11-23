@@ -1,7 +1,7 @@
 FROM webdevops/php-nginx:7.4
 
 # php modules
-RUN apt update -y 
+RUN apt update -y
 RUN apt-get update && apt-get install -y \
     curl \
     nano \
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    zip \ 
+    zip \
     unzip\
     libcurl4-openssl-dev
 

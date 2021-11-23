@@ -27,6 +27,9 @@ class UserFactory extends Factory
             'username' => $this->faker->userName,
             'email' => $this->faker->unique()->safeEmail,
             'member_id' => mt_rand(123456,999999),
+            'sponsor_id' => 1,
+            'block_type' => null,
+            'is_deactivate' => null
         ];
     }
 }

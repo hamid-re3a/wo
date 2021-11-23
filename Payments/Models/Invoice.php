@@ -17,6 +17,7 @@ use User\Models\User;
  * @property string|null $checkout_link
  * @property string|null $status
  * @property string $additional_status
+ * @property string $refund_status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $full_status
@@ -26,9 +27,12 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notPaid()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOver()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOverNotRefunded()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOverDepositToAdmin()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice refunded()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice expired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notExpired()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice notCanceled()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice canceled()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice query()
@@ -87,7 +91,7 @@ class Invoice extends Model
 
     public function getFullStatusAttribute()
     {
-        return $this->status .' '. $this->additional_status;
+        return $this->status . ' ' . $this->additional_status;
     }
 
     /**
@@ -96,67 +100,17 @@ class Invoice extends Model
 
     public function transactions()
     {
-        return $this->hasMany(InvoiceTransaction::class,'invoice_id','id');
+        return $this->hasMany(InvoiceTransaction::class, 'invoice_id', 'id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class,'user_id','id');
-    }
-
-    public function scopeOrders($query)
-    {
-        return $query->where('payable_type','=','Order');
-    }
-
-    public function scopeNotCanceled($query)
-    {
-        return $query->where('status','<>','user_cancel');
-    }
-
-    public function scopeDepositWallets($query)
-    {
-        return $query->where('payable_type','=','DepositWallet');
-    }
-
-    public function scopePaid($query)
-    {
-        return $query->where('is_paid','=',true);
-    }
-
-    public function scopeNotPaid($query)
-    {
-        return $query->where('is_paid','=',false);
-    }
-
-    public function scopePaidOver($query)
-    {
-        return $query->where('additional_status','=','PaidOver');
-    }
-
-    public function scopePaidOverNotRefunded($query)
-    {
-        return $query->where('additional_status','=','PaidOver')->whereNull('is_refund_at');
-    }
-
-    public function scopeRefunded($query)
-    {
-        return $query->whereNotNull('is_refund_at');
-    }
-
-    public function scopeExpired($query)
-    {
-        return $query->where('expiration_time','<',now()->toDateTimeString());
-    }
-
-    public function scopeNotExpired($query)
-    {
-        return $query->where('expiration_time','>',now()->toDateTimeString());
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function refunder()
     {
-        return $this->belongsTo(User::class,'refunder_user_id','id');
+        return $this->belongsTo(User::class, 'refunder_user_id', 'id');
     }
 
     /**
@@ -165,7 +119,7 @@ class Invoice extends Model
 
     public function getTypeAttribute()
     {
-        switch($this->attributes['payable_type']) {
+        switch ($this->attributes['payable_type']) {
             case 'Order':
                 return 'order';
                 break;
@@ -211,5 +165,77 @@ class Invoice extends Model
         $invoice_service->setUser($this->user->getGrpcMessage());
         return $invoice_service;
 
+    }
+
+    public function getRefundableAmount() : float
+    {
+        $total_paid_amount_in_pf = usdToPf($this->attributes['paid_amount'] * $this->attributes['rate']);
+        return (double)$total_paid_amount_in_pf - $this->attributes['pf_amount'];
+    }
+
+    /**
+     * Scopes
+     */
+
+
+
+    public function scopeOrders($query)
+    {
+        return $query->where('payable_type','=','Order');
+    }
+
+    public function scopeNotCanceled($query)
+    {
+        return $query->where('status','<>','user_cancel');
+    }
+
+    public function scopeCanceled($query)
+    {
+        return $query->where('status','=','user_cancel');
+    }
+
+    public function scopeDepositWallets($query)
+    {
+        return $query->where('payable_type','=','DepositWallet');
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('is_paid','=',true);
+    }
+
+    public function scopeNotPaid($query)
+    {
+        return $query->where('is_paid','=',false);
+    }
+
+    public function scopePaidOver($query)
+    {
+        return $query->where('additional_status','=','PaidOver');
+    }
+
+    public function scopePaidOverNotRefunded($query)
+    {
+        return $query->where('additional_status','=','PaidOver')->whereNull('is_refund_at');
+    }
+
+    public function scopePaidOverDepositTiAdmin($query)
+    {
+        return $query->where('additional_status','=','PaidOver')->whereNotNull('is_refund_at')->where('status','');
+    }
+
+    public function scopeRefunded($query)
+    {
+        return $query->whereNotNull('is_refund_at');
+    }
+
+    public function scopeExpired($query)
+    {
+        return $query->where('expiration_time','<',now()->toDateTimeString());
+    }
+
+    public function scopeNotExpired($query)
+    {
+        return $query->where('expiration_time','>',now()->toDateTimeString());
     }
 }

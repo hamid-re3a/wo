@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -35,9 +36,7 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
+        //
     }
 
 
@@ -65,6 +64,5 @@ class Handler extends ExceptionHandler
         }
         $code = (int)$e->getCode();
         return api()->error($e->getMessage(), [], ($code > 599 || $code < 100) ? 400 : $code);
-
     }
 }

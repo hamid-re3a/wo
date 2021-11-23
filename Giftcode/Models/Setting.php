@@ -11,6 +11,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $value
  * @property double $price
+ *
+ *
+ *  * @method static \Illuminate\Database\Eloquent\Builder|Setting whereName($value)
+ *  * @method static \Illuminate\Database\Eloquent\Builder|Setting whereUserCode($value)
+
  */
 class Setting extends Model
 {

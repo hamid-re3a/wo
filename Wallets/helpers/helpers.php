@@ -2,6 +2,8 @@
 
 
 use Illuminate\Support\Carbon;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 
 if (!function_exists('getWalletSetting')) {
 
@@ -35,7 +37,6 @@ if (!function_exists('getWalletEmailContent')) {
             if($check = collect(cache('wallet_email_contents'))->where('key', $key)->first())
                 $email = $check;
 
-
         if (empty($email) AND $email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
             $email = $email->toArray();
 
@@ -64,24 +65,6 @@ if (!function_exists('formatCurrencyFormat')) {
 //            $value = floatval(preg_replace('/[^\d.]/', '', number_format($value,2)));
 
         return $value;
-    }
-}
-
-if (!function_exists('getMLMGrpcClient')) {
-    function getMLMGrpcClient()
-    {
-        return new \MLM\Services\Grpc\MLMServiceClient(env('MLM_GRPC_URL', 'staging-api-gateway.janex.org:9598'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-
-if (!function_exists('getKycGrpcClient')) {
-    function getKycGrpcClient()
-    {
-        return new \Kyc\Services\Grpc\KycServiceClient(env('KYC_GRPC_URL', 'staging.janex.org:9597'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
     }
 }
 
@@ -159,6 +142,7 @@ if(!function_exists('calculateTransferFee')) {
         return [(double)$total, (double)$transfer_fee];
     }
 }
+
 if(!function_exists('calculateWithdrawalFee')) {
     function calculateWithdrawalFee($amount,$currency): array
     {
@@ -176,9 +160,33 @@ if(!function_exists('calculateWithdrawalFee')) {
                 $fee = 0;
                 break;
         }
-        $fee = $fix_or_percentage == 'fixed' ? (double)$fee : ((double)$amount * (double)$fee / 100);
+        $fee = $fix_or_percentage == 'fixed' ? (float)$fee : ((float)$amount * (float)$fee / 100);
 
-        return [(double)($fee+$amount),(double)$fee];
+        return [(float)($fee+$amount),(float)$fee];
+    }
+}
+
+if(!function_exists('calculateCharity')) {
+    function calculateCharity($amount): float
+    {
+        $fix_or_percentage = getWalletSetting('charity_wallet_fixed_or_percentage');
+        $fee = getWalletSetting('charity_wallet_fee');
+
+        return $fix_or_percentage == 'fixed' ? (float)$fee : ((float)$amount * (float)$fee / 100);
+
+    }
+}
+
+if(!function_exists('checkTransactionPassword')) {
+    function checkTransactionPassword($user_id,$password) : bool{
+        $request = new UserTransactionPassword();
+        $request->setUserId($user_id);
+        $request->setTransactionPassword($password);
+        $ack = GatewayClientFacade::checkTransactionPassword($request);
+        if($ack->getStatus())
+            return true;
+
+        return false;
     }
 }
 

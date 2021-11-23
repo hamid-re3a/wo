@@ -4,18 +4,17 @@
 namespace Wallets\Repositories;
 
 
-use Giftcode\Models\Package;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Mockery\Exception;
+use Payments\Services\Processors\PayoutFacade;
 use Payments\Services\Processors\PayoutProcessor;
 use User\Models\User;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 use User\Services\Grpc\WalletInfo;
-use User\Services\Grpc\WalletType;
 use Wallets\Models\Transaction;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Models\WithdrawProfitHistory;
@@ -45,13 +44,21 @@ class WithdrawRepository
     {
         try {
             if (!getWalletSetting('withdrawal_request_is_enabled'))
-                throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'));
+                throw new \Exception(trans('wallet.withdraw-profit-request.withdrawal-requests-is-not-active'),400);
 
-            /**@var $user User */
             $user = array_key_exists('user_id', $request) ? User::query()->find($request['user_id']) : auth()->user();
             $request['user_id'] = $user->id;
-            $this->bankService = new BankService($user);
 
+            //Check Transaction Password if request is not for reverting
+            if ($user->id == auth()->user()->id AND !array_key_exists('is_revert',$request)) {
+                if (!checkTransactionPassword($user->id,$request['transaction_password']))
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'transaction_password' => [trans('wallet.withdraw-profit-request.incorrect-transaction-password')],
+                    ]);
+            }
+
+            /**@var $user User */
+            $this->bankService = new BankService($user);
             switch ($request['currency']) {
                 case 'BTC' :
                     return $this->withdrawBTC($request);
@@ -80,7 +87,6 @@ class WithdrawRepository
             }
 
             list($total, $fee) = calculateWithdrawalFee($request['amount'], $request['currency']);
-
             //Check user balance again
             if ($this->bankService->getBalance($this->user_wallet) < $total)
                 throw new \Exception(trans('wallet.responses.not-enough-balance'), 406);
@@ -109,6 +115,8 @@ class WithdrawRepository
             ]);
 
         } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\withdrawBTC => ' . $exception->getMessage());
+            Log::error('Wallets\Repositories\withdrawBTC => ' . serialize($request));
             throw $exception;
         }
 
@@ -116,23 +124,27 @@ class WithdrawRepository
 
     public function update(array $validated_request, Collection $withdrawProfitRequests)
     {
-        switch ($validated_request['status']) {
-            case WALLET_WITHDRAW_COMMAND_PROCESS :
-                $this->pay($withdrawProfitRequests->where('status', '=', WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING));
-                break;
-            case WALLET_WITHDRAW_COMMAND_REJECT :
-                $this->rejectWithdrawRequest($validated_request, $withdrawProfitRequests);
-                break;
-            case WALLET_WITHDRAW_COMMAND_REVERT :
-                $this->revertWithdrawRequests($withdrawProfitRequests);
-                break;
-            case WALLET_WITHDRAW_COMMAND_POSTPONE:
-                $this->updateModel($withdrawProfitRequests->where('status',WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING)->pluck('id')->toArray(), [
-                    'status' => WALLET_WITHDRAW_COMMAND_POSTPONE,
-                    'postponed_to' => Carbon::parse($validated_request['postponed_to'])->toDateTimeString(),
-                    'act_reason' => isset($validated_request['act_reason']) ? $validated_request['act_reason'] : null
-                ]);
-                break;
+        try {
+            switch ($validated_request['status']) {
+                case WALLET_WITHDRAW_COMMAND_PROCESS :
+                    $this->pay($withdrawProfitRequests->where('status', '=', WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING));
+                    break;
+                case WALLET_WITHDRAW_COMMAND_REJECT :
+                    $this->rejectWithdrawRequest($validated_request, $withdrawProfitRequests);
+                    break;
+                case WALLET_WITHDRAW_COMMAND_REVERT :
+                    $this->revertWithdrawRequests($withdrawProfitRequests);
+                    break;
+                case WALLET_WITHDRAW_COMMAND_POSTPONE:
+                    $this->updateModel($withdrawProfitRequests->where('status', WALLET_WITHDRAW_REQUEST_STATUS_UNDER_REVIEW_STRING)->pluck('id')->toArray(), [
+                        'status' => WALLET_WITHDRAW_COMMAND_POSTPONE,
+                        'postponed_to' => Carbon::parse($validated_request['postponed_to'])->toDateTimeString(),
+                        'act_reason' => isset($validated_request['act_reason']) ? $validated_request['act_reason'] : null
+                    ]);
+                    break;
+            }
+        } catch (\Throwable $exception) {
+            throw $exception;
         }
     }
 
@@ -144,17 +156,11 @@ class WithdrawRepository
     public function pay($withdrawProfits, $dispatchType = 'dispatchSync')
     {
         try {
-            if (is_array($withdrawProfits) AND array_key_exists('currency', $withdrawProfits)) {
-                $currency = $withdrawProfits['currency'];
-                $amount = $withdrawProfits['crypto_amount'];
-                $withdrawProfits = collect()->push($withdrawProfits);
-            } else if ($withdrawProfits instanceof Collection)
-                list($currency, $amount) = $this->checkWithdrawRequestsForPayOut($withdrawProfits);
-            else
-                throw new \Exception(trans('wallet.responses.something-went-wrong'));
 
-            $this->checkBPSWalletBalance($amount);
-            $this->payout_processor->pay($currency, $withdrawProfits, $dispatchType);
+            list($flag,$response) = PayoutFacade::pay($withdrawProfits,$dispatchType);
+            if(!$flag)
+                throw new \Exception($response,406);
+
         } catch (\Throwable $exception) {
             throw $exception;
         }
@@ -207,42 +213,65 @@ class WithdrawRepository
 
     public function revertWithdrawRequests(Collection $withdrawProfitRequests)
     {
-        $records_have_to_update = [];
-        foreach ($withdrawProfitRequests AS $withdrawProfitRequest) {
-            //Check if request is marked as rejected
-            if ($withdrawProfitRequest->getRawOriginal('status') != WALLET_WITHDRAW_COMMAND_REJECT)
-                throw new Exception(trans('wallet.withdraw-profit-request.you-can-revert-a-rejected-request', [
-                    'uuid' => $withdrawProfitRequest->uuid
-                ]), 406);
+        try {
+            $records_have_to_update = [];
+            foreach ($withdrawProfitRequests AS $withdrawProfitRequest) {
+                //Check if request is marked as rejected
+                if ($withdrawProfitRequest->getRawOriginal('status') != WALLET_WITHDRAW_COMMAND_REJECT)
+                    throw new Exception(trans('wallet.withdraw-profit-request.you-can-revert-a-rejected-request', [
+                        'uuid' => $withdrawProfitRequest->uuid
+                    ]), 406);
+                //Make a fresh withdraw request
+                $request = $withdrawProfitRequest->toArray();
+                $request['is_revert'] = true;
+                $request['amount'] = $request['pf_amount'];
+                $this->makeWithdrawRequest($request);
+                $records_have_to_update[] = $withdrawProfitRequest->id;
+            }
+            $this->updateModel($records_have_to_update, [
+                'status' => WALLET_WITHDRAW_COMMAND_REVERT,
+                'is_update_email_sent' => true //Ignore sending update email
+            ]);
+        } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\WithdrawRepository@revertWithdrawRequests => ' . $exception->getMessage());
+            throw $exception;
 
-            //Make a fresh withdraw request
-            $request = $withdrawProfitRequest->toArray();
-            $request['is_revert'] = true;
-            $request['amount'] = $request['pf_amount'];
-            $this->makeWithdrawRequest($request);
-            $records_have_to_update[] = $withdrawProfitRequest->id;
         }
-
-        $this->updateModel($records_have_to_update, [
-            'status' => WALLET_WITHDRAW_COMMAND_REVERT,
-            'is_update_email_sent' => true //Ignore sending update email
-        ]);
-
     }
 
-    public function checkWithdrawRequestsForPayOut(Collection $withdraw_requests): array
+    public function getOverallTimeChart($type, $user_id = null)
     {
         try {
-            /**
-             * @var $first_request WithdrawProfit
-             */
-            $first_request = $withdraw_requests->first();
-            if ($withdraw_requests->where('currency', '!=', $first_request->currency)->count())
-                throw new \Exception(trans('wallet.withdraw-profit-request.different-currency-payout'));
+            $that = $this;
+            $function_pending_requests = function($from_date, $to_date) use($that,$user_id) {
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WALLET_WITHDRAW_COMMAND_UNDER_REVIEW,$user_id);
+            };
 
-            return [$first_request->currency, $withdraw_requests->sum('crypto_amount')];
+            $function_processed_requests = function($from_date, $to_date) use($that,$user_id) {
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WALLET_WITHDRAW_COMMAND_PROCESS,$user_id);
+            };
+
+            $function_rejected_requests = function($from_date, $to_date) use($that,$user_id) {
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WALLET_WITHDRAW_COMMAND_REJECT,$user_id);
+            };
+
+            $sub_function = function ($collection, $intervals) {
+                /**@var $collection Collection */
+                return $collection->whereBetween('created_at', $intervals)->sum(function ($withdraw_request) {
+                    /**@var $withdraw_request WithdrawProfit */
+                    return $withdraw_request->pf_amount;
+                });
+            };
+
+            $result = [];
+            $result['pending'] = chartMaker($type, $function_pending_requests, $sub_function);
+            $result['processed'] = chartMaker($type, $function_processed_requests, $sub_function);
+            $result['rejected'] = chartMaker($type, $function_rejected_requests, $sub_function);
+            return $result;
+
         } catch (\Throwable $exception) {
-            throw $exception;
+            Log::error('Wallets\Repositories\WithdrawRepository@getOverallTimeChart => ' . $exception->getMessage());
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 
@@ -268,7 +297,7 @@ class WithdrawRepository
 
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getPendingAmountVsTimeChart => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 
@@ -294,36 +323,7 @@ class WithdrawRepository
 
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getPendingAmountVsTimeChart => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
-        }
-    }
-
-    public function checkBPSWalletBalance($amount)
-    {
-        try {
-            $wallet_response = Http::withHeaders(['Authorization' => config('payment.btc-pay-server-api-token')])
-                ->get(
-                    config('payment.btc-pay-server-domain') . 'api/v1/stores/' .
-                    config('payment.btc-pay-server-store-id') . '/payment-methods/OnChain/BTC/wallet/');
-
-
-            if ($wallet_response->ok() AND is_array($wallet_response->json()) AND isset($wallet_response->json()['confirmedBalance'])) {
-
-                $wallet_balance = $wallet_response->json()['confirmedBalance'];
-
-                if ((float)$amount > (float)$wallet_balance)
-                    throw new \Exception(trans('wallet.withdraw-profit-request.insufficient-bpb-wallet-balance', [
-                        'amount' => ($amount - $wallet_balance)
-                    ]));
-
-            } else {
-                Log::error('BPS Wallet balance => ' . $wallet_response->json()['confirmedBalance']);
-                throw new \Exception(trans('wallet.withdraw-profit-request.check-bps-or-blockchain.com-server', [
-                    'server' => 'BTCPayServer'
-                ]));
-            }
-        } catch (\Throwable $exception) {
-            throw $exception;
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 
@@ -369,7 +369,7 @@ class WithdrawRepository
             return $withdraw_profit_requests->whereBetween($date_field, [$from_date, $to_date])->get();
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 
@@ -388,7 +388,7 @@ class WithdrawRepository
             return $withdraw_profit_requests->whereBetween($date_field, [$from_date, $to_date])->get();
         } catch (\Throwable $exception) {
             Log::error('Wallets\Repositories\WithdrawRepository@getWithdrawRequestsByDateCollection => ' . $exception->getMessage());
-            throw new \Exception(trans('wallet.responses.something-went-wrong'));
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
         }
     }
 

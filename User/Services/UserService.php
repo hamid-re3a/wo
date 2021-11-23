@@ -25,13 +25,14 @@ class UserService
         $user_grpc = updateUserFromGrpcServer($id);
 
         if(!is_null($user_grpc) && $user_grpc->getId()){
+            $this->userUpdate($user_grpc);
             $user = $this->user_repository->findById($id);
             if(!is_null($user)){
                 return $user;
             }
         }
 
-        throw new \Exception('User not found => id ' . $id);
+        throw new \Exception('User not found => id ' . $id,400);
 
     }
     public function userUpdate(User $user)

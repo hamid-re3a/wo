@@ -21,16 +21,17 @@ class SettingsSeeder extends Seeder
             $settings = [];
             $now = now()->toDateTimeString();
             foreach (WALLET_SETTINGS AS $key => $setting)
-                $settings[] = [
-                    'name' => $key,
+                Setting::query()->firstOrCreate(
+                    ['name' => $key],
+                    [
                     'value' => $setting['value'],
                     'title' => $setting['title'],
                     'description' => $setting['description'],
                     'created_at' => $now,
                     'updated_at' => $now
-                ];
-            Setting::query()->upsert($settings,'name');
-            cache(['wallet_settings' => $settings]);
+                ]);
+            Setting::query()->upsert($settings, 'name');
+            cache(['wallet_settings' => WALLET_SETTINGS]);
         }
 
 

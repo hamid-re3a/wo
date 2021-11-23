@@ -1,6 +1,7 @@
 <?php
 
 use Orders\Services\Grpc\Order;
+use Packages\Services\Grpc\PackageCheck;
 
 require './vendor/autoload.php';
 
@@ -20,18 +21,37 @@ require './vendor/autoload.php';
 
 
 
-//$client = new \Packages\Services\Grpc\PackagesServiceClient('staging.janex.org:9596', [
-$client = new \Packages\Services\Grpc\PackagesServiceClient('127.0.0.1:9596', [
+//$client = new \Packages\Services\Grpc\PackagesServiceClient('development.dreamcometrue.ai:9596', [
+////$client = new \Packages\Services\Grpc\PackagesServiceClient('127.0.0.1:9596', [
+//    'credentials' => \Grpc\ChannelCredentials::createInsecure()
+//]);
+//$request = new \Packages\Services\Grpc\Id();
+//$request->setId((int)6);
+//
+//list($reply, $status) = $client->packageById($request)->wait();
+//
+//var_dump($status);
+//var_dump($reply->getId());
+//var_dump($reply->getName());
+
+
+
+
+
+$client = new \Packages\Services\Grpc\PackagesServiceClient('development.dreamcometrue.ai:9596', [
+//$client = new \Packages\Services\Grpc\PackagesServiceClient('127.0.0.1:9596', [
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);
-$request = new \Packages\Services\Grpc\Id();
-$request->setId((int)1);
 
-list($reply, $status) = $client->packageById($request)->wait();
+$packages = new PackageCheck;
+$packages->setPackageIndexId((int)6);
+$packages->setPackageToBuyId((int)2);
+
+list($reply, $status) = $client->packageIsInBiggestPackageCategory($packages)->wait();
 
 var_dump($status);
-var_dump($reply->getId());
-var_dump($reply->getName());
+var_dump($reply->getStatus());
+var_dump($reply->getMessage());
 
 
 

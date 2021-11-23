@@ -60,7 +60,7 @@ class BankService
     public function withdraw($wallet_name, $amount, $description = null, $type = 'Withdraw', $sub_type = null, $confirmed = true,$to_admin_wallet = true)
     {
         if (!$this->getWallet($wallet_name)->holder->canWithdraw($amount))
-            throw new \Exception();
+            throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
 
         $balance = $this->getBalance($wallet_name);
         $data = [
@@ -122,16 +122,17 @@ class BankService
 
     public function getTransactions($wallet_name)
     {
-        $transactionQuery = $this->owner->transactions()->whereHas('wallet', function ($query) use ($wallet_name) {
-            $query->where('name', $wallet_name);
-        });
+        $wallet = $this->getWallet($wallet_name);
+        $transactionQuery = $this->owner->transactions()->where('wallet_id','=',$wallet->id);
 
         if (request()->has('transaction_id'))
-            $transactionQuery->where('uuid', request()->get('transaction_id'));
+            $transactionQuery->where('uuid', 'LIKE','%'. request()->get('transaction_id') .'%');
 
         if (request()->has('type'))
-            $transactionQuery->whereHas('metaData', function ($query) {
+            $transactionQuery->where(function($query){
+                $query->whereHas('metaData', function ($query) {
                     $query->where('wallet_transaction_types.name', '=', trim(request()->get('type')));
+                })->orWhere('type','=',request()->get('type'));
             });
 
         if (request()->has('amount'))
@@ -143,10 +144,10 @@ class BankService
             $transactionQuery->whereRaw('ABS(amount) <= ?', [request()->get('amount_to')]);
 
 
-        if (request()->has('from_date'))
-            $transactionQuery->whereDate('created_at', '>=', request()->get('from_date'));
-        else if (request()->has('created_at'))
-            $transactionQuery->whereDate('created_at', '<=', request()->get('to_date'));
+        if (request()->has('created_at_from'))
+            $transactionQuery->whereDate('created_at', '>=', request()->get('created_at_from'));
+        else if (request()->has('created_at_to'))
+            $transactionQuery->whereDate('created_at', '<=', request()->get('created_at_to'));
 
         if (request()->has('description')) {
             $words = explode(' ', request()->get('description'));
@@ -154,6 +155,21 @@ class BankService
                 $transactionQuery->where('meta->description', 'LIKE', "%{$word}%");
         }
 
+        if(request()->has('remarks')) {
+            $words = explode(' ', request()->get('remarks'));
+            foreach ($words AS $word)
+                $transactionQuery->where('meta->remarks', 'LIKE', "{$word}%");
+        }
+
+        if(request()->has('order_id')) {
+            $order_id = request()->get('order_id');
+            $transactionQuery->where('meta->order_id', 'LIKE', "%{$order_id}%");
+        }
+
+        if(request()->has('member_id')) {
+            $member_id = request()->get('member_id');
+            $transactionQuery->where('meta->member_id','LIKE', "%{$member_id}%");
+        }
 
         return $transactionQuery->orderBy('id','desc');
     }
@@ -166,7 +182,8 @@ class BankService
     public function toAdminDepositWallet($transaction, $amount, $description, $type)
     {
         $this->owner = User::query()->find(1);
-        $admin_wallet = $this->getWallet(Str::slug('Deposit Wallet'));
+        $admin_wallet = $this->getWallet(WALLET_NAME_DEPOSIT_WALLET);
+
 
         //Prepare description
         $description = $this->createMeta($description);
@@ -176,7 +193,13 @@ class BankService
             'wallet_after_balance' => $admin_wallet->balanceFloat + $amount,
             'type' => $type
         ];
-        $transaction = $admin_wallet->depositFloat($amount, $this->createMeta($description));
+
+        $charity_amount = 0;
+        if($type == 'Package purchased') {
+            $charity_amount = calculateCharity($amount);
+        }
+
+        $transaction = $admin_wallet->depositFloat(($amount - $charity_amount), $this->createMeta($description));
         $transaction->syncMetaData($data);
 
     }

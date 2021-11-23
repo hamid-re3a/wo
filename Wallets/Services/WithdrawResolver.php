@@ -6,6 +6,8 @@ namespace Wallets\Services;
 use Illuminate\Support\Facades\Log;
 use User\Models\User;
 use Wallets\Models\WithdrawProfit;
+use MLM\Services\MlmClientFacade;
+use Kyc\Services\KycClientFacade;
 
 class WithdrawResolver
 {
@@ -115,7 +117,7 @@ class WithdrawResolver
             $distribution = getWalletSetting('withdrawal_distribution_in_janex');
 
         if ($distribution > 100 OR $distribution < 0)
-            throw new \Exception('Distribution error');
+            throw new \Exception('Distribution error',400);
         return $distribution;
     }
 }

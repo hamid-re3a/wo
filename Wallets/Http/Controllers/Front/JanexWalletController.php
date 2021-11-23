@@ -10,7 +10,7 @@ use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Http\Resources\WalletResource;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
 
@@ -50,7 +50,7 @@ class JanexWalletController extends Controller
     public function index()
     {
 
-        return api()->success(null, EarningWalletResource::make($this->walletObject));
+        return api()->success(null, WalletResource::make($this->walletObject));
 
     }
 

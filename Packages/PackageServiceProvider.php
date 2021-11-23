@@ -4,6 +4,7 @@ namespace Packages;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Packages\Convert\ConvertOrderCommand;
 use Packages\Models\Package;
 use Packages\Observer\PackageObserver;
 
@@ -57,6 +58,10 @@ class PackageServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
+
+            $this->commands([
+                ConvertOrderCommand::class
+            ]);
         }
 
         $this->obServers();

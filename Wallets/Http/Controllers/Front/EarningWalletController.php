@@ -13,7 +13,7 @@ use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Http\Resources\WalletResource;
 use Wallets\Repositories\TransactionRepository;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
@@ -61,7 +61,7 @@ class EarningWalletController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes(auth()->user()->id,null,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes($commissions,auth()->user()->id,null));
 
     }
 
@@ -72,7 +72,7 @@ class EarningWalletController extends Controller
     public function index()
     {
         $this->prepareEarningWallet();
-        return api()->success(null, EarningWalletResource::make($this->walletObject));
+        return api()->success(null, WalletResource::make($this->walletObject));
 
     }
 
@@ -149,7 +149,9 @@ class EarningWalletController extends Controller
 
         } catch (\Throwable $exception) {
             Log::error('Transfer funds error :' . $exception->getMessage());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -188,7 +190,7 @@ class EarningWalletController extends Controller
 
             list($flag,$response) = $transfer_resolver->resolve();
             if(!$flag)
-                throw new \Exception($response);
+                throw new \Exception($response,400);
 
             if ($request->has('member_id') AND $fee > 0)
                 $this->bankService->withdraw($this->walletName, (double)$fee, [
@@ -201,7 +203,9 @@ class EarningWalletController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('Transfer funds error .' . $exception->getMessage());
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 

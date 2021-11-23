@@ -43,6 +43,14 @@ class OrderRequest extends FormRequest
                 'in:btc-pay-server'
             ],
             'giftcode' => 'required_if:payment_type,giftcode',
+            'transaction_password' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->request->has('payment_type') AND $this->request->get('payment_type') == 'deposit') {
+                        if ($this->request->has('transaction_password') AND !checkTransactionPassword(auth()->user()->id, $this->request->get('transaction_password')))
+                            return $fail(trans('order.responses.incorrect-transaction-password'));
+                    }
+                }
+            ]
         ];
     }
 

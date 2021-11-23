@@ -17,6 +17,7 @@ use User\Models\User;
  * @property string|null $checkout_link
  * @property string|null $status
  * @property string $additional_status
+ * @property string $refund_status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $full_status
@@ -26,6 +27,7 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notPaid()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOver()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOverNotRefunded()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice paidOverDepositToAdmin()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice refunded()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice expired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notExpired()
@@ -165,6 +167,12 @@ class Invoice extends Model
 
     }
 
+    public function getRefundableAmount() : float
+    {
+        $total_paid_amount_in_pf = usdToPf($this->attributes['paid_amount'] * $this->attributes['rate']);
+        return (double)$total_paid_amount_in_pf - $this->attributes['pf_amount'];
+    }
+
     /**
      * Scopes
      */
@@ -209,6 +217,11 @@ class Invoice extends Model
     public function scopePaidOverNotRefunded($query)
     {
         return $query->where('additional_status','=','PaidOver')->whereNull('is_refund_at');
+    }
+
+    public function scopePaidOverDepositTiAdmin($query)
+    {
+        return $query->where('additional_status','=','PaidOver')->whereNotNull('is_refund_at')->where('status','');
     }
 
     public function scopeRefunded($query)

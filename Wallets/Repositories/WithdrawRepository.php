@@ -51,17 +51,7 @@ class WithdrawRepository
 
             //Check Transaction Password if request is not for reverting
             if ($user->id == auth()->user()->id AND !array_key_exists('is_revert',$request)) {
-                if (!isset($request['transaction_password'])) {
-                    Log::error('Wallets\Repositories\WithdrawRepository@makeWithdrawRequest => Undefined transaction password for user in request body');
-                    throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
-                }
-
-                $password_request = new UserTransactionPassword();
-                $password_request->setUserId((int)$user->id);
-                $password_request->setTransactionPassword((string)$request['transaction_password']);
-                $acknowledge = GatewayClientFacade::checkTransactionPassword($password_request);
-
-                if (!$acknowledge->getStatus())
+                if (!checkTransactionPassword($user->id,$request['transaction_password']))
                     throw \Illuminate\Validation\ValidationException::withMessages([
                         'transaction_password' => [trans('wallet.withdraw-profit-request.incorrect-transaction-password')],
                     ]);

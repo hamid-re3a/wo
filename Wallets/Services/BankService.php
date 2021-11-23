@@ -122,9 +122,8 @@ class BankService
 
     public function getTransactions($wallet_name)
     {
-        $transactionQuery = $this->owner->transactions()->whereHas('wallet', function ($query) use ($wallet_name) {
-            $query->where('name', $wallet_name);
-        });
+        $wallet = $this->getWallet($wallet_name);
+        $transactionQuery = $this->owner->transactions()->where('wallet_id','=',$wallet->id);
 
         if (request()->has('transaction_id'))
             $transactionQuery->where('uuid', 'LIKE','%'. request()->get('transaction_id') .'%');
@@ -159,19 +158,18 @@ class BankService
         if(request()->has('remarks')) {
             $words = explode(' ', request()->get('remarks'));
             foreach ($words AS $word)
-                $transactionQuery->where('meta->remarks', 'LIKE', "%{$word}%");
+                $transactionQuery->where('meta->remarks', 'LIKE', "{$word}%");
         }
 
         if(request()->has('order_id')) {
             $order_id = request()->get('order_id');
-            $transactionQuery->where('meta->remarks', 'LIKE', "%{$order_id}%");
+            $transactionQuery->where('meta->order_id', 'LIKE', "%{$order_id}%");
         }
 
         if(request()->has('member_id')) {
             $member_id = request()->get('member_id');
             $transactionQuery->where('meta->member_id','LIKE', "%{$member_id}%");
         }
-
 
         return $transactionQuery->orderBy('id','desc');
     }
@@ -198,10 +196,7 @@ class BankService
 
         $charity_amount = 0;
         if($type == 'Package purchased') {
-            $charity_wallet = $this->getWallet(WALLET_NAME_CHARITY_WALLET);
             $charity_amount = calculateCharity($amount);
-            if($charity_amount > 0)
-                $charity_wallet->depositFloat($charity_amount,$this->createMeta($description));
         }
 
         $transaction = $admin_wallet->depositFloat(($amount - $charity_amount), $this->createMeta($description));

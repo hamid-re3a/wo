@@ -49,14 +49,14 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                     config('payment.btc-pay-server-store-id') . '/invoices/' . $this->invoice_db->transaction_id . '/payment-methods'
                 );
 
-            if ($response->ok() && $payment_response->ok() AND $this->invoice_db->status != 'user_cancel') {
+            if ($response->ok() && $payment_response->ok()) {
                 $amount_paid = $payment_response->json()[0]['totalPaid'];
                 $amount_due = $payment_response->json()[0]['due'];
                 $rate = $payment_response->json()[0]['rate'];
                 $this->recordTransactions($payment_response->json()[0]['payments']);
                 $this->invoice_db->update([
                     'expiration_time' => Carbon::createFromTimestamp($response->json()['expirationTime']),
-                    'status' => $response->json()['status'],
+                    'status' => $this->invoice_db->payable_type == 'user_cancel' ? 'user_cancel' : $response->json()['status'],
                     'additional_status' => $response->json()['additionalStatus'],
                     'paid_amount' => $amount_paid,
                     'due_amount' => $amount_due,
@@ -69,14 +69,15 @@ class InvoiceResolverBTCPayServerJob implements ShouldQueue
                 }
 
 
-                switch ($this->invoice_db->payable_type) {
-                    case 'Order' :
-                        $this->resolve(new OrderProcessor($this->invoice_db));
-                        break;
-                    case 'DepositWallet':
-                        $this->resolve(new WalletProcessor($this->invoice_db));
-                        break;
-                }
+                if($this->invoice_db->status != 'user_cancel')
+                    switch ($this->invoice_db->payable_type) {
+                        case 'Order' :
+                            $this->resolve(new OrderProcessor($this->invoice_db));
+                            break;
+                        case 'DepositWallet':
+                            $this->resolve(new WalletProcessor($this->invoice_db));
+                            break;
+                    }
 
             }
 

@@ -154,6 +154,10 @@ class PaymentProcessor
             $withdraw_service->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_service);
 
+            //Deposit to Charity wallet
+            $wallet_service = app(WalletService::class);
+            $wallet_service->depositIntoCharityWallet($order_object->getPackagesCostInPf(),$description,'Package purchased');
+
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))
                 throw new \Exception(trans('payment.responses.something-went-wrong'),400);

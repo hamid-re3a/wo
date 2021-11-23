@@ -9,6 +9,7 @@ class AskFundRequest extends FormRequest
     private $minimum_amount;
     private $maximum_amount;
     private $member_id;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,6 +24,7 @@ class AskFundRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws \Exception
      */
     public function rules()
     {
@@ -31,7 +33,14 @@ class AskFundRequest extends FormRequest
         $this->maximum_amount = getWalletSetting('maximum_payment_request_amount');
         return [
             'member_id' => 'required|integer|exists:users,member_id|not_in:' . $this->member_id,
-            'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}"
+            'amount' => "required|numeric|min:{$this->minimum_amount}|max:{$this->maximum_amount}",
+            'transaction_password' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($this->request->has('transaction_password') AND strlen($value) > 0 AND !checkTransactionPassword(auth()->user()->id, $value))
+                        return $fail(trans('wallet.responses.incorrect-transaction-password'));
+                }
+            ]
         ];
 
     }
@@ -48,7 +57,7 @@ class AskFundRequest extends FormRequest
 
     private function prepare()
     {
-        if(auth()->check())
+        if (auth()->check())
             $this->member_id = auth()->user()->member_id;
     }
 

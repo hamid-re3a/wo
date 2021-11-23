@@ -52,7 +52,13 @@ class CreateWithdrawRequest extends FormRequest
                 }
             ],
             'currency' => 'required|in:' . implode(',', $this->getNamePaymentCurrency()),
-            'transaction_password' => 'required|string',
+            'transaction_password' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($this->request->has('transaction_password') AND strlen($value) > 0 AND!checkTransactionPassword(auth()->user()->id, $value))
+                        return $fail(trans('wallet.responses.incorrect-transaction-password'));
+                }
+            ]
         ];
     }
 

@@ -198,10 +198,7 @@ class BankService
 
         $charity_amount = 0;
         if($type == 'Package purchased') {
-            $charity_wallet = $this->getWallet(WALLET_NAME_CHARITY_WALLET);
             $charity_amount = calculateCharity($amount);
-            if($charity_amount > 0)
-                $charity_wallet->depositFloat($charity_amount,$this->createMeta($description));
         }
 
         $transaction = $admin_wallet->depositFloat(($amount - $charity_amount), $this->createMeta($description));

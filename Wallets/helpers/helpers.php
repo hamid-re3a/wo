@@ -35,7 +35,6 @@ if (!function_exists('getWalletEmailContent')) {
             if($check = collect(cache('wallet_email_contents'))->where('key', $key)->first())
                 $email = $check;
 
-
         if (empty($email) AND $email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
             $email = $email->toArray();
 

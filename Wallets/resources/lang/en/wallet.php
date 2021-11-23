@@ -6,6 +6,7 @@ return [
         'not-enough-balance' => 'Insufficient balance',
         'email-key-doesnt-exists' => "Wallet email content doesn't exists",
         'setting-key-doesnt-exists' => "Setting doesn't exists",
+        'incorrect-transaction-password' => 'Your transaction password is incorrect.',
     ],
     'withdraw-profit-request' => [
         'withdrawal-requests-is-not-active' => 'Withdrawal is not active temporary, Try again later',

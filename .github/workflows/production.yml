@@ -41,3 +41,5 @@ jobs:
         sudo docker build -f devops/Dockerfiles/Dockerfile-production --network=mysql_wo_r2f -t production-subscription:1 .
         sudo docker tag production-subscription:1 staging-reg.dreamcometrue.ai/production-subscription:1
         sudo docker push staging-reg.dreamcometrue.ai/production-subscription:1
+    - name: Redeploy aws containers
+      run: sudo /usr/local/bin/aws ecs update-service --cluster dreamcometrue --service subscription --enable-execute-command --force-new-deployment

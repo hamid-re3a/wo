@@ -20,12 +20,13 @@ class OrderTableSeeder extends Seeder
     public function run()
     {
         // Load local seeder
-        if (!in_array(app()->environment(), ['production', 'staging'])) {
+        $data = [];
+        if (!in_array(app()->environment(), ['production', 'staging']) AND Order::query()->count() == 0) {
 
             $data = [
                 ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],
                 ['id' => 2, 'user_id' => 2, 'position' => 'left', 'parent_id' => 1],
-                ['id' => 3, 'user_id' => 3, 'position' => 'right', 'parent_id' => 1],
+//                ['id' => 3, 'user_id' => 3, 'position' => 'right', 'parent_id' => 1],
                 ['id' => 4, 'user_id' => 4, 'position' => 'right', 'parent_id' => 2],
                 ['id' => 5, 'user_id' => 5, 'position' => 'left', 'parent_id' => 2],
                 ['id' => 6, 'user_id' => 6, 'position' => 'right', 'parent_id' => 3],
@@ -45,10 +46,7 @@ class OrderTableSeeder extends Seeder
                 ['id' => 20, 'user_id' => 20, 'position' => 'right', 'parent_id' => 12],
                 ['id' => 21, 'user_id' => 21, 'position' => 'left', 'parent_id' => 13],
                 ['id' => 22, 'user_id' => 22, 'position' => 'right', 'parent_id' => 13],
-            ];
-        } else {
-            $data = [
-                ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],
+                ['id' => 3, 'user_id' => 3, 'position' => 'right', 'parent_id' => 14],
             ];
         }
         foreach ($data as $item) {

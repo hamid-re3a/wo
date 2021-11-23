@@ -73,29 +73,29 @@ class PaymentProcessor
             $giftcode_response = $giftcode_service->getGiftcodeByCode($giftcode_object);
 
             if (!$giftcode_response->getId()) // code is not valid
-                throw new \Exception(trans('payment.responses.giftcode.wrong-code'));
+                throw new \Exception(trans('payment.responses.giftcode.wrong-code'),406);
 
             if ($giftcode_response->getPackageId() != $order_service->getPackageId())
-                throw new \Exception(trans('payment.responses.giftcode.wrong-package'));
+                throw new \Exception(trans('payment.responses.giftcode.wrong-package'),406);
 
             if (!empty($giftcode_response->getRedeemUserId()))
-                throw new \Exception(trans('payment.responses.giftcode.used'));
+                throw new \Exception(trans('payment.responses.giftcode.used'),406);
 
             if (!empty($giftcode_response->getExpirationDate()) AND Carbon::parse($giftcode_response->getExpirationDate())->isPast())
-                throw new \Exception(trans('payment.responses.giftcode.expired'));
+                throw new \Exception(trans('payment.responses.giftcode.expired'),406);
 
             if (!empty($giftcode_response->getIsCanceled()))
-                throw new \Exception(trans('payment.responses.giftcode.canceled'));
+                throw new \Exception(trans('payment.responses.giftcode.canceled'),406);
 
             if(is_numeric($order_service->getRegistrationFeeInPf()) AND $order_service->getRegistrationFeeInPf() > 0 AND empty($giftcode_response->getRegistrationFeeInPf()))
-                throw new \Exception(trans('payment.responses.giftcode.giftcode-not-included-registration-fee'));
+                throw new \Exception(trans('payment.responses.giftcode.giftcode-not-included-registration-fee'),406);
 
             //Redeem giftcode
             $giftcode_response->setOrderId($order_service->getId());
             $redeem_giftcode = $giftcode_service->redeemGiftcode($giftcode_response, $invoice_request->getUser());
 
             if (!$redeem_giftcode->getRedeemUserId())
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
+                throw new \Exception(trans('payment.responses.something-went-wrong'),400);
 
             DB::commit();
             return [
@@ -105,7 +105,9 @@ class PaymentProcessor
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('PaymentProcessor@payFromGiftcode error ' . $exception->getMessage());
-            return [false,$exception->getMessage()];
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'giftcode' => [$exception->getMessage()],
+            ]);
         }
     }
 
@@ -123,7 +125,7 @@ class PaymentProcessor
             $wallet->setName(WalletNames::DEPOSIT);
             $balance = $wallet_service->getBalance($wallet)->getBalance();
             if ($balance < $invoice_request->getPfAmount())
-                throw new \Exception(trans('payment.responses.wallet.not-enough-balance'));
+                throw new \Exception(trans('payment.responses.wallet.not-enough-balance'),406);
 
             $package_service = app(PackageService::class);
             $package_object = $package_service->packageFullById(app(Id::class)->setId($order_object->getPackageId()));
@@ -152,9 +154,13 @@ class PaymentProcessor
             $withdraw_service->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_service);
 
+            //Deposit to Charity wallet
+            $wallet_service = app(WalletService::class);
+            $wallet_service->depositIntoCharityWallet($order_object->getPackagesCostInPf(),$description,'Package purchased');
+
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))
-                throw new \Exception(trans('payment.responses.something-went-wrong'));
+                throw new \Exception(trans('payment.responses.something-went-wrong'),400);
 
             DB::commit();
             return [

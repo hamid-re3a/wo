@@ -77,18 +77,15 @@ class OrderProcessor extends ProcessorAbstract
 
         //Send order to MLM
         /**
-         * @var $submit_response Acknowledge
          * @var $order_service Order
          */
         $order_service = $this->order_service;
         $order_service->setIsPaidAt(now()->toDateTimeString());
         $order_service->setIsResolvedAt(now()->toDateTimeString());
         $acknowledge = MlmClientFacade::submitOrder($order_service);
-        if ($acknowledge)
-            throw new \Exception();
 
 
-        if ($submit_response->getStatus()) {
+        if ($acknowledge->getMessage()) {
             $package_service = app(PackageService::class);
             $package_object = $package_service->packageFullById(app(\Packages\Services\Grpc\Id::class)->setId($this->order_service->getPackageId()));
 
@@ -102,7 +99,7 @@ class OrderProcessor extends ProcessorAbstract
 
 
             //Update order
-            $order_service->setIsCommissionResolvedAt($submit_response->getCreatedAt());
+            $order_service->setIsCommissionResolvedAt($acknowledge->getCreatedAt());
             app(OrderService::class)->updateOrder($order_service);
 
             $this->invoice_db->update([
@@ -113,6 +110,8 @@ class OrderProcessor extends ProcessorAbstract
 
             // send thank you email notification
             EmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
+        } else {
+            throw new \Exception($acknowledge->getMessage(),400);
         }
 
     }

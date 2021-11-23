@@ -34,7 +34,7 @@ class InvoiceResource extends JsonResource
             'is_refund_at' => $this->is_refund_at ? $this->is_refund_at->timestamp : null,
             'refunder_full_name' => $this->refunder_user_id ? $this->refunder->full_name : null,
             'transactions' => $transactions,
-            'expiration_time' => $this->expiration_time->timestamp,
+            'expiration_time' => $this->expiration_time ? $this->expiration_time->timestamp : null,
             'created_at' => $this->created_at->timestamp,
             'updated_at' => $this->updated_at->timestamp,
         ];

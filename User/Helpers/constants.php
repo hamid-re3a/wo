@@ -4,8 +4,8 @@
  * user_roles
  */
 
-use Illuminate\Http\Request;
 use User\Services\UserService;
+
 const USER_ROLE_SUPER_ADMIN = 'super-admin';
 const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
 const USER_ROLE_ADMIN_KYC = 'kyc-admin';

@@ -23,7 +23,7 @@ class MlmGrpcClientProvider
         /** @var $submit_response Acknowledge */
         list($submit_response, $flag) = self::$client->submitOrder($order)->wait();
         if ($flag->code != 0)
-            throw new \Exception('MLM not responding', 406);
+            throw new \Exception('MLM not responding', 500);
         return $submit_response;
     }
 
@@ -32,7 +32,7 @@ class MlmGrpcClientProvider
         /** @var $submit_response Acknowledge */
         list($submit_response, $flag) = self::$client->simulateOrder($order)->wait();
         if ($flag->code != 0)
-            throw new \Exception('MLM not responding', 406);
+            throw new \Exception('MLM not responding', 500);
         return $submit_response;
     }
 
@@ -41,7 +41,7 @@ class MlmGrpcClientProvider
         /** @var $submit_response Acknowledge */
         list($submit_response, $flag) = self::$client->hasValidPackage($user)->wait();
         if ($flag->code != 0)
-            throw new \Exception('MLM not responding', 406);
+            throw new \Exception('MLM not responding', 500);
         return $submit_response;
     }
 
@@ -51,7 +51,7 @@ class MlmGrpcClientProvider
         /** @var $submit_response Rank */
         list($submit_response, $flag) = self::$client->getUserRank($user)->wait();
         if ($flag->code != 0)
-            throw new \Exception('MLM not responding', 406);
+            throw new \Exception('MLM not responding', 500);
         return $submit_response;
     }
 }

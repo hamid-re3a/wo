@@ -11,7 +11,7 @@ use User\Models\User;
 use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Requests\Front\AskFundRequest;
 use Wallets\Http\Requests\Front\ChargeDepositWalletRequest;
-use Wallets\Http\Resources\DepositWalletResource;
+use Wallets\Http\Resources\WalletResource;
 use Wallets\Jobs\EmailJob;
 use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromDepositWalletRequest;
@@ -57,7 +57,7 @@ class DepositWalletController extends Controller
     public function index()
     {
         $this->prepareDepositWallet();
-        return api()->success(null, DepositWalletResource::make($this->bankService->getWallet($this->walletName)));
+        return api()->success(null, WalletResource::make($this->bankService->getWallet($this->walletName)));
 
     }
 
@@ -180,7 +180,7 @@ class DepositWalletController extends Controller
 
             list($flag,$response) = $transfer_resolver->resolve();
             if(!$flag)
-                throw new \Exception($response);
+                throw new \Exception($response,400);
 
             //Charger user wallet for transfer fee
             $this->bankService->withdraw($this->walletName, (double)$fee, [

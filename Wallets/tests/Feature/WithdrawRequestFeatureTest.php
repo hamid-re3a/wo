@@ -3,15 +3,11 @@
 
 namespace Wallets\tests\Feature;
 
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Kyc\Services\Grpc\Acknowledge;
 use MLM\Services\Grpc\Rank;
-use Payments\Jobs\ProcessBTCPayServerPayoutsJob;
 use Payments\Services\Processors\PayoutFacade;
-use User\Models\User;
-use User\Services\GatewayClientFacade;
 use Wallets\Models\WithdrawProfit;
 use Wallets\Services\BankService;
 use Kyc\Services\KycClientFacade;
@@ -56,14 +52,15 @@ class WithdrawRequestFeatureTest extends WalletTest
     /**
      * @test
      */
-    public function withdraw_request_preview_insufficient_balance()
+    public function ask_withdraw_request_preview_insufficient_balance()
     {
         Mail::fake();
+        $this->mockWithdrawServices();
         $payment_currency = $this->addPaymentCurrency();
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
             'amount' => 101,
             'currency' => $payment_currency->name,
-            'transaction_password' => 'password'
+            'transaction_password' => '123'
         ]);
         $response->assertStatus(422);
         $response->assertJsonStructure([
@@ -78,22 +75,21 @@ class WithdrawRequestFeatureTest extends WalletTest
     /**
      * @test
      */
-    public function withdraw_request_preview_sufficient_balance()
+    public function ask_withdraw_request_preview_sufficient_balance()
     {
         Mail::fake();
         $payment_currency = $this->addPaymentCurrency();
         $this->mockWithdrawServices();
 
-
-        $user = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user);
+        $bank_service = new BankService($this->user);
         $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 30000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.preview'), [
             'amount' => 101,
             'currency' => $payment_currency->name,
-            'transaction_password' => 'password'
+            'transaction_password' => '123'
         ]);
+
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'status',
@@ -139,8 +135,8 @@ class WithdrawRequestFeatureTest extends WalletTest
         Mail::fake();
         $this->mockWithdrawServices();
         $payment_currency = $this->addPaymentCurrency();
-        $user = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user);
+
+        $bank_service = new BankService($this->user);
         $bank_service->deposit(WALLET_NAME_EARNING_WALLET, 300000);
 
         $response = $this->postJson(route('wallets.customer.withdrawRequests.create'), [
@@ -179,7 +175,6 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function process_withdraw_request()
     {
-        $this->refreshDatabase();
         $this->create_withdraw_request_sufficient_balance();
         $withdraw_request = WithdrawProfit::query()->first();
         PayoutFacade::shouldReceive('pay')->andReturn([true,null]);
@@ -196,8 +191,7 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function reject_withdraw_request()
     {
-        $this->refreshDatabase();
-        $this->create_withdraw_request_sufficient_balance();
+        $this->process_withdraw_request();
         $withdraw_request = WithdrawProfit::query()->first();
         $response = $this->patch(route('wallets.admin.withdraw-requests.update'), [
             'ids' => [$withdraw_request->uuid],
@@ -212,9 +206,7 @@ class WithdrawRequestFeatureTest extends WalletTest
      */
     public function revert_withdraw_request()
     {
-        $this->refreshDatabase();
         $this->mockWithdrawServices();
-        $this->create_withdraw_request_sufficient_balance();
         $this->reject_withdraw_request();
         $withdraw_request = WithdrawProfit::query()->where('status', WALLET_WITHDRAW_COMMAND_REJECT)->first();
         $response = $this->patch(route('wallets.admin.withdraw-requests.update'), [
@@ -249,9 +241,7 @@ class WithdrawRequestFeatureTest extends WalletTest
         $mock_acknowledge->setMessage('Its true');
         KycClientFacade::shouldReceive('checkKYCStatus')->andReturn($mock_acknowledge);
 
-        $acknowledge = new \User\Services\Grpc\Acknowledge();
-        $acknowledge->setStatus(true);
-        GatewayClientFacade::shouldReceive('checkTransactionPassword')->andReturn($acknowledge);
+        $this->mockTransactionPasswordGrpcRequest();
 
     }
 

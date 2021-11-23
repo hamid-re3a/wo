@@ -2,6 +2,8 @@
 
 
 use Illuminate\Support\Carbon;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 
 if (!function_exists('getWalletSetting')) {
 
@@ -34,7 +36,6 @@ if (!function_exists('getWalletEmailContent')) {
         if (cache()->has('wallet_email_contents'))
             if($check = collect(cache('wallet_email_contents'))->where('key', $key)->first())
                 $email = $check;
-
 
         if (empty($email) AND $email = \Wallets\Models\EmailContent::query()->where('key', $key)->first())
             $email = $email->toArray();
@@ -173,6 +174,19 @@ if(!function_exists('calculateCharity')) {
 
         return $fix_or_percentage == 'fixed' ? (float)$fee : ((float)$amount * (float)$fee / 100);
 
+    }
+}
+
+if(!function_exists('checkTransactionPassword')) {
+    function checkTransactionPassword($user_id,$password) : bool{
+        $request = new UserTransactionPassword();
+        $request->setUserId($user_id);
+        $request->setTransactionPassword($password);
+        $ack = GatewayClientFacade::checkTransactionPassword($request);
+        if($ack->getStatus())
+            return true;
+
+        return false;
     }
 }
 

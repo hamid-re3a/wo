@@ -8,11 +8,18 @@ class OrderRepository
 {
     protected $entity_name = Order::class;
 
-    public function getCountOrders()
+    public function getResolvedOrdersCount()
     {
         /**@var $order Order */
         $order = new $this->entity_name;
-        return $order->query()->count();
+        return $order->query()->resolved()->count();
+    }
+
+    public function getCanceledOrdersCount()
+    {
+        /**@var $order Order */
+        $order = new $this->entity_name;
+        return $order->query()->canceled()->count();
     }
 
     public function getActiveOrdersSum()
@@ -39,7 +46,7 @@ class OrderRepository
         return $order->resolved()->active()->count();
     }
 
-    public function getExpiredOrders()
+    public function getExpiredOrdersCount()
     {
         /**@var $order Order */
         $order = new $this->entity_name;
@@ -53,7 +60,7 @@ class OrderRepository
         /**@var $order Order */
         $order = new $this->entity_name;
 
-        return $order->resolved()->active()->whereBetween('created_at', [$from, $until])->get();
+        return $order->select('created_at')->resolved()->active()->whereBetween('created_at', [$from, $until])->get();
     }
 
     public function getActiveOrderWithPackageByDateCollection($from, $until,$id = null)
@@ -63,9 +70,9 @@ class OrderRepository
 
 
         if(is_null($id))
-            return $order->resolved()->active()->whereBetween('created_at', [$from, $until])->get();
+            return $order->select(['created_at','package_id'])->resolved()->active()->whereBetween('created_at', [$from, $until])->get();
         else
-            return $order->resolved()->active()->whereBetween('created_at', [$from, $until])->where('user_id',$id)->get();
+            return $order->select(['created_at','package_id'])->resolved()->active()->whereBetween('created_at', [$from, $until])->where('user_id',$id)->get();
     }
 
     public function getActiveOrderWithPackageByDateForUserCollection($from, $until, $user)
@@ -81,7 +88,7 @@ class OrderRepository
         /**@var $order Order */
         $order = new $this->entity_name;
 
-        return $order->resolved()->expired()->whereBetween('created_at', [$from, $until])->get();
+        return $order->select('created_at')->resolved()->expired()->whereBetween('created_at', [$from, $until])->get();
     }
 
     public function getExpiredPackageByDateForUserCollection($from, $until, $user)
@@ -89,7 +96,7 @@ class OrderRepository
         /**@var $order Order */
         $order = new $this->entity_name;
 
-        return $order->resolved()->expired()->whereBetween('created_at', [$from, $until])->where('user_id', $user->id)->get();
+        return $order->select('created_at')->resolved()->expired()->whereBetween('created_at', [$from, $until])->where('user_id', $user->id)->get();
     }
 
     public function getTotalPackageByDateCollection($from, $until)
@@ -97,7 +104,7 @@ class OrderRepository
         /**@var $order Order */
         $order = new $this->entity_name;
 
-        return $order->resolved()->whereBetween('created_at', [$from, $until])->get();
+        return $order->select('created_at')->resolved()->whereBetween('created_at', [$from, $until])->get();
     }
 
 }

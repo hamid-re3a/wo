@@ -12,6 +12,7 @@ use MLM\Services\MlmClientFacade;
 use Orders\tests\OrderTest;
 use Payments\Models\PaymentCurrency;
 use Payments\Services\Processors\PaymentFacade;
+use User\Services\GatewayClientFacade;
 
 class OrderFeatureTest extends OrderTest
 {
@@ -47,14 +48,7 @@ class OrderFeatureTest extends OrderTest
      */
     public function submit_order_with_email()
     {
-        $this->withHeaders($this->getHeaders());
-
-        Mail::fake();
-        $acknowledge = new Acknowledge;
-        $acknowledge->setStatus(true);
-        $acknowledge->setCreatedAt(now()->toDateString());
-        MlmClientFacade::shouldReceive('simulateOrder')->once()->andReturn($acknowledge);
-        PaymentFacade::shouldReceive('pay')->once()->andReturn([true,'']);
+        $this->mockFacades();
         $payment = PaymentCurrency::query()->first();
         $payment->update(['available_services'=>[CURRENCY_SERVICE_PURCHASE]]);
         $response = $this->post(route('customer.orders.store'), [
@@ -66,6 +60,61 @@ class OrderFeatureTest extends OrderTest
         ]);
         $response->assertOk();
 
+    }
+
+    /**
+     * @test
+     */
+    public function purchase_package_from_deposit_wallet()
+    {
+        $this->mockFacades();
+        $payment = PaymentCurrency::query()->first();
+        $payment->update(['available_services'=>[CURRENCY_SERVICE_PURCHASE]]);
+        $response = $this->post(route('customer.orders.store'), [
+            'package_id' => 1,
+            'plan' => ORDER_PLAN_START,
+            'payment_type' => 'deposit',
+            'payment_driver' => 'btc-pay-server',
+            'payment_currency' => 'BTC',
+            'transaction_password' => 123
+        ]);
+        $response->assertOk();
+    }
+
+    /**
+     * @test
+     */
+    public function purchase_package_with_giftcode()
+    {
+        $this->mockFacades();
+        $payment = PaymentCurrency::query()->first();
+        $payment->update(['available_services'=>[CURRENCY_SERVICE_PURCHASE]]);
+        $response = $this->post(route('customer.orders.store'), [
+            'package_id' => 1,
+            'plan' => ORDER_PLAN_START,
+            'payment_type' => 'giftcode',
+            'payment_driver' => 'btc-pay-server',
+            'payment_currency' => 'BTC',
+            'giftcode' => 123
+        ]);
+        $response->assertOk();
+    }
+
+
+    private function mockFacades(): void
+    {
+        Mail::fake();
+        $this->withHeaders($this->getHeaders());
+        $acknowledge = new Acknowledge;
+        $acknowledge->setStatus(true);
+        $acknowledge->setCreatedAt(now()->toDateString());
+        MlmClientFacade::shouldReceive('simulateOrder')->andReturn($acknowledge);
+        MlmClientFacade::shouldReceive('submitOrder')->andReturn($acknowledge);
+        PaymentFacade::shouldReceive('pay')->once()->andReturn([true, '']);
+
+        $ack = new \User\Services\Grpc\Acknowledge();
+        $ack->setStatus(true);
+        GatewayClientFacade::shouldReceive('checkTransactionPassword')->andReturn($ack);
     }
 
 }

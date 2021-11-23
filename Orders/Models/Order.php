@@ -26,6 +26,7 @@ use User\Models\User;
  * @property \Illuminate\Support\Carbon|null $is_resolved_at
  * @property \Illuminate\Support\Carbon|null $is_refund_at
  * @property \Illuminate\Support\Carbon|null $is_commission_resolved_at
+ * @property \Illuminate\Support\Carbon|null $is_canceled_at
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property string $payment_type
  * @property string $payment_type_string
@@ -39,6 +40,7 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Order expired()
  * @method static \Illuminate\Database\Eloquent\Builder|Order active()
  * @method static \Illuminate\Database\Eloquent\Builder|Order resolved()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order canceled()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order query()
@@ -78,6 +80,7 @@ class Order extends Model
         'is_paid_at' => 'datetime',
         'is_resolved_at' => 'datetime',
         'is_refund_at' => 'datetime',
+        'is_canceled_at' => 'datetime',
         'expires_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -86,8 +89,9 @@ class Order extends Model
 
     public function scopeActive($query)
     {
-        return $query->whereDate("expires_at", ">", now()->toDate());
+        return $query->whereDate("expires_at", ">", now()->toDate())->whereNull('is_canceled_at');
     }
+
     public function scopeExpired($query)
     {
         return $query->whereDate("expires_at", "<=", now()->toDate());
@@ -95,7 +99,12 @@ class Order extends Model
 
     public function scopeResolved($query)
     {
-        return $query->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null], ["is_commission_resolved_at", "!=", null]]);
+        return $query->where([["is_paid_at", "!=", null], ["is_resolved_at", "!=", null], ["is_commission_resolved_at", "!=", null]])->whereNull('is_canceled_at');
+    }
+
+    public function scopeCanceled($query)
+    {
+        return $query->whereNotNull('is_canceled_at');
     }
 
     public function user()
@@ -164,6 +173,12 @@ class Order extends Model
 
         if (request()->has('is_expired') AND request()->get('is_expired'))
             $query->whereNotNull('is_expired');
+
+        if (request()->has('is_canceled_at_from'))
+            $query->whereDate('is_canceled_at', ' >', request()->get('is_canceled_at_from'));
+
+        if (request()->has('is_canceled_at_to'))
+            $query->whereDate('is_canceled_at', ' <', request()->get('is_canceled_at_to'));
 
         return $query;
     }

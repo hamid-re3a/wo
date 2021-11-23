@@ -4,7 +4,9 @@
 namespace Orders\Services;
 
 
+use Illuminate\Support\Facades\Log;
 use Orders\Repository\OrderRepository;
+use Orders\Services\Grpc\Acknowledge;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
@@ -63,6 +65,21 @@ class OrderService implements OrdersServiceInterface
         return $order;
     }
 
+    public function cancelOrder(Id $id): Acknowledge
+    {
+        $ack = new Acknowledge();
+        try {
+            $order_db = \Orders\Models\Order::query()->find($id->getId());
+            $order_db->update([
+                'is_canceled_at' => now()->toDateTimeString()
+            ]);
+            return $ack->setStatus(true);
+        } catch (\Throwable $exception) {
+            Log::error('Orders\Services\OrderService@cancelOrder exception => ' . $exception->getMessage());
+            return $ack->setStatus(false);
+        }
+    }
+
     public function getActiveOrdersSum()
     {
         return $this->order_repository->getActiveOrdersSum();
@@ -73,9 +90,14 @@ class OrderService implements OrdersServiceInterface
         return $this->order_repository->getPaidOrdersSum();
     }
 
-    public function getCountOrders()
+    public function getResolvedOrdersCount()
     {
-        return $this->order_repository->getCountOrders();
+        return $this->order_repository->getResolvedOrdersCount();
+    }
+
+    public function getCanceledOrdersCount()
+    {
+        return $this->order_repository->getCanceledOrdersCount();
     }
 
     public function getActiveOrdersCount()
@@ -83,9 +105,9 @@ class OrderService implements OrdersServiceInterface
         return $this->order_repository->getActiveOrdersCount();
     }
 
-    public function getExpiredOrders()
+    public function getExpiredOrdersCount()
     {
-        return $this->order_repository->getExpiredOrders();
+        return $this->order_repository->getExpiredOrdersCount();
     }
 
     public function packageOverviewCountChart($type)

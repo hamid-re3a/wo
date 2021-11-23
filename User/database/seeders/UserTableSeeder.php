@@ -22,7 +22,8 @@ class UserTableSeeder extends Seeder
         if (defined('USER_ROLES'))
             foreach (USER_ROLES as $role)
                 Role::query()->firstOrCreate(['name' => $role]);
-
+        if (User::query()->count() > 0)
+            return;
         // Load local seeder
             $admin = User::query()->firstOrCreate(['id' => 1]);
             $admin->update([

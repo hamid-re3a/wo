@@ -43,9 +43,10 @@ class DashboardController extends Controller
     public function counts()
     {
         return api()->success(null, [
-            'total_orders' => $this->order_service->getCountOrders(),
+            'total_orders' => $this->order_service->getResolvedOrdersCount(),
             'active_orders' => $this->order_service->getActiveOrdersCount(),
-            'expired_orders' => $this->order_service->getExpiredOrders(),
+            'expired_orders' => $this->order_service->getExpiredOrdersCount(),
+            'canceled_orders' => $this->order_service->getCanceledOrdersCount(),
         ]);
     }
 

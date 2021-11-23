@@ -249,6 +249,42 @@ class WithdrawRepository
         }
     }
 
+    public function getOverallTimeChart($type, $user_id = null)
+    {
+        try {
+            $that = $this;
+            $function_pending_requests = function($from_date, $to_date) use($that,$user_id) {
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WALLET_WITHDRAW_COMMAND_UNDER_REVIEW,$user_id);
+            };
+
+            $function_processed_requests = function($from_date, $to_date) use($that,$user_id) {
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WALLET_WITHDRAW_COMMAND_PROCESS,$user_id);
+            };
+
+            $function_rejected_requests = function($from_date, $to_date) use($that,$user_id) {
+                return $that->getWithdrawRequestsByDateCollection('created_at',$from_date,$to_date,WALLET_WITHDRAW_COMMAND_REJECT,$user_id);
+            };
+
+            $sub_function = function ($collection, $intervals) {
+                /**@var $collection Collection */
+                return $collection->whereBetween('created_at', $intervals)->sum(function ($withdraw_request) {
+                    /**@var $withdraw_request WithdrawProfit */
+                    return $withdraw_request->pf_amount;
+                });
+            };
+
+            $result = [];
+            $result['pending'] = chartMaker($type, $function_pending_requests, $sub_function);
+            $result['processed'] = chartMaker($type, $function_processed_requests, $sub_function);
+            $result['rejected'] = chartMaker($type, $function_rejected_requests, $sub_function);
+            return $result;
+
+        } catch (\Throwable $exception) {
+            Log::error('Wallets\Repositories\WithdrawRepository@getOverallTimeChart => ' . $exception->getMessage());
+            throw new \Exception(trans('wallet.responses.something-went-wrong'),400);
+        }
+    }
+
     public function getPendingAmountVsTimeChart($type, $user_id = null)
     {
         try {

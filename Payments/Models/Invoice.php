@@ -30,6 +30,7 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice expired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notExpired()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice notCanceled()
+ * @method static \Illuminate\Database\Eloquent\Builder|Invoice canceled()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Invoice query()
@@ -88,7 +89,7 @@ class Invoice extends Model
 
     public function getFullStatusAttribute()
     {
-        return $this->status .' '. $this->additional_status;
+        return $this->status . ' ' . $this->additional_status;
     }
 
     /**
@@ -97,67 +98,17 @@ class Invoice extends Model
 
     public function transactions()
     {
-        return $this->hasMany(InvoiceTransaction::class,'invoice_id','id');
+        return $this->hasMany(InvoiceTransaction::class, 'invoice_id', 'id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class,'user_id','id');
-    }
-
-    public function scopeOrders($query)
-    {
-        return $query->where('payable_type','=','Order');
-    }
-
-    public function scopeNotCanceled($query)
-    {
-        return $query->where('status','<>','user_cancel');
-    }
-
-    public function scopeDepositWallets($query)
-    {
-        return $query->where('payable_type','=','DepositWallet');
-    }
-
-    public function scopePaid($query)
-    {
-        return $query->where('is_paid','=',true);
-    }
-
-    public function scopeNotPaid($query)
-    {
-        return $query->where('is_paid','=',false);
-    }
-
-    public function scopePaidOver($query)
-    {
-        return $query->where('additional_status','=','PaidOver');
-    }
-
-    public function scopePaidOverNotRefunded($query)
-    {
-        return $query->where('additional_status','=','PaidOver')->whereNull('is_refund_at');
-    }
-
-    public function scopeRefunded($query)
-    {
-        return $query->whereNotNull('is_refund_at');
-    }
-
-    public function scopeExpired($query)
-    {
-        return $query->where('expiration_time','<',now()->toDateTimeString());
-    }
-
-    public function scopeNotExpired($query)
-    {
-        return $query->where('expiration_time','>',now()->toDateTimeString());
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function refunder()
     {
-        return $this->belongsTo(User::class,'refunder_user_id','id');
+        return $this->belongsTo(User::class, 'refunder_user_id', 'id');
     }
 
     /**
@@ -166,7 +117,7 @@ class Invoice extends Model
 
     public function getTypeAttribute()
     {
-        switch($this->attributes['payable_type']) {
+        switch ($this->attributes['payable_type']) {
             case 'Order':
                 return 'order';
                 break;
@@ -212,5 +163,66 @@ class Invoice extends Model
         $invoice_service->setUser($this->user->getGrpcMessage());
         return $invoice_service;
 
+    }
+
+    /**
+     * Scopes
+     */
+
+
+
+    public function scopeOrders($query)
+    {
+        return $query->where('payable_type','=','Order');
+    }
+
+    public function scopeNotCanceled($query)
+    {
+        return $query->where('status','<>','user_cancel');
+    }
+
+    public function scopeCanceled($query)
+    {
+        return $query->where('status','=','user_cancel');
+    }
+
+    public function scopeDepositWallets($query)
+    {
+        return $query->where('payable_type','=','DepositWallet');
+    }
+
+    public function scopePaid($query)
+    {
+        return $query->where('is_paid','=',true);
+    }
+
+    public function scopeNotPaid($query)
+    {
+        return $query->where('is_paid','=',false);
+    }
+
+    public function scopePaidOver($query)
+    {
+        return $query->where('additional_status','=','PaidOver');
+    }
+
+    public function scopePaidOverNotRefunded($query)
+    {
+        return $query->where('additional_status','=','PaidOver')->whereNull('is_refund_at');
+    }
+
+    public function scopeRefunded($query)
+    {
+        return $query->whereNotNull('is_refund_at');
+    }
+
+    public function scopeExpired($query)
+    {
+        return $query->where('expiration_time','<',now()->toDateTimeString());
+    }
+
+    public function scopeNotExpired($query)
+    {
+        return $query->where('expiration_time','>',now()->toDateTimeString());
     }
 }

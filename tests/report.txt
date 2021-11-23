@@ -49,7 +49,9 @@ Withdraw Request Feature (Wallets\tests\Feature\WithdrawRequestFeature)
  [x] Withdraw request preview sufficient balance
  [x] Create withdraw request insufficient balance
  [x] Create withdraw request sufficient balance
+ [x] Process withdraw request
  [x] Reject withdraw request
+ [x] Revert withdraw request
 
 Giftcode Controller (Giftcode\tests\Feature\GiftcodeController)
  [x] Create new giftcode

@@ -69,7 +69,7 @@ const BF_TO_USD_RATE = 1;
 /**
  *  main settings
  */
-const SETTINGS = [
+const PAYMENT_SETTINGS = [
     'REGISTRATION_FEE' => [
         'value' => REGISTRATION_FEE,
         'description' => 'Start Order Registration Fee in dollars',
@@ -325,8 +325,8 @@ if (!function_exists('getSetting')) {
 
         }
 
-        if (isset(SETTINGS[$key]) && isset(SETTINGS[$key]['value'])) {
-            return SETTINGS[$key]['value'];
+        if (isset(PAYMENT_SETTINGS[$key]) && isset(PAYMENT_SETTINGS[$key]['value'])) {
+            return PAYMENT_SETTINGS[$key]['value'];
         }
 
         throw new Exception(trans('payment.responses.main-key-settings-is-missing'));

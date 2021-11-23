@@ -19,7 +19,7 @@ class TransactionRepository
 
             /**@var $transaction Transaction */
             $transaction = new $this->entity;
-            $transactions = $transaction->query();
+            $transactions = $transaction->query()->select('created_at');
 
             if ($wallet_id)
                 $transactions->where('wallet_id', '=', $wallet_id);

@@ -127,7 +127,7 @@ class BankService
         });
 
         if (request()->has('transaction_id'))
-            $transactionQuery->where('uuid', request()->get('transaction_id'));
+            $transactionQuery->where('uuid', 'LIKE','%'. request()->get('transaction_id') .'%');
 
         if (request()->has('type'))
             $transactionQuery->where(function($query){
@@ -145,15 +145,31 @@ class BankService
             $transactionQuery->whereRaw('ABS(amount) <= ?', [request()->get('amount_to')]);
 
 
-        if (request()->has('from_date'))
-            $transactionQuery->whereDate('created_at', '>=', request()->get('from_date'));
-        else if (request()->has('created_at'))
-            $transactionQuery->whereDate('created_at', '<=', request()->get('to_date'));
+        if (request()->has('created_at_from'))
+            $transactionQuery->whereDate('created_at', '>=', request()->get('created_at_from'));
+        else if (request()->has('created_at_to'))
+            $transactionQuery->whereDate('created_at', '<=', request()->get('created_at_to'));
 
         if (request()->has('description')) {
             $words = explode(' ', request()->get('description'));
             foreach ($words AS $word)
                 $transactionQuery->where('meta->description', 'LIKE', "%{$word}%");
+        }
+
+        if(request()->has('remarks')) {
+            $words = explode(' ', request()->get('remarks'));
+            foreach ($words AS $word)
+                $transactionQuery->where('meta->remarks', 'LIKE', "%{$word}%");
+        }
+
+        if(request()->has('order_id')) {
+            $order_id = request()->get('order_id');
+            $transactionQuery->where('meta->remarks', 'LIKE', "%{$order_id}%");
+        }
+
+        if(request()->has('member_id')) {
+            $member_id = request()->get('member_id');
+            $transactionQuery->where('meta->member_id','LIKE', "%{$member_id}%");
         }
 
 

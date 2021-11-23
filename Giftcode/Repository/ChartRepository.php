@@ -20,10 +20,10 @@ class ChartRepository
         $this->model = new Giftcode();
     }
 
-    public function getGiftcodeByDateCollection($date_field,$from_date,$to_date,$user_id = null,$package_ids = [])
+    public function getGiftcodeByDateCollection($date_field,$from_date,$to_date,$user_id = null,$package_ids = [],$select=['created_at'])
     {
         try {
-            $giftcodes = $this->model->query();
+            $giftcodes = $this->model->query()->select($select);
 
             if($user_id)
                 $giftcodes->where('user_id','=',$user_id);
@@ -47,7 +47,7 @@ class ChartRepository
 
         $that = $this;
         $function_giftcode_collection = function($from_date,$to_date) use($that,$user_id) {
-          return $that->getGiftcodeByDateCollection('created_at',$from_date,$to_date,$user_id);
+          return $that->getGiftcodeByDateCollection('created_at',$from_date,$to_date,$user_id,[],['created_at','expiration_date','is_canceled','redeem_user_id']);
         };
 
         $sub_function_total = function ($collection, $intervals) {

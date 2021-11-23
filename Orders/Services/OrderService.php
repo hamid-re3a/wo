@@ -183,20 +183,20 @@ class OrderService implements OrdersServiceInterface
             return $that->order_repository->getActiveOrderWithPackageByDateForUserCollection($from_day, $to_day, $user);
         };
 
-        $sub_function_B = function ($collection, $intervals) {
-            $category = Category::query()->where('short_name', 'B')->first();
-            $packages = $category->packages()->pluck('id');
+        $category = Category::query()->where('short_name', 'B')->first();
+        $packages = $category->packages()->pluck('id');
+        $sub_function_B = function ($collection, $intervals) use ($packages) {
             return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count();
         };
-        $sub_function_I = function ($collection, $intervals) {
-            $category = Category::query()->where('short_name', 'I')->first();
-            $packages = $category->packages()->pluck('id');
+        $category = Category::query()->where('short_name', 'I')->first();
+        $packages = $category->packages()->pluck('id');
+        $sub_function_I = function ($collection, $intervals) use ($packages) {
             return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count();
         };
 
-        $sub_function_A = function ($collection, $intervals) {
-            $category = Category::query()->where('short_name', 'A')->first();
-            $packages = $category->packages()->pluck('id');
+        $category = Category::query()->where('short_name', 'A')->first();
+        $packages = $category->packages()->pluck('id');
+        $sub_function_A = function ($collection, $intervals) use ($packages) {
             return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count();
         };
 
@@ -221,26 +221,27 @@ class OrderService implements OrdersServiceInterface
             return $that->order_repository->getActiveOrderWithPackageByDateCollection($from_day, $to_day, $id);
         };
 
-        $sub_function_B = function ($collection, $intervals) {
-            $category = Category::query()->where('short_name', 'B')->first();
-            $packages = $category->packages()->pluck('id');
-            $all_count = $collection->whereBetween('created_at', $intervals)->count();
-            if ($all_count <= 0)
-                return 0;
-            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
-        };
-        $sub_function_I = function ($collection, $intervals) {
-            $category = Category::query()->where('short_name', 'I')->first();
-            $packages = $category->packages()->pluck('id');
+        $category = Category::query()->where('short_name', 'B')->first();
+        $packages = $category->packages()->pluck('id');
+        $sub_function_B = function ($collection, $intervals) use ($packages) {
             $all_count = $collection->whereBetween('created_at', $intervals)->count();
             if ($all_count <= 0)
                 return 0;
             return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
         };
 
-        $sub_function_A = function ($collection, $intervals) {
-            $category = Category::query()->where('short_name', 'A')->first();
-            $packages = $category->packages()->pluck('id');
+        $category = Category::query()->where('short_name', 'I')->first();
+        $packages = $category->packages()->pluck('id');
+        $sub_function_I = function ($collection, $intervals) use ($packages) {
+            $all_count = $collection->whereBetween('created_at', $intervals)->count();
+            if ($all_count <= 0)
+                return 0;
+            return $collection->whereIn('package_id', $packages)->whereBetween('created_at', $intervals)->count() / $all_count;
+        };
+
+        $category = Category::query()->where('short_name', 'A')->first();
+        $packages = $category->packages()->pluck('id');
+        $sub_function_A = function ($collection, $intervals) use ($packages) {
             $all_count = $collection->whereBetween('created_at', $intervals)->count();
             if ($all_count <= 0)
                 return 0;

@@ -25,6 +25,10 @@ ENV WEB_DOCUMENT_ROOT /app/public
 #supervisor
 COPY devops/supervisor.d/ /opt/docker/etc/supervisor.d/
 
+
+# nginx
+COPY devops/nginx-configs/ws.conf /opt/docker/etc/nginx/vhost.common.d/
+
 # src
 COPY . /app
 

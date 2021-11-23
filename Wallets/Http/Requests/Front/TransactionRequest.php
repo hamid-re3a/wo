@@ -50,7 +50,8 @@ class TransactionRequest extends FormRequest
             ],
             'description' => 'nullable|string',
             'remarks' => 'nullable|string',
-            'order_id' => 'nullable|integer'
+            'order_id' => 'nullable|integer',
+            'member_id' => 'nullable|integer'
         ];
 
     }

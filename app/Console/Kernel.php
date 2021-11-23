@@ -27,6 +27,8 @@ class Kernel extends ConsoleKernel
     {
 
         $schedule->command('invoices:check')->everyMinute();
+        $schedule->command('wallet:process-btc-withdrawals')->dailyAt('00:00');
+        $schedule->command('giftcode:check-giftcodes')->dailyAt('12:00');
     }
 
     /**

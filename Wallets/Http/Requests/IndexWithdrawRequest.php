@@ -26,7 +26,10 @@ class IndexWithdrawRequest extends FormRequest
     {
         return [
             'statuses' => 'required|array',
-            'statuses.*' => 'required|integer|in:' . implode(',',WALLET_WITHDRAW_COMMANDS)
+            'statuses.*' => 'required|integer|in:' . implode(',',WALLET_WITHDRAW_COMMANDS),
+            'withdraw_transaction_id' => 'nullable|integer',
+            'refund_transaction_id' => 'nullable|integer',
+            'member_id' => 'nullable|string'
         ];
 
     }

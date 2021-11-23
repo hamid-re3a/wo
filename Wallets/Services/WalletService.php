@@ -28,6 +28,27 @@ class WalletService implements WalletServiceInterface
 
     }
 
+    public function depositIntoCharityWallet(float $amount, array $description = null, string $type = null)
+    {
+        try {
+            DB::beginTransaction();
+            $charity_amount = calculateCharity($amount);
+            $walletUser = $this->walletUser(1);
+            $bankService = new BankService($walletUser);
+
+            $wallet_name = WALLET_NAME_CHARITY_WALLET;
+
+            $transaction = $bankService->deposit($wallet_name, $charity_amount, $description, true, $type);
+
+            DB::commit();
+            return $transaction;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            Log::error('Wallets\Services\WalletService@depositIntoCharityWallet => ' . $exception->getMessage());
+            throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
+        }
+    }
+
     public function deposit(Deposit $deposit): Deposit
     {
         try {
@@ -53,7 +74,7 @@ class WalletService implements WalletServiceInterface
             } else {
                 DB::rollBack();
                 Log::error('Deposit error 1 => ' . $deposit->getUserId() . ' | type => ' . $deposit->getType() . ' | subType => ' . $deposit->getSubType() . ' | walletName => ' .$deposit->getWalletName() );
-                throw new \Exception();
+                throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
             }
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -88,7 +109,7 @@ class WalletService implements WalletServiceInterface
             } else {
                 DB::rollBack();
                 Log::error('withdraw error 1 => ' . $withdraw->getUserId() . ' | type => ' . $withdraw->getType() . ' | subType => ' . $withdraw->getSubType() . ' | walletName => ' .$withdraw->getWalletName() );
-                throw new \Exception();
+                throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
             }
         } catch (\Throwable $exception) {
             DB::rollBack();
@@ -128,7 +149,7 @@ class WalletService implements WalletServiceInterface
             } else {
                 DB::rollBack();
                 Log::error('transfer error 1 :  from user id =>  ' . $transfer->getFromUserId() . ' | to user id => ' . $transfer->getToUserId() . ' | from wallet name => ' . $transfer->getFromWalletName() . ' | to wallet name => ' . $transfer->getToWalletName() );
-                throw new \Exception();
+                throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
             }
         } catch (\Throwable $exception) {
             DB::rollBack();

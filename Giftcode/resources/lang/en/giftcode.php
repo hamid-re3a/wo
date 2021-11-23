@@ -9,7 +9,8 @@ return [
         'something-went-wrong' => 'Oops, Something went wrong, Try again please.',
         'global-error' => 'An error occurred, Try again please.',
         'ok'=>'ok',
-        'email-key-doesnt-exists' => "giftcode email content doesn't exists",
+        'setting-key-doesnt-exists' => "setting key {:key} doesn't exists",
+        'email-key-doesnt-exists' => "giftcode email {:key} content doesn't exists",
         'not-valid-giftcode-id' => 'Giftcode ID is not valid',
 
         'giftcode-is-canceled-and-user-cant-cancel' => 'You can not cancel a giftcode again.',
@@ -21,6 +22,7 @@ return [
         'giftcode-is-canceled-and-user-cant-redeem' => 'You can not redeem a canceled giftcode.',
         'giftcode-is-used-and-user-cant-redeem' => 'You can not redeem a used giftcode.',
         'giftcode-is-expired-and-user-cant-redeem' => 'You can not redeem an expired giftcode.',
+        'incorrect-transaction-password' => 'Your transaction password is incorrect.',
 
     ],
     'validation' => [

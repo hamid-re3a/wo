@@ -4,6 +4,8 @@ namespace Wallets\Http\Requests\Front;
 
 use Illuminate\Foundation\Http\FormRequest;
 use User\Models\User;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 use Wallets\Services\BankService;
 
 class TransferFundFromDepositWalletRequest extends FormRequest
@@ -46,11 +48,18 @@ class TransferFundFromDepositWalletRequest extends FormRequest
                 'numeric',
                 'min:' . $this->minimum_amount,
                 'max:' . $this->maximum_amount,
-                function($attribute,$value,$fail){
-                    if(($value + $this->fee) > $this->wallet_balance)
-                        return $fail('Insufficient amount .');
+                function ($attribute, $value, $fail) {
+                    if (($value + $this->fee) > $this->wallet_balance)
+                        return $fail(trans('wallet.responses.not-enough-balance'));
                 }
             ],
+            'transaction_password' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($this->request->has('transaction_password') AND strlen($value) > 0 AND !checkTransactionPassword(auth()->user()->id, $value))
+                        return $fail(trans('wallet.responses.incorrect-transaction-password'));
+                }
+            ]
         ];
 
     }
@@ -59,7 +68,7 @@ class TransferFundFromDepositWalletRequest extends FormRequest
     {
         return [
             'amount.min' => 'Minimum allowed transfer is ' . formatCurrencyFormat($this->minimum_amount) . " PF .",
-            'amount.max' => 'Maximum allowed transfer is ' . formatCurrencyFormat($this->maximum_amount) ." PF .",
+            'amount.max' => 'Maximum allowed transfer is ' . formatCurrencyFormat($this->maximum_amount) . " PF .",
             'member_id.not_in' => 'You are not allowed transfer PF to your account .',
             'member_id.exists' => 'Invalid membership ID .',
         ];
@@ -78,7 +87,7 @@ class TransferFundFromDepositWalletRequest extends FormRequest
 
             $this->minimum_amount = getWalletSetting('minimum_transfer_fund_amount');
             $this->maximum_amount = getWalletSetting('maximum_transfer_fund_amount');
-            list($total, $fee) = $this->request->has('amount') ? calculateTransferFee($this->request->get('amount')) : [0,0];
+            list($total, $fee) = $this->request->has('amount') ? calculateTransferFee($this->request->get('amount')) : [0, 0];
             $this->fee = $fee;
         }
     }

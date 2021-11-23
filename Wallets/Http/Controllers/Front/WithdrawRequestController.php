@@ -4,7 +4,6 @@ namespace Wallets\Http\Controllers\Front;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -111,7 +110,9 @@ class WithdrawRequestController extends Controller
             ]);
         } catch (\Throwable $exception) {
             Log::error('WithdrawRequestController@withdraw_requests => ' . serialize(request()->all()));
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
     }
 
@@ -162,7 +163,9 @@ class WithdrawRequestController extends Controller
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('WithdrawRequestController@create_withdraw_request, User => ' . auth()->user()->id . ' => ' . serialize($request->all()));
-            throw $exception;
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
         }
 
     }

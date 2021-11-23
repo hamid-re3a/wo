@@ -38,8 +38,8 @@ class DashboardController extends Controller
 //                $subQuery->where('name', '=', 'Funds transferred');
 //            })->sum('amount');
 
-        $total_transferred = $this->transaction_repository->getTransactionsSumByPivotTypes(null,null,['Funds transferred']);
-        $current_balance = Wallet::query()->where('name','=',WALLET_NAME_DEPOSIT_WALLET)->where('id','<>',1)->sum('balance');
+        $total_transferred = $this->transaction_repository->getTransactionsSumByPivotTypes(['Funds transferred'],null,null);
+        $current_balance = Wallet::query()->where('name','=',WALLET_NAME_DEPOSIT_WALLET)->where('id','<>',WALLET_ADMIN_DEPOSIT_ID)->sum('balance');
 
         return api()->success(null,[
             'total_transferred' => $total_transferred['funds_transferred_sum'],
@@ -86,7 +86,7 @@ class DashboardController extends Controller
             'Trainer Bonus',
         ];
 
-        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes(null,null,$commissions));
+        return api()->success(null, $this->transaction_repository->getTransactionsSumByPivotTypes($commissions,null,null));
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Wallets\Services;
+namespace Kyc\Services;
 
 
 use Kyc\Services\Grpc\Acknowledge;

@@ -78,15 +78,15 @@ class EarningWalletFeatureTest extends WalletTest
     public function transfer_fund_preview_sufficient_balance()
     {
         Mail::fake();
-        $user_1 = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user_1);
+        $this->mockTransactionPasswordGrpcRequest();
+        $bank_service = new BankService($this->user);
         $bank_service->deposit('Earning Wallet', 30000);
 
-        $user_2 = User::factory()->create();
         $response = $this->postJson(route('wallets.customer.earning.transfer-funds-preview'), [
             'amount' => 101,
-            'member_id' => $user_2->member_id,
-            'own_deposit_wallet' => false
+            'member_id' => $this->user_2->member_id,
+            'own_deposit_wallet' => false,
+            'transaction_password' => 123
         ]);
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -109,11 +109,13 @@ class EarningWalletFeatureTest extends WalletTest
      */
     public function transfer_fund_preview_insufficient_balance()
     {
-        $user_2 = User::factory()->create();
+        Mail::fake();
+        $this->mockTransactionPasswordGrpcRequest();
         $response = $this->postJson(route('wallets.customer.earning.transfer-funds-preview'), [
             'amount' => 101,
-            'member_id' => $user_2->member_id,
-            'own_deposit_wallet' => false
+            'member_id' => $this->user_2->member_id,
+            'own_deposit_wallet' => false,
+            'transaction_password' => 123
         ]);
         $response->assertStatus(422);
         $response->assertJsonStructure([
@@ -130,12 +132,13 @@ class EarningWalletFeatureTest extends WalletTest
      */
     public function transfer_fund_insufficient_balance()
     {
-
-        $user_2 = User::factory()->create();
+        Mail::fake();
+        $this->mockTransactionPasswordGrpcRequest();
         $response = $this->postJson(route('wallets.customer.earning.transfer-funds'), [
             'amount' => 101,
-            'member_id' => $user_2->member_id,
-            'own_deposit_wallet' => false
+            'member_id' => $this->user_2->member_id,
+            'own_deposit_wallet' => false,
+            'transaction_password' => 123
         ]);
         $response->assertStatus(422);
         $response->assertJsonStructure([
@@ -153,15 +156,15 @@ class EarningWalletFeatureTest extends WalletTest
     public function transfer_fund_sufficient_balance()
     {
         Mail::fake();
-        $user_1 = User::query()->where('username', '=', 'admin')->first();
-        $bank_service = new BankService($user_1);
+        $this->mockTransactionPasswordGrpcRequest();
+        $bank_service = new BankService($this->user);
         $bank_service->deposit('Earning Wallet', 30000);
 
-        $user_2 = User::factory()->create();
         $response = $this->postJson(route('wallets.customer.earning.transfer-funds'), [
             'amount' => 101,
-            'member_id' => $user_2->member_id,
-            'own_deposit_wallet' => false
+            'member_id' => $this->user_2->member_id,
+            'own_deposit_wallet' => false,
+            'transaction_password' => 123
         ]);
         $response->assertStatus(200);
         $response->assertJsonStructure([

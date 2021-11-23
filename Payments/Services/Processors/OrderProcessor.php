@@ -5,9 +5,11 @@ namespace Payments\Services\Processors;
 
 
 use MLM\Services\Grpc\Acknowledge;
+use MLM\Services\MlmClientFacade;
 use Orders\Services\Grpc\Id;
 use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
+use Packages\Services\PackageService;
 use Payments\Jobs\EmailJob;
 use Payments\Mail\Payment\EmailInvoiceExpired;
 use Payments\Mail\Payment\EmailInvoicePaid;
@@ -15,6 +17,7 @@ use Payments\Mail\Payment\EmailInvoicePaidComplete;
 use Payments\Mail\Payment\EmailInvoicePaidPartial;
 use Payments\Models\Invoice;
 use User\Models\User;
+use Wallets\Services\WalletService;
 
 class OrderProcessor extends ProcessorAbstract
 {
@@ -74,20 +77,29 @@ class OrderProcessor extends ProcessorAbstract
 
         //Send order to MLM
         /**
-         * @var $submit_response Acknowledge
          * @var $order_service Order
          */
         $order_service = $this->order_service;
         $order_service->setIsPaidAt(now()->toDateTimeString());
         $order_service->setIsResolvedAt(now()->toDateTimeString());
-        list($submit_response, $flag) = getMLMGrpcClient()->submitOrder($order_service)->wait();
-        if ($flag->code != 0)
-            throw new \Exception('MLM Not responding', 406);
+        $acknowledge = MlmClientFacade::submitOrder($order_service);
 
 
-        if ($submit_response->getStatus()) {
+        if ($acknowledge->getMessage()) {
+            $package_service = app(PackageService::class);
+            $package_object = $package_service->packageFullById(app(\Packages\Services\Grpc\Id::class)->setId($this->order_service->getPackageId()));
+
+            //Deposit to Charity
+            $wallet_service = app(WalletService::class);
+            $wallet_service->depositIntoCharityWallet($order_service->getPackagesCostInPf(),[
+                'order_id' => $order_service->getId(),
+                'member_id' => $this->user->member_id,
+                'package_name' => $package_object->getName() . '(' . $package_object->getShortName() .')',
+            ],'Package purchased');
+
+
             //Update order
-            $order_service->setIsCommissionResolvedAt($submit_response->getCreatedAt());
+            $order_service->setIsCommissionResolvedAt($acknowledge->getCreatedAt());
             app(OrderService::class)->updateOrder($order_service);
 
             $this->invoice_db->update([
@@ -98,6 +110,8 @@ class OrderProcessor extends ProcessorAbstract
 
             // send thank you email notification
             EmailJob::dispatch(new EmailInvoicePaidComplete($this->user->getGrpcMessage(), $this->invoice_db), $this->user->email);
+        } else {
+            throw new \Exception($acknowledge->getMessage(),400);
         }
 
     }

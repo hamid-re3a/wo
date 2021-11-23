@@ -20,8 +20,8 @@ class WalletRepository
 
     public function getOverAllSum(int $wallet_id = null, int $user_id = null): array
     {
-        $main_types_sum = $this->transaction_repository->getTransactionsSumByMainTypes($user_id,$wallet_id,['deposit','withdraw']);
-        $pivot_types_sum = $this->transaction_repository->getTransactionsSumByPivotTypes($user_id,$wallet_id,['Funds transferred']);
+        $main_types_sum = $this->transaction_repository->getTransactionsSumByMainTypes(['deposit','withdraw'],$user_id,$wallet_id);
+        $pivot_types_sum = $this->transaction_repository->getTransactionsSumByPivotTypes(['Funds transferred'],$user_id,$wallet_id,);
 
         return [
             (double) $main_types_sum['deposit_sum'],

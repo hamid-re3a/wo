@@ -57,7 +57,7 @@ class TransferFundFromEarningWalletRequest extends FormRequest
                 'max:' . $this->maximum_amount,
                 function($attribute,$value,$fail){
                     if(($value + $this->fee) > $this->wallet_balance)
-                        return $fail('Insufficient amount .');
+                        return $fail(trans('wallet.responses.not-enough-balance'));
                 }
             ],
         ];
@@ -92,7 +92,7 @@ class TransferFundFromEarningWalletRequest extends FormRequest
             }
         } catch (\Throwable $exception){
             Log::error('Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest@prepare => ' . $exception->getMessage());
-            throw new \Exception();
+            throw new \Exception(trans('wallets.responses.something-went-wrong'), 400);
         }
     }
 

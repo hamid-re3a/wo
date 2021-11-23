@@ -27,16 +27,12 @@ class WalletService implements WalletServiceInterface
         );
 
     }
-    public function calculateCharity(int $amount): float
-    {
-        return calculateCharity($amount);
-    }
 
     public function depositIntoCharityWallet(float $amount, array $description = null, string $type = null)
     {
         try {
             DB::beginTransaction();
-            $charity_amount = $this->calculateCharity($amount);
+            $charity_amount = calculateCharity($amount);
             $walletUser = $this->walletUser(1);
             $bankService = new BankService($walletUser);
 

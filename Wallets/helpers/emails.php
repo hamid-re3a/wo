@@ -2,6 +2,7 @@
 
 CONST WALLET_EMAIL_CONTENTS = [
     'TRANSFER_FUNDS_SENDER' => [
+        'key' => 'TRANSFER_FUNDS_SENDER',
         'is_active' => true,
         'subject' => 'You transferred funds',
         'from' => 'it@dreamcometrue.ai',
@@ -24,6 +25,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'type' => 'email',
     ],
     'TRANSFER_FUNDS_RECEIVER' => [
+        'key' => 'TRANSFER_FUNDS_RECEIVER',
         'is_active' => true,
         'subject' => 'You received funds',
         'from' => 'it@dreamcometrue.ai',
@@ -46,6 +48,7 @@ CONST WALLET_EMAIL_CONTENTS = [
     ],
 
     'PAYMENT_REQUEST' => [
+        'key' => 'PAYMENT_REQUEST',
         'is_active' => true,
         'subject' => '{{request_first_name}} sent you a payment request',
         'from' => 'it@dreamcometrue.ai',
@@ -66,6 +69,7 @@ CONST WALLET_EMAIL_CONTENTS = [
     ],
 
     'WITHDRAW_REQUEST_SUBMITTED' => [
+        'key' => 'WITHDRAW_REQUEST_SUBMITTED',
         'is_active' => true,
         'subject' => 'We received your withdrawal request',
         'from' => 'it@dreamcometrue.ai',
@@ -98,6 +102,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'type' => 'email',
     ],
     'WITHDRAW_REQUEST_REJECTED' => [
+        'key' => 'WITHDRAW_REQUEST_REJECTED',
         'is_active' => true,
         'subject' => 'Your withdrawal request rejected',
         'from' => 'it@dreamcometrue.ai',
@@ -132,6 +137,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'type' => 'email',
     ],
     'WITHDRAW_REQUEST_PROCESSED' => [
+        'key' => 'WITHDRAW_REQUEST_PROCESSED',
         'is_active' => true,
         'subject' => 'Your withdrawal request processed',
         'from' => 'it@dreamcometrue.ai',
@@ -165,6 +171,7 @@ CONST WALLET_EMAIL_CONTENTS = [
         'type' => 'email',
     ],
     'WITHDRAW_REQUEST_POSTPONED' => [
+        'key' => 'WITHDRAW_REQUEST_POSTPONED',
         'is_active' => true,
         'subject' => 'Your withdrawal request postponed',
         'from' => 'it@dreamcometrue.ai',

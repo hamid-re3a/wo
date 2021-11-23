@@ -25,6 +25,7 @@ class TransactionRequest extends FormRequest
     public function rules()
     {
         return [
+            'transaction_id' => 'nullable|integer',
             'type' => 'nullable|in:deposit,withdraw',
             'amount' => 'nullable|numeric',
             'amount_from' => [
@@ -37,18 +38,19 @@ class TransactionRequest extends FormRequest
                 'numeric',
                 request()->has('amount_from') ? 'gt:amount_from' : '',
             ],
-            'from_date' => [
+            'created_at_from' => [
                 'nullable',
                 'date',
-                request()->has('to_date') ? 'lt:' . request()->get('to_date') : 'before:tomorrow',
+                request()->has('created_at_to') ? 'lt:' . request()->get('created_at_to') : 'before:tomorrow',
             ],
-            'to_date' => [
+            'created_at_to' => [
                 'nullable',
                 'date',
-                request()->has('from_date') ? 'gt:' . request()->get('from_date') : '',
-                'before:tomorrow'
+                request()->has('created_at_from') ? 'gt:' . request()->get('created_at_from') : 'before:tomorrow',
             ],
-            "description" => 'nullable|string'
+            'description' => 'nullable|string',
+            'remarks' => 'nullable|string',
+            'order_id' => 'nullable|integer'
         ];
 
     }

@@ -103,10 +103,30 @@ class WithdrawProfit extends Model
 
     /*
      * Methods
+     * Scopes
      */
     public function getTotalAmount()
     {
         return (double)($this->attributes['pf_amount'] + $this->attributes['fee']);
+    }
+
+    public function scopeFilter($query)
+    {
+        if(request()->has('withdraw_transaction_id')) {
+            $id = request()->get('withdraw_transaction_id');
+            $query->where('withdraw_transaction_id','LIKE', "%{$id}%");
+        }
+
+        if(request()->has('refund_transaction_id')) {
+            $id = request()->get('refund_transaction_id');
+            $query->where('refund_transaction_id','LIKE', "%{$id}%");
+        }
+
+        if(request()->has('member_id'))
+            $query->whereHas('user', function($subQuery){
+                $id = request()->get('member_id');
+                $subQuery->where('member_id','LIKE',"%{$id}%");
+            });
     }
 
 

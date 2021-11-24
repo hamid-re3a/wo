@@ -105,7 +105,7 @@ class User extends Model implements WalletFloat
 
     public function paidOrders()
     {
-        return $this->hasMany(Order::class, 'user_id', 'id')->whereNotNull('is_paid_at');
+        return $this->hasMany(Order::class, 'user_id', 'id')->resolved();
     }
 
     public function invoices()

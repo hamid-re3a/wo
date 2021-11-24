@@ -13,7 +13,7 @@ use Wallets\Http\Requests\Front\TransactionRequest;
 use Wallets\Http\Requests\Front\TransferFundFromEarningWalletRequest;
 use Wallets\Http\Resources\TransactionResource;
 use Wallets\Http\Resources\TransferResource;
-use Wallets\Http\Resources\EarningWalletResource;
+use Wallets\Http\Resources\WalletResource;
 use Wallets\Repositories\TransactionRepository;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
@@ -72,7 +72,7 @@ class EarningWalletController extends Controller
     public function index()
     {
         $this->prepareEarningWallet();
-        return api()->success(null, EarningWalletResource::make($this->walletObject));
+        return api()->success(null, WalletResource::make($this->walletObject));
 
     }
 

@@ -112,11 +112,16 @@ class GiftcodeTest extends TestCase
     {
 
         $this->deposit_user();
+        $ack = new \User\Services\Grpc\Acknowledge();
+        $ack->setStatus(true);
+
+        GatewayClientFacade::shouldReceive('checkTransactionPassword')->andReturn($ack);
         return $this->postJson(route('giftcodes.customer.create'), [
             'package_id' => 1,
             'user_id' => $this->user->id,
             'include_registration_fee' => true,
-            'wallet' => 'Deposit Wallet'
+            'wallet' => 'Deposit Wallet',
+            'transaction_password' => 123
         ]);
 
     }

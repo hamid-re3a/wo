@@ -11,6 +11,7 @@ use Payments\PaymentConfigure;
 use Spatie\Permission\Models\Role;
 use User\Models\User;
 use User\Services\GatewayClientFacade;
+use User\Services\Grpc\Acknowledge;
 use Wallets\database\seeders\UserWalletTableSeeder;
 use Wallets\WalletConfigure;
 use Tests\CreatesApplication;
@@ -65,5 +66,12 @@ class WalletTest extends TestCase
             'X-user-id' => $this->user->refresh()->id,
             'X-user-hash' => md5(serialize($this->user->getGrpcMessage())),
         ];
+    }
+
+    protected function mockTransactionPasswordGrpcRequest()
+    {
+        $ack = new Acknowledge();
+        $ack->setStatus(true);
+        GatewayClientFacade::shouldReceive('checkTransactionPassword')->andReturn($ack);
     }
 }

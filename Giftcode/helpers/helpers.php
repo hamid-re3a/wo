@@ -2,22 +2,24 @@
 
 
 use Illuminate\Support\Carbon;
+use User\Services\GatewayClientFacade;
+use User\Services\Grpc\UserTransactionPassword;
 
 if (!function_exists('giftcodeGetSetting')) {
 
     function giftcodeGetSetting($key)
     {
-        //Check if settings are available in cache
+//        Check if settings are available in cache
         if(cache()->has('giftcode_settings'))
             if($setting = collect(cache('giftcode_settings'))->where('name', $key)->first())
                 return $setting['value'];
-        $setting = \Giftcode\Models\Setting::whereName($key)->first();
 
+        $setting = \Giftcode\Models\Setting::whereName($key)->first();
         if($setting)
             return $setting->value;
 
-        if(defined('GIFTCODE_SETTINGS') AND is_array(GIFTCODE_SETTINGS) AND array_key_exists($key,GIFTCODE_SETTINGS))
-            return GIFTCODE_SETTINGS[$key];
+        if(defined('GIFTCODE_SETTINGS') AND is_array(GIFTCODE_SETTINGS) AND array_key_exists($key,GIFTCODE_SETTINGS) AND array_key_exists('value',GIFTCODE_SETTINGS[$key]))
+            return GIFTCODE_SETTINGS[$key]['value'];
 
         throw new \Exception(trans('giftcode.responses.setting-key-doesnt-exists',['key' => $key]),400);
     }
@@ -28,17 +30,16 @@ if(!function_exists('giftcodeGetEmailContent')) {
     function giftcodeGetEmailContent($key)
     {
         $email = null;
-        //Check if email content is available in cache
+//        Check if email content is available in cache
         if(cache()->has('giftcode_email_contents'))
-            if(collect(cache('giftcode_email_contents'))->where('key', $key)->first())
-                $email = collect(cache('giftcode_email_contents'))->where('key', $key)->first();
-
+            if( $setting = collect(cache('giftcode_email_contents'))->where('key',$key)->first())
+                $email = $setting;
 
         if(empty($email) AND $email = \Giftcode\Models\EmailContent::where('key',$key)->first())
             $email = $email->toArray();
 
-        if(empty($email) AND defined('EMAIL_CONTENTS') AND is_array(EMAIL_CONTENTS) AND array_key_exists($key,EMAIL_CONTENTS))
-            $email = EMAIL_CONTENTS[$key];
+        if(empty($email) AND defined('GIFTCODE_EMAIL_CONTENTS') AND is_array(GIFTCODE_EMAIL_CONTENTS) AND array_key_exists($key,GIFTCODE_EMAIL_CONTENTS))
+            $email = GIFTCODE_EMAIL_CONTENTS[$key];
 
         if($email AND is_array($email)) {
             $email['from'] = env('MAIL_FROM', $email['from']);
@@ -109,4 +110,15 @@ if (!function_exists('chartMaker')) {
     }
 }
 
+if(!function_exists('checkTransactionPassword')) {
+    function checkTransactionPassword($user_id,$password) : bool{
+        $request = new UserTransactionPassword();
+        $request->setUserId($user_id);
+        $request->setTransactionPassword($password);
+        $ack = GatewayClientFacade::checkTransactionPassword($request);
+        if($ack->getStatus())
+            return true;
 
+        return false;
+    }
+}

@@ -3,6 +3,7 @@
 
 namespace Payments\tests;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Packages\PackageConfigure;
 use Payments\PaymentConfigure;
@@ -15,12 +16,14 @@ use User\Models\User;
 class PaymentTest extends TestCase
 {
     use CreatesApplication;
-//    use RefreshDatabase;
+    use RefreshDatabase;
 
-    public function setUp() : void
+    protected $user;
+    protected $user_2;
+
+    public function setUp(): void
     {
         parent::setUp();
-        Artisan::call('migrate:fresh');
         UserConfigure::seed();
         $this->withHeaders($this->getHeaders());
         PackageConfigure::seed();
@@ -38,23 +41,18 @@ class PaymentTest extends TestCase
 
     public function getHeaders()
     {
-        User::query()->firstOrCreate([
-            'id' => '1',
-            'first_name' => 'Admin',
-            'last_name' => 'Admin',
-            'member_id' => 1000,
-            'email' => 'work@sajidjaved.com',
-            'username' => 'admin',
-        ]);
-        $user = User::query()->first();
-        if(defined('USER_ROLES'))
+        if (defined('USER_ROLES'))
             foreach (USER_ROLES as $role)
                 Role::query()->firstOrCreate(['name' => $role]);
-        $user->assignRole([USER_ROLE_CLIENT,USER_ROLE_SUPER_ADMIN]);
-        $hash = md5(serialize($user->getGrpcMessage()));
+
+        Artisan::call('db:seed', ['--class' => "Wallets\database\seeders\UserWalletTableSeeder"]);
+        $this->user = User::factory()->create();
+        $this->user->assignRole([USER_ROLE_CLIENT, USER_ROLE_SUPER_ADMIN]);
+        $this->user_2 = User::factory()->create();
+        $this->user_2->assignRole([USER_ROLE_CLIENT, USER_ROLE_SUPER_ADMIN]);
         return [
-            'X-user-id' => '1',
-            'X-user-hash' => $hash,
+            'X-user-id' => $this->user->refresh()->id,
+            'X-user-hash' => md5(serialize($this->user->getGrpcMessage())),
         ];
     }
 }

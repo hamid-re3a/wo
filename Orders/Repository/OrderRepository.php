@@ -8,11 +8,18 @@ class OrderRepository
 {
     protected $entity_name = Order::class;
 
-    public function getCountOrders()
+    public function getResolvedOrdersCount()
     {
         /**@var $order Order */
         $order = new $this->entity_name;
-        return $order->query()->count();
+        return $order->query()->resolved()->count();
+    }
+
+    public function getCanceledOrdersCount()
+    {
+        /**@var $order Order */
+        $order = new $this->entity_name;
+        return $order->query()->canceled()->count();
     }
 
     public function getActiveOrdersSum()
@@ -39,7 +46,7 @@ class OrderRepository
         return $order->resolved()->active()->count();
     }
 
-    public function getExpiredOrders()
+    public function getExpiredOrdersCount()
     {
         /**@var $order Order */
         $order = new $this->entity_name;

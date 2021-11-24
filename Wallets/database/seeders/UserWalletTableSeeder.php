@@ -4,6 +4,7 @@ namespace Wallets\database\seeders;
 
 use Illuminate\Database\Seeder;
 use User\Models\User;
+use Wallets\Models\Transaction;
 use Wallets\Services\BankService;
 
 /**
@@ -25,11 +26,12 @@ class UserWalletTableSeeder extends Seeder
 
         $bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);
         $bankService->getWallet(WALLET_NAME_EARNING_WALLET);
-        $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET,10000000);
-        if (!in_array(app()->environment(), ['production'])) {
+        if (!in_array(app()->environment(), ['production']) AND Transaction::query()->count() == 0 ) {
             /**
              *
              */
+            $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET,10000000);
+
             $user = User::query()->firstOrCreate(['id' => 2]);
             $bankService = new BankService($user);
             $bankService->getWallet(WALLET_NAME_DEPOSIT_WALLET);

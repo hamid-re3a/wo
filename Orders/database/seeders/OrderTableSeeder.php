@@ -19,10 +19,10 @@ class OrderTableSeeder extends Seeder
      */
     public function run()
     {
-        fwrite(STDOUT,  __CLASS__.PHP_EOL);
+        fwrite(STDOUT, __CLASS__ . PHP_EOL);
         // Load local seeder
         $data = [];
-        if (!in_array(app()->environment(), ['production'])) {
+        if (!in_array(app()->environment(), ['production', 'staging']) AND Order::query()->count() == 0) {
 
             $data = [
                 ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],
@@ -51,17 +51,14 @@ class OrderTableSeeder extends Seeder
             ];
         }
         foreach ($data as $item) {
-            if (app()->environment() != 'testing') {
-                app(UserService::class)->findByIdOrFail($item['user_id']);
-            } else {
-                if (!User::query()->where('id',$item['user_id'])->exists()) {
 
-                    $user = User::query()->firstOrCreate(['id' => $item['user_id']]);
-                    $attributes = User::factory()->raw();
-                    $user->update($attributes);
-                }
+            if (!User::query()->where('id', $item['user_id'])->exists()) {
 
+                $user = User::query()->firstOrCreate(['id' => $item['user_id']]);
+                $attributes = User::factory()->raw();
+                $user->update($attributes);
             }
+
             Order::query()->create([
                 'user_id' => $item['user_id'],
                 'total_cost_in_pf' => 118.99,
@@ -77,7 +74,7 @@ class OrderTableSeeder extends Seeder
                 'plan' => ORDER_PLAN_START
             ]);
         }
-        fwrite(STDOUT,  __CLASS__.PHP_EOL);
+        fwrite(STDOUT, __CLASS__ . PHP_EOL);
 
     }
 }

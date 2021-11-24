@@ -10,9 +10,7 @@ use Wallets\Http\Requests\Admin\SubmitRemarkRequest;
 use Wallets\Http\Requests\ChartTypeRequest;
 use Wallets\Http\Resources\Admin\CharityWalletResource;
 use Wallets\Http\Resources\Admin\CharityWalletTransactionResource;
-use Wallets\Http\Resources\DepositWalletResource;
 use Wallets\Http\Requests\Front\TransactionRequest;
-use Wallets\Http\Resources\TransactionResource;
 use Wallets\Repositories\WalletRepository;
 use Wallets\Services\BankService;
 

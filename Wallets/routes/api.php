@@ -50,6 +50,7 @@ Route::middleware('auth')->name('wallets.')->group(function(){
                 Route::patch('',[AdminWithdrawRequestController::class,'update'])->name('update');
 
                 Route::prefix('charts')->name('charts')->group(function(){
+                    Route::post('overall-amount-vs-time',[AdminWithdrawRequestController::class,'overallAmountVsTimeChart'])->name('overall-amount-vs-time');
                     Route::post('pending-amount-vs-time',[AdminWithdrawRequestController::class,'pendingAmountVsTimeChart'])->name('pending-amount-vs-time');
                     Route::post('paid-amount-vs-time',[AdminWithdrawRequestController::class,'paidAmountVsTimeChart'])->name('paid-amount-vs-time');
                 });

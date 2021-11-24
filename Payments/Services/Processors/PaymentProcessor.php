@@ -105,7 +105,9 @@ class PaymentProcessor
         } catch (\Throwable $exception) {
             DB::rollBack();
             Log::error('PaymentProcessor@payFromGiftcode error ' . $exception->getMessage());
-            return [false,$exception->getMessage()];
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'giftcode' => [$exception->getMessage()],
+            ]);
         }
     }
 
@@ -151,6 +153,10 @@ class PaymentProcessor
             $withdraw_service->setDescription(serialize($description));
             $withdraw_service->setAmount($invoice_request->getPfAmount());
             $withdraw_response = $wallet_service->withdraw($withdraw_service);
+
+            //Deposit to Charity wallet
+            $wallet_service = app(WalletService::class);
+            $wallet_service->depositIntoCharityWallet($order_object->getPackagesCostInPf(),$description,'Package purchased');
 
             //Do withdraw
             if (empty($withdraw_response->getTransactionId()))

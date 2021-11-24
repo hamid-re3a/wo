@@ -22,6 +22,7 @@ return [
         'giftcode-is-canceled-and-user-cant-redeem' => 'You can not redeem a canceled giftcode.',
         'giftcode-is-used-and-user-cant-redeem' => 'You can not redeem a used giftcode.',
         'giftcode-is-expired-and-user-cant-redeem' => 'You can not redeem an expired giftcode.',
+        'incorrect-transaction-password' => 'Your transaction password is incorrect.',
 
     ],
     'validation' => [

@@ -1,10 +1,11 @@
 <?php
 
-CONST EMAIL_CONTENTS = [
+CONST GIFTCODE_EMAIL_CONTENTS = [
     'GIFT_CODE_CREATED' => [
+        'key' => 'GIFT_CODE_CREATED',
         'is_active' => true,
         'subject'=>'Gift code created is created',
-        'from'=>'it@dreamcometrue.com',
+        'from'=>'it@dreamcometrue.ai',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -26,9 +27,10 @@ CONST EMAIL_CONTENTS = [
         'type'=>'email',
     ],
     'GIFT_CODE_CANCELED' => [
+        'key' => 'GIFT_CODE_CANCELED',
         'is_active' => true,
         'subject'=>'Gift code is canceled',
-        'from'=>'it@dreamcometrue.com',
+        'from'=>'it@dreamcometrue.ai',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -44,9 +46,10 @@ CONST EMAIL_CONTENTS = [
         'type'=>'email',
     ],
     'GIFTCODE_REDEEMED_CREATOR_EMAIL' => [
+        'key' => 'GIFTCODE_REDEEMED_CREATOR_EMAIL',
         'is_active' => true,
         'subject'=>'Giftcode is used',
-        'from'=>'it@dreamcometrue.com',
+        'from'=>'it@dreamcometrue.ai',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -62,9 +65,10 @@ CONST EMAIL_CONTENTS = [
         'type'=>'email',
     ],
     'GIFTCODE_REDEEMED_REDEEMER_EMAIL' => [
+        'key' => 'GIFTCODE_REDEEMED_REDEEMER_EMAIL',
         'is_active' => true,
         'subject'=>'You redeemed a gift code',
-        'from'=>'it@dreamcometrue.com',
+        'from'=>'it@dreamcometrue.ai',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -82,9 +86,10 @@ CONST EMAIL_CONTENTS = [
         'type'=>'email',
     ],
     'GIFTCODE_WILL_EXPIRING_SOON_EMAIL' => [
+        'key' => 'GIFTCODE_WILL_EXPIRING_SOON_EMAIL',
         'is_active' => true,
         'subject'=>'Gift code is expiring soon',
-        'from'=>'it@dreamcometrue.com',
+        'from'=>'it@dreamcometrue.ai',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>
@@ -99,9 +104,10 @@ CONST EMAIL_CONTENTS = [
         'type'=>'email',
     ],
     'GIFTCODE_EXPIRED_EMAIL' => [
+        'key' => 'GIFTCODE_EXPIRED_EMAIL',
         'is_active' => true,
         'subject'=>'Gift code is expired',
-        'from'=>'it@dreamcometrue.com',
+        'from'=>'it@dreamcometrue.ai',
         'from_name'=>'Janex Support Team',
         'body'=><<<EOT
                 <div>

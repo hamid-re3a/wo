@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Payments\Http\Requests\Admin\RefundOverPaidInvoiceRequest;
+use Payments\Http\Requests\Admin\RefundOrCancelOverPaidInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowInvoiceRequest;
 use Payments\Http\Requests\Invoice\ShowOrderTransactionsRequest;
 use Payments\Http\Resources\Admin\InvoiceResource;
@@ -64,18 +64,19 @@ class InvoiceController extends Controller
      * Refund overpaid invoice
      * @group
      * Admin User > Payments > Invoices
-     * @param RefundOverPaidInvoiceRequest $request
+     * @param RefundOrCancelOverPaidInvoiceRequest $request
      * @return JsonResponse
      * @throws \Throwable
      */
-    public function refundOverPaidInvoice(RefundOverPaidInvoiceRequest $request)
+    public function refundOverPaidInvoice(RefundOrCancelOverPaidInvoiceRequest $request)
     {
         try {
             DB::beginTransaction();
             $invoice = Invoice::query()->whereTransactionId($request->get('transaction_id'))->first();
-            $refundable_amount = $this->refundToUserWallet($invoice);
+            $refundable_amount = $this->refundToWallet($invoice,true);
 
             $invoice->update([
+                'refund_status' => 'user',
                 'is_refund_at' => now()->toDateTimeString(),
                 'refunder_user_id' => auth()->user()->id ,
                 'deposit_amount' => $refundable_amount
@@ -88,6 +89,40 @@ class InvoiceController extends Controller
             Log::error('Payments\Http\Controllers\Admin\InvoiceController@refundOverPaidInvoice error => ' . $exception->getMessage());
             if(isset($invoice))
                 Log::error('Payments\Http\Controllers\Admin\InvoiceController@refundOverPaidInvoice error => ' . $invoice->id);
+            return api()->error(null,null,$exception->getCode(),[
+                'subject' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Cancel overpaid invoice
+     * @group
+     * Admin User > Payments > Invoices
+     * @param RefundOrCancelOverPaidInvoiceRequest $request
+     * @return JsonResponse
+     * @throws \Throwable
+     */
+    public function cancelOverPaidInvoice(RefundOrCancelOverPaidInvoiceRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+            $invoice = Invoice::query()->whereTransactionId($request->get('transaction_id'))->first();
+            $this->refundToWallet($invoice,false);
+
+            $invoice->update([
+                'refund_status' => 'admin',
+                'is_refund_at' => now()->toDateTimeString(),
+                'refunder_user_id' => auth()->user()->id
+            ]);
+
+            DB::commit();
+
+            return api()->success();
+        } catch (\Throwable $exception) {
+            Log::error('Payments\Http\Controllers\Admin\InvoiceController@cancelOverPaidInvoice error => ' . $exception->getMessage());
+            if(isset($invoice))
+                Log::error('Payments\Http\Controllers\Admin\InvoiceController@cancelOverPaidInvoice error => ' . $invoice->id);
             return api()->error(null,null,$exception->getCode(),[
                 'subject' => $exception->getMessage()
             ]);
@@ -191,18 +226,18 @@ class InvoiceController extends Controller
 
     /**
      * @param $invoice
+     * @param bool $user_wallet
      * @return float
      * @throws \Exception
      */
-    private function refundToUserWallet($invoice)
+    private function refundToWallet(Invoice $invoice,$user_wallet = true)
     {
-        $total_paid_amount_in_pf = usdToPf($invoice->paid_amount * $invoice->rate);
-        $refundable_amount = $total_paid_amount_in_pf - $invoice->pf_amount;
+        $to_user = $user_wallet ? $invoice->user_id : 1;
         $wallet_service = app(WalletService::class);
         //Deposit Service
         $deposit_service = app(Deposit::class);
-        $deposit_service->setUserId($invoice->user_id);
-        $deposit_service->setAmount($refundable_amount);
+        $deposit_service->setUserId($to_user);
+        $deposit_service->setAmount($invoice->getRefundableAmount());
         $deposit_service->setType('Refund overpaid invoice');
         $deposit_service->setDescription('Refund Invoice #' . $invoice->transaction_id);
         $deposit_service->setWalletName(WalletNames::DEPOSIT);
@@ -215,9 +250,9 @@ class InvoiceController extends Controller
 
         //Deposit check
         if (!is_string($deposit->getTransactionId()))
-            throw new \Exception('Deposit Wallet Error',400);
+            throw new \Exception('Refund error',400);
 
-        return $refundable_amount;
+        return $invoice->getRefundableAmount();
     }
 
 }

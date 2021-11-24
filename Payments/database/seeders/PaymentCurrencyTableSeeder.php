@@ -8,6 +8,7 @@ class PaymentCurrencyTableSeeder extends Seeder
 {
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         if (PaymentCurrency::query()->count() > 0)
         return;
         if(is_null(config('payment.payment_currencies')))
@@ -22,6 +23,7 @@ class PaymentCurrencyTableSeeder extends Seeder
                 ]);
             }
         }
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 
 }

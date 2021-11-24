@@ -18,6 +18,7 @@ class SettingTableSeeder extends Seeder
      */
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         foreach (SETTINGS as $key => $setting) {
             $key = Setting::query()->firstOrCreate([
                 'key' => $key
@@ -50,7 +51,7 @@ class SettingTableSeeder extends Seeder
                 ]);
             }
         }
-
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
 
     }
 }

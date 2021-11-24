@@ -8,6 +8,7 @@ class CategoryTableSeeder extends Seeder
 {
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         if (Category::query()->count() > 0)
             return;
         if(is_null(config('package.categories')))
@@ -27,7 +28,7 @@ class CategoryTableSeeder extends Seeder
                 ]);
             }
         }
-
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 
 }

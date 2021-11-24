@@ -18,6 +18,7 @@ class UserWalletTableSeeder extends Seeder
      */
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         $user = User::query()->firstOrCreate(['id' => 1]);
 
         $bankService = new BankService($user);
@@ -49,5 +50,6 @@ class UserWalletTableSeeder extends Seeder
 
 
         }
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 }

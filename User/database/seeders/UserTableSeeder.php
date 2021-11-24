@@ -18,27 +18,28 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-
+        fwrite(STDOUT, __CLASS__.PHP_EOL);
         if (defined('USER_ROLES'))
             foreach (USER_ROLES as $role)
                 Role::query()->firstOrCreate(['name' => $role]);
         if (User::query()->count() > 0)
             return;
         // Load local seeder
-            $admin = User::query()->firstOrCreate(['id' => 1]);
-            $admin->update([
-                'first_name' => 'Admin',
-                'last_name' => 'Admin',
-                'member_id' => 1000,
-                'email' => 'work@sajidjaved.com',
-                'username' => 'admin',
-            ]);
+        $admin = User::query()->firstOrCreate(['id' => 1]);
+        $admin->update([
+            'first_name' => 'Admin',
+            'last_name' => 'Admin',
+            'member_id' => 1000,
+            'email' => 'work@sajidjaved.com',
+            'username' => 'admin',
+        ]);
 
-            if (defined('USER_ROLE_SUPER_ADMIN'))
-                $admin->assignRole(USER_ROLE_SUPER_ADMIN);
+        if (defined('USER_ROLE_SUPER_ADMIN'))
+            $admin->assignRole(USER_ROLE_SUPER_ADMIN);
 
-            if (defined('USER_ROLE_CLIENT'))
-                $admin->assignRole(USER_ROLE_CLIENT);
+        if (defined('USER_ROLE_CLIENT'))
+            $admin->assignRole(USER_ROLE_CLIENT);
 
+        fwrite(STDOUT, __CLASS__.PHP_EOL);
     }
 }

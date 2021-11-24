@@ -10,6 +10,7 @@ class EmailContentSeeder extends Seeder
 {
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         if (defined('WALLET_EMAIL_CONTENTS') AND is_array(WALLET_EMAIL_CONTENTS)) {
             if (EmailContent::query()->count() == 0) {
                 $emails = [];
@@ -39,6 +40,7 @@ class EmailContentSeeder extends Seeder
                 cache(['wallet_email_contents' => $emails]);
             }
         }
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 
 }

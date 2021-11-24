@@ -8,6 +8,7 @@ class PaymentDriverTableSeeder extends Seeder
 {
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         if (PaymentDriver::query()->count() > 0)
         return;
         if(is_null(config('payment.payment_drivers')))
@@ -21,6 +22,7 @@ class PaymentDriverTableSeeder extends Seeder
                 ]);
             }
         }
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 
 }

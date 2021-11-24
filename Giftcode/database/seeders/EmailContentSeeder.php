@@ -9,6 +9,7 @@ class EmailContentSeeder extends Seeder
 {
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         if (defined('EMAIL_CONTENTS') AND is_array(EMAIL_CONTENTS)) {
             if (EmailContent::query()->count() == 0) {
 
@@ -37,6 +38,7 @@ class EmailContentSeeder extends Seeder
                 cache(['giftcode_email_contents' => $emails]);
             }
         }
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 
 }

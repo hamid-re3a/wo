@@ -18,7 +18,7 @@ class AdminWalletsSeeder extends Seeder
      */
     public function run()
     {
-
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         //Default wallets for admin, This wallets MUST be seed into database
         $user = User::query()->firstOrCreate(['id' => 1]);
         $bankService = new BankService($user);
@@ -26,8 +26,6 @@ class AdminWalletsSeeder extends Seeder
         $bankService->getWallet(WALLET_NAME_EARNING_WALLET);
         $bankService->getWallet(WALLET_NAME_CHARITY_WALLET);
 //        $bankService->deposit(WALLET_NAME_DEPOSIT_WALLET,10000000);
-
-
-
+        fwrite(STDOUT, __CLASS__.PHP_EOL);
     }
 }

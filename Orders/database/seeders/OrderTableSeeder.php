@@ -19,6 +19,7 @@ class OrderTableSeeder extends Seeder
      */
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         // Load local seeder
         $data = [];
         if (!in_array(app()->environment(), ['production'])) {
@@ -76,7 +77,7 @@ class OrderTableSeeder extends Seeder
                 'plan' => ORDER_PLAN_START
             ]);
         }
-
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
 
     }
 }

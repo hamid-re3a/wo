@@ -11,10 +11,12 @@ class SettingSeeder extends Seeder
 {
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         if(defined('GIFTCODE_SETTINGS')) {
             Setting::query()->upsert(GIFTCODE_SETTINGS, 'name');
             cache(['giftcode_settings' => GIFTCODE_SETTINGS]);
         }
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 
 }

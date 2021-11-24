@@ -8,6 +8,7 @@ class PackageTableSeeder extends Seeder
 {
     public function run()
     {
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
         if (Package::query()->count() > 0)
             return;
         if(is_null(config('package.packages')))
@@ -23,7 +24,7 @@ class PackageTableSeeder extends Seeder
                 ]);
             }
         }
-
+        fwrite(STDOUT,  __CLASS__.PHP_EOL);
     }
 
 }

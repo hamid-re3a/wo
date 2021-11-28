@@ -89,6 +89,14 @@ class Order extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>int64 package_id = 19;</code>
      */
     protected $package_id = 0;
+    /**
+     * Generated from protobuf field <code>int64 attach_user_id = 20;</code>
+     */
+    protected $attach_user_id = 0;
+    /**
+     * Generated from protobuf field <code>int64 attach_user_position = 21;</code>
+     */
+    protected $attach_user_position = 0;
 
     /**
      * Constructor.
@@ -115,6 +123,8 @@ class Order extends \Google\Protobuf\Internal\Message
      *     @type string $created_at
      *     @type string $updated_at
      *     @type int|string $package_id
+     *     @type int|string $attach_user_id
+     *     @type int|string $attach_user_position
      * }
      */
     public function __construct($data = NULL) {
@@ -536,6 +546,50 @@ class Order extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkInt64($var);
         $this->package_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 attach_user_id = 20;</code>
+     * @return int|string
+     */
+    public function getAttachUserId()
+    {
+        return $this->attach_user_id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 attach_user_id = 20;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setAttachUserId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->attach_user_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 attach_user_position = 21;</code>
+     * @return int|string
+     */
+    public function getAttachUserPosition()
+    {
+        return $this->attach_user_position;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 attach_user_position = 21;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setAttachUserPosition($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->attach_user_position = $var;
 
         return $this;
     }

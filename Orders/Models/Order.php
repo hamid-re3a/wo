@@ -218,6 +218,8 @@ class Order extends Model
         $order_service->setCreatedAt((string)$this->attributes['created_at']);
         $order_service->setUpdatedAt((string)$this->attributes['updated_at']);
 
+        $order_service->setAttachUserPosition((int)$this->attributes['attach_user_position']);
+        $order_service->setAttachUserId((int)$this->attributes['attach_user_id']);
         return $order_service;
     }
 

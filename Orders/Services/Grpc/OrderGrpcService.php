@@ -50,6 +50,8 @@ class OrderGrpcService implements OrdersServiceInterface
                 "from_user_id" => $user_who_pays_for_package->id,
                 "user_id" => $user_who_is_package_for->id,
                 "payment_type" => 'deposit',
+                "attach_user_position" => (int)$order->getAttachUserPosition(),
+                "attach_user_id" => (int)$order->getAttachUserId(),
                 "package_id" => $order->getPackageId(),
                 'validity_in_days' => $package->getValidityInDays(),
                 'plan' => $user_who_is_package_for->paidOrders()->exists() ? ORDER_PLAN_PURCHASE : ORDER_PLAN_START

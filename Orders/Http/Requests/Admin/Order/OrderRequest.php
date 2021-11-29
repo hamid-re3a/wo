@@ -27,7 +27,7 @@ class OrderRequest extends FormRequest
         return [
             'package_id' => 'required|numeric',
             'user_id' => 'required|exists:users,id',
-            'plan' => 'required|in:'.ORDER_PLAN_SPECIAL.'|'.ORDER_PLAN_COMPANY
+            'plan' => 'required|in:'.ORDER_PLAN_SPECIAL.','.ORDER_PLAN_COMPANY
         ];
     }
 

@@ -57,7 +57,7 @@ class PackageRepository
         $package_entity = new $this->entity_name;
         return $package_entity->with('category', 'packageIndirectCommission')
         ->whereHas('category', function(Builder $category){
-            $category->where('is_active','=',true);
+            $category->where('is_active','=',1);
         })->get();
     }
 

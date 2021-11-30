@@ -16,7 +16,7 @@ class CategoryTableSeeder extends Seeder
 
         foreach (config('package.categories') as $key => $setting) {
 
-            if (!Category::query()->whereKey($key)->exists()) {
+            if (!Category::query()->where('key',$key)->exists()) {
                 Category::query()->create([
                     'key' => $key,
                     'name' => $setting['name'],

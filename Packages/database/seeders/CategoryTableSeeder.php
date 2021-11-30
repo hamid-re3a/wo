@@ -9,8 +9,8 @@ class CategoryTableSeeder extends Seeder
     public function run()
     {
         fwrite(STDOUT,  __CLASS__.PHP_EOL);
-        if (Category::query()->count() > 0)
-            return;
+//        if (Category::query()->count() > 0)
+//            return;
         if(is_null(config('package.categories')))
             throw new \Exception('packages.config-key-setting-missing',400);
 
@@ -21,6 +21,7 @@ class CategoryTableSeeder extends Seeder
                     'key' => $key,
                     'name' => $setting['name'],
                     'short_name' => $setting['short_name'],
+                    'is_active' => $setting['is_active'],
                     'roi_percentage' => $setting['roi_percentage'],
                     'direct_percentage' => $setting['direct_percentage'],
                     'binary_percentage' => $setting['binary_percentage'],

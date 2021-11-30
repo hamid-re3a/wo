@@ -3,6 +3,7 @@
 
 namespace Packages\Repository;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Packages\Models\Package;
 use Packages\Services\Grpc\Id;
@@ -54,7 +55,10 @@ class PackageRepository
     public function getAll()
     {
         $package_entity = new $this->entity_name;
-        return $package_entity->with('category', 'packageIndirectCommission')->get();
+        return $package_entity->with('category', 'packageIndirectCommission')
+        ->whereHas('category', function(Builder $category){
+            $category->where('is_active','=',true);
+        })->get();
     }
 
     public function getCountAllPackageByMonth($from_month, $until_month)

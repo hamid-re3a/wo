@@ -9,8 +9,8 @@ class PackageTableSeeder extends Seeder
     public function run()
     {
         fwrite(STDOUT,  __CLASS__.PHP_EOL);
-        if (Package::query()->count() > 0)
-            return;
+//        if (Package::query()->count() > 0)
+//            return;
         if(is_null(config('package.packages')))
             throw new \Exception('packages.config-key-setting-missing',400);
 

@@ -6,6 +6,7 @@ return [
             "id" => 1,
             "name" => 'Beginner',
             "short_name" => 'B',
+            "is_active" => true,
 
             "roi_percentage" => 1,
             "direct_percentage" => 8,
@@ -17,6 +18,7 @@ return [
             "id" => 2,
             "name" => 'Intermediate',
             "short_name" => 'I',
+            "is_active" => true,
 
             "roi_percentage" => 1,
             "direct_percentage" => 8,
@@ -28,6 +30,7 @@ return [
             "id" => 3,
             "name" => 'Advance',
             "short_name" => 'A',
+            "is_active" => true,
 
             "roi_percentage" => 1,
             "direct_percentage" => 8,
@@ -35,17 +38,18 @@ return [
 
             "package_validity_in_days" => 200,
         ],
-//        'professional' => [
-//            "id" => 2,
-//            "name" => 'Professional',
-//            "short_name" => 'P',
-//
-//            "roi_percentage" => 1,
-//            "direct_percentage" => 8,
-//            "binary_percentage" => 10,
-//
-//            "package_validity_in_days" => 200,
-//        ],
+        'professional' => [
+            "id" => 2,
+            "name" => 'Professional',
+            "short_name" => 'P',
+            "is_active" => false,
+
+            "roi_percentage" => 1,
+            "direct_percentage" => 8,
+            "binary_percentage" => 10,
+
+            "package_validity_in_days" => 200,
+        ],
     ],
     'packages' => [
         /**
@@ -126,27 +130,27 @@ return [
         /**
          * Professional
          */
-//        [
-//            "name" => 'Pro 1',
-//            "short_name" => 'P1',
-//            'price' => 99999,
-//            'category_id' => 4,
-//        ], [
-//            "name" => 'Pro 2',
-//            "short_name" => 'P2',
-//            'price' => 299999,
-//            'category_id' => 4,
-//        ], [
-//            "name" => 'Pro 3',
-//            "short_name" => 'P3',
-//            'price' => 499999,
-//            'category_id' => 4,
-//        ], [
-//            "name" => 'Pro 4',
-//            "short_name" => 'P4',
-//            'price' => 999999,
-//            'category_id' => 4,
-//        ],
+        [
+            "name" => 'Pro 1',
+            "short_name" => 'P1',
+            'price' => 99999,
+            'category_id' => 4,
+        ], [
+            "name" => 'Pro 2',
+            "short_name" => 'P2',
+            'price' => 299999,
+            'category_id' => 4,
+        ], [
+            "name" => 'Pro 3',
+            "short_name" => 'P3',
+            'price' => 499999,
+            'category_id' => 4,
+        ], [
+            "name" => 'Pro 4',
+            "short_name" => 'P4',
+            'price' => 999999,
+            'category_id' => 4,
+        ],
 
     ],
     'categories-indirect-commissions' => [
@@ -237,43 +241,43 @@ return [
          * Pro indirect settings
          */
 
-//        [
-//            'category_id' => 4,
-//            'level' => 1,
-//            'percentage' => 3
-//        ], [
-//            'category_id' => 4,
-//            'level' => 2,
-//            'percentage' => 2
-//        ], [
-//            'category_id' => 4,
-//            'level' => 3,
-//            'percentage' => 1
-//        ], [
-//            'category_id' => 4,
-//            'level' => 4,
-//            'percentage' => 1
-//        ], [
-//            'category_id' => 4,
-//            'level' => 5,
-//            'percentage' => 1
-//        ], [
-//            'category_id' => 4,
-//            'level' => 6,
-//            'percentage' => 1
-//        ], [
-//            'category_id' => 4,
-//            'level' => 7,
-//            'percentage' => 1
-//        ], [
-//            'category_id' => 4,
-//            'level' => 8,
-//            'percentage' => 1
-//        ], [
-//            'category_id' => 4,
-//            'level' => 9,
-//            'percentage' => 1
-//        ],
+        [
+            'category_id' => 4,
+            'level' => 1,
+            'percentage' => 3
+        ], [
+            'category_id' => 4,
+            'level' => 2,
+            'percentage' => 2
+        ], [
+            'category_id' => 4,
+            'level' => 3,
+            'percentage' => 1
+        ], [
+            'category_id' => 4,
+            'level' => 4,
+            'percentage' => 1
+        ], [
+            'category_id' => 4,
+            'level' => 5,
+            'percentage' => 1
+        ], [
+            'category_id' => 4,
+            'level' => 6,
+            'percentage' => 1
+        ], [
+            'category_id' => 4,
+            'level' => 7,
+            'percentage' => 1
+        ], [
+            'category_id' => 4,
+            'level' => 8,
+            'percentage' => 1
+        ], [
+            'category_id' => 4,
+            'level' => 9,
+            'percentage' => 1
+        ],
     ]
 
 ];

@@ -49,6 +49,10 @@ class Package extends Model
     use SoftDeletes;
     protected $guarded = [];
 
+    public function scopeActive($query)
+    {
+        return $query->where('is_active' != false);
+    }
     /**
      * relation with Category
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

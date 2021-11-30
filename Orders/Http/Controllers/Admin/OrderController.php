@@ -13,6 +13,7 @@ use Orders\Http\Requests\Admin\Order\OrderRequest;
 use Orders\Http\Resources\Admin\OrderResource;
 use Orders\Models\Order;
 use MLM\Services\MlmClientFacade;
+use Packages\Models\Package;
 use Packages\Services\Grpc\Id;
 use Packages\Services\PackageService;
 use Payments\Services\PaymentService;
@@ -64,13 +65,19 @@ class OrderController extends Controller
             /**@var $user User */
             $user = auth()->user();
 
+
+            if($request->get('plan') == ORDER_PLAN_SPECIAL) {
+                $package = Package::query()->where('short_name','A1');
+            } else {
+                $package = Package::query()->where('short_name','P4');
+            }
             DB::beginTransaction();
             $now = now()->toDateTimeString();
             $order_db = Order::query()->create([
                 "from_user_id" => $user->id,
                 "user_id" => $request->get('user_id'),
                 "payment_type" => 'admin',
-                "package_id" => $request->get('package_id'),
+                "package_id" => $package->id,
                 'validity_in_days' => $package->getValidityInDays(),
                 'is_paid_at' => $now,
                 'is_resolved_at' => $now,

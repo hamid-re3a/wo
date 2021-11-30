@@ -25,7 +25,6 @@ class OrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'package_id' => 'required|numeric',
             'user_id' => 'required|exists:users,id',
             'plan' => 'required|in:'.ORDER_PLAN_SPECIAL.','.ORDER_PLAN_COMPANY
         ];
